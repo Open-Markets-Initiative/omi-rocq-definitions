@@ -1,0 +1,97 @@
+[![Siac](https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Images/Logo.png)](https://en.wikipedia.org/wiki/Securities_Industry_Automation_Corporation)
+
+
+## The Securities Industry Automation Corporation
+
+| Division | [Protocol][Omi.Siac.Protocol.Definitions] | [Encoding][Omi.Encoding.Definitions] | Version | Date | Size | [Deployment][Omi.Glossary.Deployment] | [Testing][Omi.Glossary.Testing] | [Documentation][Omi.Siac.Specifications] |
+| --- | --- | --- | --- | ---: | ---: | --- | --- | --- |
+| [Cqs][Cqs.Consolidator] | [Input][Siac.Cqs.Input] | [Cta][Omi.Encoding.Cta] | [2.9.b][Siac.Cqs.Input.Cta.v2.9.b.Definition] | 1/29/2026 | 682 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Cqs.Input.Cta.v2.9.b.Url] - [pdf][Siac.Cqs.Input.Cta.v2.9.b.Pdf] |
+| [Cqs][Cqs.Consolidator] | [Snapshot][Siac.Cqs.Snapshot] | [Cta][Omi.Encoding.Cta] | [1.0][Siac.Cqs.Snapshot.Cta.v1.0.Definition] | 1/24/2022 | 677 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Cqs.Snapshot.Cta.v1.0.Url] - [pdf][Siac.Cqs.Snapshot.Cta.v1.0.Pdf] |
+| [Cqs][Cqs.Consolidator] | [Snapshot][Siac.Cqs.Snapshot] | [Cta][Omi.Encoding.Cta] | [2.1][Siac.Cqs.Snapshot.Cta.v2.1.Definition] | 6/6/2025 | 864 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Cqs.Snapshot.Cta.v2.1.Url] - [pdf][Siac.Cqs.Snapshot.Cta.v2.1.Pdf] |
+| [Cts][Cts.Consolidator] | [Input][Siac.Cts.Input] | [Cta][Omi.Encoding.Cta] | [2.7.f][Siac.Cts.Input.Cta.v2.7.f.Definition] | 1/29/2026 | 925 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Cts.Input.Cta.v2.7.f.Url] - [pdf][Siac.Cts.Input.Cta.v2.7.f.Pdf] |
+| [Cts][Cts.Consolidator] | [Output][Siac.Cts.Output] | [Cta][Omi.Encoding.Cta] | [1.91][Siac.Cts.Output.Cta.v1.91.Definition] | 1/2/2020 | 932 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Cts.Output.Cta.v1.91.Url] - [pdf][Siac.Cts.Output.Cta.v1.91.Pdf] |
+| [Cts][Cts.Consolidator] | [Output][Siac.Cts.Output] | [Cta][Omi.Encoding.Cta] | [2.10][Siac.Cts.Output.Cta.v2.10.Definition] | 6/12/2024 | 2196 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Cts.Output.Cta.v2.10.Url] - [pdf][Siac.Cts.Output.Cta.v2.10.Pdf] |
+| [Cts][Cts.Consolidator] | [Output][Siac.Cts.Output] | [Cta][Omi.Encoding.Cta] | [2.11.b][Siac.Cts.Output.Cta.v2.11.b.Definition] | 1/29/2026 | 635 | [Active][Omi.Glossary.Deployment.Active] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Cts.Output.Cta.v2.11.b.Url] - [pdf][Siac.Cts.Output.Cta.v2.11.b.Pdf] |
+| [Cts][Cts.Consolidator] | [Output][Siac.Cts.Output] | [Cta][Omi.Encoding.Cta] | [2.9][Siac.Cts.Output.Cta.v2.9.Definition] | 12/16/2022 | 932 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Cts.Output.Cta.v2.9.Url] - [pdf][Siac.Cts.Output.Cta.v2.9.Pdf] |
+| [Opra][Opra.Consolidator] | [Headers][Siac.Opra.Headers] | [Udp][Omi.Encoding.Udp] | [1][Siac.Opra.Headers.Udp.v1.Definition] | 8/3/2022 | 99 | [Header][Omi.Glossary.Deployment.Header] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Opra.Headers.Udp.v1.Url] |
+| [Opra][Opra.Consolidator] | [Input][Siac.Opra.Input] | [Obi][Omi.Encoding.Obi] | [5.0.i][Siac.Opra.Input.Obi.v5.0.i.Definition] | 2/20/2026 | 1362 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Opra.Input.Obi.v5.0.i.Url] - [pdf][Siac.Opra.Input.Obi.v5.0.i.Pdf] |
+| [Opra][Opra.Consolidator] | [Output][Siac.Opra.Output] | [Obi][Omi.Encoding.Obi] | [4.0][Siac.Opra.Output.Obi.v4.0.Definition] | 1/17/2020 | 979 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Opra.Output.Obi.v4.0.Url] - [pdf][Siac.Opra.Output.Obi.v4.0.Pdf] |
+| [Opra][Opra.Consolidator] | [Output][Siac.Opra.Output] | [Obi][Omi.Encoding.Obi] | [6.1][Siac.Opra.Output.Obi.v6.1.Definition] | 3/25/2022 | 968 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Untested][Omi.Glossary.Testing.Untested] | [url][Siac.Opra.Output.Obi.v6.1.Url] - [pdf][Siac.Opra.Output.Obi.v6.1.Pdf] |
+| [Opra][Opra.Consolidator] | [Output][Siac.Opra.Output] | [Obi][Omi.Encoding.Obi] | [6.2][Siac.Opra.Output.Obi.v6.2.Definition] | 12/6/2024 | 1078 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Verified][Omi.Glossary.Testing.Verified] | [url][Siac.Opra.Output.Obi.v6.2.Url] - [pdf][Siac.Opra.Output.Obi.v6.2.Pdf] |
+| [Opra][Opra.Consolidator] | [Output][Siac.Opra.Output] | [Obi][Omi.Encoding.Obi] | [6.3.a][Siac.Opra.Output.Obi.v6.3.a.Definition] | 2/20/2026 | 1244 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [pdf][Siac.Opra.Output.Obi.v6.3.a.Pdf] - [url][Siac.Opra.Output.Obi.v6.3.a.Url] |
+
+
+<p align="center"><a href="https://en.wikipedia.org/wiki/Securities_Industry_Automation_Corporation" title="The Securities Industry Automation Corporation Website"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/Website.png" alt="Website" width="32" height="32"></a>&nbsp;&nbsp;<a href="https://en.wikipedia.org/wiki/Securities_Industry_Automation_Corporation" title="The Securities Industry Automation Corporation on Wikipedia"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/Wikipedia.png" alt="Wikipedia" width="32" height="32"></a></p>
+
+
+[Omi.Glossary.Deployment]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Protocol Deployment"
+[Omi.Glossary.Deployment.Active]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is in active production"
+[Omi.Glossary.Deployment.Deprecated]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is no longer in active use"
+[Omi.Glossary.Deployment.Pending]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is not yet deployed to an active production environment"
+[Omi.Glossary.Deployment.Observability]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is carried for observability rather than trading"
+[Omi.Glossary.Deployment.Header]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Header only protocol provided for debugging"
+[Omi.Glossary.Deployment.Unknown]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol deployment is unknown"
+[Omi.Glossary.Testing]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Protocol Testing Status"
+[Omi.Glossary.Testing.Verified]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has been tested on live data"
+[Omi.Glossary.Testing.Incomplete]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has been tested on live data but contains known issues"
+[Omi.Glossary.Testing.Beta]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has not been tested and structure is speculative"
+[Omi.Glossary.Testing.Untested]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has not been tested on live data"
+[Omi.Glossary.Testing.Unavailable]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol does not state a testing status"
+[Omi.Encoding.Definitions]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Protocols/ReadMe.md "Encoding Directory"
+[Omi.Siac.Protocol.Definitions]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Siac/Protocols "Siac Protocol Directory"
+[Omi.Siac.Specifications]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Siac/Specifications "Siac Specifications Directory"
+[Omi.Encoding.Cta]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Cta.md "Cta Encoding"
+[Omi.Encoding.Udp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Udp.md "Udp Encoding"
+[Omi.Encoding.Obi]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Obi.md "Obi Encoding"
+[Cqs.Consolidator]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Siac/Protocols/Cqs "Siac Cqs"
+[Cts.Consolidator]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Siac/Protocols/Cts "Siac Cts"
+[Opra.Consolidator]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Siac/Protocols/Opra "Siac Opra"
+[Siac.Cqs.Input]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cqs/Input.md ""
+[Siac.Cqs.Snapshot]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cqs/Snapshot.md "Snapshot"
+[Siac.Cts.Input]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cts/Input.md ""
+[Siac.Cts.Output]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cts/Output.md "Output"
+[Siac.Opra.Headers]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Opra/Headers.md "Headers"
+[Siac.Opra.Input]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Opra/Input.md "Input"
+[Siac.Opra.Output]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Opra/Output.md "Output"
+
+[Siac.Cqs.Input.Cta.v2.9.b.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cqs/input/Siac_Cqs_Input_v2_9_b.v "Siac Cqs Input Cta v2.9.b Rocq Definition"
+[Siac.Cqs.Input.Cta.v2.9.b.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.9.b Url"
+[Siac.Cqs.Input.Cta.v2.9.b.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Cqs/Input/Siac.Cqs.Input.Cta.v2.9.b.pdf "The Securities Industry Automation Corporation 2.9.b Pdf"
+[Siac.Cqs.Snapshot.Cta.v1.0.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cqs/snapshot/Siac_Cqs_Snapshot_v1_0.v "Siac Cqs Snapshot Cta v1.0 Rocq Definition"
+[Siac.Cqs.Snapshot.Cta.v1.0.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 1.0 Url"
+[Siac.Cqs.Snapshot.Cta.v1.0.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Cqs/Snapshot/Siac.Cqs.Snapshot.Cta.v1.0.pdf "The Securities Industry Automation Corporation 1.0 Pdf"
+[Siac.Cqs.Snapshot.Cta.v2.1.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cqs/snapshot/Siac_Cqs_Snapshot_v2_1.v "Siac Cqs Snapshot Cta v2.1 Rocq Definition"
+[Siac.Cqs.Snapshot.Cta.v2.1.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.1 Url"
+[Siac.Cqs.Snapshot.Cta.v2.1.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Cqs/Snapshot/Siac.Cqs.Snapshot.Cta.v2.1.pdf "The Securities Industry Automation Corporation 2.1 Pdf"
+[Siac.Cts.Input.Cta.v2.7.f.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cts/input/Siac_Cts_Input_v2_7_f.v "Siac Cts Input Cta v2.7.f Rocq Definition"
+[Siac.Cts.Input.Cta.v2.7.f.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.7.f Url"
+[Siac.Cts.Input.Cta.v2.7.f.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Cts/Input/Siac.Cts.Input.Cta.v2.7.f.pdf "The Securities Industry Automation Corporation 2.7.f Pdf"
+[Siac.Cts.Output.Cta.v1.91.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cts/output/Siac_Cts_Output_v1_91.v "Siac Cts Output Cta v1.91 Rocq Definition"
+[Siac.Cts.Output.Cta.v1.91.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 1.91 Url"
+[Siac.Cts.Output.Cta.v1.91.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Cts/Output/Siac.Cts.Output.Cta.v1.91.pdf "The Securities Industry Automation Corporation 1.91 Pdf"
+[Siac.Cts.Output.Cta.v2.10.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cts/output/Siac_Cts_Output_v2_10.v "Siac Cts Output Cta v2.10 Rocq Definition"
+[Siac.Cts.Output.Cta.v2.10.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.10 Url"
+[Siac.Cts.Output.Cta.v2.10.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Documentation/Siac.Cts.Output.Cta.v2.10.b.pdf "The Securities Industry Automation Corporation 2.10 Pdf"
+[Siac.Cts.Output.Cta.v2.11.b.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cts/output/Siac_Cts_Output_v2_11_b.v "Siac Cts Output Cta v2.11.b Rocq Definition"
+[Siac.Cts.Output.Cta.v2.11.b.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.11.b Url"
+[Siac.Cts.Output.Cta.v2.11.b.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Documentation/Siac.Cts.Output.Cta.v2.11.b.pdf "The Securities Industry Automation Corporation 2.11.b Pdf"
+[Siac.Cts.Output.Cta.v2.9.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/cts/output/Siac_Cts_Output_v2_9.v "Siac Cts Output Cta v2.9 Rocq Definition"
+[Siac.Cts.Output.Cta.v2.9.Url]: https://www.ctaplan.com/tech-specs "The Securities Industry Automation Corporation 2.9 Url"
+[Siac.Cts.Output.Cta.v2.9.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Documentation/Siac.Cts.Output.Cta.v2.9.f.pdf "The Securities Industry Automation Corporation 2.9 Pdf"
+[Siac.Opra.Headers.Udp.v1.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/headers/Siac_Opra_Headers_v1.v "Siac Opra Headers Udp v1 Rocq Definition"
+[Siac.Opra.Headers.Udp.v1.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 1 Url"
+[Siac.Opra.Input.Obi.v5.0.i.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/input/Siac_Opra_Input_v5_0_i.v "Siac Opra Input Obi v5.0.i Rocq Definition"
+[Siac.Opra.Input.Obi.v5.0.i.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 5.0.i Url"
+[Siac.Opra.Input.Obi.v5.0.i.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Siac.Opra.Input.Obi.v5.0.i.pdf "The Securities Industry Automation Corporation 5.0.i Pdf"
+[Siac.Opra.Output.Obi.v4.0.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/output/Siac_Opra_Output_v4_0.v "Siac Opra Output Obi v4.0 Rocq Definition"
+[Siac.Opra.Output.Obi.v4.0.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 4.0 Url"
+[Siac.Opra.Output.Obi.v4.0.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Opra/Output/Siac.Opra.Output.Obi.v4.0.pdf "The Securities Industry Automation Corporation 4.0 Pdf"
+[Siac.Opra.Output.Obi.v6.1.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/output/Siac_Opra_Output_v6_1.v "Siac Opra Output Obi v6.1 Rocq Definition"
+[Siac.Opra.Output.Obi.v6.1.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 6.1 Url"
+[Siac.Opra.Output.Obi.v6.1.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Opra/Output/Siac.Opra.Output.Obi.v6.1.c.pdf "The Securities Industry Automation Corporation 6.1 Pdf"
+[Siac.Opra.Output.Obi.v6.2.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/output/Siac_Opra_Output_v6_2.v "Siac Opra Output Obi v6.2 Rocq Definition"
+[Siac.Opra.Output.Obi.v6.2.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 6.2 Url"
+[Siac.Opra.Output.Obi.v6.2.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Documentation/Siac.Opra.Output.Obi.v6.2.j.pdf "The Securities Industry Automation Corporation 6.2 Pdf"
+[Siac.Opra.Output.Obi.v6.3.a.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/siac/opra/output/Siac_Opra_Output_v6_3_a.v "Siac Opra Output Obi v6.3.a Rocq Definition"
+[Siac.Opra.Output.Obi.v6.3.a.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Specifications/Opra/Output/Siac.Opra.Output.Obi.v6.3.a.pdf "The Securities Industry Automation Corporation 6.3.a Pdf"
+[Siac.Opra.Output.Obi.v6.3.a.Url]: https://www.opraplan.com/document-library "The Securities Industry Automation Corporation 6.3.a Url"

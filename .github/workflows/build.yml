@@ -1,0 +1,24 @@
+name: Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Rocq Prover Version
+      run: docker run --rm rocq/rocq-prover:9.0 rocq -v
+
+    - name: Check Every Definition
+      run: |
+        chmod -R a+w .
+        docker run --rm -v "$PWD:/work" -w /work rocq/rocq-prover:9.0 \
+          sh -c 'rocq makefile -f _CoqProject -o Makefile.rocq && make -f Makefile.rocq -j4'

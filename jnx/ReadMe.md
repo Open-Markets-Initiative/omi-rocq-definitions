@@ -1,0 +1,78 @@
+[![Jnx](https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Images/Logo.png)](https://www.japannext.co.jp/en)
+
+
+## Japannext Securities
+
+| Division | [Protocol][Omi.Jnx.Protocol.Definitions] | [Encoding][Omi.Encoding.Definitions] | Version | Transport | Date | Size | [Deployment][Omi.Glossary.Deployment] | [Testing][Omi.Glossary.Testing] | [Documentation][Omi.Jnx.Specifications] |
+| --- | --- | --- | --- | --- | ---: | ---: | --- | --- | --- |
+| [JnxBonds][JnxBonds.Exchange] | [Pts][Jnx.JnxBonds.Pts] | [Itch][Omi.Encoding.Itch] | [1.2][Jnx.JnxBonds.Pts.Itch.v1.2.Definition] |  | 4/1/2020 | 766 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxBonds.Pts.Itch.v1.2.Url] - [pdf][Jnx.JnxBonds.Pts.Itch.v1.2.Pdf] |
+| [JnxBonds][JnxBonds.Exchange] | [Pts][Jnx.JnxBonds.Pts] | [Ouch][Omi.Encoding.Ouch] | 1.4 | [Client][Jnx.JnxBonds.Pts.Ouch.v1.4.Client.Definition] [Server][Jnx.JnxBonds.Pts.Ouch.v1.4.Server.Definition] | 4/1/2020 | 1281 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxBonds.Pts.Ouch.v1.4.Url] - [pdf][Jnx.JnxBonds.Pts.Ouch.v1.4.Pdf] |
+| [JnxBonds][JnxBonds.Exchange] | [Pts][Jnx.JnxBonds.Pts] | [Ouch][Omi.Encoding.Ouch] | 2.01 | [Client][Jnx.JnxBonds.Pts.Ouch.v2.01.Client.Definition] [Server][Jnx.JnxBonds.Pts.Ouch.v2.01.Server.Definition] | 1/16/2026 | 1281 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxBonds.Pts.Ouch.v2.01.Url] - [pdf][Jnx.JnxBonds.Pts.Ouch.v2.01.Pdf] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Glimpse][Omi.Encoding.Glimpse] | 1.3 | [Client][Jnx.JnxEquities.Pts.Glimpse.v1.3.Client.Definition] [Server][Jnx.JnxEquities.Pts.Glimpse.v1.3.Server.Definition] | 11/1/2023 | 1122 | [Pending][Omi.Glossary.Deployment.Pending] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxEquities.Pts.Glimpse.v1.3.Url] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Itch][Omi.Encoding.Itch] | [1.6][Jnx.JnxEquities.Pts.Itch.v1.6.Definition] |  | 3/9/2023 | 940 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Verified][Omi.Glossary.Testing.Verified] | [url][Jnx.JnxEquities.Pts.Itch.v1.6.Url] - [pdf][Jnx.JnxEquities.Pts.Itch.v1.6.Pdf] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Itch][Omi.Encoding.Itch] | 1.7 | [Client][Jnx.JnxEquities.Pts.Itch.v1.7.Client.Definition] [Server][Jnx.JnxEquities.Pts.Itch.v1.7.Server.Definition] [Udp][Jnx.JnxEquities.Pts.Itch.v1.7.Udp.Definition] | 11/1/2023 | 2062 | [Pending][Omi.Glossary.Deployment.Pending] | [Verified][Omi.Glossary.Testing.Verified] | [url][Jnx.JnxEquities.Pts.Itch.v1.7.Url] - [pdf][Jnx.JnxEquities.Pts.Itch.v1.7.Pdf] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Itch][Omi.Encoding.Itch] | [2.0][Jnx.JnxEquities.Pts.Itch.v2.0.Definition] |  | 9/17/2025 | 940 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxEquities.Pts.Itch.v2.0.Url] - [pdf][Jnx.JnxEquities.Pts.Itch.v2.0.Pdf] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Ouch][Omi.Encoding.Ouch] | 1.11 | [Client][Jnx.JnxEquities.Pts.Ouch.v1.11.Client.Definition] [Server][Jnx.JnxEquities.Pts.Ouch.v1.11.Server.Definition] | 3/9/2023 | 1273 | [Deprecated][Omi.Glossary.Deployment.Deprecated] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxEquities.Pts.Ouch.v1.11.Url] - [pdf][Jnx.JnxEquities.Pts.Ouch.v1.11.Pdf] |
+| [JnxEquities][JnxEquities.Exchange] | [Pts][Jnx.JnxEquities.Pts] | [Ouch][Omi.Encoding.Ouch] | 2.01 | [Client][Jnx.JnxEquities.Pts.Ouch.v2.01.Client.Definition] [Server][Jnx.JnxEquities.Pts.Ouch.v2.01.Server.Definition] | 1/16/2026 | 1273 | [Active][Omi.Glossary.Deployment.Active] | [Untested][Omi.Glossary.Testing.Untested] | [url][Jnx.JnxEquities.Pts.Ouch.v2.01.Url] - [pdf][Jnx.JnxEquities.Pts.Ouch.v2.01.Pdf] |
+
+
+<p align="center"><a href="https://www.japannext.co.jp/en" title="Japannext Securities Website"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/Website.png" alt="Website" width="32" height="32"></a>&nbsp;&nbsp;<a href="https://www.linkedin.com/company/japannext" title="Japannext Securities on LinkedIn"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/LinkedIn.png" alt="LinkedIn" width="32" height="32"></a></p>
+
+
+[Omi.Glossary.Deployment]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Protocol Deployment"
+[Omi.Glossary.Deployment.Active]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is in active production"
+[Omi.Glossary.Deployment.Deprecated]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is no longer in active use"
+[Omi.Glossary.Deployment.Pending]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is not yet deployed to an active production environment"
+[Omi.Glossary.Deployment.Observability]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol is carried for observability rather than trading"
+[Omi.Glossary.Deployment.Header]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Header only protocol provided for debugging"
+[Omi.Glossary.Deployment.Unknown]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Deployment.md "Deployment: Protocol deployment is unknown"
+[Omi.Glossary.Testing]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Protocol Testing Status"
+[Omi.Glossary.Testing.Verified]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has been tested on live data"
+[Omi.Glossary.Testing.Incomplete]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has been tested on live data but contains known issues"
+[Omi.Glossary.Testing.Beta]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has not been tested and structure is speculative"
+[Omi.Glossary.Testing.Untested]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol has not been tested on live data"
+[Omi.Glossary.Testing.Unavailable]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Glossary/Testing.md "Testing Status: Protocol does not state a testing status"
+[Omi.Encoding.Definitions]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Protocols/ReadMe.md "Encoding Directory"
+[Omi.Jnx.Protocol.Definitions]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Jnx/Protocols "Jnx Protocol Directory"
+[Omi.Jnx.Specifications]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Jnx/Specifications "Jnx Specifications Directory"
+[Omi.Encoding.Itch]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Itch.md "Itch Encoding"
+[Omi.Encoding.Ouch]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Ouch.md "Ouch Encoding"
+[Omi.Encoding.Glimpse]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Glimpse.md "Glimpse Encoding"
+[JnxBonds.Exchange]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Jnx/Protocols/JnxBonds "Jnx JnxBonds"
+[JnxEquities.Exchange]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/tree/main/Organizations/Jnx/Protocols/JnxEquities "Jnx JnxEquities"
+[Jnx.JnxBonds.Pts]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Protocols/JnxBonds/Pts.md "Proprietary Trading System"
+[Jnx.JnxEquities.Pts]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Protocols/JnxEquities/Pts.md "Proprietary Trading System"
+
+[Jnx.JnxBonds.Pts.Itch.v1.2.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxbonds/pts/JnxBonds_Pts_v1_2.v "Jnx JnxBonds Pts Itch v1.2 Rocq Definition"
+[Jnx.JnxBonds.Pts.Itch.v1.2.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.2 Url"
+[Jnx.JnxBonds.Pts.Itch.v1.2.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxBonds/Itch/Jnx.JnxBonds.Pts.Itch.v1.2.pdf "Japannext Securities 1.2 Pdf"
+[Jnx.JnxBonds.Pts.Ouch.v1.4.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxbonds/pts/JnxBonds_Pts_v1_4_Client.v "Jnx JnxBonds Pts Ouch v1.4 Rocq Definition"
+[Jnx.JnxBonds.Pts.Ouch.v1.4.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.4 Url"
+[Jnx.JnxBonds.Pts.Ouch.v1.4.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxBonds/Ouch/Jnx.JnxBonds.Pts.Ouch.v1.4.pdf "Japannext Securities 1.4 Pdf"
+[Jnx.JnxBonds.Pts.Ouch.v1.4.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxbonds/pts/JnxBonds_Pts_v1_4_Server.v "Jnx JnxBonds Pts Ouch v1.4 Rocq Definition"
+[Jnx.JnxBonds.Pts.Ouch.v2.01.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxbonds/pts/JnxBonds_Pts_v2_01_Client.v "Jnx JnxBonds Pts Ouch v2.01 Rocq Definition"
+[Jnx.JnxBonds.Pts.Ouch.v2.01.Url]: https://www.japannext.co.jp/library "Japannext Securities 2.01 Url"
+[Jnx.JnxBonds.Pts.Ouch.v2.01.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxBonds/Ouch/Jnx.JnxBonds.Pts.Ouch.v2.01.pdf "Japannext Securities 2.01 Pdf"
+[Jnx.JnxBonds.Pts.Ouch.v2.01.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxbonds/pts/JnxBonds_Pts_v2_01_Server.v "Jnx JnxBonds Pts Ouch v2.01 Rocq Definition"
+[Jnx.JnxEquities.Pts.Glimpse.v1.3.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_3_Client.v "Jnx JnxEquities Pts Glimpse v1.3 Rocq Definition"
+[Jnx.JnxEquities.Pts.Glimpse.v1.3.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.3 Url"
+[Jnx.JnxEquities.Pts.Glimpse.v1.3.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_3_Server.v "Jnx JnxEquities Pts Glimpse v1.3 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v1.6.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_6.v "Jnx JnxEquities Pts Itch v1.6 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v1.6.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.6 Url"
+[Jnx.JnxEquities.Pts.Itch.v1.6.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxEquities/Itch/Jnx.JnxEquities.Pts.Itch.v1.6.pdf "Japannext Securities 1.6 Pdf"
+[Jnx.JnxEquities.Pts.Itch.v1.7.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_7_Client.v "Jnx JnxEquities Pts Itch v1.7 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v1.7.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.7 Url"
+[Jnx.JnxEquities.Pts.Itch.v1.7.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxEquities/Itch/Jnx.JnxEquities.Pts.Itch.v1.7.pdf "Japannext Securities 1.7 Pdf"
+[Jnx.JnxEquities.Pts.Itch.v1.7.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_7_Server.v "Jnx JnxEquities Pts Itch v1.7 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v1.7.Udp.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_7_Udp.v "Jnx JnxEquities Pts Itch v1.7 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v2.0.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v2_0.v "Jnx JnxEquities Pts Itch v2.0 Rocq Definition"
+[Jnx.JnxEquities.Pts.Itch.v2.0.Url]: https://www.japannext.co.jp/library "Japannext Securities 2.0 Url"
+[Jnx.JnxEquities.Pts.Itch.v2.0.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxEquities/Itch/Jnx.JnxEquities.Pts.Itch.v2.0.pdf "Japannext Securities 2.0 Pdf"
+[Jnx.JnxEquities.Pts.Ouch.v1.11.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_11_Client.v "Jnx JnxEquities Pts Ouch v1.11 Rocq Definition"
+[Jnx.JnxEquities.Pts.Ouch.v1.11.Url]: https://www.japannext.co.jp/library "Japannext Securities 1.11 Url"
+[Jnx.JnxEquities.Pts.Ouch.v1.11.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxEquities/Ouch/Jnx.JnxEquities.Pts.Ouch.v1.11.pdf "Japannext Securities 1.11 Pdf"
+[Jnx.JnxEquities.Pts.Ouch.v1.11.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v1_11_Server.v "Jnx JnxEquities Pts Ouch v1.11 Rocq Definition"
+[Jnx.JnxEquities.Pts.Ouch.v2.01.Client.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v2_01_Client.v "Jnx JnxEquities Pts Ouch v2.01 Rocq Definition"
+[Jnx.JnxEquities.Pts.Ouch.v2.01.Url]: https://www.japannext.co.jp/library "Japannext Securities 2.01 Url"
+[Jnx.JnxEquities.Pts.Ouch.v2.01.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Jnx/Specifications/JnxEquities/Ouch/Jnx.JnxEquities.Pts.Ouch.v2.01.pdf "Japannext Securities 2.01 Pdf"
+[Jnx.JnxEquities.Pts.Ouch.v2.01.Server.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/jnx/jnxequities/pts/JnxEquities_Pts_v2_01_Server.v "Jnx JnxEquities Pts Ouch v2.01 Rocq Definition"
