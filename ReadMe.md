@@ -56,7 +56,7 @@ Updates are greatly appreciated; however, this entire repository is source gener
 
 | Protocol Count | Generated Lines |
 | --- | --- |
-| 1587 | 2946003 |
+| 1,633 | 3,561,630 |
 
 ## Testing
 
@@ -172,14 +172,15 @@ Enjoy.
 [Omi.Encoding.Sqf]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Sqf.md "Sqf Encoding"
 [Omi.Encoding.AsciiItch]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/AsciiItch.md "AsciiItch Encoding"
 [Omi.Encoding.GeniumAmd]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/GeniumAmd.md "GeniumAmd Encoding"
-[Omi.Encoding.Binary]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Binary.md "Binary Encoding"
+[Omi.Encoding.Prm]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Prm.md "Prm Encoding"
 [Omi.Encoding.Utp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Utp.md "Utp Encoding"
 [Omi.Encoding.NxtAscii]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NxtAscii.md "NxtAscii Encoding"
 [Omi.Encoding.NxtBinary]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NxtBinary.md "NxtBinary Encoding"
 [Omi.Encoding.NnfDirect]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NnfDirect.md "NnfDirect Encoding"
+[Omi.Encoding.Tbt]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Tbt.md "Tbt Encoding"
+[Omi.Encoding.Nnf]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Nnf.md "Nnf Encoding"
 [Omi.Encoding.NnfBcast]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NnfBcast.md "NnfBcast Encoding"
 [Omi.Encoding.NnfDc]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NnfDc.md "NnfDc Encoding"
-[Omi.Encoding.Nnf]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Nnf.md "Nnf Encoding"
 [Omi.Encoding.NnfTrimmed]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/NnfTrimmed.md "NnfTrimmed Encoding"
 [Omi.Encoding.Pillar]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Pillar.md "Pillar Encoding"
 [Omi.Encoding.PillarStream]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/PillarStream.md "PillarStream Encoding"
@@ -720,6 +721,7 @@ Enjoy.
 [Nse.NseCd.DropCopy]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/DropCopy.md "Drop Copy"
 [Nse.NseCd.Mtbt]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/Mtbt.md "Multicast Tick By Tick"
 [Nse.NseCd.MtbtNdal]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/MtbtNdal.md "Multicast Tick By Tick Data Feed"
+[Nse.NseCd.OrderEntry]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/OrderEntry.md "Order Entry"
 [Nse.NseCd.Recovery]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/Recovery.md "Mtbt Tick Data Recovery"
 [Nse.NseCd.Snapshot]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCd/Snapshot.md "Mtbt Order Book Snapshot Recovery"
 [Nse.NseCm.Broadcast]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCm/Broadcast.md ""
@@ -731,6 +733,7 @@ Enjoy.
 [Nse.NseCm.Snapshot]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCm/Snapshot.md "Mtbt Order Book Snapshot Recovery"
 [Nse.NseCom.DropCopy]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCom/DropCopy.md "Drop Copy"
 [Nse.NseCom.Mtbt]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCom/Mtbt.md "Multicast Tick By Tick"
+[Nse.NseCom.OrderEntry]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCom/OrderEntry.md "Order Entry"
 [Nse.NseCom.Recovery]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCom/Recovery.md "Mtbt Tick Data Recovery"
 [Nse.NseCom.Snapshot]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseCom/Snapshot.md "Mtbt Order Book Snapshot Recovery"
 [Nse.NseFo.Broadcast]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Nse/Protocols/NseFo/Broadcast.md ""
@@ -855,6 +858,7 @@ Enjoy.
 [Qse.QseCash.MarketData]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Qse/Protocols/QseCash/MarketData.md "Qse Cash Market Data"
 [Sgx.TitanDt.DepthOfBook]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Sgx/Protocols/TitanDt/DepthOfBook.md "Depth Of Book"
 [Siac.Cqs.Input]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cqs/Input.md ""
+[Siac.Cqs.Output]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cqs/Output.md "Output"
 [Siac.Cqs.Snapshot]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cqs/Snapshot.md "Snapshot"
 [Siac.Cts.Input]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cts/Input.md ""
 [Siac.Cts.Output]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Siac/Protocols/Cts/Output.md "Output"
@@ -1024,7 +1028,7 @@ Enjoy.
 [LmeSelect.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/lme/lmeselect "LMEselect"
 [Lse.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/lseg/lse "London Stock Exchange"
 [LtseEquities.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/ltse/ltseequities "Ltse Equities"
-[LynxAts.Ats]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/tradelogiq "Lynx ATS"
+[LynxAts.Ats]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/tradelogiq/lynxats "Lynx ATS"
 [MarketData.Redistributor]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/databento "Databento Market Data"
 [MatchNow.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/cboe/matchnow "Cboe Canada MATCHNow"
 [MdcsRealtime.Consolidator]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/koscom/mdcsrealtime "MDCS Realtime Market Data"
@@ -1059,7 +1063,7 @@ Enjoy.
 [NyseOptions.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/nyse/nyseoptions "New York Stock Exchange Options"
 [OdxEquities.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/odx/odxequities "Odx Equities"
 [OdxSecurityToken.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/odx/odxsecuritytoken "Odx Security Token"
-[OmegaAts.Ats]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/tradelogiq "Omega ATS"
+[OmegaAts.Ats]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/tradelogiq/omegaats "Omega ATS"
 [OnyxFutures.Exchange]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/miax/onyxfutures "MIAX Futures Onyx"
 [Opra.Consolidator]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/siac/opra "Options Price Reporting Authority"
 [Optiq.Platform]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/tree/main/euronext/optiq "Euronext Optiq"

@@ -23,12 +23,145 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a Reassemble rule
-      - a Composite rule
       - the dispatch that chooses a message by its type
       - a run counted by a field
   *)
 
 Module TaifexDerivativesDropCopyV2187.
+
+  Module HeaderTime.
+
+    (** Message time, the Tmp time format of section 2.1 carried by the common message header *)
+    Record t := {
+      header_epoch_s : N;
+      header_ms : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (header_epoch_s record < 256 ^ N.of_nat 4)%N /\
+      (header_ms record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (header_epoch_s record) ++
+      encode_uint 2 (header_ms record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (header_epoch_s_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (header_ms_value, bytes) =>
+              Some ({| header_epoch_s := header_epoch_s_value; header_ms := header_ms_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End HeaderTime.
+
+  Module Hdr.
+
+    (** Tmp Common message header, carried by every Tmp message *)
+    Record t := {
+      msg_length : N;
+      msg_seq_num : N;
+      header_time : HeaderTime.t;
+      message_type : N;
+      fcm_id : N;
+      session_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (msg_length record < 256 ^ N.of_nat 2)%N /\
+      (msg_seq_num record < 256 ^ N.of_nat 4)%N /\
+      HeaderTime.bounded (header_time record) /\
+      (message_type record < 256 ^ N.of_nat 1)%N /\
+      (fcm_id record < 256 ^ N.of_nat 2)%N /\
+      (session_id record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (msg_length record) ++
+      encode_uint 4 (msg_seq_num record) ++
+      HeaderTime.encode (header_time record) ++
+      encode_uint 1 (message_type record) ++
+      encode_uint 2 (fcm_id record) ++
+      encode_uint 2 (session_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (msg_length_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (msg_seq_num_value, bytes) =>
+              match HeaderTime.decode bytes with
+              | None => None
+              | Some (header_time_value, bytes) =>
+                  match decode_uint 1 bytes with
+                  | None => None
+                  | Some (message_type_value, bytes) =>
+                      match decode_uint 2 bytes with
+                      | None => None
+                      | Some (fcm_id_value, bytes) =>
+                          match decode_uint 2 bytes with
+                          | None => None
+                          | Some (session_id_value, bytes) =>
+                              Some ({| msg_length := msg_length_value; msg_seq_num := msg_seq_num_value; header_time := header_time_value; message_type := message_type_value; fcm_id := fcm_id_value; session_id := session_id_value |}, bytes)
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !HeaderTime.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite HeaderTime.decode_encode by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply HeaderTime.eq_dec]. Defined.
+
+  End Hdr.
 
   Module WakeUpCallMessage.
 
@@ -702,6 +835,108 @@ Module TaifexDerivativesDropCopyV2187.
 
   End SymbolText.
 
+  Module OrgTransTimeMsgTime.
+
+    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
+    Record t := {
+      epoch_s_int_324 : N;
+      ms : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (ms record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 2 (ms record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_int_324_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (ms_value, bytes) =>
+              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End OrgTransTimeMsgTime.
+
+  Module TransactTimeMsgTime.
+
+    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
+    Record t := {
+      epoch_s_int_324 : N;
+      ms : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (ms record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 2 (ms record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_int_324_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (ms_value, bytes) =>
+              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTimeMsgTime.
+
   Module LongSymbolText.
 
     (** Text product ID in the long product format, naming a product by its Ascii character string symbol *)
@@ -742,6 +977,108 @@ Module TaifexDerivativesDropCopyV2187.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End LongSymbolText.
+
+  Module OrgTransTimeMsgTime2.
+
+    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
+    Record t := {
+      epoch_s_int_324 : N;
+      ms : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (ms record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 2 (ms record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_int_324_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (ms_value, bytes) =>
+              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End OrgTransTimeMsgTime2.
+
+  Module TransactTimeMsgTime2.
+
+    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
+    Record t := {
+      epoch_s_int_324 : N;
+      ms : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (ms record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 2 (ms record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_int_324_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (ms_value, bytes) =>
+              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTimeMsgTime2.
 
   Module ErrorReportMessage.
 
@@ -1064,6 +1401,108 @@ Module TaifexDerivativesDropCopyV2187.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End LegSymSymbolTxtX.
+
+  Module OrgTransTimeMsgTimeX.
+
+    (** Tmp Expanded Time Format, the seconds since the epoch and the billionth of a second, which the FLEX reports carry in place of msg_time *)
+    Record t := {
+      epoch_s_uint_324 : N;
+      nanosecond : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_uint_324 record < 256 ^ N.of_nat 4)%N /\
+      (nanosecond record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_uint_324 record) ++
+      encode_uint 4 (nanosecond record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_uint_324_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanosecond_value, bytes) =>
+              Some ({| epoch_s_uint_324 := epoch_s_uint_324_value; nanosecond := nanosecond_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End OrgTransTimeMsgTimeX.
+
+  Module TransactTimeMsgTimeX.
+
+    (** Tmp Expanded Time Format, the seconds since the epoch and the billionth of a second, which the FLEX reports carry in place of msg_time *)
+    Record t := {
+      epoch_s_uint_324 : N;
+      nanosecond : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (epoch_s_uint_324 record < 256 ^ N.of_nat 4)%N /\
+      (nanosecond record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (epoch_s_uint_324 record) ++
+      encode_uint 4 (nanosecond record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (epoch_s_uint_324_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanosecond_value, bytes) =>
+              Some ({| epoch_s_uint_324 := epoch_s_uint_324_value; nanosecond := nanosecond_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTimeMsgTimeX.
 
   Module SubHdr3.
 

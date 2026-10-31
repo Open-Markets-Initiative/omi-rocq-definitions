@@ -26,7 +26,6 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
       - a run counted by a field
-      - a Composite rule
   *)
 
 Module BrokerTecUsTreasuryV101Tcp.
@@ -258,5 +257,107 @@ Module BrokerTecUsTreasuryV101Tcp.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End GroupSize.
+
+  Module MdEntryPx.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End MdEntryPx.
+
+  Module CouponRate.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa_32 : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa_32 record < 256 ^ N.of_nat 4)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (mantissa_32 record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (mantissa_32_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa_32 := mantissa_32_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End CouponRate.
 
 End BrokerTecUsTreasuryV101Tcp.

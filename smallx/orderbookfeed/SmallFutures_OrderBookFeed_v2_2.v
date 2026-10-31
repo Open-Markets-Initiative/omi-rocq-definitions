@@ -25,7 +25,6 @@ Import ListNotations.
       - a field read in bits
       - a length prefix framing what follows
       - a block whose stated length holds more than its fields
-      - a Composite rule
       - a run counted by a field
   *)
 

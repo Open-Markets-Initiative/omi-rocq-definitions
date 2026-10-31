@@ -22,7 +22,6 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Empty element
       - a run filling what frames it
   *)
 

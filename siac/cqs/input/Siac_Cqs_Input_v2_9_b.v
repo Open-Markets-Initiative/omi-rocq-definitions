@@ -24,7 +24,6 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
-      - a Composite rule
       - a field present only on a condition
   *)
 
@@ -104,6 +103,156 @@ Module SiacCqsInputV29B.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End BlockHeader.
+
+  Module Timestamp1.
+
+    (** Participant-provided timestamp *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End Timestamp1.
+
+  Module MessageHeader.
+
+    (** Cta participant input message header (26 bytes) *)
+    Record t := {
+      message_length : N;
+      message_category : list byte;
+      message_type : list byte;
+      participant_i_d : list byte;
+      timestamp_1 : Timestamp1.t;
+      message_i_d : N;
+      reserved : N;
+      participant_reference_number : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (message_length record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (message_category record) = 1 /\
+      Datatypes.length (message_type record) = 1 /\
+      Datatypes.length (participant_i_d record) = 1 /\
+      Timestamp1.bounded (timestamp_1 record) /\
+      (message_i_d record < 256 ^ N.of_nat 1)%N /\
+      (reserved record < 256 ^ N.of_nat 4)%N /\
+      (participant_reference_number record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (message_length record) ++
+      encode_bytes 1 (message_category record) ++
+      encode_bytes 1 (message_type record) ++
+      encode_bytes 1 (participant_i_d record) ++
+      Timestamp1.encode (timestamp_1 record) ++
+      encode_uint 1 (message_i_d record) ++
+      encode_uint 4 (reserved record) ++
+      encode_uint 8 (participant_reference_number record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (message_length_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (message_category_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (message_type_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (participant_i_d_value, bytes) =>
+                      match Timestamp1.decode bytes with
+                      | None => None
+                      | Some (timestamp_1_value, bytes) =>
+                          match decode_uint 1 bytes with
+                          | None => None
+                          | Some (message_i_d_value, bytes) =>
+                              match decode_uint 4 bytes with
+                              | None => None
+                              | Some (reserved_value, bytes) =>
+                                  match decode_uint 8 bytes with
+                                  | None => None
+                                  | Some (participant_reference_number_value, bytes) =>
+                                      Some ({| message_length := message_length_value; message_category := message_category_value; message_type := message_type_value; participant_i_d := participant_i_d_value; timestamp_1 := timestamp_1_value; message_i_d := message_i_d_value; reserved := reserved_value; participant_reference_number := participant_reference_number_value |}, bytes)
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !Timestamp1.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite Timestamp1.decode_encode by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp1.eq_dec]. Defined.
+
+  End MessageHeader.
 
   Module RejectionMessage.
 
@@ -555,6 +704,576 @@ Module SiacCqsInputV29B.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ShortQuoteMessage.
+
+  Module Timestamp2.
+
+    (** Timestamp 2 *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End Timestamp2.
+
+  Module LongQuoteMessage.
+
+    (** Reports quote information for a CTA eligible Equity, Local Issue or Bond. Used to report trading suspensions, price indications and trading range indications on the CQS input lines. Will be discontinued in favor of Round Lot Long Quote. *)
+    Record t := {
+      security_symbol : list byte;
+      instrument_type : list byte;
+      quote_condition : list byte;
+      security_status_indicator : list byte;
+      bid_price : N;
+      bid_size : N;
+      offer_price : N;
+      offer_size : N;
+      retail_interest_indicator : list byte;
+      settlement_condition : list byte;
+      market_condition : list byte;
+      finra_market_maker_id : list byte;
+      finra_bbo_indicator : list byte;
+      timestamp_2 : Timestamp2.t;
+      short_sale_restriction_indicator : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (security_symbol record) = 11 /\
+      Datatypes.length (instrument_type record) = 1 /\
+      Datatypes.length (quote_condition record) = 1 /\
+      Datatypes.length (security_status_indicator record) = 1 /\
+      (bid_price record < 256 ^ N.of_nat 8)%N /\
+      (bid_size record < 256 ^ N.of_nat 4)%N /\
+      (offer_price record < 256 ^ N.of_nat 8)%N /\
+      (offer_size record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (retail_interest_indicator record) = 1 /\
+      Datatypes.length (settlement_condition record) = 1 /\
+      Datatypes.length (market_condition record) = 1 /\
+      Datatypes.length (finra_market_maker_id record) = 4 /\
+      Datatypes.length (finra_bbo_indicator record) = 1 /\
+      Timestamp2.bounded (timestamp_2 record) /\
+      Datatypes.length (short_sale_restriction_indicator record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 11 (security_symbol record) ++
+      encode_bytes 1 (instrument_type record) ++
+      encode_bytes 1 (quote_condition record) ++
+      encode_bytes 1 (security_status_indicator record) ++
+      encode_uint 8 (bid_price record) ++
+      encode_uint 4 (bid_size record) ++
+      encode_uint 8 (offer_price record) ++
+      encode_uint 4 (offer_size record) ++
+      encode_bytes 1 (retail_interest_indicator record) ++
+      encode_bytes 1 (settlement_condition record) ++
+      encode_bytes 1 (market_condition record) ++
+      encode_bytes 4 (finra_market_maker_id record) ++
+      encode_bytes 1 (finra_bbo_indicator record) ++
+      Timestamp2.encode (timestamp_2 record) ++
+      encode_bytes 1 (short_sale_restriction_indicator record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 11 bytes with
+      | None => None
+      | Some (security_symbol_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (instrument_type_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (quote_condition_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (security_status_indicator_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (bid_price_value, bytes) =>
+                          match decode_uint 4 bytes with
+                          | None => None
+                          | Some (bid_size_value, bytes) =>
+                              match decode_uint 8 bytes with
+                              | None => None
+                              | Some (offer_price_value, bytes) =>
+                                  match decode_uint 4 bytes with
+                                  | None => None
+                                  | Some (offer_size_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (retail_interest_indicator_value, bytes) =>
+                                          match decode_bytes 1 bytes with
+                                          | None => None
+                                          | Some (settlement_condition_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (market_condition_value, bytes) =>
+                                                  match decode_bytes 4 bytes with
+                                                  | None => None
+                                                  | Some (finra_market_maker_id_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (finra_bbo_indicator_value, bytes) =>
+                                                          match Timestamp2.decode bytes with
+                                                          | None => None
+                                                          | Some (timestamp_2_value, bytes) =>
+                                                              match decode_bytes 1 bytes with
+                                                              | None => None
+                                                              | Some (short_sale_restriction_indicator_value, bytes) =>
+                                                                  Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; quote_condition := quote_condition_value; security_status_indicator := security_status_indicator_value; bid_price := bid_price_value; bid_size := bid_size_value; offer_price := offer_price_value; offer_size := offer_size_value; retail_interest_indicator := retail_interest_indicator_value; settlement_condition := settlement_condition_value; market_condition := market_condition_value; finra_market_maker_id := finra_market_maker_id_value; finra_bbo_indicator := finra_bbo_indicator_value; timestamp_2 := timestamp_2_value; short_sale_restriction_indicator := short_sale_restriction_indicator_value |}, bytes)
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 55.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite Timestamp2.decode_encode by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
+
+  End LongQuoteMessage.
+
+  Module Timestamp22.
+
+    (** Timestamp 2 *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End Timestamp22.
+
+  Module SpecialLongQuoteMessage.
+
+    (** Used only by FINRA ADF for CTA eligible Equity, Local Issue or Bond to identify the FINRA Best Bid and Best Offer at the Bid and/or Offer side. Will be discontinued in favor of Round Lot FINRA ADF Quote. *)
+    Record t := {
+      security_symbol : list byte;
+      instrument_type : list byte;
+      quote_condition : list byte;
+      security_status_indicator : list byte;
+      bid_price : N;
+      bid_size : N;
+      offer_price : N;
+      offer_size : N;
+      retail_interest_indicator : list byte;
+      settlement_condition : list byte;
+      market_condition : list byte;
+      finra_market_maker_id : list byte;
+      finra_best_bid_quote_condition : list byte;
+      finra_best_bid_price : N;
+      finra_best_bid_size : N;
+      finra_best_bid_market_maker_id : list byte;
+      finra_best_offer_quote_condition : list byte;
+      finra_best_offer_price : N;
+      finra_best_offer_size : N;
+      finra_best_offer_market_maker_id : list byte;
+      timestamp_2 : Timestamp22.t;
+      short_sale_restriction_indicator : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (security_symbol record) = 11 /\
+      Datatypes.length (instrument_type record) = 1 /\
+      Datatypes.length (quote_condition record) = 1 /\
+      Datatypes.length (security_status_indicator record) = 1 /\
+      (bid_price record < 256 ^ N.of_nat 8)%N /\
+      (bid_size record < 256 ^ N.of_nat 4)%N /\
+      (offer_price record < 256 ^ N.of_nat 8)%N /\
+      (offer_size record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (retail_interest_indicator record) = 1 /\
+      Datatypes.length (settlement_condition record) = 1 /\
+      Datatypes.length (market_condition record) = 1 /\
+      Datatypes.length (finra_market_maker_id record) = 4 /\
+      Datatypes.length (finra_best_bid_quote_condition record) = 1 /\
+      (finra_best_bid_price record < 256 ^ N.of_nat 8)%N /\
+      (finra_best_bid_size record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (finra_best_bid_market_maker_id record) = 4 /\
+      Datatypes.length (finra_best_offer_quote_condition record) = 1 /\
+      (finra_best_offer_price record < 256 ^ N.of_nat 8)%N /\
+      (finra_best_offer_size record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (finra_best_offer_market_maker_id record) = 4 /\
+      Timestamp22.bounded (timestamp_2 record) /\
+      Datatypes.length (short_sale_restriction_indicator record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 11 (security_symbol record) ++
+      encode_bytes 1 (instrument_type record) ++
+      encode_bytes 1 (quote_condition record) ++
+      encode_bytes 1 (security_status_indicator record) ++
+      encode_uint 8 (bid_price record) ++
+      encode_uint 4 (bid_size record) ++
+      encode_uint 8 (offer_price record) ++
+      encode_uint 4 (offer_size record) ++
+      encode_bytes 1 (retail_interest_indicator record) ++
+      encode_bytes 1 (settlement_condition record) ++
+      encode_bytes 1 (market_condition record) ++
+      encode_bytes 4 (finra_market_maker_id record) ++
+      encode_bytes 1 (finra_best_bid_quote_condition record) ++
+      encode_uint 8 (finra_best_bid_price record) ++
+      encode_uint 4 (finra_best_bid_size record) ++
+      encode_bytes 4 (finra_best_bid_market_maker_id record) ++
+      encode_bytes 1 (finra_best_offer_quote_condition record) ++
+      encode_uint 8 (finra_best_offer_price record) ++
+      encode_uint 4 (finra_best_offer_size record) ++
+      encode_bytes 4 (finra_best_offer_market_maker_id record) ++
+      Timestamp22.encode (timestamp_2 record) ++
+      encode_bytes 1 (short_sale_restriction_indicator record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 11 bytes with
+      | None => None
+      | Some (security_symbol_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (instrument_type_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (quote_condition_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (security_status_indicator_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (bid_price_value, bytes) =>
+                          match decode_uint 4 bytes with
+                          | None => None
+                          | Some (bid_size_value, bytes) =>
+                              match decode_uint 8 bytes with
+                              | None => None
+                              | Some (offer_price_value, bytes) =>
+                                  match decode_uint 4 bytes with
+                                  | None => None
+                                  | Some (offer_size_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (retail_interest_indicator_value, bytes) =>
+                                          match decode_bytes 1 bytes with
+                                          | None => None
+                                          | Some (settlement_condition_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (market_condition_value, bytes) =>
+                                                  match decode_bytes 4 bytes with
+                                                  | None => None
+                                                  | Some (finra_market_maker_id_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (finra_best_bid_quote_condition_value, bytes) =>
+                                                          match decode_uint 8 bytes with
+                                                          | None => None
+                                                          | Some (finra_best_bid_price_value, bytes) =>
+                                                              match decode_uint 4 bytes with
+                                                              | None => None
+                                                              | Some (finra_best_bid_size_value, bytes) =>
+                                                                  match decode_bytes 4 bytes with
+                                                                  | None => None
+                                                                  | Some (finra_best_bid_market_maker_id_value, bytes) =>
+                                                                      match decode_bytes 1 bytes with
+                                                                      | None => None
+                                                                      | Some (finra_best_offer_quote_condition_value, bytes) =>
+                                                                          match decode_uint 8 bytes with
+                                                                          | None => None
+                                                                          | Some (finra_best_offer_price_value, bytes) =>
+                                                                              match decode_uint 4 bytes with
+                                                                              | None => None
+                                                                              | Some (finra_best_offer_size_value, bytes) =>
+                                                                                  match decode_bytes 4 bytes with
+                                                                                  | None => None
+                                                                                  | Some (finra_best_offer_market_maker_id_value, bytes) =>
+                                                                                      match Timestamp22.decode bytes with
+                                                                                      | None => None
+                                                                                      | Some (timestamp_2_value, bytes) =>
+                                                                                          match decode_bytes 1 bytes with
+                                                                                          | None => None
+                                                                                          | Some (short_sale_restriction_indicator_value, bytes) =>
+                                                                                              Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; quote_condition := quote_condition_value; security_status_indicator := security_status_indicator_value; bid_price := bid_price_value; bid_size := bid_size_value; offer_price := offer_price_value; offer_size := offer_size_value; retail_interest_indicator := retail_interest_indicator_value; settlement_condition := settlement_condition_value; market_condition := market_condition_value; finra_market_maker_id := finra_market_maker_id_value; finra_best_bid_quote_condition := finra_best_bid_quote_condition_value; finra_best_bid_price := finra_best_bid_price_value; finra_best_bid_size := finra_best_bid_size_value; finra_best_bid_market_maker_id := finra_best_bid_market_maker_id_value; finra_best_offer_quote_condition := finra_best_offer_quote_condition_value; finra_best_offer_price := finra_best_offer_price_value; finra_best_offer_size := finra_best_offer_size_value; finra_best_offer_market_maker_id := finra_best_offer_market_maker_id_value; timestamp_2 := timestamp_2_value; short_sale_restriction_indicator := short_sale_restriction_indicator_value |}, bytes)
+                                                                                          end
+                                                                                      end
+                                                                                  end
+                                                                              end
+                                                                          end
+                                                                      end
+                                                                  end
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp22.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_16.
+      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_19.
+      rewrite Timestamp22.decode_encode by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_21.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp22.eq_dec]. Defined.
+
+  End SpecialLongQuoteMessage.
+
+  Module Timestamp23.
+
+    (** Timestamp 2 *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End Timestamp23.
+
+  Module Timestamp24.
+
+    (** Timestamp 2 *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End Timestamp24.
 
   Module TradingStatusMessage.
 

@@ -130,7 +130,7 @@ Module AquisEquitiesSnapshotV40.
 
   Module SnapshotStartMessage.
 
-    (** Published as the first message in a snapshot, identifying the continuous stream sequence number and number of securities being reported. *)
+    (** A Snapshot Start message is published as the first message in a snapshot to identify the sequence number in the continuous stream that this snapshot relates to. It also states the number of securities being reported in this snapshot. *)
     Record t := {
       stream_seq_no : N;
       security_count : N;
@@ -189,7 +189,7 @@ Module AquisEquitiesSnapshotV40.
 
   Module BookEntryMessage.
 
-    (** Published after each Book Status message to provide details of each order for building the book. *)
+    (** An appropriate number of Book Entry messages is published after each Book Status message to provide details of each order and allow the book to be built. *)
     Record t := {
       security_id : N;
       side : N;
@@ -262,9 +262,9 @@ Module AquisEquitiesSnapshotV40.
 
   End BookEntryMessage.
 
-  Module MaCBookEntryMessage.
+  Module MacBookEntryMessage.
 
-    (** Published during MaC phase to provide the volume of the 5 best bid and offer orders per security in chronological order. *)
+    (** During the MaC phase, Aquis will publish the volume of the 5 best bid and offer orders per security in chronological order using the MaC Book Entry Message. *)
     Record t := {
       security_id : N;
       side : N;
@@ -335,6 +335,6 @@ Module AquisEquitiesSnapshotV40.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End MaCBookEntryMessage.
+  End MacBookEntryMessage.
 
 End AquisEquitiesSnapshotV40.

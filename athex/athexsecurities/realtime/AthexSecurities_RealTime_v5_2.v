@@ -24,7 +24,6 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
       - a length prefix framing what follows
-      - a field read in bits
       - a run counted by a field
   *)
 
@@ -112,6 +111,217 @@ Module AthexSecuritiesRealTimeV52.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End MessageHeader.
+
+  Module TradeMessage.
+
+    (** Transmitted when an instrument trade occurs in the trading platform or the clearing system *)
+    Record t := {
+      symbol : list byte;
+      board_id : list byte;
+      trade_number : list byte;
+      buy_order_number : list byte;
+      buy_order_date : list byte;
+      sell_order_number : list byte;
+      sell_order_date : list byte;
+      price : list byte;
+      volume : list byte;
+      total_volume : list byte;
+      trade_type : list byte;
+      trade_source : list byte;
+      buy_order_type : list byte;
+      sell_order_type : list byte;
+      buy_waiver_indicator : list byte;
+      sell_waiver_indicator : list byte;
+      notional_amount : list byte;
+      buy_algo_flag : list byte;
+      sell_algo_flag : list byte;
+      sdiv_flag : list byte;
+      dupl_flag : list byte;
+      time_stamp : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (symbol record) = 15 /\
+      Datatypes.length (board_id record) = 1 /\
+      Datatypes.length (trade_number record) = 6 /\
+      Datatypes.length (buy_order_number record) = 8 /\
+      Datatypes.length (buy_order_date record) = 8 /\
+      Datatypes.length (sell_order_number record) = 8 /\
+      Datatypes.length (sell_order_date record) = 8 /\
+      Datatypes.length (price record) = 9 /\
+      Datatypes.length (volume record) = 17 /\
+      Datatypes.length (total_volume record) = 17 /\
+      Datatypes.length (trade_type record) = 1 /\
+      Datatypes.length (trade_source record) = 1 /\
+      Datatypes.length (buy_order_type record) = 1 /\
+      Datatypes.length (sell_order_type record) = 1 /\
+      Datatypes.length (buy_waiver_indicator record) = 4 /\
+      Datatypes.length (sell_waiver_indicator record) = 4 /\
+      Datatypes.length (notional_amount record) = 14 /\
+      Datatypes.length (buy_algo_flag record) = 1 /\
+      Datatypes.length (sell_algo_flag record) = 1 /\
+      Datatypes.length (sdiv_flag record) = 1 /\
+      Datatypes.length (dupl_flag record) = 1 /\
+      Datatypes.length (time_stamp record) = 20.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 15 (symbol record) ++
+      encode_bytes 1 (board_id record) ++
+      encode_bytes 6 (trade_number record) ++
+      encode_bytes 8 (buy_order_number record) ++
+      encode_bytes 8 (buy_order_date record) ++
+      encode_bytes 8 (sell_order_number record) ++
+      encode_bytes 8 (sell_order_date record) ++
+      encode_bytes 9 (price record) ++
+      encode_bytes 17 (volume record) ++
+      encode_bytes 17 (total_volume record) ++
+      encode_bytes 1 (trade_type record) ++
+      encode_bytes 1 (trade_source record) ++
+      encode_bytes 1 (buy_order_type record) ++
+      encode_bytes 1 (sell_order_type record) ++
+      encode_bytes 4 (buy_waiver_indicator record) ++
+      encode_bytes 4 (sell_waiver_indicator record) ++
+      encode_bytes 14 (notional_amount record) ++
+      encode_bytes 1 (buy_algo_flag record) ++
+      encode_bytes 1 (sell_algo_flag record) ++
+      encode_bytes 1 (sdiv_flag record) ++
+      encode_bytes 1 (dupl_flag record) ++
+      encode_bytes 20 (time_stamp record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 15 bytes with
+      | None => None
+      | Some (symbol_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (board_id_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (trade_number_value, bytes) =>
+                  match decode_bytes 8 bytes with
+                  | None => None
+                  | Some (buy_order_number_value, bytes) =>
+                      match decode_bytes 8 bytes with
+                      | None => None
+                      | Some (buy_order_date_value, bytes) =>
+                          match decode_bytes 8 bytes with
+                          | None => None
+                          | Some (sell_order_number_value, bytes) =>
+                              match decode_bytes 8 bytes with
+                              | None => None
+                              | Some (sell_order_date_value, bytes) =>
+                                  match decode_bytes 9 bytes with
+                                  | None => None
+                                  | Some (price_value, bytes) =>
+                                      match decode_bytes 17 bytes with
+                                      | None => None
+                                      | Some (volume_value, bytes) =>
+                                          match decode_bytes 17 bytes with
+                                          | None => None
+                                          | Some (total_volume_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (trade_type_value, bytes) =>
+                                                  match decode_bytes 1 bytes with
+                                                  | None => None
+                                                  | Some (trade_source_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (buy_order_type_value, bytes) =>
+                                                          match decode_bytes 1 bytes with
+                                                          | None => None
+                                                          | Some (sell_order_type_value, bytes) =>
+                                                              match decode_bytes 4 bytes with
+                                                              | None => None
+                                                              | Some (buy_waiver_indicator_value, bytes) =>
+                                                                  match decode_bytes 4 bytes with
+                                                                  | None => None
+                                                                  | Some (sell_waiver_indicator_value, bytes) =>
+                                                                      match decode_bytes 14 bytes with
+                                                                      | None => None
+                                                                      | Some (notional_amount_value, bytes) =>
+                                                                          match decode_bytes 1 bytes with
+                                                                          | None => None
+                                                                          | Some (buy_algo_flag_value, bytes) =>
+                                                                              match decode_bytes 1 bytes with
+                                                                              | None => None
+                                                                              | Some (sell_algo_flag_value, bytes) =>
+                                                                                  match decode_bytes 1 bytes with
+                                                                                  | None => None
+                                                                                  | Some (sdiv_flag_value, bytes) =>
+                                                                                      match decode_bytes 1 bytes with
+                                                                                      | None => None
+                                                                                      | Some (dupl_flag_value, bytes) =>
+                                                                                          match decode_bytes 20 bytes with
+                                                                                          | None => None
+                                                                                          | Some (time_stamp_value, bytes) =>
+                                                                                              Some ({| symbol := symbol_value; board_id := board_id_value; trade_number := trade_number_value; buy_order_number := buy_order_number_value; buy_order_date := buy_order_date_value; sell_order_number := sell_order_number_value; sell_order_date := sell_order_date_value; price := price_value; volume := volume_value; total_volume := total_volume_value; trade_type := trade_type_value; trade_source := trade_source_value; buy_order_type := buy_order_type_value; sell_order_type := sell_order_type_value; buy_waiver_indicator := buy_waiver_indicator_value; sell_waiver_indicator := sell_waiver_indicator_value; notional_amount := notional_amount_value; buy_algo_flag := buy_algo_flag_value; sell_algo_flag := sell_algo_flag_value; sdiv_flag := sdiv_flag_value; dupl_flag := dupl_flag_value; time_stamp := time_stamp_value |}, bytes)
+                                                                                          end
+                                                                                      end
+                                                                                  end
+                                                                              end
+                                                                          end
+                                                                      end
+                                                                  end
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 147.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_19.
+      rewrite decode_encode_bytes by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_21.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End TradeMessage.
 
   Module IndexMessage.
 
@@ -270,6 +480,217 @@ Module AthexSecuritiesRealTimeV52.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End InstrumentSummaryMessage.
+
+  Module CancelledTradeMessage.
+
+    (** Transmitted when an instrument trade cancellation occurs in the trading platform or clearing system *)
+    Record t := {
+      symbol : list byte;
+      board_id : list byte;
+      trade_number : list byte;
+      buy_order_number : list byte;
+      buy_order_date : list byte;
+      sell_order_number : list byte;
+      sell_order_date : list byte;
+      cancelled_trade_price : list byte;
+      cancelled_volume : list byte;
+      total_volume : list byte;
+      trade_type : list byte;
+      trade_source : list byte;
+      buy_order_type : list byte;
+      sell_order_type : list byte;
+      buy_waiver_indicator : list byte;
+      sell_waiver_indicator : list byte;
+      notional_amount : list byte;
+      buy_algo_flag : list byte;
+      sell_algo_flag : list byte;
+      sdiv_flag : list byte;
+      dupl_flag : list byte;
+      time_stamp : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (symbol record) = 15 /\
+      Datatypes.length (board_id record) = 1 /\
+      Datatypes.length (trade_number record) = 6 /\
+      Datatypes.length (buy_order_number record) = 8 /\
+      Datatypes.length (buy_order_date record) = 8 /\
+      Datatypes.length (sell_order_number record) = 8 /\
+      Datatypes.length (sell_order_date record) = 8 /\
+      Datatypes.length (cancelled_trade_price record) = 9 /\
+      Datatypes.length (cancelled_volume record) = 17 /\
+      Datatypes.length (total_volume record) = 17 /\
+      Datatypes.length (trade_type record) = 1 /\
+      Datatypes.length (trade_source record) = 1 /\
+      Datatypes.length (buy_order_type record) = 1 /\
+      Datatypes.length (sell_order_type record) = 1 /\
+      Datatypes.length (buy_waiver_indicator record) = 4 /\
+      Datatypes.length (sell_waiver_indicator record) = 4 /\
+      Datatypes.length (notional_amount record) = 14 /\
+      Datatypes.length (buy_algo_flag record) = 1 /\
+      Datatypes.length (sell_algo_flag record) = 1 /\
+      Datatypes.length (sdiv_flag record) = 1 /\
+      Datatypes.length (dupl_flag record) = 1 /\
+      Datatypes.length (time_stamp record) = 20.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 15 (symbol record) ++
+      encode_bytes 1 (board_id record) ++
+      encode_bytes 6 (trade_number record) ++
+      encode_bytes 8 (buy_order_number record) ++
+      encode_bytes 8 (buy_order_date record) ++
+      encode_bytes 8 (sell_order_number record) ++
+      encode_bytes 8 (sell_order_date record) ++
+      encode_bytes 9 (cancelled_trade_price record) ++
+      encode_bytes 17 (cancelled_volume record) ++
+      encode_bytes 17 (total_volume record) ++
+      encode_bytes 1 (trade_type record) ++
+      encode_bytes 1 (trade_source record) ++
+      encode_bytes 1 (buy_order_type record) ++
+      encode_bytes 1 (sell_order_type record) ++
+      encode_bytes 4 (buy_waiver_indicator record) ++
+      encode_bytes 4 (sell_waiver_indicator record) ++
+      encode_bytes 14 (notional_amount record) ++
+      encode_bytes 1 (buy_algo_flag record) ++
+      encode_bytes 1 (sell_algo_flag record) ++
+      encode_bytes 1 (sdiv_flag record) ++
+      encode_bytes 1 (dupl_flag record) ++
+      encode_bytes 20 (time_stamp record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 15 bytes with
+      | None => None
+      | Some (symbol_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (board_id_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (trade_number_value, bytes) =>
+                  match decode_bytes 8 bytes with
+                  | None => None
+                  | Some (buy_order_number_value, bytes) =>
+                      match decode_bytes 8 bytes with
+                      | None => None
+                      | Some (buy_order_date_value, bytes) =>
+                          match decode_bytes 8 bytes with
+                          | None => None
+                          | Some (sell_order_number_value, bytes) =>
+                              match decode_bytes 8 bytes with
+                              | None => None
+                              | Some (sell_order_date_value, bytes) =>
+                                  match decode_bytes 9 bytes with
+                                  | None => None
+                                  | Some (cancelled_trade_price_value, bytes) =>
+                                      match decode_bytes 17 bytes with
+                                      | None => None
+                                      | Some (cancelled_volume_value, bytes) =>
+                                          match decode_bytes 17 bytes with
+                                          | None => None
+                                          | Some (total_volume_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (trade_type_value, bytes) =>
+                                                  match decode_bytes 1 bytes with
+                                                  | None => None
+                                                  | Some (trade_source_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (buy_order_type_value, bytes) =>
+                                                          match decode_bytes 1 bytes with
+                                                          | None => None
+                                                          | Some (sell_order_type_value, bytes) =>
+                                                              match decode_bytes 4 bytes with
+                                                              | None => None
+                                                              | Some (buy_waiver_indicator_value, bytes) =>
+                                                                  match decode_bytes 4 bytes with
+                                                                  | None => None
+                                                                  | Some (sell_waiver_indicator_value, bytes) =>
+                                                                      match decode_bytes 14 bytes with
+                                                                      | None => None
+                                                                      | Some (notional_amount_value, bytes) =>
+                                                                          match decode_bytes 1 bytes with
+                                                                          | None => None
+                                                                          | Some (buy_algo_flag_value, bytes) =>
+                                                                              match decode_bytes 1 bytes with
+                                                                              | None => None
+                                                                              | Some (sell_algo_flag_value, bytes) =>
+                                                                                  match decode_bytes 1 bytes with
+                                                                                  | None => None
+                                                                                  | Some (sdiv_flag_value, bytes) =>
+                                                                                      match decode_bytes 1 bytes with
+                                                                                      | None => None
+                                                                                      | Some (dupl_flag_value, bytes) =>
+                                                                                          match decode_bytes 20 bytes with
+                                                                                          | None => None
+                                                                                          | Some (time_stamp_value, bytes) =>
+                                                                                              Some ({| symbol := symbol_value; board_id := board_id_value; trade_number := trade_number_value; buy_order_number := buy_order_number_value; buy_order_date := buy_order_date_value; sell_order_number := sell_order_number_value; sell_order_date := sell_order_date_value; cancelled_trade_price := cancelled_trade_price_value; cancelled_volume := cancelled_volume_value; total_volume := total_volume_value; trade_type := trade_type_value; trade_source := trade_source_value; buy_order_type := buy_order_type_value; sell_order_type := sell_order_type_value; buy_waiver_indicator := buy_waiver_indicator_value; sell_waiver_indicator := sell_waiver_indicator_value; notional_amount := notional_amount_value; buy_algo_flag := buy_algo_flag_value; sell_algo_flag := sell_algo_flag_value; sdiv_flag := sdiv_flag_value; dupl_flag := dupl_flag_value; time_stamp := time_stamp_value |}, bytes)
+                                                                                          end
+                                                                                      end
+                                                                                  end
+                                                                              end
+                                                                          end
+                                                                      end
+                                                                  end
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 147.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_19.
+      rewrite decode_encode_bytes by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_21.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End CancelledTradeMessage.
 
   Module ClosingPriceMessage.
 

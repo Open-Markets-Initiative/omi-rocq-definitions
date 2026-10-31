@@ -25,7 +25,7 @@ Import ListNotations.
       - a run filling what frames it
       - a block whose stated length holds more than its fields
       - a run counted by a field
-      - a Composite rule
+      - a field present only on a condition
   *)
 
 Module IexOptionsMarketDataV104.

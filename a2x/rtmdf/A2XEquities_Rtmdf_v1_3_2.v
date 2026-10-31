@@ -89,7 +89,7 @@ Module A2XEquitiesRtmdfV132.
 
   Module OrderAddMessage.
 
-    (** The Order Add message is published when order quantity is posted to the order book for a particular security *)
+    (** The Order Add message is published when order quantity is posted to the order book for a particular security. *)
     Record t := {
       security_id : N;
       side : N;
@@ -172,7 +172,7 @@ Module A2XEquitiesRtmdfV132.
 
   Module OrderCancelMessage.
 
-    (** The Order Cancel message is published when a visible order is removed from the book *)
+    (** The Order Cancel message is published when a visible order is removed from the book. *)
     Record t := {
       security_id : N;
       order_ref : N;
@@ -231,10 +231,10 @@ Module A2XEquitiesRtmdfV132.
 
   Module OrderModifyMessage.
 
-    (** The Order Modify message is published when a visible order is modified by the client *)
+    (** The Order Modify message is published when a visible order is modified by the client (change of price and/or quantity). *)
     Record t := {
       security_id : N;
-      quantity : N;
+      remaining_quantity : N;
       price : N;
       order_ref : N;
       timestamp : N;
@@ -243,14 +243,14 @@ Module A2XEquitiesRtmdfV132.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 2)%N /\
-      (quantity record < 256 ^ N.of_nat 4)%N /\
+      (remaining_quantity record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (order_ref record < 256 ^ N.of_nat 4)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (security_id record) ++
-      encode_uint 4 (quantity record) ++
+      encode_uint 4 (remaining_quantity record) ++
       encode_uint 8 (price record) ++
       encode_uint 4 (order_ref record) ++
       encode_uint 8 (timestamp record).
@@ -261,7 +261,7 @@ Module A2XEquitiesRtmdfV132.
       | Some (security_id_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (quantity_value, bytes) =>
+          | Some (remaining_quantity_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
@@ -271,7 +271,7 @@ Module A2XEquitiesRtmdfV132.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (timestamp_value, bytes) =>
-                          Some ({| security_id := security_id_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value; timestamp := timestamp_value |}, bytes)
+                          Some ({| security_id := security_id_value; remaining_quantity := remaining_quantity_value; price := price_value; order_ref := order_ref_value; timestamp := timestamp_value |}, bytes)
                       end
                   end
               end
@@ -306,12 +306,12 @@ Module A2XEquitiesRtmdfV132.
 
   Module TradeMessage.
 
-    (** Whenever an order trades, partially or fully, a Trade message is published *)
+    (** Whenever an order trades, partially or fully, a Trade message is published. *)
     Record t := {
       security_id : N;
       trade_type : N;
-      quantity : N;
-      price : N;
+      traded_quantity : N;
+      execution_price : N;
       order_ref : N;
       trade_ref : N;
       timestamp : N;
@@ -321,8 +321,8 @@ Module A2XEquitiesRtmdfV132.
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 2)%N /\
       (trade_type record < 256 ^ N.of_nat 1)%N /\
-      (quantity record < 256 ^ N.of_nat 4)%N /\
-      (price record < 256 ^ N.of_nat 8)%N /\
+      (traded_quantity record < 256 ^ N.of_nat 4)%N /\
+      (execution_price record < 256 ^ N.of_nat 8)%N /\
       (order_ref record < 256 ^ N.of_nat 4)%N /\
       (trade_ref record < 256 ^ N.of_nat 4)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
@@ -330,8 +330,8 @@ Module A2XEquitiesRtmdfV132.
     Definition encode (record : t) : list byte :=
       encode_uint 2 (security_id record) ++
       encode_uint 1 (trade_type record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint 4 (traded_quantity record) ++
+      encode_uint 8 (execution_price record) ++
       encode_uint 4 (order_ref record) ++
       encode_uint 4 (trade_ref record) ++
       encode_uint 8 (timestamp record).
@@ -345,10 +345,10 @@ Module A2XEquitiesRtmdfV132.
           | Some (trade_type_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (quantity_value, bytes) =>
+              | Some (traded_quantity_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (price_value, bytes) =>
+                  | Some (execution_price_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (order_ref_value, bytes) =>
@@ -358,7 +358,7 @@ Module A2XEquitiesRtmdfV132.
                               match decode_uint 8 bytes with
                               | None => None
                               | Some (timestamp_value, bytes) =>
-                                  Some ({| security_id := security_id_value; trade_type := trade_type_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value; trade_ref := trade_ref_value; timestamp := timestamp_value |}, bytes)
+                                  Some ({| security_id := security_id_value; trade_type := trade_type_value; traded_quantity := traded_quantity_value; execution_price := execution_price_value; order_ref := order_ref_value; trade_ref := trade_ref_value; timestamp := timestamp_value |}, bytes)
                               end
                           end
                       end
@@ -397,11 +397,11 @@ Module A2XEquitiesRtmdfV132.
 
   Module TradeBustMessage.
 
-    (** If a trade has been declared erroneous by A2X then a Trade Bust message is published *)
+    (** If a trade has been declared erroneous by A2X then a Trade Bust message is published. *)
     Record t := {
       security_id : N;
-      quantity : N;
-      price : N;
+      traded_quantity : N;
+      execution_price : N;
       trade_ref : N;
       timestamp : N;
     }.
@@ -409,15 +409,15 @@ Module A2XEquitiesRtmdfV132.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 2)%N /\
-      (quantity record < 256 ^ N.of_nat 4)%N /\
-      (price record < 256 ^ N.of_nat 8)%N /\
+      (traded_quantity record < 256 ^ N.of_nat 4)%N /\
+      (execution_price record < 256 ^ N.of_nat 8)%N /\
       (trade_ref record < 256 ^ N.of_nat 4)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (security_id record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint 4 (traded_quantity record) ++
+      encode_uint 8 (execution_price record) ++
       encode_uint 4 (trade_ref record) ++
       encode_uint 8 (timestamp record).
 
@@ -427,17 +427,17 @@ Module A2XEquitiesRtmdfV132.
       | Some (security_id_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (quantity_value, bytes) =>
+          | Some (traded_quantity_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (price_value, bytes) =>
+              | Some (execution_price_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (trade_ref_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (timestamp_value, bytes) =>
-                          Some ({| security_id := security_id_value; quantity := quantity_value; price := price_value; trade_ref := trade_ref_value; timestamp := timestamp_value |}, bytes)
+                          Some ({| security_id := security_id_value; traded_quantity := traded_quantity_value; execution_price := execution_price_value; trade_ref := trade_ref_value; timestamp := timestamp_value |}, bytes)
                       end
                   end
               end
@@ -472,7 +472,7 @@ Module A2XEquitiesRtmdfV132.
 
   Module TickTableDataMessage.
 
-    (** A series of Tick Table Data messages are published pre-market to specify the dynamic tick tables and static ticks that apply to the securities traded on A2X *)
+    (** A series of Tick Table Data messages are published pre-market to specify the dynamic tick tables and static ticks that apply to the securities traded on A2X. *)
     Record t := {
       tick_table_id : N;
       name : list byte;
@@ -537,76 +537,9 @@ Module A2XEquitiesRtmdfV132.
 
   End TickTableDataMessage.
 
-  Module AuctionOnDemandMessage.
+  Module MacUpdateMessage.
 
-    (** During the AoD this message is used to publish the indicative price and indicative matched volume *)
-    Record t := {
-      security_id : N;
-      indicative_price : N;
-      match_vol : N;
-      timestamp : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (security_id record < 256 ^ N.of_nat 2)%N /\
-      (indicative_price record < 256 ^ N.of_nat 8)%N /\
-      (match_vol record < 256 ^ N.of_nat 4)%N /\
-      (timestamp record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (security_id record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 4 (match_vol record) ++
-      encode_uint 8 (timestamp record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (indicative_price_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (match_vol_value, bytes) =>
-                  match decode_uint 8 bytes with
-                  | None => None
-                  | Some (timestamp_value, bytes) =>
-                      Some ({| security_id := security_id_value; indicative_price := indicative_price_value; match_vol := match_vol_value; timestamp := timestamp_value |}, bytes)
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End AuctionOnDemandMessage.
-
-  Module MarketAtClose.
-
-    (** During the MaC this message is used to publish the indicative price from the buy and sell order totals *)
+    (** During the MaC this message is used to publish the indicative price from the buy and sell order totals. *)
     Record t := {
       security_id : N;
       indicative_price : N;
@@ -677,6 +610,73 @@ Module A2XEquitiesRtmdfV132.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End MarketAtClose.
+  End MacUpdateMessage.
+
+  Module AodUpdateMessage.
+
+    (** During the AoD this message is used to publish the indicative price and indicative matched volume. *)
+    Record t := {
+      security_id : N;
+      indicative_price : N;
+      match_vol : N;
+      timestamp : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      (indicative_price record < 256 ^ N.of_nat 8)%N /\
+      (match_vol record < 256 ^ N.of_nat 4)%N /\
+      (timestamp record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (security_id record) ++
+      encode_uint 8 (indicative_price record) ++
+      encode_uint 4 (match_vol record) ++
+      encode_uint 8 (timestamp record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (security_id_value, bytes) =>
+          match decode_uint 8 bytes with
+          | None => None
+          | Some (indicative_price_value, bytes) =>
+              match decode_uint 4 bytes with
+              | None => None
+              | Some (match_vol_value, bytes) =>
+                  match decode_uint 8 bytes with
+                  | None => None
+                  | Some (timestamp_value, bytes) =>
+                      Some ({| security_id := security_id_value; indicative_price := indicative_price_value; match_vol := match_vol_value; timestamp := timestamp_value |}, bytes)
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End AodUpdateMessage.
 
 End A2XEquitiesRtmdfV132.

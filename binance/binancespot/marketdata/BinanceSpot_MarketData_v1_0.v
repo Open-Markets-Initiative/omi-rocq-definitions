@@ -25,7 +25,7 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
       - a run counted by a field
-      - a Composite rule
+      - a field present only on a condition
   *)
 
 Module BinanceSpotMarketDataV10.

@@ -22,6 +22,7 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
+      - a length prefix framing what follows
       - a run filling what frames it
   *)
 

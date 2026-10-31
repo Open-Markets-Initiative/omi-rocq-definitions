@@ -6,8 +6,8 @@
 | [Protocol][Omi.Currenex.Protocol.Definitions] | [Encoding][Omi.Encoding.Definitions] | Version | Date | Size | [Deployment][Omi.Glossary.Deployment] | [Testing][Omi.Glossary.Testing] | [Documentation][Omi.Currenex.Specifications] |
 | --- | --- | --- | ---: | ---: | --- | --- | --- |
 | [Esp][Currenex.CurrenexForex.Esp] | [Cbp][Omi.Encoding.Cbp] | [9][Currenex.CurrenexForex.Esp.Cbp.v9.Definition] | 3/24/2021 | 784 | [Active][Omi.Glossary.Deployment.Active] | [Beta][Omi.Glossary.Testing.Beta] | [url][Currenex.CurrenexForex.Esp.Cbp.v9.Url] - [pdf][Currenex.CurrenexForex.Esp.Cbp.v9.Pdf] |
-| [Now][Currenex.CurrenexForex.Now] | [Cbp][Omi.Encoding.Cbp] | [10][Currenex.CurrenexForex.Now.Cbp.v10.Definition] | 5/7/2018 | 1025 | [Active][Omi.Glossary.Deployment.Active] | [Beta][Omi.Glossary.Testing.Beta] | [url][Currenex.CurrenexForex.Now.Cbp.v10.Url] - [pdf][Currenex.CurrenexForex.Now.Cbp.v10.Pdf] |
-| [OrderService][Currenex.CurrenexForex.OrderService] | [Cbp][Omi.Encoding.Cbp] | [26][Currenex.CurrenexForex.OrderService.Cbp.v26.Definition] | 4/6/2024 | 1337 | [Active][Omi.Glossary.Deployment.Active] | [Beta][Omi.Glossary.Testing.Beta] | [url][Currenex.CurrenexForex.OrderService.Cbp.v26.Url] - [pdf][Currenex.CurrenexForex.OrderService.Cbp.v26.Pdf] |
+| [Now][Currenex.CurrenexForex.Now] | [Cbp][Omi.Encoding.Cbp] | [10][Currenex.CurrenexForex.Now.Cbp.v10.Definition] | 5/7/2018 | 1,025 | [Active][Omi.Glossary.Deployment.Active] | [Beta][Omi.Glossary.Testing.Beta] | [url][Currenex.CurrenexForex.Now.Cbp.v10.Url] - [pdf][Currenex.CurrenexForex.Now.Cbp.v10.Pdf] |
+| [OrderService][Currenex.CurrenexForex.OrderService] | [Cbp][Omi.Encoding.Cbp] | [26][Currenex.CurrenexForex.OrderService.Cbp.v26.Definition] | 4/6/2024 | 1,337 | [Active][Omi.Glossary.Deployment.Active] | [Beta][Omi.Glossary.Testing.Beta] | [url][Currenex.CurrenexForex.OrderService.Cbp.v26.Url] - [pdf][Currenex.CurrenexForex.OrderService.Cbp.v26.Pdf] |
 
 
 <p align="center"><a href="https://currenex.com" title="Currenex Website"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/Website.png" alt="Website" width="32" height="32"></a>&nbsp;&nbsp;<a href="https://www.linkedin.com/showcase/currenex/" title="Currenex on LinkedIn"><img src="https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/raw/main/About/Icons/LinkedIn.png" alt="LinkedIn" width="32" height="32"></a></p>
@@ -37,10 +37,10 @@
 
 [Currenex.CurrenexForex.Esp.Cbp.v9.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/currenex/esp/CurrenexForex_Esp_v9.v "Currenex Esp Cbp v9 Rocq Definition"
 [Currenex.CurrenexForex.Esp.Cbp.v9.Url]: https://www.currenex.com/support "Currenex 9 Url"
-[Currenex.CurrenexForex.Esp.Cbp.v9.Pdf]: https://www.currenex.com/support/documentation/currenex/ITCH-Spec.pdf "Currenex 9 Pdf"
+[Currenex.CurrenexForex.Esp.Cbp.v9.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Currenex/Specifications/Itch/Esp/Currenex.CurrenexForex.Esp.Cbp.v9.pdf "Currenex 9 Pdf"
 [Currenex.CurrenexForex.Now.Cbp.v10.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/currenex/now/CurrenexForex_Now_v10.v "Currenex Now Cbp v10 Rocq Definition"
 [Currenex.CurrenexForex.Now.Cbp.v10.Url]: https://www.currenex.com/support "Currenex 10 Url"
-[Currenex.CurrenexForex.Now.Cbp.v10.Pdf]: https://www.currenex.com/support/documentation/currenexnow/Currenex_NOW_Itch_Specification.pdf "Currenex 10 Pdf"
+[Currenex.CurrenexForex.Now.Cbp.v10.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Currenex/Specifications/Itch/Now/Currenex.CurrenexForex.Now.Cbp.v10.pdf "Currenex 10 Pdf"
 [Currenex.CurrenexForex.OrderService.Cbp.v26.Definition]: https://github.com/Open-Markets-Initiative/omi-rocq-definitions/blob/main/currenex/orderservice/CurrenexForex_OrderService_v26.v "Currenex OrderService Cbp v26 Rocq Definition"
 [Currenex.CurrenexForex.OrderService.Cbp.v26.Url]: https://www.currenex.com/support "Currenex 26 Url"
-[Currenex.CurrenexForex.OrderService.Cbp.v26.Pdf]: https://www.currenex.com/support/documentation/currenex/OUCH-Spec.pdf "Currenex 26 Pdf"
+[Currenex.CurrenexForex.OrderService.Cbp.v26.Pdf]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Currenex/Specifications/Ouch/Currenex.CurrenexForex.OrderService.Cbp.v26.pdf "Currenex 26 Pdf"

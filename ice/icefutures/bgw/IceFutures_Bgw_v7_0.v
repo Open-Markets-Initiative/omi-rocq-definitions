@@ -23,8 +23,9 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - a Composite rule
+      - a field read in bits
       - a block whose stated length holds more than its fields
+      - a field present only on a condition
       - a run counted by a field
   *)
 

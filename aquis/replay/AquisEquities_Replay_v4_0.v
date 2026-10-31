@@ -22,7 +22,6 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Empty element
       - a run filling what frames it
   *)
 
@@ -89,7 +88,7 @@ Module AquisEquitiesReplayV40.
 
   Module LoginMessage.
 
-    (** Sent to authenticate with the replay server before using the message replay service. *)
+    (** If a recipient wishes to use the message replay service, they must first be authenticated by sending a Login message to the relevant replay server. *)
     Record t := {
       username : list byte;
       password : list byte;
@@ -140,7 +139,7 @@ Module AquisEquitiesReplayV40.
 
   Module ReplayRequestMessage.
 
-    (** Sent to request a particular message or range of messages from the replay server. *)
+    (** The recipient sends a Replay Request message to request a particular message or range of messages from the replay server. *)
     Record t := {
       begin_seq_no : N;
       end_seq_no : N;
@@ -191,7 +190,7 @@ Module AquisEquitiesReplayV40.
 
   Module ReplayResponseMessage.
 
-    (** Sent by Aquis to acknowledge a successful login or report problems with a Resend Request. *)
+    (** Aquis will send a Replay Response message to the recipient to acknowledge a successful Login or to report problems with a Resend Request. *)
     Record t := {
       response_code : N;
     }.

@@ -89,7 +89,7 @@ Module A2XEquitiesSnapshotV132.
 
   Module SnapshotStartMessage.
 
-    (** A Snapshot Start message is published as the first message in a snapshot to identify the continous stream *)
+    (** A Snapshot Start message is published as the first message in a snapshot to identify the sequence number in the continuous stream that this snapshot relates to. *)
     Record t := {
       stream_seq_no : N;
       security_count : N;
@@ -148,9 +148,10 @@ Module A2XEquitiesSnapshotV132.
 
   Module BookEntryMessage.
 
-    (** An appropriate number of Book Entry messages is published after each Book Status message to provide details of each order and allow the book to be built *)
+    (** An appropriate number of Book Entry messages is published after each Book Status message to provide details of each order and allow the book to be built. *)
     Record t := {
       security_id : N;
+      side : N;
       quantity : N;
       price : N;
       order_ref : N;
@@ -159,12 +160,14 @@ Module A2XEquitiesSnapshotV132.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 2)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (order_ref record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (security_id record) ++
+      encode_uint 1 (side record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 8 (price record) ++
       encode_uint 4 (order_ref record).
@@ -173,22 +176,26 @@ Module A2XEquitiesSnapshotV132.
       match decode_uint 2 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint 1 bytes with
           | None => None
-          | Some (quantity_value, bytes) =>
-              match decode_uint 8 bytes with
+          | Some (side_value, bytes) =>
+              match decode_uint 4 bytes with
               | None => None
-              | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+              | Some (quantity_value, bytes) =>
+                  match decode_uint 8 bytes with
                   | None => None
-                  | Some (order_ref_value, bytes) =>
-                      Some ({| security_id := security_id_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value |}, bytes)
+                  | Some (price_value, bytes) =>
+                      match decode_uint 4 bytes with
+                      | None => None
+                      | Some (order_ref_value, bytes) =>
+                          Some ({| security_id := security_id_value; side := side_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value |}, bytes)
+                      end
                   end
               end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length. reflexivity.
@@ -198,13 +205,14 @@ Module A2XEquitiesSnapshotV132.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -213,11 +221,12 @@ Module A2XEquitiesSnapshotV132.
 
   End BookEntryMessage.
 
-  Module MarketAtCloseBookEntryMessage.
+  Module MacBookEntryMessage.
 
-    (** A2X will publish the volume of the 5 best bid and offer orders per security in chronological order *)
+    (** During the MaC phase, A2X will publish the volume of the 5 best bid and offer orders per security in chronological order using the MaC Book Entry Message. *)
     Record t := {
       security_id : N;
+      side : N;
       quantity : N;
       price : N;
       order_ref : N;
@@ -226,12 +235,14 @@ Module A2XEquitiesSnapshotV132.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 2)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (order_ref record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (security_id record) ++
+      encode_uint 1 (side record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 8 (price record) ++
       encode_uint 4 (order_ref record).
@@ -240,22 +251,26 @@ Module A2XEquitiesSnapshotV132.
       match decode_uint 2 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint 1 bytes with
           | None => None
-          | Some (quantity_value, bytes) =>
-              match decode_uint 8 bytes with
+          | Some (side_value, bytes) =>
+              match decode_uint 4 bytes with
               | None => None
-              | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+              | Some (quantity_value, bytes) =>
+                  match decode_uint 8 bytes with
                   | None => None
-                  | Some (order_ref_value, bytes) =>
-                      Some ({| security_id := security_id_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value |}, bytes)
+                  | Some (price_value, bytes) =>
+                      match decode_uint 4 bytes with
+                      | None => None
+                      | Some (order_ref_value, bytes) =>
+                          Some ({| security_id := security_id_value; side := side_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value |}, bytes)
+                      end
                   end
               end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length. reflexivity.
@@ -265,19 +280,20 @@ Module A2XEquitiesSnapshotV132.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End MarketAtCloseBookEntryMessage.
+  End MacBookEntryMessage.
 
 End A2XEquitiesSnapshotV132.

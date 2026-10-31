@@ -2638,7 +2638,7 @@ Module FinraOrfTddsV21.
       closing_price_market_center : list byte;
       closing_price_denominator : list byte;
       closing_price : list byte;
-      reserved_1 : list byte;
+      reserved_1 : N;
       net_change_denominator : list byte;
       net_change_amount : list byte;
       net_change_direction : list byte;
@@ -2657,7 +2657,7 @@ Module FinraOrfTddsV21.
       Datatypes.length (closing_price_market_center record) = 1 /\
       Datatypes.length (closing_price_denominator record) = 1 /\
       Datatypes.length (closing_price record) = 12 /\
-      Datatypes.length (reserved_1 record) = 1 /\
+      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (net_change_denominator record) = 1 /\
       Datatypes.length (net_change_amount record) = 10 /\
       Datatypes.length (net_change_direction record) = 1 /\
@@ -2674,7 +2674,7 @@ Module FinraOrfTddsV21.
       encode_bytes 1 (closing_price_market_center record) ++
       encode_bytes 1 (closing_price_denominator record) ++
       encode_bytes 12 (closing_price record) ++
-      encode_bytes 1 (reserved_1 record) ++
+      encode_uint 1 (reserved_1 record) ++
       encode_bytes 1 (net_change_denominator record) ++
       encode_bytes 10 (net_change_amount record) ++
       encode_bytes 1 (net_change_direction record) ++
@@ -2709,7 +2709,7 @@ Module FinraOrfTddsV21.
                                       match decode_bytes 12 bytes with
                                       | None => None
                                       | Some (closing_price_value, bytes) =>
-                                          match decode_bytes 1 bytes with
+                                          match decode_uint 1 bytes with
                                           | None => None
                                           | Some (reserved_1_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -2747,7 +2747,7 @@ Module FinraOrfTddsV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 114.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !MessageHeader6.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !MessageHeader6.encode_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2766,7 +2766,7 @@ Module FinraOrfTddsV21.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.

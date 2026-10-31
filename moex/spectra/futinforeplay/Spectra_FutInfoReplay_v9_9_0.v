@@ -22,10 +22,11 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Composite rule
+      - a field read in bits
       - a run filling what frames it
       - a block whose stated length holds more than its fields
       - a run counted by a field
+      - a field present only on a condition
   *)
 
 Module SpectraFutInfoReplayV990.

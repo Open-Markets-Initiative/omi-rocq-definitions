@@ -24,6 +24,7 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a length prefix framing what follows
+      - a run counted by a field
       - a field present only on a condition
   *)
 

@@ -24,8 +24,9 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a block whose stated length holds more than its fields
-      - a Composite rule
+      - a field read in bits
       - a run counted by a field
+      - a field present only on a condition
   *)
 
 Module B3DerivativesBinaryUmdfV21.

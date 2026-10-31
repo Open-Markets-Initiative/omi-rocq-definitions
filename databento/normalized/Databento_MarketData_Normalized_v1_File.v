@@ -25,7 +25,7 @@ Import ListNotations.
       - a length prefix framing what follows
       - a run counted by a field
       - a run filling what frames it
-      - a Composite rule
+      - a field read in bits
   *)
 
 Module DatabentoMarketDataNormalizedV1File.

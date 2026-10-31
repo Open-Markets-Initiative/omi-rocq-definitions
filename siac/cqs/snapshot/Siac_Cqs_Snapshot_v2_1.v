@@ -22,12 +22,169 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Composite rule
       - a run counted by a field
       - the dispatch that chooses a message by its type
   *)
 
 Module SiacCqsSnapshotV21.
+
+  Module SipBlockTimestamp.
+
+    (** Cqs packet timestamp *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SipBlockTimestamp.
+
+  Module BlockHeader.
+
+    (** Cqs Snapshot packet header *)
+    Record t := {
+      version : N;
+      block_size : N;
+      block_sequence_number : N;
+      messages_in_block : N;
+      deliveryflag : N;
+      lastseqnum : N;
+      totpubseqrollover : N;
+      sip_block_timestamp : SipBlockTimestamp.t;
+      block_checksum : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (version record < 256 ^ N.of_nat 1)%N /\
+      (block_size record < 256 ^ N.of_nat 2)%N /\
+      (block_sequence_number record < 256 ^ N.of_nat 4)%N /\
+      (messages_in_block record < 256 ^ N.of_nat 1)%N /\
+      (deliveryflag record < 256 ^ N.of_nat 1)%N /\
+      (lastseqnum record < 256 ^ N.of_nat 4)%N /\
+      (totpubseqrollover record < 256 ^ N.of_nat 1)%N /\
+      SipBlockTimestamp.bounded (sip_block_timestamp record) /\
+      (block_checksum record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 1 (version record) ++
+      encode_uint 2 (block_size record) ++
+      encode_uint 4 (block_sequence_number record) ++
+      encode_uint 1 (messages_in_block record) ++
+      encode_uint 1 (deliveryflag record) ++
+      encode_uint 4 (lastseqnum record) ++
+      encode_uint 1 (totpubseqrollover record) ++
+      SipBlockTimestamp.encode (sip_block_timestamp record) ++
+      encode_uint 2 (block_checksum record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 1 bytes with
+      | None => None
+      | Some (version_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (block_size_value, bytes) =>
+              match decode_uint 4 bytes with
+              | None => None
+              | Some (block_sequence_number_value, bytes) =>
+                  match decode_uint 1 bytes with
+                  | None => None
+                  | Some (messages_in_block_value, bytes) =>
+                      match decode_uint 1 bytes with
+                      | None => None
+                      | Some (deliveryflag_value, bytes) =>
+                          match decode_uint 4 bytes with
+                          | None => None
+                          | Some (lastseqnum_value, bytes) =>
+                              match decode_uint 1 bytes with
+                              | None => None
+                              | Some (totpubseqrollover_value, bytes) =>
+                                  match SipBlockTimestamp.decode bytes with
+                                  | None => None
+                                  | Some (sip_block_timestamp_value, bytes) =>
+                                      match decode_uint 2 bytes with
+                                      | None => None
+                                      | Some (block_checksum_value, bytes) =>
+                                          Some ({| version := version_value; block_size := block_size_value; block_sequence_number := block_sequence_number_value; messages_in_block := messages_in_block_value; deliveryflag := deliveryflag_value; lastseqnum := lastseqnum_value; totpubseqrollover := totpubseqrollover_value; sip_block_timestamp := sip_block_timestamp_value; block_checksum := block_checksum_value |}, bytes)
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !SipBlockTimestamp.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite SipBlockTimestamp.decode_encode by exact bound_7.
+      rewrite decode_encode_uint by exact bound_8.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply SipBlockTimestamp.eq_dec]. Defined.
+
+  End BlockHeader.
 
   Module LineIntegrityMessage.
 

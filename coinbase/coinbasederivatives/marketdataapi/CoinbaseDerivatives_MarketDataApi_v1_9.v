@@ -22,7 +22,7 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Composite rule
+      - a field read in bits
       - a run counted by a field
       - a block whose stated length holds more than its fields
   *)

@@ -130,7 +130,7 @@ Module AquisEquitiesRealTimeV41.
 
   Module TickTableDataMessage.
 
-    (** Published pre-market to specify dynamic tick tables and static ticks controlling valid price increments for securities on the order book. *)
+    (** A series of Tick Table Data messages are published pre-market to specify the dynamic tick tables and static ticks that apply to the securities traded on Aquis. *)
     Record t := {
       tick_table_id : N;
       name : list byte;
@@ -195,9 +195,60 @@ Module AquisEquitiesRealTimeV41.
 
   End TickTableDataMessage.
 
-  Module AoDUpdateMessage.
+  Module LotSizeComposite.
 
-    (** Published during AoD to provide the indicative price and matched volume. *)
+    (** Lot size scaled at runtime by lotSizeDecimal *)
+    Record t := {
+      lot_size : N;
+      lot_size_decimal : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (lot_size record < 256 ^ N.of_nat 8)%N /\
+      (lot_size_decimal record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (lot_size record) ++
+      encode_uint 1 (lot_size_decimal record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (lot_size_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (lot_size_decimal_value, bytes) =>
+              Some ({| lot_size := lot_size_value; lot_size_decimal := lot_size_decimal_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End LotSizeComposite.
+
+  Module AodUpdateMessage.
+
+    (** During the AoD this message is used to publish the indicative price and indicative matched volume. *)
     Record t := {
       security_id : N;
       indicative_price : N;
@@ -260,9 +311,9 @@ Module AquisEquitiesRealTimeV41.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End AoDUpdateMessage.
+  End AodUpdateMessage.
 
-  Module MaCUpdateMessage.
+  Module MacUpdateMessage.
 
     (** During the MaC this message is used to publish the indicative price from the buy and sell order totals. *)
     Record t := {
@@ -335,6 +386,6 @@ Module AquisEquitiesRealTimeV41.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End MaCUpdateMessage.
+  End MacUpdateMessage.
 
 End AquisEquitiesRealTimeV41.

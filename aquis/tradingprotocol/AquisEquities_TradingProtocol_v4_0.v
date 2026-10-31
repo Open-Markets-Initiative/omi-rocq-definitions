@@ -89,7 +89,7 @@ Module AquisEquitiesTradingProtocolV40.
 
   Module LoginMessage.
 
-    (** The Login message is sent by the trading Member as the initial message used to establish a trading session *)
+    (** The Login message is sent by the trading Member as the initial message used to establish a trading session. It is also used to re-establish a session after a break. *)
     Record t := {
       protocol_version : N;
       sender_id : list byte;
@@ -215,7 +215,7 @@ Module AquisEquitiesTradingProtocolV40.
 
   Module LogoutMessage.
 
-    (** The Logout message is usually sent as a response to the Logout Request. The TCP/IP connection is closed immediately after this message has been sent. *)
+    (** The Logout message is usually sent as a response to the Logout Request. However it may also be sent by Aquis in case of a low sequence number or other protocol violation, or for other reasons. The TCP/IP connection is closed immediately after this message has been sent. *)
     Record t := {
       logout_reason_code : N;
       reason_text : list byte;
@@ -340,7 +340,7 @@ Module AquisEquitiesTradingProtocolV40.
       price : N;
       side : N;
       trade_ref : N;
-      timestamp : N;
+      bust_timestamp : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -350,7 +350,7 @@ Module AquisEquitiesTradingProtocolV40.
       (price record < 256 ^ N.of_nat 8)%N /\
       (side record < 256 ^ N.of_nat 1)%N /\
       (trade_ref record < 256 ^ N.of_nat 4)%N /\
-      (timestamp record < 256 ^ N.of_nat 8)%N.
+      (bust_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (order_ref record) ++
@@ -358,7 +358,7 @@ Module AquisEquitiesTradingProtocolV40.
       encode_uint 8 (price record) ++
       encode_uint 1 (side record) ++
       encode_uint 4 (trade_ref record) ++
-      encode_uint 8 (timestamp record).
+      encode_uint 8 (bust_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -378,8 +378,8 @@ Module AquisEquitiesTradingProtocolV40.
                       | Some (trade_ref_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
-                          | Some (timestamp_value, bytes) =>
-                              Some ({| order_ref := order_ref_value; quantity := quantity_value; price := price_value; side := side_value; trade_ref := trade_ref_value; timestamp := timestamp_value |}, bytes)
+                          | Some (bust_timestamp_value, bytes) =>
+                              Some ({| order_ref := order_ref_value; quantity := quantity_value; price := price_value; side := side_value; trade_ref := trade_ref_value; bust_timestamp := bust_timestamp_value |}, bytes)
                           end
                       end
                   end
@@ -422,7 +422,7 @@ Module AquisEquitiesTradingProtocolV40.
       price : N;
       quantity : N;
       min_qty : N;
-      timestamp : N;
+      invite_timestamp : N;
       user_tag : N;
     }.
 
@@ -432,7 +432,7 @@ Module AquisEquitiesTradingProtocolV40.
       (price record < 256 ^ N.of_nat 8)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (min_qty record < 256 ^ N.of_nat 4)%N /\
-      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (invite_timestamp record < 256 ^ N.of_nat 8)%N /\
       (user_tag record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
@@ -440,7 +440,7 @@ Module AquisEquitiesTradingProtocolV40.
       encode_uint 8 (price record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 4 (min_qty record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint 8 (invite_timestamp record) ++
       encode_uint 8 (user_tag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -458,11 +458,11 @@ Module AquisEquitiesTradingProtocolV40.
                   | Some (min_qty_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
-                      | Some (timestamp_value, bytes) =>
+                      | Some (invite_timestamp_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (user_tag_value, bytes) =>
-                              Some ({| order_ref := order_ref_value; price := price_value; quantity := quantity_value; min_qty := min_qty_value; timestamp := timestamp_value; user_tag := user_tag_value |}, bytes)
+                              Some ({| order_ref := order_ref_value; price := price_value; quantity := quantity_value; min_qty := min_qty_value; invite_timestamp := invite_timestamp_value; user_tag := user_tag_value |}, bytes)
                           end
                       end
                   end

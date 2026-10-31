@@ -25,7 +25,7 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run counted by a field
       - a block whose stated length holds more than its fields
-      - a Composite rule
+      - a field read in bits
   *)
 
 Module MemxOptionsMemoirDepthV13.

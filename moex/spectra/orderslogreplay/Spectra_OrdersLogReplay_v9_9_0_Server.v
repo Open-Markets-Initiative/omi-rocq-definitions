@@ -23,7 +23,7 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - a Composite rule
+      - a field read in bits
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
       - a length prefix framing what follows

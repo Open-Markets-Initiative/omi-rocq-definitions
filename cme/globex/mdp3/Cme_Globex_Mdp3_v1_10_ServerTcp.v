@@ -25,7 +25,7 @@ Import ListNotations.
       - a run filling what frames it
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
-      - a Composite rule
+      - a field read in bits
       - a run counted by a field
   *)
 

@@ -25,6 +25,7 @@ Import ListNotations.
       - a run filling what frames it
       - a length prefix framing what follows
       - a field read in bits
+      - a run counted by a field
   *)
 
 Module NordicEquitiesOrderEntryV50211Server.

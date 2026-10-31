@@ -23,7 +23,7 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - a Conversion rule
+      - a length prefix framing what follows
       - a Composite rule
       - a field read in bits
   *)

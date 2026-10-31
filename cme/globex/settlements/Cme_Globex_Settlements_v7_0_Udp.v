@@ -25,7 +25,7 @@ Import ListNotations.
       - a length prefix framing what follows
       - a block whose stated length holds more than its fields
       - a run counted by a field
-      - a Composite rule
+      - a field read in bits
   *)
 
 Module CmeGlobexSettlementsV70Udp.
@@ -317,6 +317,57 @@ Module CmeGlobexSettlementsV70Udp.
 
   End MaturityMonthYear.
 
+  Module StrikePrice.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End StrikePrice.
+
   Module UnderlyingMaturityMonthYear.
 
     (** Number of data blocks *)
@@ -383,6 +434,57 @@ Module CmeGlobexSettlementsV70Udp.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End UnderlyingMaturityMonthYear.
+
+  Module FormattedLastPx.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End FormattedLastPx.
 
   Module GroupSize2.
 
@@ -501,6 +603,57 @@ Module CmeGlobexSettlementsV70Udp.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End MaturityMonthYear2.
+
+  Module StrikePrice2.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End StrikePrice2.
 
   Module UnderlyingMaturityMonthYear2.
 
@@ -687,6 +840,57 @@ Module CmeGlobexSettlementsV70Udp.
 
   End MaturityMonthYear3.
 
+  Module StrikePrice3.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End StrikePrice3.
+
   Module UnderlyingMaturityMonthYear3.
 
     (** Number of data blocks *)
@@ -753,5 +957,107 @@ Module CmeGlobexSettlementsV70Udp.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End UnderlyingMaturityMonthYear3.
+
+  Module LowPx.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End LowPx.
+
+  Module HighPx.
+
+    (** Number of data blocks *)
+    Record t := {
+      mantissa : N;
+      exponent : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (exponent record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (mantissa record) ++
+      encode_uint 1 (exponent record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (mantissa_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (exponent_value, bytes) =>
+              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End HighPx.
 
 End CmeGlobexSettlementsV70Udp.

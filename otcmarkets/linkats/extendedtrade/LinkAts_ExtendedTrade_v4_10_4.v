@@ -22,9 +22,8 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Composite rule
-      - a run counted by a field
       - a field read in bits
+      - a run counted by a field
   *)
 
 Module LinkAtsExtendedTradeV4104.

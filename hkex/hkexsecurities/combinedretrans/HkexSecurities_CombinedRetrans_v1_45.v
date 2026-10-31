@@ -25,7 +25,6 @@ Import ListNotations.
       - a Reassemble rule
       - a run counted by a field
       - a Encoding rule
-      - a Composite rule
   *)
 
 Module HkexSecuritiesCombinedRetransV145.
@@ -1177,6 +1176,159 @@ Module HkexSecuritiesCombinedRetransV145.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End MarketDefinitionMessage.
+
+  Module FaceValueComposite.
+
+    (** Bond face value scaled at runtime by DecimalsInFaceValue. 0 mantissa means Not available. *)
+    Record t := {
+      face_value : N;
+      decimals_in_face_value : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (face_value record < 256 ^ N.of_nat 8)%N /\
+      (decimals_in_face_value record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (face_value record) ++
+      encode_uint 1 (decimals_in_face_value record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (face_value_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (decimals_in_face_value_value, bytes) =>
+              Some ({| face_value := face_value_value; decimals_in_face_value := decimals_in_face_value_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End FaceValueComposite.
+
+  Module CallPriceComposite.
+
+    (** CBBC call price scaled at runtime by DecimalsInCallPrice. 0 mantissa means Not available. *)
+    Record t := {
+      call_price : N;
+      decimals_in_call_price : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (call_price record < 256 ^ N.of_nat 4)%N /\
+      (decimals_in_call_price record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (call_price record) ++
+      encode_uint 1 (decimals_in_call_price record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (call_price_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (decimals_in_call_price_value, bytes) =>
+              Some ({| call_price := call_price_value; decimals_in_call_price := decimals_in_call_price_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End CallPriceComposite.
+
+  Module EntitlementComposite.
+
+    (** Warrant entitlement scaled at runtime by DecimalsInEntitlement. 0 mantissa means Not available. *)
+    Record t := {
+      entitlement : N;
+      decimals_in_entitlement : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (entitlement record < 256 ^ N.of_nat 4)%N /\
+      (decimals_in_entitlement record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (entitlement record) ++
+      encode_uint 1 (decimals_in_entitlement record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (entitlement_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (decimals_in_entitlement_value, bytes) =>
+              Some ({| entitlement := entitlement_value; decimals_in_entitlement := decimals_in_entitlement_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End EntitlementComposite.
 
   Module CurrencyRateMessage.
 

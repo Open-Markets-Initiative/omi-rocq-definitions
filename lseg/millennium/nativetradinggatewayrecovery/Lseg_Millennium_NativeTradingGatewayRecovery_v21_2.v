@@ -24,7 +24,6 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a length prefix framing what follows
       - a field read in bits
-      - a Composite rule
   *)
 
 Module LsegMillenniumNativeTradingGatewayRecoveryV212.
@@ -497,6 +496,207 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End SystemStatusMessage.
+
+  Module TransactTime.
+
+    (** Composite *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTime.
+
+  Module TransactTime2.
+
+    (** Composite *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTime2.
+
+  Module OrderMassCancelReportMessage.
+
+    (** Indicates that a mass order cancel request was accepted or rejected. *)
+    Record t := {
+      app_id : N;
+      sequence_no : N;
+      client_order_id : list byte;
+      mass_cancel_response : N;
+      mass_cancel_reject_reason : N;
+      reserved_4 : N;
+      transact_time : TransactTime2.t;
+      reserved_10 : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (app_id record < 256 ^ N.of_nat 1)%N /\
+      (sequence_no record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (client_order_id record) = 20 /\
+      (mass_cancel_response record < 256 ^ N.of_nat 1)%N /\
+      (mass_cancel_reject_reason record < 256 ^ N.of_nat 4)%N /\
+      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      TransactTime2.bounded (transact_time record) /\
+      Datatypes.length (reserved_10 record) = 10.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 1 (app_id record) ++
+      encode_uint 4 (sequence_no record) ++
+      encode_bytes 20 (client_order_id record) ++
+      encode_uint 1 (mass_cancel_response record) ++
+      encode_uint 4 (mass_cancel_reject_reason record) ++
+      encode_uint 4 (reserved_4 record) ++
+      TransactTime2.encode (transact_time record) ++
+      encode_bytes 10 (reserved_10 record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 1 bytes with
+      | None => None
+      | Some (app_id_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (sequence_no_value, bytes) =>
+              match decode_bytes 20 bytes with
+              | None => None
+              | Some (client_order_id_value, bytes) =>
+                  match decode_uint 1 bytes with
+                  | None => None
+                  | Some (mass_cancel_response_value, bytes) =>
+                      match decode_uint 4 bytes with
+                      | None => None
+                      | Some (mass_cancel_reject_reason_value, bytes) =>
+                          match decode_uint 4 bytes with
+                          | None => None
+                          | Some (reserved_4_value, bytes) =>
+                              match TransactTime2.decode bytes with
+                              | None => None
+                              | Some (transact_time_value, bytes) =>
+                                  match decode_bytes 10 bytes with
+                                  | None => None
+                                  | Some (reserved_10_value, bytes) =>
+                                      Some ({| app_id := app_id_value; sequence_no := sequence_no_value; client_order_id := client_order_id_value; mass_cancel_response := mass_cancel_response_value; mass_cancel_reject_reason := mass_cancel_reject_reason_value; reserved_4 := reserved_4_value; transact_time := transact_time_value; reserved_10 := reserved_10_value |}, bytes)
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime2.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite TransactTime2.decode_encode by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime2.eq_dec]. Defined.
+
+  End OrderMassCancelReportMessage.
 
   Module QuoteStatusReportMessage.
 
@@ -1021,5 +1221,56 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End QuoteResponseMessage.
+
+  Module TransactTime3.
+
+    (** Composite *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TransactTime3.
 
 End LsegMillenniumNativeTradingGatewayRecoveryV212.

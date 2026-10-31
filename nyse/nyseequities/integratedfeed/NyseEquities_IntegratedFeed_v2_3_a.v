@@ -22,12 +22,136 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a Composite rule
       - a run filling what frames it
       - a field present only on a condition
   *)
 
 Module NyseEquitiesIntegratedFeedV23A.
+
+  Module SendTime.
+
+    (** The time when this packet was published to the multicast channel *)
+    Record t := {
+      seconds : N;
+      nanoseconds : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (seconds record < 256 ^ N.of_nat 4)%N /\
+      (nanoseconds record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (seconds record) ++
+      encode_uint 4 (nanoseconds record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (seconds_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (nanoseconds_value, bytes) =>
+              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SendTime.
+
+  Module PacketHeader.
+
+    Record t := {
+      packet_size : N;
+      delivery_flag : N;
+      message_count : N;
+      sequence_number : N;
+      send_time : SendTime.t;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (packet_size record < 256 ^ N.of_nat 2)%N /\
+      (delivery_flag record < 256 ^ N.of_nat 1)%N /\
+      (message_count record < 256 ^ N.of_nat 1)%N /\
+      (sequence_number record < 256 ^ N.of_nat 4)%N /\
+      SendTime.bounded (send_time record).
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (packet_size record) ++
+      encode_uint 1 (delivery_flag record) ++
+      encode_uint 1 (message_count record) ++
+      encode_uint 4 (sequence_number record) ++
+      SendTime.encode (send_time record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (packet_size_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (delivery_flag_value, bytes) =>
+              match decode_uint 1 bytes with
+              | None => None
+              | Some (message_count_value, bytes) =>
+                  match decode_uint 4 bytes with
+                  | None => None
+                  | Some (sequence_number_value, bytes) =>
+                      match SendTime.decode bytes with
+                      | None => None
+                      | Some (send_time_value, bytes) =>
+                          Some ({| packet_size := packet_size_value; delivery_flag := delivery_flag_value; message_count := message_count_value; sequence_number := sequence_number_value; send_time := send_time_value |}, bytes)
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !SendTime.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite SendTime.decode_encode by exact bound_4.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply SendTime.eq_dec]. Defined.
+
+  End PacketHeader.
 
   Module MessageHeader.
 
