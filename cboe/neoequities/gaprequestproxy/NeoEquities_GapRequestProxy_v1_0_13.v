@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run filling what frames it
+
+    License: MIT No Attribution
   *)
 
 Module NeoEquitiesGapRequestProxyV1013.

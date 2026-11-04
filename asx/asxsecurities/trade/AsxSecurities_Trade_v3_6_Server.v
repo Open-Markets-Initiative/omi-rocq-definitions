@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a length prefix framing what follows
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module AsxSecuritiesTradeV36Server.
@@ -501,89 +503,6 @@ Module AsxSecuritiesTradeV36Server.
 
   End OrderRejectedMessage.
 
-  Module RegulatoryData2.
-
-    (** Regulatory Data *)
-    Record t := {
-      capacity_of_participant : list byte;
-      directed_wholesale : list byte;
-      execution_venue : list byte;
-      intermediary_id : list byte;
-      order_origin : list byte;
-      filler : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (capacity_of_participant record) = 1 /\
-      Datatypes.length (directed_wholesale record) = 1 /\
-      Datatypes.length (execution_venue record) = 4 /\
-      Datatypes.length (intermediary_id record) = 10 /\
-      Datatypes.length (order_origin record) = 20 /\
-      Datatypes.length (filler record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (capacity_of_participant record) ++
-      encode_bytes 1 (directed_wholesale record) ++
-      encode_bytes 4 (execution_venue record) ++
-      encode_bytes 10 (intermediary_id record) ++
-      encode_bytes 20 (order_origin record) ++
-      encode_bytes 8 (filler record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (capacity_of_participant_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (directed_wholesale_value, bytes) =>
-              match decode_bytes 4 bytes with
-              | None => None
-              | Some (execution_venue_value, bytes) =>
-                  match decode_bytes 10 bytes with
-                  | None => None
-                  | Some (intermediary_id_value, bytes) =>
-                      match decode_bytes 20 bytes with
-                      | None => None
-                      | Some (order_origin_value, bytes) =>
-                          match decode_bytes 8 bytes with
-                          | None => None
-                          | Some (filler_value, bytes) =>
-                              Some ({| capacity_of_participant := capacity_of_participant_value; directed_wholesale := directed_wholesale_value; execution_venue := execution_venue_value; intermediary_id := intermediary_id_value; order_origin := order_origin_value; filler := filler_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End RegulatoryData2.
-
   Module OrderReplacedMessage.
 
     (** The Order Replaced message acknowledges the receipt and acceptance of a valid Replace Order message. *)
@@ -604,7 +523,7 @@ Module AsxSecuritiesTradeV36Server.
       exchange_info : list byte;
       clearing_participant : list byte;
       crossing_key : N;
-      regulatory_data : RegulatoryData2.t;
+      regulatory_data : RegulatoryData.t;
       ouch_order_type : list byte;
       short_sell_quantity : N;
       minimum_acceptable_quantity : N;
@@ -628,7 +547,7 @@ Module AsxSecuritiesTradeV36Server.
       Datatypes.length (exchange_info record) = 32 /\
       Datatypes.length (clearing_participant record) = 1 /\
       (crossing_key record < 256 ^ N.of_nat 4)%N /\
-      RegulatoryData2.bounded (regulatory_data record) /\
+      RegulatoryData.bounded (regulatory_data record) /\
       Datatypes.length (ouch_order_type record) = 1 /\
       (short_sell_quantity record < 256 ^ N.of_nat 8)%N /\
       (minimum_acceptable_quantity record < 256 ^ N.of_nat 8)%N.
@@ -650,7 +569,7 @@ Module AsxSecuritiesTradeV36Server.
       encode_bytes 32 (exchange_info record) ++
       encode_bytes 1 (clearing_participant record) ++
       encode_uint 4 (crossing_key record) ++
-      RegulatoryData2.encode (regulatory_data record) ++
+      RegulatoryData.encode (regulatory_data record) ++
       encode_bytes 1 (ouch_order_type record) ++
       encode_uint 8 (short_sell_quantity record) ++
       encode_uint 8 (minimum_acceptable_quantity record).
@@ -704,7 +623,7 @@ Module AsxSecuritiesTradeV36Server.
                                                                   match decode_uint 4 bytes with
                                                                   | None => None
                                                                   | Some (crossing_key_value, bytes) =>
-                                                                      match RegulatoryData2.decode bytes with
+                                                                      match RegulatoryData.decode bytes with
                                                                       | None => None
                                                                       | Some (regulatory_data_value, bytes) =>
                                                                           match decode_bytes 1 bytes with
@@ -741,7 +660,7 @@ Module AsxSecuritiesTradeV36Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 187.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !RegulatoryData2.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !RegulatoryData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -767,7 +686,7 @@ Module AsxSecuritiesTradeV36Server.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite RegulatoryData2.decode_encode by exact bound_16.
+      rewrite RegulatoryData.decode_encode by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
@@ -775,7 +694,7 @@ Module AsxSecuritiesTradeV36Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply RegulatoryData2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply RegulatoryData.eq_dec]. Defined.
 
   End OrderReplacedMessage.
 

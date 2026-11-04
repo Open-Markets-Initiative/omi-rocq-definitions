@@ -26,6 +26,8 @@ Import ListNotations.
       - a length prefix framing what follows
       - a run counted by a field
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module CboeEuropeTradeReportingV2024.

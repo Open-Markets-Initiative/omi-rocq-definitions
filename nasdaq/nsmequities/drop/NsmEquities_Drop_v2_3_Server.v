@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a length prefix framing what follows
       - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module NsmEquitiesDropV23Server.

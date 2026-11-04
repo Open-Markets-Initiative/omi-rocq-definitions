@@ -27,6 +27,8 @@ Import ListNotations.
       - a field present only on a condition
       - a run counted by a field
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module SzseSecuritiesMulticastMarketDataV117.

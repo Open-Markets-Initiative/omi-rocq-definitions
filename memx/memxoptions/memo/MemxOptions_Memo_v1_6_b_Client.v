@@ -24,9 +24,11 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - the dispatch that chooses a message by its type
-      - a block whose stated length holds more than its fields
       - a field read in bits
+      - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module MemxOptionsMemoV16BClient.
@@ -410,565 +412,269 @@ Module MemxOptionsMemoV16BClient.
 
   End RepeatingGroupDimensions.
 
-  Module RepeatingGroupDimensions2.
+  Module OrderCancelReplaceRequestMessage.
 
-    (** RepeatingGroupDimensions *)
+    (** OrderCancelReplaceRequestMessage *)
     Record t := {
-      block_length_short : N;
-      num_in_group : N;
+      sending_time : N;
+      order_id_optional : N;
+      cl_ord_id : list byte;
+      list_seq_no : N;
+      orig_cl_ord_id : list byte;
+      security_id : list byte;
+      side : list byte;
+      order_qty : N;
+      ord_type : list byte;
+      price_optional : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
+      (sending_time record < 256 ^ N.of_nat 8)%N /\
+      (order_id_optional record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      (list_seq_no record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (orig_cl_ord_id record) = 20 /\
+      Datatypes.length (security_id record) = 8 /\
+      Datatypes.length (side record) = 1 /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (ord_type record) = 1 /\
+      (price_optional record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
+      encode_uint 8 (sending_time record) ++
+      encode_uint 8 (order_id_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_uint 1 (list_seq_no record) ++
+      encode_bytes 20 (orig_cl_ord_id record) ++
+      encode_bytes 8 (security_id record) ++
+      encode_bytes 1 (side record) ++
+      encode_uint 4 (order_qty record) ++
+      encode_bytes 1 (ord_type record) ++
+      encode_uint 8 (price_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_uint 8 bytes with
       | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
+      | Some (sending_time_value, bytes) =>
+          match decode_uint 8 bytes with
           | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
+          | Some (order_id_optional_value, bytes) =>
+              match decode_bytes 20 bytes with
+              | None => None
+              | Some (cl_ord_id_value, bytes) =>
+                  match decode_uint 1 bytes with
+                  | None => None
+                  | Some (list_seq_no_value, bytes) =>
+                      match decode_bytes 20 bytes with
+                      | None => None
+                      | Some (orig_cl_ord_id_value, bytes) =>
+                          match decode_bytes 8 bytes with
+                          | None => None
+                          | Some (security_id_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (side_value, bytes) =>
+                                  match decode_uint 4 bytes with
+                                  | None => None
+                                  | Some (order_qty_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (ord_type_value, bytes) =>
+                                          match decode_uint 8 bytes with
+                                          | None => None
+                                          | Some (price_optional_value, bytes) =>
+                                              Some ({| sending_time := sending_time_value; order_id_optional := order_id_optional_value; cl_ord_id := cl_ord_id_value; list_seq_no := list_seq_no_value; orig_cl_ord_id := orig_cl_ord_id_value; security_id := security_id_value; side := side_value; order_qty := order_qty_value; ord_type := ord_type_value; price_optional := price_optional_value |}, bytes)
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 79.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_uint by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End RepeatingGroupDimensions2.
+  End OrderCancelReplaceRequestMessage.
 
-  Module RepeatingGroupDimensions3.
+  Module OrderCancelRequestMessage.
 
-    (** RepeatingGroupDimensions *)
+    (** OrderCancelRequestMessage *)
     Record t := {
-      block_length_short : N;
-      num_in_group : N;
+      sending_time : N;
+      order_id_optional : N;
+      cl_ord_id : list byte;
+      list_seq_no : N;
+      orig_cl_ord_id_optional : list byte;
+      security_id : list byte;
+      side_optional : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
+      (sending_time record < 256 ^ N.of_nat 8)%N /\
+      (order_id_optional record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      (list_seq_no record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (orig_cl_ord_id_optional record) = 20 /\
+      Datatypes.length (security_id record) = 8 /\
+      Datatypes.length (side_optional record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
+      encode_uint 8 (sending_time record) ++
+      encode_uint 8 (order_id_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_uint 1 (list_seq_no record) ++
+      encode_bytes 20 (orig_cl_ord_id_optional record) ++
+      encode_bytes 8 (security_id record) ++
+      encode_bytes 1 (side_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_uint 8 bytes with
       | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
+      | Some (sending_time_value, bytes) =>
+          match decode_uint 8 bytes with
           | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
+          | Some (order_id_optional_value, bytes) =>
+              match decode_bytes 20 bytes with
+              | None => None
+              | Some (cl_ord_id_value, bytes) =>
+                  match decode_uint 1 bytes with
+                  | None => None
+                  | Some (list_seq_no_value, bytes) =>
+                      match decode_bytes 20 bytes with
+                      | None => None
+                      | Some (orig_cl_ord_id_optional_value, bytes) =>
+                          match decode_bytes 8 bytes with
+                          | None => None
+                          | Some (security_id_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (side_optional_value, bytes) =>
+                                  Some ({| sending_time := sending_time_value; order_id_optional := order_id_optional_value; cl_ord_id := cl_ord_id_value; list_seq_no := list_seq_no_value; orig_cl_ord_id_optional := orig_cl_ord_id_optional_value; security_id := security_id_value; side_optional := side_optional_value |}, bytes)
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 66.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End RepeatingGroupDimensions3.
+  End OrderCancelRequestMessage.
 
-  Module RepeatingGroupDimensions4.
+  Module MassCancelClearLockoutRequestMessage.
 
-    (** RepeatingGroupDimensions *)
+    (** MassCancelClearLockoutRequestMessage *)
     Record t := {
-      block_length_short : N;
-      num_in_group : N;
+      sending_time : N;
+      cl_ord_id : list byte;
+      lockout_id : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
+      (sending_time record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      (lockout_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
+      encode_uint 8 (sending_time record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_uint 8 (lockout_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_uint 8 bytes with
       | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
+      | Some (sending_time_value, bytes) =>
+          match decode_bytes 20 bytes with
           | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
+          | Some (cl_ord_id_value, bytes) =>
+              match decode_uint 8 bytes with
+              | None => None
+              | Some (lockout_id_value, bytes) =>
+                  Some ({| sending_time := sending_time_value; cl_ord_id := cl_ord_id_value; lockout_id := lockout_id_value |}, bytes)
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End RepeatingGroupDimensions4.
-
-  Module RepeatingGroupDimensions5.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions5.
-
-  Module RepeatingGroupDimensions6.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions6.
-
-  Module RepeatingGroupDimensions7.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions7.
-
-  Module RepeatingGroupDimensions8.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions8.
-
-  Module RepeatingGroupDimensions9.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions9.
-
-  Module RepeatingGroupDimensions10.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions10.
-
-  Module RepeatingGroupDimensions11.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions11.
-
-  Module RepeatingGroupDimensions12.
-
-    (** RepeatingGroupDimensions *)
-    Record t := {
-      block_length_short : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length_short record < 256 ^ N.of_nat 1)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (block_length_short record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (block_length_short_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length_short := block_length_short_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End RepeatingGroupDimensions12.
+  End MassCancelClearLockoutRequestMessage.
 
 End MemxOptionsMemoV16BClient.

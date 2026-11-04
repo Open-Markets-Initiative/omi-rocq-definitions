@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - the dispatch that chooses a message by its type
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module TaifexDerivativesDropCopyV2187.
@@ -978,108 +980,6 @@ Module TaifexDerivativesDropCopyV2187.
 
   End LongSymbolText.
 
-  Module OrgTransTimeMsgTime2.
-
-    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
-    Record t := {
-      epoch_s_int_324 : N;
-      ms : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
-      (ms record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_int_324 record) ++
-      encode_uint 2 (ms record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (epoch_s_int_324_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (ms_value, bytes) =>
-              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OrgTransTimeMsgTime2.
-
-  Module TransactTimeMsgTime2.
-
-    (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
-    Record t := {
-      epoch_s_int_324 : N;
-      ms : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
-      (ms record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_int_324 record) ++
-      encode_uint 2 (ms record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (epoch_s_int_324_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (ms_value, bytes) =>
-              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End TransactTimeMsgTime2.
-
   Module ErrorReportMessage.
 
     (** Error report, with which Taifex rejects an order, quote or inquiry the futures commission merchant sent. *)
@@ -1178,65 +1078,6 @@ Module TaifexDerivativesDropCopyV2187.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ErrorReportMessage.
-
-  Module SubHdr2.
-
-    (** Tmp Expanded Message Header, which assigns different functionalities to a MessageType by defining additional subcategories for it *)
-    Record t := {
-      msg_type_ext : N;
-      preserve : N;
-      msg_time_ns : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type_ext record < 256 ^ N.of_nat 1)%N /\
-      (preserve record < 256 ^ N.of_nat 1)%N /\
-      (msg_time_ns record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (msg_type_ext record) ++
-      encode_uint 1 (preserve record) ++
-      encode_uint 4 (msg_time_ns record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (msg_type_ext_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (preserve_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (msg_time_ns_value, bytes) =>
-                  Some ({| msg_type_ext := msg_type_ext_value; preserve := preserve_value; msg_time_ns := msg_time_ns_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubHdr2.
 
   Module SymbolNumX.
 
@@ -1504,70 +1345,11 @@ Module TaifexDerivativesDropCopyV2187.
 
   End TransactTimeMsgTimeX.
 
-  Module SubHdr3.
-
-    (** Tmp Expanded Message Header, which assigns different functionalities to a MessageType by defining additional subcategories for it *)
-    Record t := {
-      msg_type_ext : N;
-      preserve : N;
-      msg_time_ns : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type_ext record < 256 ^ N.of_nat 1)%N /\
-      (preserve record < 256 ^ N.of_nat 1)%N /\
-      (msg_time_ns record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (msg_type_ext record) ++
-      encode_uint 1 (preserve record) ++
-      encode_uint 4 (msg_time_ns record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (msg_type_ext_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (preserve_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (msg_time_ns_value, bytes) =>
-                  Some ({| msg_type_ext := msg_type_ext_value; preserve := preserve_value; msg_time_ns := msg_time_ns_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubHdr3.
-
   Module FlexErrorReportMessage.
 
     (** FLEX Error Report, with which Taifex rejects a FLEX order, quote or inquiry. *)
     Record t := {
-      sub_hdr : SubHdr3.t;
+      sub_hdr : SubHdr.t;
       part_id : N;
       ori_message_type : N;
       status_code_uint_162 : N;
@@ -1583,7 +1365,7 @@ Module TaifexDerivativesDropCopyV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      SubHdr3.bounded (sub_hdr record) /\
+      SubHdr.bounded (sub_hdr record) /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (ori_message_type record < 256 ^ N.of_nat 1)%N /\
       (status_code_uint_162 record < 256 ^ N.of_nat 2)%N /\
@@ -1597,7 +1379,7 @@ Module TaifexDerivativesDropCopyV2187.
       Datatypes.length (reserved_12 record) = 12.
 
     Definition encode (record : t) : list byte :=
-      SubHdr3.encode (sub_hdr record) ++
+      SubHdr.encode (sub_hdr record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 1 (ori_message_type record) ++
       encode_uint 2 (status_code_uint_162 record) ++
@@ -1611,7 +1393,7 @@ Module TaifexDerivativesDropCopyV2187.
       encode_bytes 12 (reserved_12 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match SubHdr3.decode bytes with
+      match SubHdr.decode bytes with
       | None => None
       | Some (sub_hdr_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1664,7 +1446,7 @@ Module TaifexDerivativesDropCopyV2187.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 47.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SubHdr3.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !SubHdr.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1674,7 +1456,7 @@ Module TaifexDerivativesDropCopyV2187.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite SubHdr3.decode_encode by exact bound_0.
+      rewrite SubHdr.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1690,7 +1472,7 @@ Module TaifexDerivativesDropCopyV2187.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubHdr3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubHdr.eq_dec]. Defined.
 
   End FlexErrorReportMessage.
 
@@ -1820,70 +1602,11 @@ Module TaifexDerivativesDropCopyV2187.
 
   End DropCopyInitiateOperationConfirmedMessage.
 
-  Module SubHdr4.
-
-    (** Tmp Expanded Message Header, which assigns different functionalities to a MessageType by defining additional subcategories for it *)
-    Record t := {
-      msg_type_ext : N;
-      preserve : N;
-      msg_time_ns : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type_ext record < 256 ^ N.of_nat 1)%N /\
-      (preserve record < 256 ^ N.of_nat 1)%N /\
-      (msg_time_ns record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (msg_type_ext record) ++
-      encode_uint 1 (preserve record) ++
-      encode_uint 4 (msg_time_ns record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (msg_type_ext_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (preserve_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (msg_time_ns_value, bytes) =>
-                  Some ({| msg_type_ext := msg_type_ext_value; preserve := preserve_value; msg_time_ns := msg_time_ns_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubHdr4.
-
   Module FlexDropCopyInitiateOperationMessage.
 
     (** TMPDC initiate FLEX operation message, with which the broker subscribes to the FLEX drop copies of a partition. *)
     Record t := {
-      sub_hdr : SubHdr4.t;
+      sub_hdr : SubHdr.t;
       part_id : N;
       fcm_id : N;
       target_id : N;
@@ -1892,21 +1615,21 @@ Module TaifexDerivativesDropCopyV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      SubHdr4.bounded (sub_hdr record) /\
+      SubHdr.bounded (sub_hdr record) /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (fcm_id record < 256 ^ N.of_nat 2)%N /\
       (target_id record < 256 ^ N.of_nat 1)%N /\
       (req_cm_seq record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      SubHdr4.encode (sub_hdr record) ++
+      SubHdr.encode (sub_hdr record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 2 (fcm_id record) ++
       encode_uint 1 (target_id record) ++
       encode_uint 4 (req_cm_seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match SubHdr4.decode bytes with
+      match SubHdr.decode bytes with
       | None => None
       | Some (sub_hdr_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1931,7 +1654,7 @@ Module TaifexDerivativesDropCopyV2187.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SubHdr4.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !SubHdr.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1941,7 +1664,7 @@ Module TaifexDerivativesDropCopyV2187.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite SubHdr4.decode_encode by exact bound_0.
+      rewrite SubHdr.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1950,74 +1673,15 @@ Module TaifexDerivativesDropCopyV2187.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply SubHdr4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply SubHdr.eq_dec]. Defined.
 
   End FlexDropCopyInitiateOperationMessage.
-
-  Module SubHdr5.
-
-    (** Tmp Expanded Message Header, which assigns different functionalities to a MessageType by defining additional subcategories for it *)
-    Record t := {
-      msg_type_ext : N;
-      preserve : N;
-      msg_time_ns : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type_ext record < 256 ^ N.of_nat 1)%N /\
-      (preserve record < 256 ^ N.of_nat 1)%N /\
-      (msg_time_ns record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (msg_type_ext record) ++
-      encode_uint 1 (preserve record) ++
-      encode_uint 4 (msg_time_ns record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (msg_type_ext_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (preserve_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (msg_time_ns_value, bytes) =>
-                  Some ({| msg_type_ext := msg_type_ext_value; preserve := preserve_value; msg_time_ns := msg_time_ns_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubHdr5.
 
   Module FlexDropCopyInitiateOperationConfirmedMessage.
 
     (** TMPDC initiate FLEX operation confirmed message, with which Taifex confirms the FLEX drop copy subscription. *)
     Record t := {
-      sub_hdr : SubHdr5.t;
+      sub_hdr : SubHdr.t;
       part_id : N;
       status_code_uint_162 : N;
       fcm_id : N;
@@ -2028,7 +1692,7 @@ Module TaifexDerivativesDropCopyV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      SubHdr5.bounded (sub_hdr record) /\
+      SubHdr.bounded (sub_hdr record) /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (status_code_uint_162 record < 256 ^ N.of_nat 2)%N /\
       (fcm_id record < 256 ^ N.of_nat 2)%N /\
@@ -2037,7 +1701,7 @@ Module TaifexDerivativesDropCopyV2187.
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
-      SubHdr5.encode (sub_hdr record) ++
+      SubHdr.encode (sub_hdr record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 2 (status_code_uint_162 record) ++
       encode_uint 2 (fcm_id record) ++
@@ -2046,7 +1710,7 @@ Module TaifexDerivativesDropCopyV2187.
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match SubHdr5.decode bytes with
+      match SubHdr.decode bytes with
       | None => None
       | Some (sub_hdr_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2079,7 +1743,7 @@ Module TaifexDerivativesDropCopyV2187.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SubHdr5.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !SubHdr.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2089,7 +1753,7 @@ Module TaifexDerivativesDropCopyV2187.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite SubHdr5.decode_encode by exact bound_0.
+      rewrite SubHdr.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -2100,7 +1764,7 @@ Module TaifexDerivativesDropCopyV2187.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubHdr5.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubHdr.eq_dec]. Defined.
 
   End FlexDropCopyInitiateOperationConfirmedMessage.
 

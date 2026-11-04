@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module NseCmSnapshotV71Response.

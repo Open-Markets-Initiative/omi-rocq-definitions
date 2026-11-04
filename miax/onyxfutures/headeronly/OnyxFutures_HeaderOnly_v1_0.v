@@ -23,6 +23,8 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module OnyxFuturesHeaderOnlyV10.

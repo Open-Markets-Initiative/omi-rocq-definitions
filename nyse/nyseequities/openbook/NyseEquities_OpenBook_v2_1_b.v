@@ -25,6 +25,8 @@ Import ListNotations.
       - a length prefix framing what follows
       - a run counted by a field
       - a run filling what frames it
+
+    License: MIT No Attribution
   *)
 
 Module NyseEquitiesOpenBookV21B.

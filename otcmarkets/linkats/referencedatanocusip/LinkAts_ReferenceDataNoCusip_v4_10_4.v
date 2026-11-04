@@ -25,6 +25,8 @@ Import ListNotations.
       - a field read in bits
       - a run counted by a field
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module LinkAtsReferenceDataNoCusipV4104.

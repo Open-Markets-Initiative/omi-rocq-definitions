@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a length prefix framing what follows
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module ByxEquitiesBinaryOrderEntryV2455.

@@ -28,6 +28,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a field read in bits
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module NseCmOrderEntryV66Server.
@@ -626,159 +628,6 @@ Module NseCmOrderEntryV66Server.
 
   End ControlMessageToTraderMessage.
 
-  Module SecInfo2.
-
-    (** SEC_INFO *)
-    Record t := {
-      symbol : list byte;
-      series : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol record) = 10 /\
-      Datatypes.length (series record) = 2.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 10 (symbol record) ++
-      encode_bytes 2 (series record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 10 bytes with
-      | None => None
-      | Some (symbol_value, bytes) =>
-          match decode_bytes 2 bytes with
-          | None => None
-          | Some (series_value, bytes) =>
-              Some ({| symbol := symbol_value; series := series_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SecInfo2.
-
-  Module SecInfo3.
-
-    (** SEC_INFO *)
-    Record t := {
-      symbol : list byte;
-      series : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol record) = 10 /\
-      Datatypes.length (series record) = 2.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 10 (symbol record) ++
-      encode_bytes 2 (series record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 10 bytes with
-      | None => None
-      | Some (symbol_value, bytes) =>
-          match decode_bytes 2 bytes with
-          | None => None
-          | Some (series_value, bytes) =>
-              Some ({| symbol := symbol_value; series := series_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SecInfo3.
-
-  Module SecInfo4.
-
-    (** SEC_INFO *)
-    Record t := {
-      symbol : list byte;
-      series : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol record) = 10 /\
-      Datatypes.length (series record) = 2.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 10 (symbol record) ++
-      encode_bytes 2 (series record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 10 bytes with
-      | None => None
-      | Some (symbol_value, bytes) =>
-          match decode_bytes 2 bytes with
-          | None => None
-          | Some (series_value, bytes) =>
-              Some ({| symbol := symbol_value; series := series_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SecInfo4.
-
   Module PasswordResetOutMessage.
 
     (** Sent as RESET_PASSWORD_OUT *)
@@ -830,113 +679,11 @@ Module NseCmOrderEntryV66Server.
 
   End PasswordResetOutMessage.
 
-  Module SecInfo5.
-
-    (** SEC_INFO *)
-    Record t := {
-      symbol : list byte;
-      series : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol record) = 10 /\
-      Datatypes.length (series record) = 2.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 10 (symbol record) ++
-      encode_bytes 2 (series record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 10 bytes with
-      | None => None
-      | Some (symbol_value, bytes) =>
-          match decode_bytes 2 bytes with
-          | None => None
-          | Some (series_value, bytes) =>
-              Some ({| symbol := symbol_value; series := series_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SecInfo5.
-
-  Module SecInfo6.
-
-    (** SEC_INFO *)
-    Record t := {
-      symbol : list byte;
-      series : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol record) = 10 /\
-      Datatypes.length (series record) = 2.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 10 (symbol record) ++
-      encode_bytes 2 (series record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 10 bytes with
-      | None => None
-      | Some (symbol_value, bytes) =>
-          match decode_bytes 2 bytes with
-          | None => None
-          | Some (series_value, bytes) =>
-              Some ({| symbol := symbol_value; series := series_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SecInfo6.
-
   Module TradeInquiryOutMessage.
 
     (** Sent as TRADE_ERROR, TRADE_CANCEL_OUT *)
     Record t := {
-      sec_info : SecInfo6.t;
+      sec_info : SecInfo.t;
       fill_number : N;
       fill_qty : N;
       fill_price : N;
@@ -956,7 +703,7 @@ Module NseCmOrderEntryV66Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      SecInfo6.bounded (sec_info record) /\
+      SecInfo.bounded (sec_info record) /\
       (fill_number record < 256 ^ N.of_nat 4)%N /\
       (fill_qty record < 256 ^ N.of_nat 4)%N /\
       (fill_price record < 256 ^ N.of_nat 4)%N /\
@@ -974,7 +721,7 @@ Module NseCmOrderEntryV66Server.
       Datatypes.length (reserved_60 record) = 60.
 
     Definition encode (record : t) : list byte :=
-      SecInfo6.encode (sec_info record) ++
+      SecInfo.encode (sec_info record) ++
       encode_uint 4 (fill_number record) ++
       encode_uint 4 (fill_qty record) ++
       encode_uint 4 (fill_price record) ++
@@ -992,7 +739,7 @@ Module NseCmOrderEntryV66Server.
       encode_bytes 60 (reserved_60 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match SecInfo6.decode bytes with
+      match SecInfo.decode bytes with
       | None => None
       | Some (sec_info_value, bytes) =>
           match decode_uint 4 bytes with
@@ -1061,7 +808,7 @@ Module NseCmOrderEntryV66Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 170.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SecInfo6.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !SecInfo.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1071,7 +818,7 @@ Module NseCmOrderEntryV66Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite SecInfo6.decode_encode by exact bound_0.
+      rewrite SecInfo.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1091,7 +838,7 @@ Module NseCmOrderEntryV66Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SecInfo6.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SecInfo.eq_dec]. Defined.
 
   End TradeInquiryOutMessage.
 

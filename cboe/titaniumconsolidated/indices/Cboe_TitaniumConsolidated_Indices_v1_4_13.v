@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run counted by a field
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module CboeTitaniumConsolidatedIndicesV1413.
@@ -221,57 +223,6 @@ Module CboeTitaniumConsolidatedIndicesV1413.
 
   End MdEntryPx.
 
-  Module MdEntryPx2.
-
-    (** MDEntryPx *)
-    Record t := {
-      exponent : N;
-      mantissa : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (exponent record < 256 ^ N.of_nat 1)%N /\
-      (mantissa record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (exponent record) ++
-      encode_uint 4 (mantissa record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (exponent_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (mantissa_value, bytes) =>
-              Some ({| exponent := exponent_value; mantissa := mantissa_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MdEntryPx2.
-
   Module EffectiveBusinessDate.
 
     (** EffectiveBusinessDate *)
@@ -322,108 +273,6 @@ Module CboeTitaniumConsolidatedIndicesV1413.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End EffectiveBusinessDate.
-
-  Module MdEntryPx3.
-
-    (** MDEntryPx *)
-    Record t := {
-      exponent : N;
-      mantissa : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (exponent record < 256 ^ N.of_nat 1)%N /\
-      (mantissa record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (exponent record) ++
-      encode_uint 4 (mantissa record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (exponent_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (mantissa_value, bytes) =>
-              Some ({| exponent := exponent_value; mantissa := mantissa_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MdEntryPx3.
-
-  Module MdEntryPx4.
-
-    (** MDEntryPx *)
-    Record t := {
-      exponent : N;
-      mantissa : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (exponent record < 256 ^ N.of_nat 1)%N /\
-      (mantissa record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (exponent record) ++
-      encode_uint 4 (mantissa record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (exponent_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (mantissa_value, bytes) =>
-              Some ({| exponent := exponent_value; mantissa := mantissa_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MdEntryPx4.
 
   Module Date.
 

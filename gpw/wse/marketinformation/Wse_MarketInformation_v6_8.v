@@ -26,6 +26,8 @@ Import ListNotations.
       - a run filling what frames it
       - a run counted by a field
       - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module WseMarketInformationV68.

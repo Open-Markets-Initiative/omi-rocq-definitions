@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a run filling what frames it
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BzxOptionsComplexV2161.

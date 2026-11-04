@@ -23,6 +23,8 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
+
+    License: MIT No Attribution
   *)
 
 Module KoscomMdcsRealtimeNightDerivativesV2020.

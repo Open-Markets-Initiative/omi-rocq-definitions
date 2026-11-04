@@ -26,6 +26,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a field present only on a condition
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module NasdaqUtpSnapshotV50Server.

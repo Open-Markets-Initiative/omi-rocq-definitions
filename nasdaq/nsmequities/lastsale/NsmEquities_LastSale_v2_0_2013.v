@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module NsmEquitiesLastSaleV202013.
@@ -493,73 +495,6 @@ Module NsmEquitiesLastSaleV202013.
 
   End TradeCancelErrorMessage.
 
-  Module OriginalSaleConditionModifier2.
-
-    (** Original Sale Condition Modifier *)
-    Record t := {
-      original_settlement_type : list byte;
-      original_trade_through_exemption : list byte;
-      original_extended_hours_or_sold_code : list byte;
-      original_special_sale_condition : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (original_settlement_type record) = 1 /\
-      Datatypes.length (original_trade_through_exemption record) = 1 /\
-      Datatypes.length (original_extended_hours_or_sold_code record) = 1 /\
-      Datatypes.length (original_special_sale_condition record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (original_settlement_type record) ++
-      encode_bytes 1 (original_trade_through_exemption record) ++
-      encode_bytes 1 (original_extended_hours_or_sold_code record) ++
-      encode_bytes 1 (original_special_sale_condition record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (original_settlement_type_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (original_trade_through_exemption_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (original_extended_hours_or_sold_code_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (original_special_sale_condition_value, bytes) =>
-                      Some ({| original_settlement_type := original_settlement_type_value; original_trade_through_exemption := original_trade_through_exemption_value; original_extended_hours_or_sold_code := original_extended_hours_or_sold_code_value; original_special_sale_condition := original_special_sale_condition_value |}, bytes)
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OriginalSaleConditionModifier2.
-
   Module CorrectedSaleConditionModifier.
 
     (** Corrected Sale Condition Modifier *)
@@ -637,7 +572,7 @@ Module NsmEquitiesLastSaleV202013.
       original_trade_control_number : list byte;
       original_trade_price : list byte;
       original_trade_size : list byte;
-      original_sale_condition_modifier : OriginalSaleConditionModifier2.t;
+      original_sale_condition_modifier : OriginalSaleConditionModifier.t;
       corrected_trade_control_number : list byte;
       corrected_trade_price : list byte;
       corrected_trade_size : list byte;
@@ -652,7 +587,7 @@ Module NsmEquitiesLastSaleV202013.
       Datatypes.length (original_trade_control_number record) = 10 /\
       Datatypes.length (original_trade_price record) = 10 /\
       Datatypes.length (original_trade_size record) = 9 /\
-      OriginalSaleConditionModifier2.bounded (original_sale_condition_modifier record) /\
+      OriginalSaleConditionModifier.bounded (original_sale_condition_modifier record) /\
       Datatypes.length (corrected_trade_control_number record) = 10 /\
       Datatypes.length (corrected_trade_price record) = 10 /\
       Datatypes.length (corrected_trade_size record) = 9 /\
@@ -665,7 +600,7 @@ Module NsmEquitiesLastSaleV202013.
       encode_bytes 10 (original_trade_control_number record) ++
       encode_bytes 10 (original_trade_price record) ++
       encode_bytes 9 (original_trade_size record) ++
-      OriginalSaleConditionModifier2.encode (original_sale_condition_modifier record) ++
+      OriginalSaleConditionModifier.encode (original_sale_condition_modifier record) ++
       encode_bytes 10 (corrected_trade_control_number record) ++
       encode_bytes 10 (corrected_trade_price record) ++
       encode_bytes 9 (corrected_trade_size record) ++
@@ -690,7 +625,7 @@ Module NsmEquitiesLastSaleV202013.
                           match decode_bytes 9 bytes with
                           | None => None
                           | Some (original_trade_size_value, bytes) =>
-                              match OriginalSaleConditionModifier2.decode bytes with
+                              match OriginalSaleConditionModifier.decode bytes with
                               | None => None
                               | Some (original_sale_condition_modifier_value, bytes) =>
                                   match decode_bytes 10 bytes with
@@ -721,7 +656,7 @@ Module NsmEquitiesLastSaleV202013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !OriginalSaleConditionModifier2.encode_length, !CorrectedSaleConditionModifier.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !OriginalSaleConditionModifier.encode_length, !CorrectedSaleConditionModifier.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -737,7 +672,7 @@ Module NsmEquitiesLastSaleV202013.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite OriginalSaleConditionModifier2.decode_encode by exact bound_6.
+      rewrite OriginalSaleConditionModifier.decode_encode by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -746,7 +681,7 @@ Module NsmEquitiesLastSaleV202013.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply OriginalSaleConditionModifier2.eq_dec | apply CorrectedSaleConditionModifier.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply OriginalSaleConditionModifier.eq_dec | apply CorrectedSaleConditionModifier.eq_dec]. Defined.
 
   End TradeCorrectionMessage.
 

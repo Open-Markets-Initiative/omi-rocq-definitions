@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a run filling what frames it
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module BzxOptionsMulticastDepthOfBookV24166.

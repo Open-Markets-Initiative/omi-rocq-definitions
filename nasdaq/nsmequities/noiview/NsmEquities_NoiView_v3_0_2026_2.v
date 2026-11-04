@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module NsmEquitiesNoiViewV3020262.

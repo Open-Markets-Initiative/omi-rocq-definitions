@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a length prefix framing what follows
       - a Composite rule
+
+    License: MIT No Attribution
   *)
 
 Module NseFoMtbtV68.

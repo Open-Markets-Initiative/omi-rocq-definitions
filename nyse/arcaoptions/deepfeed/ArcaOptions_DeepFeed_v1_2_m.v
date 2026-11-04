@@ -26,6 +26,8 @@ Import ListNotations.
       - a run filling what frames it
       - a run counted by a field
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module ArcaOptionsDeepFeedV12M.

@@ -23,6 +23,8 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module NyseBondsTradesV107AClient.

@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module MemxEquitiesCommonHeaderV12Client.

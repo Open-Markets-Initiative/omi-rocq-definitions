@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module MxSolaOrderEntryV121Firm.
@@ -235,65 +237,6 @@ Module MxSolaOrderEntryV121Firm.
 
   End OrderRequest.
 
-  Module IncomingMessagesHeader2.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader2.
-
   Module ClearingData.
 
     (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
@@ -413,7 +356,7 @@ Module MxSolaOrderEntryV121Firm.
   Module BulkQuoteData.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader2.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       clearing_data : ClearingData.t;
       owner_data : OwnerData.t;
@@ -431,7 +374,7 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader2.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       ClearingData.bounded (clearing_data record) /\
       OwnerData.bounded (owner_data record) /\
@@ -447,7 +390,7 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (filler_20 record) = 20.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader2.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       ClearingData.encode (clearing_data record) ++
       OwnerData.encode (owner_data record) ++
@@ -463,7 +406,7 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 20 (filler_20 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader2.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -524,7 +467,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 174.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader2.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -534,7 +477,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader2.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite ClearingData.decode_encode by exact bound_2.
       rewrite OwnerData.decode_encode by exact bound_3.
@@ -552,149 +495,31 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader2.eq_dec | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End BulkQuoteData.
-
-  Module IncomingMessagesHeader3.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader3.
-
-  Module IncomingMessagesHeader4.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader4.
 
   Module GlobalCancellation.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader4.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       type_of_cancellation_q_quotes_only : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader4.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (type_of_cancellation_q_quotes_only record) = 1.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader4.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 1 (type_of_cancellation_q_quotes_only record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader4.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -711,7 +536,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader4.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -721,80 +546,21 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader4.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End GlobalCancellation.
-
-  Module IncomingMessagesHeader5.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader5.
 
   Module UserGlobalCancellation.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader5.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group_filter : list byte;
       instrument_filter : list byte;
       type_of_cancellation : list byte;
@@ -803,21 +569,21 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader5.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group_filter record) = 2 /\
       Datatypes.length (instrument_filter record) = 4 /\
       Datatypes.length (type_of_cancellation record) = 1 /\
       Datatypes.length (account_type_filter record) = 8.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader5.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group_filter record) ++
       encode_bytes 4 (instrument_filter record) ++
       encode_bytes 1 (type_of_cancellation record) ++
       encode_bytes 8 (account_type_filter record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader5.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -842,7 +608,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 37.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader5.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -852,7 +618,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader5.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -861,132 +627,14 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader5.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End UserGlobalCancellation.
-
-  Module IncomingMessagesHeader6.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader6.
-
-  Module IncomingMessagesHeader7.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader7.
 
   Module SetGlobalRiskLimits.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader7.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       global_net_exposure_action : list byte;
       default_net_exposure_action : list byte;
       default_long_exposure_action : list byte;
@@ -1006,7 +654,7 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader7.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (global_net_exposure_action record) = 1 /\
       Datatypes.length (default_net_exposure_action record) = 1 /\
       Datatypes.length (default_long_exposure_action record) = 1 /\
@@ -1024,7 +672,7 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (default_short_position_limit record) = 8.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader7.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 1 (global_net_exposure_action record) ++
       encode_bytes 1 (default_net_exposure_action record) ++
       encode_bytes 1 (default_long_exposure_action record) ++
@@ -1042,7 +690,7 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 8 (default_short_position_limit record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader7.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -1111,7 +759,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader7.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1121,7 +769,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader7.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1141,189 +789,14 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader7.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End SetGlobalRiskLimits.
-
-  Module IncomingMessagesHeader8.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader8.
-
-  Module ClearingData2.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      filler_5 : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      (filler_5 record < 256 ^ N.of_nat 5)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_uint 5 (filler_5 record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_uint 5 bytes with
-                      | None => None
-                      | Some (filler_5_value, bytes) =>
-                          Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; filler_5 := filler_5_value |}, bytes)
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData2.
-
-  Module OwnerData2.
-
-    (** The guide states this field once, as Owner Data, for every message that carries it. *)
-    Record t := {
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 50 bytes with
-      | None => None
-      | Some (memo_value, bytes) =>
-          Some ({| memo := memo_value |}, bytes)
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
-    Proof.
-      intros record. unfold encode.
-      rewrite !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      unfold decode, encode.
-      rewrite decode_encode_bytes by exact bound.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData2.
 
   Module OrderEntry.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader8.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       price_type : list byte;
@@ -1338,8 +811,8 @@ Module MxSolaOrderEntryV121Firm.
       gtd_date : list byte;
       executing_participant : list byte;
       filler_1 : N;
-      clearing_data : ClearingData2.t;
-      owner_data : OwnerData2.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       anti_wash_id : list byte;
       anti_wash_instruction : list byte;
       filler_20 : list byte;
@@ -1347,7 +820,7 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader8.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       Datatypes.length (price_type record) = 1 /\
@@ -1362,14 +835,14 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (gtd_date record) = 8 /\
       Datatypes.length (executing_participant record) = 4 /\
       (filler_1 record < 256 ^ N.of_nat 1)%N /\
-      ClearingData2.bounded (clearing_data record) /\
-      OwnerData2.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (anti_wash_id record) = 8 /\
       Datatypes.length (anti_wash_instruction record) = 1 /\
       Datatypes.length (filler_20 record) = 20.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader8.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_bytes 1 (price_type record) ++
@@ -1384,14 +857,14 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 8 (gtd_date record) ++
       encode_bytes 4 (executing_participant record) ++
       encode_uint 1 (filler_1 record) ++
-      ClearingData2.encode (clearing_data record) ++
-      OwnerData2.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (anti_wash_id record) ++
       encode_bytes 1 (anti_wash_instruction record) ++
       encode_bytes 20 (filler_20 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader8.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -1436,10 +909,10 @@ Module MxSolaOrderEntryV121Firm.
                                                               match decode_uint 1 bytes with
                                                               | None => None
                                                               | Some (filler_1_value, bytes) =>
-                                                                  match ClearingData2.decode bytes with
+                                                                  match ClearingData.decode bytes with
                                                                   | None => None
                                                                   | Some (clearing_data_value, bytes) =>
-                                                                      match OwnerData2.decode bytes with
+                                                                      match OwnerData.decode bytes with
                                                                       | None => None
                                                                       | Some (owner_data_value, bytes) =>
                                                                           match decode_bytes 8 bytes with
@@ -1476,7 +949,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 181.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader8.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData2.encode_length, !OwnerData2.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1486,7 +959,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 bound_19]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader8.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1501,8 +974,8 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
-      rewrite ClearingData2.decode_encode by exact bound_15.
-      rewrite OwnerData2.decode_encode by exact bound_16.
+      rewrite ClearingData.decode_encode by exact bound_15.
+      rewrite OwnerData.decode_encode by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
@@ -1510,189 +983,14 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader8.eq_dec | apply ClearingData2.eq_dec | apply OwnerData2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End OrderEntry.
-
-  Module IncomingMessagesHeader9.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader9.
-
-  Module ClearingData3.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      filler_5 : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      (filler_5 record < 256 ^ N.of_nat 5)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_uint 5 (filler_5 record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_uint 5 bytes with
-                      | None => None
-                      | Some (filler_5_value, bytes) =>
-                          Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; filler_5 := filler_5_value |}, bytes)
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData3.
-
-  Module OwnerData3.
-
-    (** The guide states this field once, as Owner Data, for every message that carries it. *)
-    Record t := {
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 50 bytes with
-      | None => None
-      | Some (memo_value, bytes) =>
-          Some ({| memo := memo_value |}, bytes)
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
-    Proof.
-      intros record. unfold encode.
-      rewrite !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      unfold decode, encode.
-      rewrite decode_encode_bytes by exact bound.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData3.
 
   Module OrderModification.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader9.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       price_type : list byte;
@@ -1709,8 +1007,8 @@ Module MxSolaOrderEntryV121Firm.
       filler_4 : N;
       filler_1 : N;
       modified_order_id : list byte;
-      clearing_data : ClearingData3.t;
-      owner_data : OwnerData3.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       anti_wash_id : list byte;
       anti_wash_instruction : list byte;
       filler_20 : list byte;
@@ -1718,7 +1016,7 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader9.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       Datatypes.length (price_type record) = 1 /\
@@ -1735,14 +1033,14 @@ Module MxSolaOrderEntryV121Firm.
       (filler_4 record < 256 ^ N.of_nat 4)%N /\
       (filler_1 record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (modified_order_id record) = 8 /\
-      ClearingData3.bounded (clearing_data record) /\
-      OwnerData3.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (anti_wash_id record) = 8 /\
       Datatypes.length (anti_wash_instruction record) = 1 /\
       Datatypes.length (filler_20 record) = 20.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader9.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_bytes 1 (price_type record) ++
@@ -1759,14 +1057,14 @@ Module MxSolaOrderEntryV121Firm.
       encode_uint 4 (filler_4 record) ++
       encode_uint 1 (filler_1 record) ++
       encode_bytes 8 (modified_order_id record) ++
-      ClearingData3.encode (clearing_data record) ++
-      OwnerData3.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (anti_wash_id record) ++
       encode_bytes 1 (anti_wash_instruction record) ++
       encode_bytes 20 (filler_20 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader9.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -1817,10 +1115,10 @@ Module MxSolaOrderEntryV121Firm.
                                                                       match decode_bytes 8 bytes with
                                                                       | None => None
                                                                       | Some (modified_order_id_value, bytes) =>
-                                                                          match ClearingData3.decode bytes with
+                                                                          match ClearingData.decode bytes with
                                                                           | None => None
                                                                           | Some (clearing_data_value, bytes) =>
-                                                                              match OwnerData3.decode bytes with
+                                                                              match OwnerData.decode bytes with
                                                                               | None => None
                                                                               | Some (owner_data_value, bytes) =>
                                                                                   match decode_bytes 8 bytes with
@@ -1859,7 +1157,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 190.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader9.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData3.encode_length, !OwnerData3.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1869,7 +1167,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader9.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1886,8 +1184,8 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite ClearingData3.decode_encode by exact bound_17.
-      rewrite OwnerData3.decode_encode by exact bound_18.
+      rewrite ClearingData.decode_encode by exact bound_17.
+      rewrite OwnerData.decode_encode by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
@@ -1895,127 +1193,9 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader9.eq_dec | apply ClearingData3.eq_dec | apply OwnerData3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End OrderModification.
-
-  Module IncomingMessagesHeader10.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader10.
-
-  Module IncomingMessagesHeader11.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader11.
 
   Module BuyingClearingData.
 
@@ -2252,7 +1432,7 @@ Module MxSolaOrderEntryV121Firm.
   Module CrossEntry.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader11.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       filler_1 : N;
@@ -2267,7 +1447,7 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader11.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       (filler_1 record < 256 ^ N.of_nat 1)%N /\
@@ -2280,7 +1460,7 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (filler_20 record) = 20.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader11.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_uint 1 (filler_1 record) ++
@@ -2293,7 +1473,7 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 20 (filler_20 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader11.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -2342,7 +1522,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 207.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader11.encode_length, !encode_bytes_length, !encode_uint_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2352,7 +1532,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader11.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -2367,1017 +1547,14 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader11.eq_dec | apply BuyingClearingData.eq_dec | apply SellingClearingData.eq_dec | apply BuyingOwnerData.eq_dec | apply SellingOwnerData.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec | apply BuyingClearingData.eq_dec | apply SellingClearingData.eq_dec | apply BuyingOwnerData.eq_dec | apply SellingOwnerData.eq_dec]. Defined.
 
   End CrossEntry.
-
-  Module IncomingMessagesHeader12.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader12.
-
-  Module IncomingMessagesHeader13.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader13.
-
-  Module IncomingMessagesHeader14.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader14.
-
-  Module IncomingMessagesHeader15.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader15.
-
-  Module IncomingMessagesHeader16.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader16.
-
-  Module IncomingMessagesHeader17.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader17.
-
-  Module IncomingMessagesHeader18.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader18.
-
-  Module IncomingMessagesHeader19.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader19.
-
-  Module IncomingMessagesHeader20.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader20.
-
-  Module IncomingMessagesHeader21.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader21.
-
-  Module IncomingMessagesHeader22.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader22.
-
-  Module IncomingMessagesHeader23.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader23.
-
-  Module IncomingMessagesHeader24.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader24.
-
-  Module IncomingMessagesHeader25.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader25.
-
-  Module IncomingMessagesHeader26.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader26.
-
-  Module IncomingMessagesHeader27.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader27.
-
-  Module IncomingMessagesHeader28.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader28.
 
   Module SailRequestForQuoteWithSide.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader28.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       quantity : list byte;
@@ -3386,21 +1563,21 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader28.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (market_side record) = 1.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader28.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 1 (market_side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader28.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -3425,7 +1602,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 37.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader28.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3435,7 +1612,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader28.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -3444,90 +1621,31 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader28.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End SailRequestForQuoteWithSide.
-
-  Module IncomingMessagesHeader29.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader29.
 
   Module BulkQuoteParticipantBqpProtectionSubscription.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader29.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       protection_type_advanced_protection_advanced_protection_disabled : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader29.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (protection_type_advanced_protection_advanced_protection_disabled record) = 1.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader29.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 1 (protection_type_advanced_protection_advanced_protection_disabled record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader29.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -3544,7 +1662,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader29.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3554,80 +1672,21 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader29.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader29.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End BulkQuoteParticipantBqpProtectionSubscription.
-
-  Module IncomingMessagesHeader30.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader30.
 
   Module RequestForQuote.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader30.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       quantity : list byte;
@@ -3635,19 +1694,19 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader30.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       Datatypes.length (quantity record) = 8.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader30.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_bytes 8 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader30.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -3668,7 +1727,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader30.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3678,7 +1737,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader30.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -3686,73 +1745,14 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader30.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End RequestForQuote.
-
-  Module IncomingMessagesHeader31.
-
-    (** The guide states these fields once, as the Incoming Messages Header, for every business message a Participant sends. Message Type is read by the packet before the branch, so it is not repeated here. *)
-    Record t := {
-      user_timestamp_local_hhmmss : list byte;
-      trader_id : list byte;
-      user_sequence_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (user_timestamp_local_hhmmss record) = 6 /\
-      Datatypes.length (trader_id record) = 8 /\
-      Datatypes.length (user_sequence_id record) = 8.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (user_timestamp_local_hhmmss record) ++
-      encode_bytes 8 (trader_id record) ++
-      encode_bytes 8 (user_sequence_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (user_timestamp_local_hhmmss_value, bytes) =>
-          match decode_bytes 8 bytes with
-          | None => None
-          | Some (trader_id_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (user_sequence_id_value, bytes) =>
-                  Some ({| user_timestamp_local_hhmmss := user_timestamp_local_hhmmss_value; trader_id := trader_id_value; user_sequence_id := user_sequence_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End IncomingMessagesHeader31.
 
   Module OrderCancellation.
 
     Record t := {
-      incoming_messages_header : IncomingMessagesHeader31.t;
+      incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
       cancelled_order_id : list byte;
@@ -3760,19 +1760,19 @@ Module MxSolaOrderEntryV121Firm.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      IncomingMessagesHeader31.bounded (incoming_messages_header record) /\
+      IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
       Datatypes.length (cancelled_order_id record) = 8.
 
     Definition encode (record : t) : list byte :=
-      IncomingMessagesHeader31.encode (incoming_messages_header record) ++
+      IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
       encode_bytes 8 (cancelled_order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match IncomingMessagesHeader31.decode bytes with
+      match IncomingMessagesHeader.decode bytes with
       | None => None
       | Some (incoming_messages_header_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -3793,7 +1793,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader31.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3803,7 +1803,7 @@ Module MxSolaOrderEntryV121Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite IncomingMessagesHeader31.decode_encode by exact bound_0.
+      rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -3811,7 +1811,7 @@ Module MxSolaOrderEntryV121Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader31.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply IncomingMessagesHeader.eq_dec]. Defined.
 
   End OrderCancellation.
 

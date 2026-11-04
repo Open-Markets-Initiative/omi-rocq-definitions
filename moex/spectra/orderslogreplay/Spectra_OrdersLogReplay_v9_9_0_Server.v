@@ -25,9 +25,11 @@ Import ListNotations.
       - a run filling what frames it
       - a field read in bits
       - the dispatch that chooses a message by its type
-      - a block whose stated length holds more than its fields
       - a length prefix framing what follows
+      - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module SpectraOrdersLogReplayV990Server.
@@ -99,6 +101,47 @@ Module SpectraOrdersLogReplayV990Server.
 
   End SbeHeader.
 
+  Module LogoutMessage.
+
+    (** LogoutMessage *)
+    Record t := {
+      text : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (text record) = 256.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 256 (text record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 256 bytes with
+      | None => None
+      | Some (text_value, bytes) =>
+          Some ({| text := text_value |}, bytes)
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 256.
+    Proof.
+      intros record. unfold encode.
+      rewrite !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      unfold decode, encode.
+      rewrite decode_encode_bytes by exact bound.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End LogoutMessage.
+
   Module IncrementalPacketHeader.
 
     (** MarketDataDummyMessage *)
@@ -150,73 +193,6 @@ Module SpectraOrdersLogReplayV990Server.
 
   End IncrementalPacketHeader.
 
-  Module SbeHeader2.
-
-    (** Root block length, message template id, message schema id and schema version *)
-    Record t := {
-      block_length : N;
-      template_id : N;
-      schema_id : N;
-      version : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length record < 256 ^ N.of_nat 2)%N /\
-      (template_id record < 256 ^ N.of_nat 2)%N /\
-      (schema_id record < 256 ^ N.of_nat 2)%N /\
-      (version record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
-              | None => None
-              | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
-                  | None => None
-                  | Some (version_value, bytes) =>
-                      Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SbeHeader2.
-
   Module GroupSize.
 
     (** groupSize *)
@@ -267,5 +243,46 @@ Module SpectraOrdersLogReplayV990Server.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End GroupSize.
+
+  Module EmptyBookMessage.
+
+    (** EmptyBookMessage *)
+    Record t := {
+      last_msg_seq_num_processed_u_int_32_null_optional : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (last_msg_seq_num_processed_u_int_32_null_optional record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (last_msg_seq_num_processed_u_int_32_null_optional record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (last_msg_seq_num_processed_u_int_32_null_optional_value, bytes) =>
+          Some ({| last_msg_seq_num_processed_u_int_32_null_optional := last_msg_seq_num_processed_u_int_32_null_optional_value |}, bytes)
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
+    Proof.
+      intros record. unfold encode.
+      rewrite !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      unfold decode, encode.
+      rewrite decode_encode_uint by exact bound.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End EmptyBookMessage.
 
 End SpectraOrdersLogReplayV990Server.

@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a length prefix framing what follows
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module PearlEquitiesDepthOfMarketV13A.

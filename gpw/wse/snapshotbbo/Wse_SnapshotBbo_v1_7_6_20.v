@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a field read in bits
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module WseSnapshotBboV17620.
@@ -1859,89 +1861,6 @@ Module WseSnapshotBboV17620.
 
   End PriceLevel.
 
-  Module PriceLevel2.
-
-    (** PriceLevel *)
-    Record t := {
-      is_encrypted : N;
-      encryption_offset : N;
-      encryption_key_id : N;
-      price : N;
-      quantity : N;
-      order_count : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (is_encrypted record < 256 ^ N.of_nat 1)%N /\
-      (encryption_offset record < 256 ^ N.of_nat 8)%N /\
-      (encryption_key_id record < 256 ^ N.of_nat 4)%N /\
-      (price record < 256 ^ N.of_nat 8)%N /\
-      (quantity record < 256 ^ N.of_nat 8)%N /\
-      (order_count record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (is_encrypted record) ++
-      encode_uint 8 (encryption_offset record) ++
-      encode_uint 4 (encryption_key_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (quantity record) ++
-      encode_uint 2 (order_count record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (is_encrypted_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (encryption_offset_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (encryption_key_id_value, bytes) =>
-                  match decode_uint 8 bytes with
-                  | None => None
-                  | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
-                      | None => None
-                      | Some (quantity_value, bytes) =>
-                          match decode_uint 2 bytes with
-                          | None => None
-                          | Some (order_count_value, bytes) =>
-                              Some ({| is_encrypted := is_encrypted_value; encryption_offset := encryption_offset_value; encryption_key_id := encryption_key_id_value; price := price_value; quantity := quantity_value; order_count := order_count_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End PriceLevel2.
-
   Module TopPriceLevelUpdate.
 
     (** BBO Level 1 *)
@@ -2017,57 +1936,6 @@ Module WseSnapshotBboV17620.
 
   End TopPriceLevelUpdate.
 
-  Module PublicProductIdentification2.
-
-    (** PublicProductIdentification *)
-    Record t := {
-      product_identification_product_identification : list byte;
-      product_identification_type : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (product_identification_product_identification record) = 30 /\
-      (product_identification_type record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 30 (product_identification_product_identification record) ++
-      encode_uint 1 (product_identification_type record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 30 bytes with
-      | None => None
-      | Some (product_identification_product_identification_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (product_identification_type_value, bytes) =>
-              Some ({| product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End PublicProductIdentification2.
-
   Module Trade.
 
     (** Enriched trade report *)
@@ -2076,7 +1944,7 @@ Module WseSnapshotBboV17620.
       settlement_value_value : N;
       settlement_date : N;
       trading_timestamp : N;
-      public_product_identification : PublicProductIdentification2.t;
+      public_product_identification : PublicProductIdentification.t;
       price : N;
       price_currency : N;
       price_notation : N;
@@ -2116,7 +1984,7 @@ Module WseSnapshotBboV17620.
       (settlement_value_value record < 256 ^ N.of_nat 8)%N /\
       (settlement_date record < 256 ^ N.of_nat 4)%N /\
       (trading_timestamp record < 256 ^ N.of_nat 8)%N /\
-      PublicProductIdentification2.bounded (public_product_identification record) /\
+      PublicProductIdentification.bounded (public_product_identification record) /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (price_currency record < 256 ^ N.of_nat 2)%N /\
       (price_notation record < 256 ^ N.of_nat 1)%N /\
@@ -2154,7 +2022,7 @@ Module WseSnapshotBboV17620.
       encode_uint 8 (settlement_value_value record) ++
       encode_uint 4 (settlement_date record) ++
       encode_uint 8 (trading_timestamp record) ++
-      PublicProductIdentification2.encode (public_product_identification record) ++
+      PublicProductIdentification.encode (public_product_identification record) ++
       encode_uint 8 (price record) ++
       encode_uint 2 (price_currency record) ++
       encode_uint 1 (price_notation record) ++
@@ -2200,7 +2068,7 @@ Module WseSnapshotBboV17620.
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (trading_timestamp_value, bytes) =>
-                      match PublicProductIdentification2.decode bytes with
+                      match PublicProductIdentification.decode bytes with
                       | None => None
                       | Some (public_product_identification_value, bytes) =>
                           match decode_uint 8 bytes with
@@ -2337,7 +2205,7 @@ Module WseSnapshotBboV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 178.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !PublicProductIdentification2.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !PublicProductIdentification.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2351,7 +2219,7 @@ Module WseSnapshotBboV17620.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite PublicProductIdentification2.decode_encode by exact bound_4.
+      rewrite PublicProductIdentification.decode_encode by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
@@ -2387,66 +2255,15 @@ Module WseSnapshotBboV17620.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PublicProductIdentification2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PublicProductIdentification.eq_dec]. Defined.
 
   End Trade.
-
-  Module PublicProductIdentification3.
-
-    (** PublicProductIdentification *)
-    Record t := {
-      product_identification_product_identification : list byte;
-      product_identification_type : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (product_identification_product_identification record) = 30 /\
-      (product_identification_type record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 30 (product_identification_product_identification record) ++
-      encode_uint 1 (product_identification_type record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 30 bytes with
-      | None => None
-      | Some (product_identification_product_identification_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (product_identification_type_value, bytes) =>
-              Some ({| product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End PublicProductIdentification3.
 
   Module PositionReport.
 
     (** Report of open positions *)
     Record t := {
-      public_product_identification : PublicProductIdentification3.t;
+      public_product_identification : PublicProductIdentification.t;
       pos_type : N;
       open_positions : N;
       trade_id : N;
@@ -2454,19 +2271,19 @@ Module WseSnapshotBboV17620.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      PublicProductIdentification3.bounded (public_product_identification record) /\
+      PublicProductIdentification.bounded (public_product_identification record) /\
       (pos_type record < 256 ^ N.of_nat 1)%N /\
       (open_positions record < 256 ^ N.of_nat 4)%N /\
       (trade_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      PublicProductIdentification3.encode (public_product_identification record) ++
+      PublicProductIdentification.encode (public_product_identification record) ++
       encode_uint 1 (pos_type record) ++
       encode_uint 4 (open_positions record) ++
       encode_uint 4 (trade_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match PublicProductIdentification3.decode bytes with
+      match PublicProductIdentification.decode bytes with
       | None => None
       | Some (public_product_identification_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2487,7 +2304,7 @@ Module WseSnapshotBboV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !PublicProductIdentification3.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !PublicProductIdentification.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2497,7 +2314,7 @@ Module WseSnapshotBboV17620.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite PublicProductIdentification3.decode_encode by exact bound_0.
+      rewrite PublicProductIdentification.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -2505,7 +2322,7 @@ Module WseSnapshotBboV17620.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply PublicProductIdentification3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply PublicProductIdentification.eq_dec]. Defined.
 
   End PositionReport.
 

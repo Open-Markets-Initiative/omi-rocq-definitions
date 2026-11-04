@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run filling what frames it
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module TseEquitiesIndexStatisticsV195.
@@ -670,57 +672,6 @@ Module TseEquitiesIndexStatisticsV195.
 
   End WeightedYield.
 
-  Module YieldDayOnDayComparison2.
-
-    (** Yield Day-on-day comparison *)
-    Record t := {
-      day_on_day_comparison_c_8 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (day_on_day_comparison_c_8 record) = 8 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 8 (day_on_day_comparison_c_8 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 8 bytes with
-      | None => None
-      | Some (day_on_day_comparison_c_8_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (sign_value, bytes) =>
-              Some ({| day_on_day_comparison_c_8 := day_on_day_comparison_c_8_value; sign := sign_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End YieldDayOnDayComparison2.
-
   Module WeightedYieldMessage.
 
     (** In this tag, weighted yield information for each market (issue classification) will be set. This data appears as part of a statistics message. *)
@@ -729,7 +680,7 @@ Module TseEquitiesIndexStatisticsV195.
       time_c_6_hhmm : list byte;
       issue_classification_code : list byte;
       weighted_yield : WeightedYield.t;
-      yield_day_on_day_comparison : YieldDayOnDayComparison2.t;
+      yield_day_on_day_comparison : YieldDayOnDayComparison.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -738,14 +689,14 @@ Module TseEquitiesIndexStatisticsV195.
       Datatypes.length (time_c_6_hhmm record) = 6 /\
       Datatypes.length (issue_classification_code record) = 4 /\
       WeightedYield.bounded (weighted_yield record) /\
-      YieldDayOnDayComparison2.bounded (yield_day_on_day_comparison record).
+      YieldDayOnDayComparison.bounded (yield_day_on_day_comparison record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 6 (time_c_6_hhmm record) ++
       encode_bytes 4 (issue_classification_code record) ++
       WeightedYield.encode (weighted_yield record) ++
-      YieldDayOnDayComparison2.encode (yield_day_on_day_comparison record).
+      YieldDayOnDayComparison.encode (yield_day_on_day_comparison record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -760,7 +711,7 @@ Module TseEquitiesIndexStatisticsV195.
                   match WeightedYield.decode bytes with
                   | None => None
                   | Some (weighted_yield_value, bytes) =>
-                      match YieldDayOnDayComparison2.decode bytes with
+                      match YieldDayOnDayComparison.decode bytes with
                       | None => None
                       | Some (yield_day_on_day_comparison_value, bytes) =>
                           Some ({| reserved_2 := reserved_2_value; time_c_6_hhmm := time_c_6_hhmm_value; issue_classification_code := issue_classification_code_value; weighted_yield := weighted_yield_value; yield_day_on_day_comparison := yield_day_on_day_comparison_value |}, bytes)
@@ -773,7 +724,7 @@ Module TseEquitiesIndexStatisticsV195.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !WeightedYield.encode_length, !YieldDayOnDayComparison2.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !WeightedYield.encode_length, !YieldDayOnDayComparison.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -787,12 +738,12 @@ Module TseEquitiesIndexStatisticsV195.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite WeightedYield.decode_encode by exact bound_3.
-      rewrite YieldDayOnDayComparison2.decode_encode by exact bound_4.
+      rewrite YieldDayOnDayComparison.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply WeightedYield.eq_dec | apply YieldDayOnDayComparison2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply WeightedYield.eq_dec | apply YieldDayOnDayComparison.eq_dec]. Defined.
 
   End WeightedYieldMessage.
 
@@ -1048,65 +999,6 @@ Module TseEquitiesIndexStatisticsV195.
 
   End WeightedStockPriceAverage.
 
-  Module StockPriceAverageDayOnDayComparison2.
-
-    (** Stock price average Day-on-day comparison *)
-    Record t := {
-      unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (unit_flag_value, bytes) =>
-          match decode_bytes 14 bytes with
-          | None => None
-          | Some (day_on_day_comparison_c_14_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; sign := sign_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StockPriceAverageDayOnDayComparison2.
-
   Module WeightedStockPriceAverageMessage.
 
     (** In this tag, weighted stock price average information for each market (issue classification) will be set. This data appears as part of a statistics message. *)
@@ -1115,7 +1007,7 @@ Module TseEquitiesIndexStatisticsV195.
       output_time : list byte;
       issue_classification_code : list byte;
       weighted_stock_price_average : WeightedStockPriceAverage.t;
-      stock_price_average_day_on_day_comparison : StockPriceAverageDayOnDayComparison2.t;
+      stock_price_average_day_on_day_comparison : StockPriceAverageDayOnDayComparison.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1124,14 +1016,14 @@ Module TseEquitiesIndexStatisticsV195.
       Datatypes.length (output_time record) = 6 /\
       Datatypes.length (issue_classification_code record) = 4 /\
       WeightedStockPriceAverage.bounded (weighted_stock_price_average record) /\
-      StockPriceAverageDayOnDayComparison2.bounded (stock_price_average_day_on_day_comparison record).
+      StockPriceAverageDayOnDayComparison.bounded (stock_price_average_day_on_day_comparison record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 6 (output_time record) ++
       encode_bytes 4 (issue_classification_code record) ++
       WeightedStockPriceAverage.encode (weighted_stock_price_average record) ++
-      StockPriceAverageDayOnDayComparison2.encode (stock_price_average_day_on_day_comparison record).
+      StockPriceAverageDayOnDayComparison.encode (stock_price_average_day_on_day_comparison record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1146,7 +1038,7 @@ Module TseEquitiesIndexStatisticsV195.
                   match WeightedStockPriceAverage.decode bytes with
                   | None => None
                   | Some (weighted_stock_price_average_value, bytes) =>
-                      match StockPriceAverageDayOnDayComparison2.decode bytes with
+                      match StockPriceAverageDayOnDayComparison.decode bytes with
                       | None => None
                       | Some (stock_price_average_day_on_day_comparison_value, bytes) =>
                           Some ({| reserved_2 := reserved_2_value; output_time := output_time_value; issue_classification_code := issue_classification_code_value; weighted_stock_price_average := weighted_stock_price_average_value; stock_price_average_day_on_day_comparison := stock_price_average_day_on_day_comparison_value |}, bytes)
@@ -1159,7 +1051,7 @@ Module TseEquitiesIndexStatisticsV195.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !WeightedStockPriceAverage.encode_length, !StockPriceAverageDayOnDayComparison2.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !WeightedStockPriceAverage.encode_length, !StockPriceAverageDayOnDayComparison.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1173,132 +1065,14 @@ Module TseEquitiesIndexStatisticsV195.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite WeightedStockPriceAverage.decode_encode by exact bound_3.
-      rewrite StockPriceAverageDayOnDayComparison2.decode_encode by exact bound_4.
+      rewrite StockPriceAverageDayOnDayComparison.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply WeightedStockPriceAverage.eq_dec | apply StockPriceAverageDayOnDayComparison2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply WeightedStockPriceAverage.eq_dec | apply StockPriceAverageDayOnDayComparison.eq_dec]. Defined.
 
   End WeightedStockPriceAverageMessage.
-
-  Module SimpleStockPriceAverage2.
-
-    (** Simple stock price average *)
-    Record t := {
-      unit_flag : list byte;
-      simple_stock_price_average_c_14 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (simple_stock_price_average_c_14 record) = 14 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (simple_stock_price_average_c_14 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (unit_flag_value, bytes) =>
-          match decode_bytes 14 bytes with
-          | None => None
-          | Some (simple_stock_price_average_c_14_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; simple_stock_price_average_c_14 := simple_stock_price_average_c_14_value; sign := sign_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SimpleStockPriceAverage2.
-
-  Module StockPriceAverageDayOnDayComparison3.
-
-    (** Stock price average Day-on-day comparison *)
-    Record t := {
-      unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (unit_flag_value, bytes) =>
-          match decode_bytes 14 bytes with
-          | None => None
-          | Some (day_on_day_comparison_c_14_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; sign := sign_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StockPriceAverageDayOnDayComparison3.
 
   Module SimpleStockPriceAverageByIndustryMessage.
 
@@ -1307,8 +1081,8 @@ Module TseEquitiesIndexStatisticsV195.
       reserved_2 : list byte;
       output_time : list byte;
       industry_code : list byte;
-      simple_stock_price_average : SimpleStockPriceAverage2.t;
-      stock_price_average_day_on_day_comparison : StockPriceAverageDayOnDayComparison3.t;
+      simple_stock_price_average : SimpleStockPriceAverage.t;
+      stock_price_average_day_on_day_comparison : StockPriceAverageDayOnDayComparison.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1316,15 +1090,15 @@ Module TseEquitiesIndexStatisticsV195.
       Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (output_time record) = 6 /\
       Datatypes.length (industry_code record) = 4 /\
-      SimpleStockPriceAverage2.bounded (simple_stock_price_average record) /\
-      StockPriceAverageDayOnDayComparison3.bounded (stock_price_average_day_on_day_comparison record).
+      SimpleStockPriceAverage.bounded (simple_stock_price_average record) /\
+      StockPriceAverageDayOnDayComparison.bounded (stock_price_average_day_on_day_comparison record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 6 (output_time record) ++
       encode_bytes 4 (industry_code record) ++
-      SimpleStockPriceAverage2.encode (simple_stock_price_average record) ++
-      StockPriceAverageDayOnDayComparison3.encode (stock_price_average_day_on_day_comparison record).
+      SimpleStockPriceAverage.encode (simple_stock_price_average record) ++
+      StockPriceAverageDayOnDayComparison.encode (stock_price_average_day_on_day_comparison record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1336,10 +1110,10 @@ Module TseEquitiesIndexStatisticsV195.
               match decode_bytes 4 bytes with
               | None => None
               | Some (industry_code_value, bytes) =>
-                  match SimpleStockPriceAverage2.decode bytes with
+                  match SimpleStockPriceAverage.decode bytes with
                   | None => None
                   | Some (simple_stock_price_average_value, bytes) =>
-                      match StockPriceAverageDayOnDayComparison3.decode bytes with
+                      match StockPriceAverageDayOnDayComparison.decode bytes with
                       | None => None
                       | Some (stock_price_average_day_on_day_comparison_value, bytes) =>
                           Some ({| reserved_2 := reserved_2_value; output_time := output_time_value; industry_code := industry_code_value; simple_stock_price_average := simple_stock_price_average_value; stock_price_average_day_on_day_comparison := stock_price_average_day_on_day_comparison_value |}, bytes)
@@ -1352,7 +1126,7 @@ Module TseEquitiesIndexStatisticsV195.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !SimpleStockPriceAverage2.encode_length, !StockPriceAverageDayOnDayComparison3.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !SimpleStockPriceAverage.encode_length, !StockPriceAverageDayOnDayComparison.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1365,13 +1139,13 @@ Module TseEquitiesIndexStatisticsV195.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite SimpleStockPriceAverage2.decode_encode by exact bound_3.
-      rewrite StockPriceAverageDayOnDayComparison3.decode_encode by exact bound_4.
+      rewrite SimpleStockPriceAverage.decode_encode by exact bound_3.
+      rewrite StockPriceAverageDayOnDayComparison.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SimpleStockPriceAverage2.eq_dec | apply StockPriceAverageDayOnDayComparison3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SimpleStockPriceAverage.eq_dec | apply StockPriceAverageDayOnDayComparison.eq_dec]. Defined.
 
   End SimpleStockPriceAverageByIndustryMessage.
 
@@ -2029,260 +1803,40 @@ Module TseEquitiesIndexStatisticsV195.
 
   End Parity100OrHigher.
 
-  Module SimpleAverage2.
-
-    (** Simple average *)
-    Record t := {
-      unit_flag : list byte;
-      simple_average_c_14 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (simple_average_c_14 record) = 14 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (simple_average_c_14 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (unit_flag_value, bytes) =>
-          match decode_bytes 14 bytes with
-          | None => None
-          | Some (simple_average_c_14_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; simple_average_c_14 := simple_average_c_14_value; sign := sign_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End SimpleAverage2.
-
-  Module DivergenceAverage2.
-
-    (** Divergence average *)
-    Record t := {
-      divergence_average_c_8 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (divergence_average_c_8 record) = 8 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 8 (divergence_average_c_8 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 8 bytes with
-      | None => None
-      | Some (divergence_average_c_8_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (sign_value, bytes) =>
-              Some ({| divergence_average_c_8 := divergence_average_c_8_value; sign := sign_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End DivergenceAverage2.
-
-  Module ParityAverage2.
-
-    (** Parity average *)
-    Record t := {
-      unit_flag : list byte;
-      parity_average_c_14 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (parity_average_c_14 record) = 14 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (parity_average_c_14 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (unit_flag_value, bytes) =>
-          match decode_bytes 14 bytes with
-          | None => None
-          | Some (parity_average_c_14_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; parity_average_c_14 := parity_average_c_14_value; sign := sign_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ParityAverage2.
-
-  Module DirectYieldAverage2.
-
-    (** Direct yield average *)
-    Record t := {
-      direct_yield_average_c_8 : list byte;
-      sign : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (direct_yield_average_c_8 record) = 8 /\
-      Datatypes.length (sign record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 8 (direct_yield_average_c_8 record) ++
-      encode_bytes 1 (sign record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 8 bytes with
-      | None => None
-      | Some (direct_yield_average_c_8_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (sign_value, bytes) =>
-              Some ({| direct_yield_average_c_8 := direct_yield_average_c_8_value; sign := sign_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End DirectYieldAverage2.
-
   Module ParityLessThan100.
 
     (** Parity less than 100 *)
     Record t := {
-      simple_average : SimpleAverage2.t;
-      divergence_average : DivergenceAverage2.t;
-      parity_average : ParityAverage2.t;
-      direct_yield_average : DirectYieldAverage2.t;
+      simple_average : SimpleAverage.t;
+      divergence_average : DivergenceAverage.t;
+      parity_average : ParityAverage.t;
+      direct_yield_average : DirectYieldAverage.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      SimpleAverage2.bounded (simple_average record) /\
-      DivergenceAverage2.bounded (divergence_average record) /\
-      ParityAverage2.bounded (parity_average record) /\
-      DirectYieldAverage2.bounded (direct_yield_average record).
+      SimpleAverage.bounded (simple_average record) /\
+      DivergenceAverage.bounded (divergence_average record) /\
+      ParityAverage.bounded (parity_average record) /\
+      DirectYieldAverage.bounded (direct_yield_average record).
 
     Definition encode (record : t) : list byte :=
-      SimpleAverage2.encode (simple_average record) ++
-      DivergenceAverage2.encode (divergence_average record) ++
-      ParityAverage2.encode (parity_average record) ++
-      DirectYieldAverage2.encode (direct_yield_average record).
+      SimpleAverage.encode (simple_average record) ++
+      DivergenceAverage.encode (divergence_average record) ++
+      ParityAverage.encode (parity_average record) ++
+      DirectYieldAverage.encode (direct_yield_average record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match SimpleAverage2.decode bytes with
+      match SimpleAverage.decode bytes with
       | None => None
       | Some (simple_average_value, bytes) =>
-          match DivergenceAverage2.decode bytes with
+          match DivergenceAverage.decode bytes with
           | None => None
           | Some (divergence_average_value, bytes) =>
-              match ParityAverage2.decode bytes with
+              match ParityAverage.decode bytes with
               | None => None
               | Some (parity_average_value, bytes) =>
-                  match DirectYieldAverage2.decode bytes with
+                  match DirectYieldAverage.decode bytes with
                   | None => None
                   | Some (direct_yield_average_value, bytes) =>
                       Some ({| simple_average := simple_average_value; divergence_average := divergence_average_value; parity_average := parity_average_value; direct_yield_average := direct_yield_average_value |}, bytes)
@@ -2294,7 +1848,7 @@ Module TseEquitiesIndexStatisticsV195.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SimpleAverage2.encode_length, !DivergenceAverage2.encode_length, !ParityAverage2.encode_length, !DirectYieldAverage2.encode_length. reflexivity.
+      rewrite !length_app, !SimpleAverage.encode_length, !DivergenceAverage.encode_length, !ParityAverage.encode_length, !DirectYieldAverage.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2304,15 +1858,15 @@ Module TseEquitiesIndexStatisticsV195.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite SimpleAverage2.decode_encode by exact bound_0.
-      rewrite DivergenceAverage2.decode_encode by exact bound_1.
-      rewrite ParityAverage2.decode_encode by exact bound_2.
-      rewrite DirectYieldAverage2.decode_encode by exact bound_3.
+      rewrite SimpleAverage.decode_encode by exact bound_0.
+      rewrite DivergenceAverage.decode_encode by exact bound_1.
+      rewrite ParityAverage.decode_encode by exact bound_2.
+      rewrite DirectYieldAverage.decode_encode by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply SimpleAverage2.eq_dec | apply DivergenceAverage2.eq_dec | apply ParityAverage2.eq_dec | apply DirectYieldAverage2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply SimpleAverage.eq_dec | apply DivergenceAverage.eq_dec | apply ParityAverage.eq_dec | apply DirectYieldAverage.eq_dec]. Defined.
 
   End ParityLessThan100.
 

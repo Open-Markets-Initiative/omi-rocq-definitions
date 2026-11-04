@@ -24,9 +24,11 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - the dispatch that chooses a message by its type
-      - a block whose stated length holds more than its fields
       - a field read in bits
+      - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BlueEquitiesMemoV114Client.
@@ -409,5 +411,302 @@ Module BlueEquitiesMemoV114Client.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End RepeatingGroupDimensions.
+
+  Module OrderCancelReplaceRequestMessage.
+
+    (** Changes the parameters of an existing order; Fix message type G *)
+    Record t := {
+      orig_cl_ord_id : list byte;
+      cl_ord_id : list byte;
+      symbol : list byte;
+      symbol_sfx : list byte;
+      side : list byte;
+      order_qty : N;
+      ord_type : list byte;
+      price : N;
+      display_qty : N;
+      locate_reqd : list byte;
+      link_id_optional : list byte;
+      locate_broker_optional : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (orig_cl_ord_id record) = 16 /\
+      Datatypes.length (cl_ord_id record) = 16 /\
+      Datatypes.length (symbol record) = 6 /\
+      Datatypes.length (symbol_sfx record) = 6 /\
+      Datatypes.length (side record) = 1 /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (ord_type record) = 1 /\
+      (price record < 256 ^ N.of_nat 8)%N /\
+      (display_qty record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (locate_reqd record) = 1 /\
+      Datatypes.length (link_id_optional record) = 4 /\
+      Datatypes.length (locate_broker_optional record) = 4.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 16 (orig_cl_ord_id record) ++
+      encode_bytes 16 (cl_ord_id record) ++
+      encode_bytes 6 (symbol record) ++
+      encode_bytes 6 (symbol_sfx record) ++
+      encode_bytes 1 (side record) ++
+      encode_uint 4 (order_qty record) ++
+      encode_bytes 1 (ord_type record) ++
+      encode_uint 8 (price record) ++
+      encode_uint 4 (display_qty record) ++
+      encode_bytes 1 (locate_reqd record) ++
+      encode_bytes 4 (link_id_optional record) ++
+      encode_bytes 4 (locate_broker_optional record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 16 bytes with
+      | None => None
+      | Some (orig_cl_ord_id_value, bytes) =>
+          match decode_bytes 16 bytes with
+          | None => None
+          | Some (cl_ord_id_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (symbol_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (symbol_sfx_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (side_value, bytes) =>
+                          match decode_uint 4 bytes with
+                          | None => None
+                          | Some (order_qty_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (ord_type_value, bytes) =>
+                                  match decode_uint 8 bytes with
+                                  | None => None
+                                  | Some (price_value, bytes) =>
+                                      match decode_uint 4 bytes with
+                                      | None => None
+                                      | Some (display_qty_value, bytes) =>
+                                          match decode_bytes 1 bytes with
+                                          | None => None
+                                          | Some (locate_reqd_value, bytes) =>
+                                              match decode_bytes 4 bytes with
+                                              | None => None
+                                              | Some (link_id_optional_value, bytes) =>
+                                                  match decode_bytes 4 bytes with
+                                                  | None => None
+                                                  | Some (locate_broker_optional_value, bytes) =>
+                                                      Some ({| orig_cl_ord_id := orig_cl_ord_id_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; symbol_sfx := symbol_sfx_value; side := side_value; order_qty := order_qty_value; ord_type := ord_type_value; price := price_value; display_qty := display_qty_value; locate_reqd := locate_reqd_value; link_id_optional := link_id_optional_value; locate_broker_optional := locate_broker_optional_value |}, bytes)
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End OrderCancelReplaceRequestMessage.
+
+  Module OrderCancelRequestMessage.
+
+    (** Cancels all remaining size on an order; naming the exchange Order Id cancels an order entered on another account or through the Memo Fix ports; Fix message type F *)
+    Record t := {
+      orig_cl_ord_id_optional : list byte;
+      order_id_optional : N;
+      cl_ord_id : list byte;
+      symbol : list byte;
+      symbol_sfx : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (orig_cl_ord_id_optional record) = 16 /\
+      (order_id_optional record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (cl_ord_id record) = 16 /\
+      Datatypes.length (symbol record) = 6 /\
+      Datatypes.length (symbol_sfx record) = 6.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 16 (orig_cl_ord_id_optional record) ++
+      encode_uint 8 (order_id_optional record) ++
+      encode_bytes 16 (cl_ord_id record) ++
+      encode_bytes 6 (symbol record) ++
+      encode_bytes 6 (symbol_sfx record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 16 bytes with
+      | None => None
+      | Some (orig_cl_ord_id_optional_value, bytes) =>
+          match decode_uint 8 bytes with
+          | None => None
+          | Some (order_id_optional_value, bytes) =>
+              match decode_bytes 16 bytes with
+              | None => None
+              | Some (cl_ord_id_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (symbol_value, bytes) =>
+                      match decode_bytes 6 bytes with
+                      | None => None
+                      | Some (symbol_sfx_value, bytes) =>
+                          Some ({| orig_cl_ord_id_optional := orig_cl_ord_id_optional_value; order_id_optional := order_id_optional_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; symbol_sfx := symbol_sfx_value |}, bytes)
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End OrderCancelRequestMessage.
+
+  Module MassCancelRequestMessage.
+
+    (** Cancels all remaining size on every existing order matching the given criteria, across accounts and across the Memo and Memo Fix protocols *)
+    Record t := {
+      cl_ord_id : list byte;
+      symbol : list byte;
+      symbol_sfx : list byte;
+      side_optional : list byte;
+      lower_than_price : N;
+      higher_than_price : N;
+      cancel_group_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (cl_ord_id record) = 16 /\
+      Datatypes.length (symbol record) = 6 /\
+      Datatypes.length (symbol_sfx record) = 6 /\
+      Datatypes.length (side_optional record) = 1 /\
+      (lower_than_price record < 256 ^ N.of_nat 8)%N /\
+      (higher_than_price record < 256 ^ N.of_nat 8)%N /\
+      (cancel_group_id record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 16 (cl_ord_id record) ++
+      encode_bytes 6 (symbol record) ++
+      encode_bytes 6 (symbol_sfx record) ++
+      encode_bytes 1 (side_optional record) ++
+      encode_uint 8 (lower_than_price record) ++
+      encode_uint 8 (higher_than_price record) ++
+      encode_uint 2 (cancel_group_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 16 bytes with
+      | None => None
+      | Some (cl_ord_id_value, bytes) =>
+          match decode_bytes 6 bytes with
+          | None => None
+          | Some (symbol_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (symbol_sfx_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (side_optional_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (lower_than_price_value, bytes) =>
+                          match decode_uint 8 bytes with
+                          | None => None
+                          | Some (higher_than_price_value, bytes) =>
+                              match decode_uint 2 bytes with
+                              | None => None
+                              | Some (cancel_group_id_value, bytes) =>
+                                  Some ({| cl_ord_id := cl_ord_id_value; symbol := symbol_value; symbol_sfx := symbol_sfx_value; side_optional := side_optional_value; lower_than_price := lower_than_price_value; higher_than_price := higher_than_price_value; cancel_group_id := cancel_group_id_value |}, bytes)
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 47.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End MassCancelRequestMessage.
 
 End BlueEquitiesMemoV114Client.

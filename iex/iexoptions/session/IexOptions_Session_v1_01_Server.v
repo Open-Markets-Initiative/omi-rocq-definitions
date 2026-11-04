@@ -26,6 +26,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module IexOptionsSessionV101Server.
@@ -97,6 +99,57 @@ Module IexOptionsSessionV101Server.
 
   End MessageHeader.
 
+  Module LoginResponseMessage.
+
+    (** LoginResponseMessage *)
+    Record t := {
+      logon_id : list byte;
+      status : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (logon_id record) = 16 /\
+      (status record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 16 (logon_id record) ++
+      encode_uint 1 (status record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 16 bytes with
+      | None => None
+      | Some (logon_id_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (status_value, bytes) =>
+              Some ({| logon_id := logon_id_value; status := status_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End LoginResponseMessage.
+
   Module SessionInfoGroupEncoding.
 
     (** sessionInfoGroupEncoding *)
@@ -147,5 +200,207 @@ Module IexOptionsSessionV101Server.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End SessionInfoGroupEncoding.
+
+  Module TerminateMessage.
+
+    (** TerminateMessage *)
+    Record t := {
+      reason : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (reason record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 1 (reason record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 1 bytes with
+      | None => None
+      | Some (reason_value, bytes) =>
+          Some ({| reason := reason_value |}, bytes)
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
+    Proof.
+      intros record. unfold encode.
+      rewrite !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      unfold decode, encode.
+      rewrite decode_encode_uint by exact bound.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TerminateMessage.
+
+  Module SequencedMessageHeaderMessage.
+
+    (** SequencedMessageHeaderMessage *)
+    Record t := {
+      subsession_id : N;
+      sequence : N;
+      timestamp : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (subsession_id record < 256 ^ N.of_nat 8)%N /\
+      (sequence record < 256 ^ N.of_nat 4)%N /\
+      (timestamp record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (subsession_id record) ++
+      encode_uint 4 (sequence record) ++
+      encode_uint 8 (timestamp record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (subsession_id_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (sequence_value, bytes) =>
+              match decode_uint 8 bytes with
+              | None => None
+              | Some (timestamp_value, bytes) =>
+                  Some ({| subsession_id := subsession_id_value; sequence := sequence_value; timestamp := timestamp_value |}, bytes)
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 bound_2]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SequencedMessageHeaderMessage.
+
+  Module SubsessionJoinResponseMessage.
+
+    (** SubsessionJoinResponseMessage *)
+    Record t := {
+      subsession_id : N;
+      status : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (subsession_id record < 256 ^ N.of_nat 8)%N /\
+      (status record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (subsession_id record) ++
+      encode_uint 1 (status record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (subsession_id_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (status_value, bytes) =>
+              Some ({| subsession_id := subsession_id_value; status := status_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SubsessionJoinResponseMessage.
+
+  Module SubsessionLeaveResponseMessage.
+
+    (** SubsessionLeaveResponseMessage *)
+    Record t := {
+      subsession_id : N;
+      reason : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (subsession_id record < 256 ^ N.of_nat 8)%N /\
+      (reason record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (subsession_id record) ++
+      encode_uint 1 (reason record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (subsession_id_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (reason_value, bytes) =>
+              Some ({| subsession_id := subsession_id_value; reason := reason_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SubsessionLeaveResponseMessage.
 
 End IexOptionsSessionV101Server.

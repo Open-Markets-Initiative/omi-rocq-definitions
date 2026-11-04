@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a field read in bits
       - a Conversion rule
+
+    License: MIT No Attribution
   *)
 
 Module EuronextOptiqMarketDataPacketV1.

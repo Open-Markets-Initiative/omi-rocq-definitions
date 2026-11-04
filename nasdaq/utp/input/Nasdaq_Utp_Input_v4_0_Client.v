@@ -27,6 +27,8 @@ Import ListNotations.
       - a run counted by a field
       - a field of no fixed width
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module NasdaqUtpInputV40Client.

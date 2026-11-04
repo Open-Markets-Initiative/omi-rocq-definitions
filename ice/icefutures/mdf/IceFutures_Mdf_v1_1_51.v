@@ -25,6 +25,8 @@ Import ListNotations.
       - a run counted by a field
       - a field read in bits
       - a field of no fixed width
+
+    License: MIT No Attribution
   *)
 
 Module IceFuturesMdfV1151.

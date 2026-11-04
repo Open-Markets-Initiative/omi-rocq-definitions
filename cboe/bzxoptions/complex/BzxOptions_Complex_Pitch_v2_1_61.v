@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run filling what frames it
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BzxOptionsComplexV2161.

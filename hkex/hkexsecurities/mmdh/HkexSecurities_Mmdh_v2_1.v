@@ -25,7 +25,9 @@ Import ListNotations.
       - a Reassemble rule
       - a length prefix framing what follows
       - a run counted by a field
-      - a Encoding rule
+      - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module HkexSecuritiesMmdhV21.

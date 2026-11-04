@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run filling what frames it
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module CxeEquitiesMulticastDepthOfBookV62.
@@ -527,65 +529,6 @@ Module CxeEquitiesMulticastDepthOfBookV62.
 
   End OrderExecutedMessage.
 
-  Module ExecutionFlags2.
-
-    (** Execution Flags *)
-    Record t := {
-      market_mechanism : list byte;
-      trading_mode : list byte;
-      ex_cum_dividend : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (market_mechanism record) = 1 /\
-      Datatypes.length (trading_mode record) = 1 /\
-      Datatypes.length (ex_cum_dividend record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (market_mechanism record) ++
-      encode_bytes 1 (trading_mode record) ++
-      encode_bytes 1 (ex_cum_dividend record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (market_mechanism_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trading_mode_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (ex_cum_dividend_value, bytes) =>
-                  Some ({| market_mechanism := market_mechanism_value; trading_mode := trading_mode_value; ex_cum_dividend := ex_cum_dividend_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ExecutionFlags2.
-
   Module OrderExecutedAtPriceSizeMessage.
 
     (** Order Executed at Price/Size *)
@@ -596,7 +539,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       remaining_shares : N;
       execution_id : N;
       price_long : N;
-      execution_flags : ExecutionFlags2.t;
+      execution_flags : ExecutionFlags.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -607,7 +550,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       (remaining_shares record < 256 ^ N.of_nat 4)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
       (price_long record < 256 ^ N.of_nat 8)%N /\
-      ExecutionFlags2.bounded (execution_flags record).
+      ExecutionFlags.bounded (execution_flags record).
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -616,7 +559,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       encode_uint 4 (remaining_shares record) ++
       encode_uint 8 (execution_id record) ++
       encode_uint 8 (price_long record) ++
-      ExecutionFlags2.encode (execution_flags record).
+      ExecutionFlags.encode (execution_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -637,7 +580,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (price_long_value, bytes) =>
-                              match ExecutionFlags2.decode bytes with
+                              match ExecutionFlags.decode bytes with
                               | None => None
                               | Some (execution_flags_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; order_id := order_id_value; executed_shares := executed_shares_value; remaining_shares := remaining_shares_value; execution_id := execution_id_value; price_long := price_long_value; execution_flags := execution_flags_value |}, bytes)
@@ -652,7 +595,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !ExecutionFlags2.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !ExecutionFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -668,12 +611,12 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite ExecutionFlags2.decode_encode by exact bound_6.
+      rewrite ExecutionFlags.decode_encode by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply ExecutionFlags2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply ExecutionFlags.eq_dec]. Defined.
 
   End OrderExecutedAtPriceSizeMessage.
 
@@ -1146,73 +1089,6 @@ Module CxeEquitiesMulticastDepthOfBookV62.
 
   End TradeLongMessage.
 
-  Module TradeFlags2.
-
-    (** Trade Flags *)
-    Record t := {
-      market_mechanism : list byte;
-      trading_mode : list byte;
-      transaction_category : list byte;
-      ex_cum_dividend : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (market_mechanism record) = 1 /\
-      Datatypes.length (trading_mode record) = 1 /\
-      Datatypes.length (transaction_category record) = 1 /\
-      Datatypes.length (ex_cum_dividend record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (market_mechanism record) ++
-      encode_bytes 1 (trading_mode record) ++
-      encode_bytes 1 (transaction_category record) ++
-      encode_bytes 1 (ex_cum_dividend record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (market_mechanism_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trading_mode_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (transaction_category_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (ex_cum_dividend_value, bytes) =>
-                      Some ({| market_mechanism := market_mechanism_value; trading_mode := trading_mode_value; transaction_category := transaction_category_value; ex_cum_dividend := ex_cum_dividend_value |}, bytes)
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradeFlags2.
-
   Module TradeShortMessage.
 
     (** Trade — Short *)
@@ -1224,7 +1100,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       symbol_alphanumeric_6 : list byte;
       price_short : N;
       execution_id : N;
-      trade_flags : TradeFlags2.t;
+      trade_flags : TradeFlags.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1236,7 +1112,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       Datatypes.length (symbol_alphanumeric_6 record) = 6 /\
       (price_short record < 256 ^ N.of_nat 2)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
-      TradeFlags2.bounded (trade_flags record).
+      TradeFlags.bounded (trade_flags record).
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -1246,7 +1122,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       encode_bytes 6 (symbol_alphanumeric_6 record) ++
       encode_uint 2 (price_short record) ++
       encode_uint 8 (execution_id record) ++
-      TradeFlags2.encode (trade_flags record).
+      TradeFlags.encode (trade_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1270,7 +1146,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
                               match decode_uint 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
-                                  match TradeFlags2.decode bytes with
+                                  match TradeFlags.decode bytes with
                                   | None => None
                                   | Some (trade_flags_value, bytes) =>
                                       Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; shares_short := shares_short_value; symbol_alphanumeric_6 := symbol_alphanumeric_6_value; price_short := price_short_value; execution_id := execution_id_value; trade_flags := trade_flags_value |}, bytes)
@@ -1286,7 +1162,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TradeFlags2.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1303,12 +1179,12 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite TradeFlags2.decode_encode by exact bound_7.
+      rewrite TradeFlags.decode_encode by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TradeFlags2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TradeFlags.eq_dec]. Defined.
 
   End TradeShortMessage.
 

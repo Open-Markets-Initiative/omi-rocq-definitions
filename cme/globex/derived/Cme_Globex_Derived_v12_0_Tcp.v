@@ -24,9 +24,11 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - the dispatch that chooses a message by its type
-      - a block whose stated length holds more than its fields
       - a field read in bits
+      - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module CmeGlobexDerivedV120Tcp.
@@ -259,35 +261,35 @@ Module CmeGlobexDerivedV120Tcp.
 
   End GroupSize.
 
-  Module GroupSize2.
+  Module GlobalDayRoll.
 
-    (** Repeating group dimensions *)
+    (** GlobalDayRoll *)
     Record t := {
-      block_length : N;
-      num_in_group : N;
+      transact_time : N;
+      security_trading_event : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (block_length record < 256 ^ N.of_nat 2)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
+      (transact_time record < 256 ^ N.of_nat 8)%N /\
+      (security_trading_event record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 1 (num_in_group record).
+      encode_uint 8 (transact_time record) ++
+      encode_uint 1 (security_trading_event record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint 8 bytes with
       | None => None
-      | Some (block_length_value, bytes) =>
+      | Some (transact_time_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
+          | Some (security_trading_event_value, bytes) =>
+              Some ({| transact_time := transact_time_value; security_trading_event := security_trading_event_value |}, bytes)
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length. reflexivity.
@@ -308,108 +310,6 @@ Module CmeGlobexDerivedV120Tcp.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
-  End GroupSize2.
-
-  Module GroupSize3.
-
-    (** Repeating group dimensions *)
-    Record t := {
-      block_length : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length record < 256 ^ N.of_nat 2)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (block_length_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End GroupSize3.
-
-  Module GroupSize4.
-
-    (** Repeating group dimensions *)
-    Record t := {
-      block_length : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length record < 256 ^ N.of_nat 2)%N /\
-      (num_in_group record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 1 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (block_length_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End GroupSize4.
+  End GlobalDayRoll.
 
 End CmeGlobexDerivedV120Tcp.

@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module A2XEquitiesTradingProtocolV29.

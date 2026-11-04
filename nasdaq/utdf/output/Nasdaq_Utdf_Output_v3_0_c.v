@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run counted by a field
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module NasdaqUtdfOutputV30C.

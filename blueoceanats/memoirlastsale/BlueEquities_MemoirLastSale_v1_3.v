@@ -26,6 +26,8 @@ Import ListNotations.
       - a run counted by a field
       - a length prefix framing what follows
       - a block whose stated length holds more than its fields
+
+    License: MIT No Attribution
   *)
 
 Module BlueEquitiesMemoirLastSaleV13.
@@ -163,5 +165,642 @@ Module BlueEquitiesMemoirLastSaleV13.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End SbeHeader.
+
+  Module InstrumentDirectoryMessage.
+
+    (** Maps a tradable security to the Security ID used in place of its ticker on every later message of the session; sent for all tradable securities at the start of the trading day *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      symbol : list byte;
+      symbol_sfx : list byte;
+      round_lot : N;
+      is_test_symbol : N;
+      mpv : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (symbol record) = 6 /\
+      Datatypes.length (symbol_sfx record) = 6 /\
+      (round_lot record < 256 ^ N.of_nat 4)%N /\
+      (is_test_symbol record < 256 ^ N.of_nat 1)%N /\
+      (mpv record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_bytes 6 (symbol record) ++
+      encode_bytes 6 (symbol_sfx record) ++
+      encode_uint 4 (round_lot record) ++
+      encode_uint 1 (is_test_symbol record) ++
+      encode_uint 8 (mpv record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (symbol_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (symbol_sfx_value, bytes) =>
+                      match decode_uint 4 bytes with
+                      | None => None
+                      | Some (round_lot_value, bytes) =>
+                          match decode_uint 1 bytes with
+                          | None => None
+                          | Some (is_test_symbol_value, bytes) =>
+                              match decode_uint 8 bytes with
+                              | None => None
+                              | Some (mpv_value, bytes) =>
+                                  Some ({| timestamp := timestamp_value; security_id := security_id_value; symbol := symbol_value; symbol_sfx := symbol_sfx_value; round_lot := round_lot_value; is_test_symbol := is_test_symbol_value; mpv := mpv_value |}, bytes)
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End InstrumentDirectoryMessage.
+
+  Module RegShoRestrictionMessage.
+
+    (** Indicates that a security is subject to the Rule 201 Regulation SHO short sale price restriction; may follow the Instrument Directory message when the restriction is already in effect *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      short_sale_restriction : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      (short_sale_restriction record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_uint 1 (short_sale_restriction record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_uint 1 bytes with
+              | None => None
+              | Some (short_sale_restriction_value, bytes) =>
+                  Some ({| timestamp := timestamp_value; security_id := security_id_value; short_sale_restriction := short_sale_restriction_value |}, bytes)
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 bound_2]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End RegShoRestrictionMessage.
+
+  Module SecurityTradingStatusMessage.
+
+    (** Current trading status of a security, halted or paused by the listing market over the Sip or by the exchange itself; assume Halted until one is received *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      security_trading_status : list byte;
+      security_trading_status_reason : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (security_trading_status record) = 1 /\
+      Datatypes.length (security_trading_status_reason record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_bytes 1 (security_trading_status record) ++
+      encode_bytes 1 (security_trading_status_reason record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (security_trading_status_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (security_trading_status_reason_value, bytes) =>
+                      Some ({| timestamp := timestamp_value; security_id := security_id_value; security_trading_status := security_trading_status_value; security_trading_status_reason := security_trading_status_reason_value |}, bytes)
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End SecurityTradingStatusMessage.
+
+  Module TradingSessionStatusMessage.
+
+    (** The trading system has entered a new trading session *)
+    Record t := {
+      timestamp : N;
+      trading_session : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (trading_session record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_bytes 1 (trading_session record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_bytes 1 bytes with
+          | None => None
+          | Some (trading_session_value, bytes) =>
+              Some ({| timestamp := timestamp_value; trading_session := trading_session_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End TradingSessionStatusMessage.
+
+  Module TradeReportMessage.
+
+    (** An order on the book was executed in part or whole, reported with its sale conditions *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      trade_id : N;
+      trade_qty : N;
+      trade_price : N;
+      sale_condition_1 : list byte;
+      sale_condition_2 : list byte;
+      sale_condition_3 : list byte;
+      sale_condition_4 : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      (trade_id record < 256 ^ N.of_nat 8)%N /\
+      (trade_qty record < 256 ^ N.of_nat 4)%N /\
+      (trade_price record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (sale_condition_1 record) = 1 /\
+      Datatypes.length (sale_condition_2 record) = 1 /\
+      Datatypes.length (sale_condition_3 record) = 1 /\
+      Datatypes.length (sale_condition_4 record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_uint 8 (trade_id record) ++
+      encode_uint 4 (trade_qty record) ++
+      encode_uint 8 (trade_price record) ++
+      encode_bytes 1 (sale_condition_1 record) ++
+      encode_bytes 1 (sale_condition_2 record) ++
+      encode_bytes 1 (sale_condition_3 record) ++
+      encode_bytes 1 (sale_condition_4 record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_uint 8 bytes with
+              | None => None
+              | Some (trade_id_value, bytes) =>
+                  match decode_uint 4 bytes with
+                  | None => None
+                  | Some (trade_qty_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (trade_price_value, bytes) =>
+                          match decode_bytes 1 bytes with
+                          | None => None
+                          | Some (sale_condition_1_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (sale_condition_2_value, bytes) =>
+                                  match decode_bytes 1 bytes with
+                                  | None => None
+                                  | Some (sale_condition_3_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (sale_condition_4_value, bytes) =>
+                                          Some ({| timestamp := timestamp_value; security_id := security_id_value; trade_id := trade_id_value; trade_qty := trade_qty_value; trade_price := trade_price_value; sale_condition_1 := sale_condition_1_value; sale_condition_2 := sale_condition_2_value; sale_condition_3 := sale_condition_3_value; sale_condition_4 := sale_condition_4_value |}, bytes)
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End TradeReportMessage.
+
+  Module TradeCancelMessage.
+
+    (** The exchange busted an execution found to be clearly erroneous; a broken trade cannot be reinstated *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      trade_id : N;
+      trade_qty : N;
+      last_price : N;
+      sale_condition_1 : list byte;
+      sale_condition_2 : list byte;
+      sale_condition_3 : list byte;
+      sale_condition_4 : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      (trade_id record < 256 ^ N.of_nat 8)%N /\
+      (trade_qty record < 256 ^ N.of_nat 4)%N /\
+      (last_price record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (sale_condition_1 record) = 1 /\
+      Datatypes.length (sale_condition_2 record) = 1 /\
+      Datatypes.length (sale_condition_3 record) = 1 /\
+      Datatypes.length (sale_condition_4 record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_uint 8 (trade_id record) ++
+      encode_uint 4 (trade_qty record) ++
+      encode_uint 8 (last_price record) ++
+      encode_bytes 1 (sale_condition_1 record) ++
+      encode_bytes 1 (sale_condition_2 record) ++
+      encode_bytes 1 (sale_condition_3 record) ++
+      encode_bytes 1 (sale_condition_4 record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_uint 8 bytes with
+              | None => None
+              | Some (trade_id_value, bytes) =>
+                  match decode_uint 4 bytes with
+                  | None => None
+                  | Some (trade_qty_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (last_price_value, bytes) =>
+                          match decode_bytes 1 bytes with
+                          | None => None
+                          | Some (sale_condition_1_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (sale_condition_2_value, bytes) =>
+                                  match decode_bytes 1 bytes with
+                                  | None => None
+                                  | Some (sale_condition_3_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (sale_condition_4_value, bytes) =>
+                                          Some ({| timestamp := timestamp_value; security_id := security_id_value; trade_id := trade_id_value; trade_qty := trade_qty_value; last_price := last_price_value; sale_condition_1 := sale_condition_1_value; sale_condition_2 := sale_condition_2_value; sale_condition_3 := sale_condition_3_value; sale_condition_4 := sale_condition_4_value |}, bytes)
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End TradeCancelMessage.
+
+  Module TradeCorrectMessage.
+
+    (** Trade cancellation or correction policy has altered the details of an existing trade, carrying both the original and the corrected values *)
+    Record t := {
+      timestamp : N;
+      security_id : N;
+      trade_id : N;
+      original_trade_qty : N;
+      original_trade_price : N;
+      original_sale_condition_1 : list byte;
+      original_sale_condition_2 : list byte;
+      original_sale_condition_3 : list byte;
+      original_sale_condition_4 : list byte;
+      corrected_trade_qty : N;
+      corrected_trade_price : N;
+      corrected_sale_condition_1 : list byte;
+      corrected_sale_condition_2 : list byte;
+      corrected_sale_condition_3 : list byte;
+      corrected_sale_condition_4 : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (security_id record < 256 ^ N.of_nat 2)%N /\
+      (trade_id record < 256 ^ N.of_nat 8)%N /\
+      (original_trade_qty record < 256 ^ N.of_nat 4)%N /\
+      (original_trade_price record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (original_sale_condition_1 record) = 1 /\
+      Datatypes.length (original_sale_condition_2 record) = 1 /\
+      Datatypes.length (original_sale_condition_3 record) = 1 /\
+      Datatypes.length (original_sale_condition_4 record) = 1 /\
+      (corrected_trade_qty record < 256 ^ N.of_nat 4)%N /\
+      (corrected_trade_price record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (corrected_sale_condition_1 record) = 1 /\
+      Datatypes.length (corrected_sale_condition_2 record) = 1 /\
+      Datatypes.length (corrected_sale_condition_3 record) = 1 /\
+      Datatypes.length (corrected_sale_condition_4 record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 8 (timestamp record) ++
+      encode_uint 2 (security_id record) ++
+      encode_uint 8 (trade_id record) ++
+      encode_uint 4 (original_trade_qty record) ++
+      encode_uint 8 (original_trade_price record) ++
+      encode_bytes 1 (original_sale_condition_1 record) ++
+      encode_bytes 1 (original_sale_condition_2 record) ++
+      encode_bytes 1 (original_sale_condition_3 record) ++
+      encode_bytes 1 (original_sale_condition_4 record) ++
+      encode_uint 4 (corrected_trade_qty record) ++
+      encode_uint 8 (corrected_trade_price record) ++
+      encode_bytes 1 (corrected_sale_condition_1 record) ++
+      encode_bytes 1 (corrected_sale_condition_2 record) ++
+      encode_bytes 1 (corrected_sale_condition_3 record) ++
+      encode_bytes 1 (corrected_sale_condition_4 record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint 2 bytes with
+          | None => None
+          | Some (security_id_value, bytes) =>
+              match decode_uint 8 bytes with
+              | None => None
+              | Some (trade_id_value, bytes) =>
+                  match decode_uint 4 bytes with
+                  | None => None
+                  | Some (original_trade_qty_value, bytes) =>
+                      match decode_uint 8 bytes with
+                      | None => None
+                      | Some (original_trade_price_value, bytes) =>
+                          match decode_bytes 1 bytes with
+                          | None => None
+                          | Some (original_sale_condition_1_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (original_sale_condition_2_value, bytes) =>
+                                  match decode_bytes 1 bytes with
+                                  | None => None
+                                  | Some (original_sale_condition_3_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (original_sale_condition_4_value, bytes) =>
+                                          match decode_uint 4 bytes with
+                                          | None => None
+                                          | Some (corrected_trade_qty_value, bytes) =>
+                                              match decode_uint 8 bytes with
+                                              | None => None
+                                              | Some (corrected_trade_price_value, bytes) =>
+                                                  match decode_bytes 1 bytes with
+                                                  | None => None
+                                                  | Some (corrected_sale_condition_1_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (corrected_sale_condition_2_value, bytes) =>
+                                                          match decode_bytes 1 bytes with
+                                                          | None => None
+                                                          | Some (corrected_sale_condition_3_value, bytes) =>
+                                                              match decode_bytes 1 bytes with
+                                                              | None => None
+                                                              | Some (corrected_sale_condition_4_value, bytes) =>
+                                                                  Some ({| timestamp := timestamp_value; security_id := security_id_value; trade_id := trade_id_value; original_trade_qty := original_trade_qty_value; original_trade_price := original_trade_price_value; original_sale_condition_1 := original_sale_condition_1_value; original_sale_condition_2 := original_sale_condition_2_value; original_sale_condition_3 := original_sale_condition_3_value; original_sale_condition_4 := original_sale_condition_4_value; corrected_trade_qty := corrected_trade_qty_value; corrected_trade_price := corrected_trade_price_value; corrected_sale_condition_1 := corrected_sale_condition_1_value; corrected_sale_condition_2 := corrected_sale_condition_2_value; corrected_sale_condition_3 := corrected_sale_condition_3_value; corrected_sale_condition_4 := corrected_sale_condition_4_value |}, bytes)
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End TradeCorrectMessage.
 
 End BlueEquitiesMemoirLastSaleV13.

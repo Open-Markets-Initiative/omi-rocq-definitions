@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module CfeFuturesBinaryOrderEntryV1136Firm.
@@ -404,64 +406,6 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
 
   End NewOrder.
 
-  Module PreventMatch2.
-
-    Record t := {
-      mtp_modifier : list byte;
-      unique_id_level : list byte;
-      trading_group_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (mtp_modifier record) = 1 /\
-      Datatypes.length (unique_id_level record) = 1 /\
-      Datatypes.length (trading_group_id record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (mtp_modifier record) ++
-      encode_bytes 1 (unique_id_level record) ++
-      encode_bytes 1 (trading_group_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (mtp_modifier_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (unique_id_level_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (trading_group_id_value, bytes) =>
-                  Some ({| mtp_modifier := mtp_modifier_value; unique_id_level := unique_id_level_value; trading_group_id := trading_group_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End PreventMatch2.
-
   Module ModifyOrder.
 
     (** Request to modify an order *)
@@ -825,88 +769,6 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
 
   End MassCancelOrder.
 
-  Module MassCancelInst2.
-
-    Record t := {
-      clearing_firm_filter : list byte;
-      acknowledgement_style : list byte;
-      lockout_instruction : list byte;
-      instrument_type_filter : list byte;
-      gtc_order_filter : list byte;
-      instruction_details : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_firm_filter record) = 1 /\
-      Datatypes.length (acknowledgement_style record) = 1 /\
-      Datatypes.length (lockout_instruction record) = 1 /\
-      Datatypes.length (instrument_type_filter record) = 1 /\
-      Datatypes.length (gtc_order_filter record) = 1 /\
-      Datatypes.length (instruction_details record) = 11.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (clearing_firm_filter record) ++
-      encode_bytes 1 (acknowledgement_style record) ++
-      encode_bytes 1 (lockout_instruction record) ++
-      encode_bytes 1 (instrument_type_filter record) ++
-      encode_bytes 1 (gtc_order_filter record) ++
-      encode_bytes 11 (instruction_details record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (clearing_firm_filter_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (acknowledgement_style_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (lockout_instruction_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (instrument_type_filter_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (gtc_order_filter_value, bytes) =>
-                          match decode_bytes 11 bytes with
-                          | None => None
-                          | Some (instruction_details_value, bytes) =>
-                              Some ({| clearing_firm_filter := clearing_firm_filter_value; acknowledgement_style := acknowledgement_style_value; lockout_instruction := lockout_instruction_value; instrument_type_filter := instrument_type_filter_value; gtc_order_filter := gtc_order_filter_value; instruction_details := instruction_details_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MassCancelInst2.
-
   Module PurgeOrders.
 
     (** Request to cancel a group of orders or quotes across all the TPH's sessions for that port’s matching unit *)
@@ -914,7 +776,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
       mass_cancel_id : list byte;
       clearing_firm : list byte;
       product_name : list byte;
-      mass_cancel_inst : MassCancelInst2.t;
+      mass_cancel_inst : MassCancelInst.t;
       manual_order_indicator : list byte;
       oeo_id : list byte;
       custom_group_id_cnt : N;
@@ -926,7 +788,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
       Datatypes.length (mass_cancel_id record) = 20 /\
       Datatypes.length (clearing_firm record) = 4 /\
       Datatypes.length (product_name record) = 6 /\
-      MassCancelInst2.bounded (mass_cancel_inst record) /\
+      MassCancelInst.bounded (mass_cancel_inst record) /\
       Datatypes.length (manual_order_indicator record) = 1 /\
       Datatypes.length (oeo_id record) = 18 /\
       (custom_group_id_cnt record < 256 ^ N.of_nat 1)%N /\
@@ -936,7 +798,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 6 (product_name record) ++
-      MassCancelInst2.encode (mass_cancel_inst record) ++
+      MassCancelInst.encode (mass_cancel_inst record) ++
       encode_bytes 1 (manual_order_indicator record) ++
       encode_bytes 18 (oeo_id record) ++
       encode_uint 1 (custom_group_id_cnt record) ++
@@ -952,7 +814,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
               match decode_bytes 6 bytes with
               | None => None
               | Some (product_name_value, bytes) =>
-                  match MassCancelInst2.decode bytes with
+                  match MassCancelInst.decode bytes with
                   | None => None
                   | Some (mass_cancel_inst_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -980,7 +842,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 68.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !MassCancelInst2.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !MassCancelInst.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -993,7 +855,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite MassCancelInst2.decode_encode by exact bound_3.
+      rewrite MassCancelInst.decode_encode by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -1002,7 +864,7 @@ Module CfeFuturesBinaryOrderEntryV1136Firm.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply MassCancelInst2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply MassCancelInst.eq_dec]. Defined.
 
   End PurgeOrders.
 

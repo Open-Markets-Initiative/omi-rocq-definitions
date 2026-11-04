@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run counted by a field
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module IexEquitiesTopsV156.

@@ -26,6 +26,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BrokerTecUsTreasuryV101Tcp.

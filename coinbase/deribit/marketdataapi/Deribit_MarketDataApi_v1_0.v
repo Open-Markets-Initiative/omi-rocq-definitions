@@ -24,6 +24,9 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a field read in bits
       - a run counted by a field
+      - a block whose stated length holds more than its fields
+
+    License: MIT No Attribution
   *)
 
 Module DeribitMarketDataApiV10.
@@ -78,57 +81,6 @@ Module DeribitMarketDataApiV10.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End GroupSizeEncoding.
-
-  Module GroupSizeEncoding2.
-
-    (** groupSizeEncoding *)
-    Record t := {
-      block_length : N;
-      num_in_group : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (block_length record < 256 ^ N.of_nat 2)%N /\
-      (num_in_group record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (num_in_group record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (num_in_group_value, bytes) =>
-              Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End GroupSizeEncoding2.
 
   Module IndexDefinitionMessage.
 

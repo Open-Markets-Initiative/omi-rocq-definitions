@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a length prefix framing what follows
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module JseItacBasicNativeTradingRecoveryV405.
@@ -548,57 +550,6 @@ Module JseItacBasicNativeTradingRecoveryV405.
 
   End TransactTime.
 
-  Module TransactTime2.
-
-    (** Time the Execution Report was generated *)
-    Record t := {
-      transact_time_seconds : N;
-      transact_time_nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (transact_time_seconds record < 256 ^ N.of_nat 4)%N /\
-      (transact_time_nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (transact_time_seconds record) ++
-      encode_uint 4 (transact_time_nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (transact_time_seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (transact_time_nanoseconds_value, bytes) =>
-              Some ({| transact_time_seconds := transact_time_seconds_value; transact_time_nanoseconds := transact_time_nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End TransactTime2.
-
   Module OrderCancelRejectMessage.
 
     (** Indicates that an order cancel or cancel replace request has been rejected. *)
@@ -607,7 +558,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       sequence_number : N;
       client_order_id : list byte;
       order_id : list byte;
-      transact_time : TransactTime2.t;
+      transact_time : TransactTime.t;
       reject_code : N;
       order_book : N;
     }.
@@ -618,7 +569,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       (sequence_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (client_order_id record) = 20 /\
       Datatypes.length (order_id record) = 12 /\
-      TransactTime2.bounded (transact_time record) /\
+      TransactTime.bounded (transact_time record) /\
       (reject_code record < 256 ^ N.of_nat 4)%N /\
       (order_book record < 256 ^ N.of_nat 1)%N.
 
@@ -627,7 +578,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       encode_uint 4 (sequence_number record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 12 (order_id record) ++
-      TransactTime2.encode (transact_time record) ++
+      TransactTime.encode (transact_time record) ++
       encode_uint 4 (reject_code record) ++
       encode_uint 1 (order_book record).
 
@@ -644,7 +595,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
                   match decode_bytes 12 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match TransactTime2.decode bytes with
+                      match TransactTime.decode bytes with
                       | None => None
                       | Some (transact_time_value, bytes) =>
                           match decode_uint 4 bytes with
@@ -665,7 +616,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime2.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -679,67 +630,16 @@ Module JseItacBasicNativeTradingRecoveryV405.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite TransactTime2.decode_encode by exact bound_4.
+      rewrite TransactTime.decode_encode by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime.eq_dec]. Defined.
 
   End OrderCancelRejectMessage.
-
-  Module TransactTime3.
-
-    (** Time the Execution Report was generated *)
-    Record t := {
-      transact_time_seconds : N;
-      transact_time_nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (transact_time_seconds record < 256 ^ N.of_nat 4)%N /\
-      (transact_time_nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (transact_time_seconds record) ++
-      encode_uint 4 (transact_time_nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (transact_time_seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (transact_time_nanoseconds_value, bytes) =>
-              Some ({| transact_time_seconds := transact_time_seconds_value; transact_time_nanoseconds := transact_time_nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End TransactTime3.
 
   Module OrderMassCancelReportMessage.
 
@@ -750,7 +650,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       client_order_id : list byte;
       mass_cancel_status : N;
       reject_code : N;
-      transact_time : TransactTime3.t;
+      transact_time : TransactTime.t;
       order_book : N;
     }.
 
@@ -761,7 +661,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       Datatypes.length (client_order_id record) = 20 /\
       (mass_cancel_status record < 256 ^ N.of_nat 1)%N /\
       (reject_code record < 256 ^ N.of_nat 4)%N /\
-      TransactTime3.bounded (transact_time record) /\
+      TransactTime.bounded (transact_time record) /\
       (order_book record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
@@ -770,7 +670,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       encode_bytes 20 (client_order_id record) ++
       encode_uint 1 (mass_cancel_status record) ++
       encode_uint 4 (reject_code record) ++
-      TransactTime3.encode (transact_time record) ++
+      TransactTime.encode (transact_time record) ++
       encode_uint 1 (order_book record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -789,7 +689,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (reject_code_value, bytes) =>
-                          match TransactTime3.decode bytes with
+                          match TransactTime.decode bytes with
                           | None => None
                           | Some (transact_time_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -807,7 +707,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime3.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -822,13 +722,13 @@ Module JseItacBasicNativeTradingRecoveryV405.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite TransactTime3.decode_encode by exact bound_5.
+      rewrite TransactTime.decode_encode by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime.eq_dec]. Defined.
 
   End OrderMassCancelReportMessage.
 
@@ -947,57 +847,6 @@ Module JseItacBasicNativeTradingRecoveryV405.
 
   End NewsMessage.
 
-  Module TransactTime4.
-
-    (** Time the Execution Report was generated *)
-    Record t := {
-      transact_time_seconds : N;
-      transact_time_nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (transact_time_seconds record < 256 ^ N.of_nat 4)%N /\
-      (transact_time_nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (transact_time_seconds record) ++
-      encode_uint 4 (transact_time_nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (transact_time_seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (transact_time_nanoseconds_value, bytes) =>
-              Some ({| transact_time_seconds := transact_time_seconds_value; transact_time_nanoseconds := transact_time_nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End TransactTime4.
-
   Module BusinessRejectMessage.
 
     (** Indicates that an application message could not be processed. *)
@@ -1007,7 +856,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       reject_code : N;
       client_order_id : list byte;
       order_id : list byte;
-      transact_time : TransactTime4.t;
+      transact_time : TransactTime.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1017,7 +866,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       (reject_code record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (client_order_id record) = 20 /\
       Datatypes.length (order_id record) = 12 /\
-      TransactTime4.bounded (transact_time record).
+      TransactTime.bounded (transact_time record).
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
@@ -1025,7 +874,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
       encode_uint 4 (reject_code record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 12 (order_id record) ++
-      TransactTime4.encode (transact_time record).
+      TransactTime.encode (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1043,7 +892,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
                       match decode_bytes 12 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match TransactTime4.decode bytes with
+                          match TransactTime.decode bytes with
                           | None => None
                           | Some (transact_time_value, bytes) =>
                               Some ({| partition_id := partition_id_value; sequence_number := sequence_number_value; reject_code := reject_code_value; client_order_id := client_order_id_value; order_id := order_id_value; transact_time := transact_time_value |}, bytes)
@@ -1057,7 +906,7 @@ Module JseItacBasicNativeTradingRecoveryV405.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 49.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime4.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1072,12 +921,12 @@ Module JseItacBasicNativeTradingRecoveryV405.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite TransactTime4.decode_encode by exact bound_5.
+      rewrite TransactTime.decode_encode by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply TransactTime.eq_dec]. Defined.
 
   End BusinessRejectMessage.
 

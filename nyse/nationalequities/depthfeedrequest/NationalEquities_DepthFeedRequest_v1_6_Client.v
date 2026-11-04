@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module NationalEquitiesDepthFeedRequestV16Client.

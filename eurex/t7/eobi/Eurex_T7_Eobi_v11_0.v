@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module EurexT7EobiV110.
@@ -1272,103 +1274,13 @@ Module EurexT7EobiV110.
 
   End OrderAdd.
 
-  Module OrderDetailsComp2.
-
-    Record t := {
-      trd_reg_ts_time_priority : N;
-      display_qty : N;
-      side : N;
-      ord_type : N;
-      hhi_indicator : N;
-      pad5 : N;
-      price : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (trd_reg_ts_time_priority record < 256 ^ N.of_nat 8)%N /\
-      (display_qty record < 256 ^ N.of_nat 8)%N /\
-      (side record < 256 ^ N.of_nat 1)%N /\
-      (ord_type record < 256 ^ N.of_nat 1)%N /\
-      (hhi_indicator record < 256 ^ N.of_nat 1)%N /\
-      (pad5 record < 256 ^ N.of_nat 5)%N /\
-      (price record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (display_qty record) ++
-      encode_uint 1 (side record) ++
-      encode_uint 1 (ord_type record) ++
-      encode_uint 1 (hhi_indicator record) ++
-      encode_uint 5 (pad5 record) ++
-      encode_uint 8 (price record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
-      | None => None
-      | Some (trd_reg_ts_time_priority_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (display_qty_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (side_value, bytes) =>
-                  match decode_uint 1 bytes with
-                  | None => None
-                  | Some (ord_type_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (hhi_indicator_value, bytes) =>
-                          match decode_uint 5 bytes with
-                          | None => None
-                          | Some (pad5_value, bytes) =>
-                              match decode_uint 8 bytes with
-                              | None => None
-                              | Some (price_value, bytes) =>
-                                  Some ({| trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; display_qty := display_qty_value; side := side_value; ord_type := ord_type_value; hhi_indicator := hhi_indicator_value; pad5 := pad5_value; price := price_value |}, bytes)
-                              end
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OrderDetailsComp2.
-
   Module OrderDelete.
 
     Record t := {
       request_time : N;
       transact_time : N;
       security_id : N;
-      order_details_comp : OrderDetailsComp2.t;
+      order_details_comp : OrderDetailsComp.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1376,13 +1288,13 @@ Module EurexT7EobiV110.
       (request_time record < 256 ^ N.of_nat 8)%N /\
       (transact_time record < 256 ^ N.of_nat 8)%N /\
       (security_id record < 256 ^ N.of_nat 8)%N /\
-      OrderDetailsComp2.bounded (order_details_comp record).
+      OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (request_time record) ++
       encode_uint 8 (transact_time record) ++
       encode_uint 8 (security_id record) ++
-      OrderDetailsComp2.encode (order_details_comp record).
+      OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -1394,7 +1306,7 @@ Module EurexT7EobiV110.
               match decode_uint 8 bytes with
               | None => None
               | Some (security_id_value, bytes) =>
-                  match OrderDetailsComp2.decode bytes with
+                  match OrderDetailsComp.decode bytes with
                   | None => None
                   | Some (order_details_comp_value, bytes) =>
                       Some ({| request_time := request_time_value; transact_time := transact_time_value; security_id := security_id_value; order_details_comp := order_details_comp_value |}, bytes)
@@ -1406,7 +1318,7 @@ Module EurexT7EobiV110.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !OrderDetailsComp2.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1419,12 +1331,12 @@ Module EurexT7EobiV110.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite OrderDetailsComp2.decode_encode by exact bound_3.
+      rewrite OrderDetailsComp.decode_encode by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp.eq_dec]. Defined.
 
   End OrderDelete.
 
@@ -1478,96 +1390,6 @@ Module EurexT7EobiV110.
 
   End OrderMassDelete.
 
-  Module OrderDetailsComp3.
-
-    Record t := {
-      trd_reg_ts_time_priority : N;
-      display_qty : N;
-      side : N;
-      ord_type : N;
-      hhi_indicator : N;
-      pad5 : N;
-      price : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (trd_reg_ts_time_priority record < 256 ^ N.of_nat 8)%N /\
-      (display_qty record < 256 ^ N.of_nat 8)%N /\
-      (side record < 256 ^ N.of_nat 1)%N /\
-      (ord_type record < 256 ^ N.of_nat 1)%N /\
-      (hhi_indicator record < 256 ^ N.of_nat 1)%N /\
-      (pad5 record < 256 ^ N.of_nat 5)%N /\
-      (price record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (display_qty record) ++
-      encode_uint 1 (side record) ++
-      encode_uint 1 (ord_type record) ++
-      encode_uint 1 (hhi_indicator record) ++
-      encode_uint 5 (pad5 record) ++
-      encode_uint 8 (price record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
-      | None => None
-      | Some (trd_reg_ts_time_priority_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (display_qty_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (side_value, bytes) =>
-                  match decode_uint 1 bytes with
-                  | None => None
-                  | Some (ord_type_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (hhi_indicator_value, bytes) =>
-                          match decode_uint 5 bytes with
-                          | None => None
-                          | Some (pad5_value, bytes) =>
-                              match decode_uint 8 bytes with
-                              | None => None
-                              | Some (price_value, bytes) =>
-                                  Some ({| trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; display_qty := display_qty_value; side := side_value; ord_type := ord_type_value; hhi_indicator := hhi_indicator_value; pad5 := pad5_value; price := price_value |}, bytes)
-                              end
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OrderDetailsComp3.
-
   Module OrderModify.
 
     Record t := {
@@ -1576,7 +1398,7 @@ Module EurexT7EobiV110.
       prev_price : N;
       prev_display_qty : N;
       security_id : N;
-      order_details_comp : OrderDetailsComp3.t;
+      order_details_comp : OrderDetailsComp.t;
       prev_price_hhi_indicator : N;
       pad7 : N;
     }.
@@ -1588,7 +1410,7 @@ Module EurexT7EobiV110.
       (prev_price record < 256 ^ N.of_nat 8)%N /\
       (prev_display_qty record < 256 ^ N.of_nat 8)%N /\
       (security_id record < 256 ^ N.of_nat 8)%N /\
-      OrderDetailsComp3.bounded (order_details_comp record) /\
+      OrderDetailsComp.bounded (order_details_comp record) /\
       (prev_price_hhi_indicator record < 256 ^ N.of_nat 1)%N /\
       (pad7 record < 256 ^ N.of_nat 7)%N.
 
@@ -1598,7 +1420,7 @@ Module EurexT7EobiV110.
       encode_uint 8 (prev_price record) ++
       encode_uint 8 (prev_display_qty record) ++
       encode_uint 8 (security_id record) ++
-      OrderDetailsComp3.encode (order_details_comp record) ++
+      OrderDetailsComp.encode (order_details_comp record) ++
       encode_uint 1 (prev_price_hhi_indicator record) ++
       encode_uint 7 (pad7 record).
 
@@ -1618,7 +1440,7 @@ Module EurexT7EobiV110.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (security_id_value, bytes) =>
-                          match OrderDetailsComp3.decode bytes with
+                          match OrderDetailsComp.decode bytes with
                           | None => None
                           | Some (order_details_comp_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -1640,7 +1462,7 @@ Module EurexT7EobiV110.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 80.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !OrderDetailsComp3.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1655,106 +1477,16 @@ Module EurexT7EobiV110.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite OrderDetailsComp3.decode_encode by exact bound_5.
+      rewrite OrderDetailsComp.decode_encode by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp.eq_dec]. Defined.
 
   End OrderModify.
-
-  Module OrderDetailsComp4.
-
-    Record t := {
-      trd_reg_ts_time_priority : N;
-      display_qty : N;
-      side : N;
-      ord_type : N;
-      hhi_indicator : N;
-      pad5 : N;
-      price : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (trd_reg_ts_time_priority record < 256 ^ N.of_nat 8)%N /\
-      (display_qty record < 256 ^ N.of_nat 8)%N /\
-      (side record < 256 ^ N.of_nat 1)%N /\
-      (ord_type record < 256 ^ N.of_nat 1)%N /\
-      (hhi_indicator record < 256 ^ N.of_nat 1)%N /\
-      (pad5 record < 256 ^ N.of_nat 5)%N /\
-      (price record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (display_qty record) ++
-      encode_uint 1 (side record) ++
-      encode_uint 1 (ord_type record) ++
-      encode_uint 1 (hhi_indicator record) ++
-      encode_uint 5 (pad5 record) ++
-      encode_uint 8 (price record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
-      | None => None
-      | Some (trd_reg_ts_time_priority_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (display_qty_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (side_value, bytes) =>
-                  match decode_uint 1 bytes with
-                  | None => None
-                  | Some (ord_type_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (hhi_indicator_value, bytes) =>
-                          match decode_uint 5 bytes with
-                          | None => None
-                          | Some (pad5_value, bytes) =>
-                              match decode_uint 8 bytes with
-                              | None => None
-                              | Some (price_value, bytes) =>
-                                  Some ({| trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; display_qty := display_qty_value; side := side_value; ord_type := ord_type_value; hhi_indicator := hhi_indicator_value; pad5 := pad5_value; price := price_value |}, bytes)
-                              end
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OrderDetailsComp4.
 
   Module OrderModifySamePrio.
 
@@ -1763,7 +1495,7 @@ Module EurexT7EobiV110.
       transact_time : N;
       prev_display_qty : N;
       security_id : N;
-      order_details_comp : OrderDetailsComp4.t;
+      order_details_comp : OrderDetailsComp.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1772,14 +1504,14 @@ Module EurexT7EobiV110.
       (transact_time record < 256 ^ N.of_nat 8)%N /\
       (prev_display_qty record < 256 ^ N.of_nat 8)%N /\
       (security_id record < 256 ^ N.of_nat 8)%N /\
-      OrderDetailsComp4.bounded (order_details_comp record).
+      OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (request_time record) ++
       encode_uint 8 (transact_time record) ++
       encode_uint 8 (prev_display_qty record) ++
       encode_uint 8 (security_id record) ++
-      OrderDetailsComp4.encode (order_details_comp record).
+      OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -1794,7 +1526,7 @@ Module EurexT7EobiV110.
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (security_id_value, bytes) =>
-                      match OrderDetailsComp4.decode bytes with
+                      match OrderDetailsComp.decode bytes with
                       | None => None
                       | Some (order_details_comp_value, bytes) =>
                           Some ({| request_time := request_time_value; transact_time := transact_time_value; prev_display_qty := prev_display_qty_value; security_id := security_id_value; order_details_comp := order_details_comp_value |}, bytes)
@@ -1807,7 +1539,7 @@ Module EurexT7EobiV110.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !OrderDetailsComp4.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1821,12 +1553,12 @@ Module EurexT7EobiV110.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite OrderDetailsComp4.decode_encode by exact bound_4.
+      rewrite OrderDetailsComp.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp.eq_dec]. Defined.
 
   End OrderModifySamePrio.
 
@@ -2214,111 +1946,21 @@ Module EurexT7EobiV110.
 
   End QuoteRequest.
 
-  Module OrderDetailsComp5.
-
-    Record t := {
-      trd_reg_ts_time_priority : N;
-      display_qty : N;
-      side : N;
-      ord_type : N;
-      hhi_indicator : N;
-      pad5 : N;
-      price : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (trd_reg_ts_time_priority record < 256 ^ N.of_nat 8)%N /\
-      (display_qty record < 256 ^ N.of_nat 8)%N /\
-      (side record < 256 ^ N.of_nat 1)%N /\
-      (ord_type record < 256 ^ N.of_nat 1)%N /\
-      (hhi_indicator record < 256 ^ N.of_nat 1)%N /\
-      (pad5 record < 256 ^ N.of_nat 5)%N /\
-      (price record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (display_qty record) ++
-      encode_uint 1 (side record) ++
-      encode_uint 1 (ord_type record) ++
-      encode_uint 1 (hhi_indicator record) ++
-      encode_uint 5 (pad5 record) ++
-      encode_uint 8 (price record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
-      | None => None
-      | Some (trd_reg_ts_time_priority_value, bytes) =>
-          match decode_uint 8 bytes with
-          | None => None
-          | Some (display_qty_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (side_value, bytes) =>
-                  match decode_uint 1 bytes with
-                  | None => None
-                  | Some (ord_type_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (hhi_indicator_value, bytes) =>
-                          match decode_uint 5 bytes with
-                          | None => None
-                          | Some (pad5_value, bytes) =>
-                              match decode_uint 8 bytes with
-                              | None => None
-                              | Some (price_value, bytes) =>
-                                  Some ({| trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; display_qty := display_qty_value; side := side_value; ord_type := ord_type_value; hhi_indicator := hhi_indicator_value; pad5 := pad5_value; price := price_value |}, bytes)
-                              end
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OrderDetailsComp5.
-
   Module SnapshotOrder.
 
     Record t := {
-      order_details_comp : OrderDetailsComp5.t;
+      order_details_comp : OrderDetailsComp.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      OrderDetailsComp5.bounded (order_details_comp record).
+      OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
-      OrderDetailsComp5.encode (order_details_comp record).
+      OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match OrderDetailsComp5.decode bytes with
+      match OrderDetailsComp.decode bytes with
       | None => None
       | Some (order_details_comp_value, bytes) =>
           Some ({| order_details_comp := order_details_comp_value |}, bytes)
@@ -2327,7 +1969,7 @@ Module EurexT7EobiV110.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !OrderDetailsComp5.encode_length. reflexivity.
+      rewrite !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2335,12 +1977,12 @@ Module EurexT7EobiV110.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite OrderDetailsComp5.decode_encode by exact bound.
+      rewrite OrderDetailsComp.decode_encode by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp5.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply OrderDetailsComp.eq_dec]. Defined.
 
   End SnapshotOrder.
 

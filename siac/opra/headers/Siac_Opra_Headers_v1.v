@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run counted by a field
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module SiacOpraHeadersV1.

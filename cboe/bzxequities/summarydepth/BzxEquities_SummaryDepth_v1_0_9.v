@@ -26,6 +26,8 @@ Import ListNotations.
       - a run filling what frames it
       - a field read in bits
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BzxEquitiesSummaryDepthV109.

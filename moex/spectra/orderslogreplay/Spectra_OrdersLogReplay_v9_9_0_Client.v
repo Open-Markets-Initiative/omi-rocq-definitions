@@ -26,6 +26,8 @@ Import ListNotations.
       - a field read in bits
       - the dispatch that chooses a message by its type
       - a block whose stated length holds more than its fields
+
+    License: MIT No Attribution
   *)
 
 Module SpectraOrdersLogReplayV990Client.
@@ -96,5 +98,97 @@ Module SpectraOrdersLogReplayV990Client.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End SbeHeader.
+
+  Module LogoutMessage.
+
+    (** LogoutMessage *)
+    Record t := {
+      text : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (text record) = 256.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 256 (text record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 256 bytes with
+      | None => None
+      | Some (text_value, bytes) =>
+          Some ({| text := text_value |}, bytes)
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 256.
+    Proof.
+      intros record. unfold encode.
+      rewrite !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      unfold decode, encode.
+      rewrite decode_encode_bytes by exact bound.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End LogoutMessage.
+
+  Module MarketDataRequestMessage.
+
+    (** MarketDataRequestMessage *)
+    Record t := {
+      appl_beg_seq_num : N;
+      appl_end_seq_num : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (appl_beg_seq_num record < 256 ^ N.of_nat 4)%N /\
+      (appl_end_seq_num record < 256 ^ N.of_nat 4)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 4 (appl_beg_seq_num record) ++
+      encode_uint 4 (appl_end_seq_num record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 4 bytes with
+      | None => None
+      | Some (appl_beg_seq_num_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (appl_end_seq_num_value, bytes) =>
+              Some ({| appl_beg_seq_num := appl_beg_seq_num_value; appl_end_seq_num := appl_end_seq_num_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End MarketDataRequestMessage.
 
 End SpectraOrdersLogReplayV990Client.

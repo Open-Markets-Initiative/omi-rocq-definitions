@@ -26,6 +26,8 @@ Import ListNotations.
       - a length prefix framing what follows
       - a Composite rule
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module NseCmDropCopyV30Server.

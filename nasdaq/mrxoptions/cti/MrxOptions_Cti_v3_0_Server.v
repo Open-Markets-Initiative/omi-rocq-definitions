@@ -26,6 +26,8 @@ Import ListNotations.
       - a length prefix framing what follows
       - a field read in bits
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module MrxOptionsCtiV30Server.

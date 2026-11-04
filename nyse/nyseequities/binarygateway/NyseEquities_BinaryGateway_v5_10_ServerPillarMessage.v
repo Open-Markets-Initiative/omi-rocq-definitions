@@ -27,6 +27,8 @@ Import ListNotations.
       - a run filling what frames it
       - a field read in bits
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
@@ -82,57 +84,6 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
 
   End MsgHeader.
 
-  Module MsgHeader2.
-
-    (** Pillar Stream Message Header *)
-    Record t := {
-      msg_type : N;
-      msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type record < 256 ^ N.of_nat 2)%N /\
-      (msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (msg_length_value, bytes) =>
-              Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MsgHeader2.
-
   Module StreamId.
 
     (** Pillar Stream Protocol Stream Identifier *)
@@ -184,382 +135,25 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
 
   End StreamId.
 
-  Module MsgHeader3.
-
-    (** Pillar Stream Message Header *)
-    Record t := {
-      msg_type : N;
-      msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type record < 256 ^ N.of_nat 2)%N /\
-      (msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (msg_length_value, bytes) =>
-              Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MsgHeader3.
-
-  Module MsgHeader4.
-
-    (** Pillar Stream Message Header *)
-    Record t := {
-      msg_type : N;
-      msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type record < 256 ^ N.of_nat 2)%N /\
-      (msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (msg_length_value, bytes) =>
-              Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MsgHeader4.
-
-  Module StreamId2.
-
-    (** Pillar Stream Protocol Stream Identifier *)
-    Record t := {
-      sess : N;
-      value : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sess record < 256 ^ N.of_nat 4)%N /\
-      (value record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (value_value, bytes) =>
-              Some ({| sess := sess_value; value := value_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End StreamId2.
-
-  Module MsgHeader5.
-
-    (** Pillar Stream Message Header *)
-    Record t := {
-      msg_type : N;
-      msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type record < 256 ^ N.of_nat 2)%N /\
-      (msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (msg_length_value, bytes) =>
-              Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MsgHeader5.
-
-  Module StreamId3.
-
-    (** Pillar Stream Protocol Stream Identifier *)
-    Record t := {
-      sess : N;
-      value : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sess record < 256 ^ N.of_nat 4)%N /\
-      (value record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (value_value, bytes) =>
-              Some ({| sess := sess_value; value := value_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End StreamId3.
-
-  Module MsgHeader6.
-
-    (** Pillar Stream Message Header *)
-    Record t := {
-      msg_type : N;
-      msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (msg_type record < 256 ^ N.of_nat 2)%N /\
-      (msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (msg_length_value, bytes) =>
-              Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End MsgHeader6.
-
-  Module StreamId4.
-
-    (** Pillar Stream Protocol Stream Identifier *)
-    Record t := {
-      sess : N;
-      value : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sess record < 256 ^ N.of_nat 4)%N /\
-      (value record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (value_value, bytes) =>
-              Some ({| sess := sess_value; value := value_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End StreamId4.
-
   Module SeqMsgId.
 
     (** Pillar Stream Sequenced Message Identifier *)
     Record t := {
-      stream_id : StreamId4.t;
+      stream_id : StreamId.t;
       seq : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      StreamId4.bounded (stream_id record) /\
+      StreamId.bounded (stream_id record) /\
       (seq record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      StreamId4.encode (stream_id record) ++
+      StreamId.encode (stream_id record) ++
       encode_uint 8 (seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match StreamId4.decode bytes with
+      match StreamId.decode bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
           match decode_uint 8 bytes with
@@ -572,7 +166,7 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !StreamId4.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !StreamId.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -582,13 +176,13 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite StreamId4.decode_encode by exact bound_0.
+      rewrite StreamId.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply StreamId4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply StreamId.eq_dec]. Defined.
 
   End SeqMsgId.
 
@@ -694,178 +288,25 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
 
   End SubMsgHeader.
 
-  Module SubMsgHeader2.
-
-    (** Pillar Stream Sub Message Item Header *)
-    Record t := {
-      sub_msg_type : N;
-      sub_msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sub_msg_type record < 256 ^ N.of_nat 2)%N /\
-      (sub_msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (sub_msg_type record) ++
-      encode_uint 2 (sub_msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (sub_msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (sub_msg_length_value, bytes) =>
-              Some ({| sub_msg_type := sub_msg_type_value; sub_msg_length := sub_msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubMsgHeader2.
-
-  Module SubMsgHeader3.
-
-    (** Pillar Stream Sub Message Item Header *)
-    Record t := {
-      sub_msg_type : N;
-      sub_msg_length : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sub_msg_type record < 256 ^ N.of_nat 2)%N /\
-      (sub_msg_length record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 2 (sub_msg_type record) ++
-      encode_uint 2 (sub_msg_length record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
-      | None => None
-      | Some (sub_msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (sub_msg_length_value, bytes) =>
-              Some ({| sub_msg_type := sub_msg_type_value; sub_msg_length := sub_msg_length_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End SubMsgHeader3.
-
-  Module StreamId5.
-
-    (** Pillar Stream Protocol Stream Identifier *)
-    Record t := {
-      sess : N;
-      value : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sess record < 256 ^ N.of_nat 4)%N /\
-      (value record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (value_value, bytes) =>
-              Some ({| sess := sess_value; value := value_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End StreamId5.
-
   Module RefSeqMsgId.
 
     (** Pillar reference sequenced message identifier *)
     Record t := {
-      stream_id : StreamId5.t;
+      stream_id : StreamId.t;
       seq : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      StreamId5.bounded (stream_id record) /\
+      StreamId.bounded (stream_id record) /\
       (seq record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      StreamId5.encode (stream_id record) ++
+      StreamId.encode (stream_id record) ++
       encode_uint 8 (seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match StreamId5.decode bytes with
+      match StreamId.decode bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
           match decode_uint 8 bytes with
@@ -878,7 +319,7 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !StreamId5.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !StreamId.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -888,86 +329,35 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite StreamId5.decode_encode by exact bound_0.
+      rewrite StreamId.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply StreamId5.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply StreamId.eq_dec]. Defined.
 
   End RefSeqMsgId.
-
-  Module StreamId6.
-
-    (** Pillar Stream Protocol Stream Identifier *)
-    Record t := {
-      sess : N;
-      value : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (sess record < 256 ^ N.of_nat 4)%N /\
-      (value record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (value_value, bytes) =>
-              Some ({| sess := sess_value; value := value_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End StreamId6.
 
   Module ManualActionId.
 
     (** ManualActionID *)
     Record t := {
-      stream_id : StreamId6.t;
+      stream_id : StreamId.t;
       seq : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      StreamId6.bounded (stream_id record) /\
+      StreamId.bounded (stream_id record) /\
       (seq record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      StreamId6.encode (stream_id record) ++
+      StreamId.encode (stream_id record) ++
       encode_uint 8 (seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match StreamId6.decode bytes with
+      match StreamId.decode bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
           match decode_uint 8 bytes with
@@ -980,7 +370,7 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !StreamId6.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !StreamId.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -990,13 +380,13 @@ Module NyseEquitiesBinaryGatewayV510ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite StreamId6.decode_encode by exact bound_0.
+      rewrite StreamId.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply StreamId6.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply StreamId.eq_dec]. Defined.
 
   End ManualActionId.
 

@@ -25,6 +25,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a run filling what frames it
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module TexasEquitiesTradesV26.

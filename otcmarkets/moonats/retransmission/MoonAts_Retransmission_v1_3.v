@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a length prefix framing what follows
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module MoonAtsRetransmissionV13.

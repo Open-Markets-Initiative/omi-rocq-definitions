@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a length prefix framing what follows
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module NomOptionsOttoV300Client.

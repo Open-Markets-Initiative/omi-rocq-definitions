@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a field of no fixed width
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module CurrenexForexNowV10.

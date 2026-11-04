@@ -26,6 +26,8 @@ Import ListNotations.
       - a field read in bits
       - a field present only on a condition
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module NyseEquitiesBqtV21A.

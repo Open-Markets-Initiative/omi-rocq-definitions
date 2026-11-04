@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module JnxEquitiesPtsV13Server.

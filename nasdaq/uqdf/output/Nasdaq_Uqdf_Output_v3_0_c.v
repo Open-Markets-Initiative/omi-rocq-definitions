@@ -26,6 +26,8 @@ Import ListNotations.
       - a run counted by a field
       - a field present only on a condition
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module NasdaqUqdfOutputV30C.

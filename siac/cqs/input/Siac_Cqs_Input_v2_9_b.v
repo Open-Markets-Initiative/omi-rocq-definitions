@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a run counted by a field
       - a field present only on a condition
+
+    License: MIT No Attribution
   *)
 
 Module SiacCqsInputV29B.
@@ -911,57 +913,6 @@ Module SiacCqsInputV29B.
 
   End LongQuoteMessage.
 
-  Module Timestamp22.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp22.
-
   Module SpecialLongQuoteMessage.
 
     (** Used only by FINRA ADF for CTA eligible Equity, Local Issue or Bond to identify the FINRA Best Bid and Best Offer at the Bid and/or Offer side. Will be discontinued in favor of Round Lot FINRA ADF Quote. *)
@@ -986,7 +937,7 @@ Module SiacCqsInputV29B.
       finra_best_offer_price : N;
       finra_best_offer_size : N;
       finra_best_offer_market_maker_id : list byte;
-      timestamp_2 : Timestamp22.t;
+      timestamp_2 : Timestamp2.t;
       short_sale_restriction_indicator : list byte;
     }.
 
@@ -1012,7 +963,7 @@ Module SiacCqsInputV29B.
       (finra_best_offer_price record < 256 ^ N.of_nat 8)%N /\
       (finra_best_offer_size record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (finra_best_offer_market_maker_id record) = 4 /\
-      Timestamp22.bounded (timestamp_2 record) /\
+      Timestamp2.bounded (timestamp_2 record) /\
       Datatypes.length (short_sale_restriction_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -1036,7 +987,7 @@ Module SiacCqsInputV29B.
       encode_uint 8 (finra_best_offer_price record) ++
       encode_uint 4 (finra_best_offer_size record) ++
       encode_bytes 4 (finra_best_offer_market_maker_id record) ++
-      Timestamp22.encode (timestamp_2 record) ++
+      Timestamp2.encode (timestamp_2 record) ++
       encode_bytes 1 (short_sale_restriction_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1100,7 +1051,7 @@ Module SiacCqsInputV29B.
                                                                                   match decode_bytes 4 bytes with
                                                                                   | None => None
                                                                                   | Some (finra_best_offer_market_maker_id_value, bytes) =>
-                                                                                      match Timestamp22.decode bytes with
+                                                                                      match Timestamp2.decode bytes with
                                                                                       | None => None
                                                                                       | Some (timestamp_2_value, bytes) =>
                                                                                           match decode_bytes 1 bytes with
@@ -1133,7 +1084,7 @@ Module SiacCqsInputV29B.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp22.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1163,117 +1114,15 @@ Module SiacCqsInputV29B.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite Timestamp22.decode_encode by exact bound_20.
+      rewrite Timestamp2.decode_encode by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp22.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
 
   End SpecialLongQuoteMessage.
-
-  Module Timestamp23.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp23.
-
-  Module Timestamp24.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp24.
 
   Module TradingStatusMessage.
 

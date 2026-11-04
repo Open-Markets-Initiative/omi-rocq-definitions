@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BoxOptionsSolaOrderEntryV225Exchange.
@@ -1029,148 +1031,6 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
 
   End GlobalCancellationConfirmation.
 
-  Module ClearingData2.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData2.
-
-  Module OwnerData2.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData2.
-
   Module ImprovementOrderAcknowlegment.
 
     Record t := {
@@ -1182,8 +1042,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData2.t;
-      owner_data : OwnerData2.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       auction_i_d : list byte;
       additional_client_memo : list byte;
@@ -1200,8 +1060,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData2.bounded (clearing_data record) /\
-      OwnerData2.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       Datatypes.length (auction_i_d record) = 6 /\
       Datatypes.length (additional_client_memo record) = 16 /\
@@ -1216,8 +1076,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData2.encode (clearing_data record) ++
-      OwnerData2.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_bytes 6 (auction_i_d record) ++
       encode_bytes 16 (additional_client_memo record) ++
@@ -1248,10 +1108,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData2.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData2.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -1285,7 +1145,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 167.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData2.encode_length, !OwnerData2.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1303,8 +1163,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData2.decode_encode by exact bound_8.
-      rewrite OwnerData2.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1313,151 +1173,9 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData2.eq_dec | apply OwnerData2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End ImprovementOrderAcknowlegment.
-
-  Module ClearingData3.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData3.
-
-  Module OwnerData3.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData3.
 
   Module OrderModificationAcknowledgement.
 
@@ -1470,8 +1188,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData3.t;
-      owner_data : OwnerData3.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       reserved_6 : N;
       additional_client_memo : list byte;
@@ -1488,8 +1206,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData3.bounded (clearing_data record) /\
-      OwnerData3.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       (reserved_6 record < 256 ^ N.of_nat 6)%N /\
       Datatypes.length (additional_client_memo record) = 16 /\
@@ -1504,8 +1222,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData3.encode (clearing_data record) ++
-      OwnerData3.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_uint 6 (reserved_6 record) ++
       encode_bytes 16 (additional_client_memo record) ++
@@ -1536,10 +1254,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData3.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData3.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -1573,7 +1291,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 167.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData3.encode_length, !OwnerData3.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1591,8 +1309,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData3.decode_encode by exact bound_8.
-      rewrite OwnerData3.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1601,7 +1319,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData3.eq_dec | apply OwnerData3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End OrderModificationAcknowledgement.
 
@@ -1655,148 +1373,6 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
 
   End StandardAcknowledgement.
 
-  Module ClearingData4.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData4.
-
-  Module OwnerData4.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData4.
-
   Module ComplexOrderAuctionAcknowledgement.
 
     Record t := {
@@ -1808,8 +1384,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData4.t;
-      owner_data : OwnerData4.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       auction_i_d_optional : list byte;
       additional_client_memo : list byte;
@@ -1826,8 +1402,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData4.bounded (clearing_data record) /\
-      OwnerData4.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       Datatypes.length (auction_i_d_optional record) = 6 /\
       Datatypes.length (additional_client_memo record) = 16 /\
@@ -1842,8 +1418,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData4.encode (clearing_data record) ++
-      OwnerData4.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_bytes 6 (auction_i_d_optional record) ++
       encode_bytes 16 (additional_client_memo record) ++
@@ -1874,10 +1450,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData4.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData4.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -1911,7 +1487,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 167.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData4.encode_length, !OwnerData4.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1929,8 +1505,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData4.decode_encode by exact bound_8.
-      rewrite OwnerData4.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1939,151 +1515,9 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData4.eq_dec | apply OwnerData4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End ComplexOrderAuctionAcknowledgement.
-
-  Module ClearingData5.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData5.
-
-  Module OwnerData5.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData5.
 
   Module AuctionOrImprovementCancellationAcknowledgement.
 
@@ -2096,8 +1530,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData5.t;
-      owner_data : OwnerData5.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       auction_i_d : list byte;
     }.
@@ -2112,8 +1546,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData5.bounded (clearing_data record) /\
-      OwnerData5.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       Datatypes.length (auction_i_d record) = 6.
 
@@ -2126,8 +1560,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData5.encode (clearing_data record) ++
-      OwnerData5.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_bytes 6 (auction_i_d record).
 
@@ -2156,10 +1590,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData5.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData5.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -2185,7 +1619,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 147.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData5.encode_length, !OwnerData5.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2203,159 +1637,17 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData5.decode_encode by exact bound_8.
-      rewrite OwnerData5.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData5.eq_dec | apply OwnerData5.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End AuctionOrImprovementCancellationAcknowledgement.
-
-  Module ClearingData6.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData6.
-
-  Module OwnerData6.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData6.
 
   Module OrderCancellationAcknowledgement.
 
@@ -2368,8 +1660,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData6.t;
-      owner_data : OwnerData6.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       auction_i_d : list byte;
       additional_client_memo : list byte;
@@ -2386,8 +1678,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData6.bounded (clearing_data record) /\
-      OwnerData6.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       Datatypes.length (auction_i_d record) = 6 /\
       Datatypes.length (additional_client_memo record) = 16 /\
@@ -2402,8 +1694,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData6.encode (clearing_data record) ++
-      OwnerData6.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_bytes 6 (auction_i_d record) ++
       encode_bytes 16 (additional_client_memo record) ++
@@ -2434,10 +1726,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData6.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData6.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -2471,7 +1763,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 167.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData6.encode_length, !OwnerData6.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2489,8 +1781,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData6.decode_encode by exact bound_8.
-      rewrite OwnerData6.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -2499,7 +1791,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData6.eq_dec | apply OwnerData6.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End OrderCancellationAcknowledgement.
 
@@ -2873,148 +2165,6 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
 
   End GroupStateChange.
 
-  Module ClearingData7.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData7.
-
-  Module OwnerData7.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData7.
-
   Module LegExecutionNotice.
 
     Record t := {
@@ -3026,8 +2176,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       quantity_traded : list byte;
       trade_price : list byte;
       time_trade_hhmmss : list byte;
-      clearing_data : ClearingData7.t;
-      owner_data : OwnerData7.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       special_trade_indicator : list byte;
       price_type : list byte;
       trade_type : list byte;
@@ -3058,8 +2208,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (quantity_traded record) = 8 /\
       Datatypes.length (trade_price record) = 10 /\
       Datatypes.length (time_trade_hhmmss record) = 6 /\
-      ClearingData7.bounded (clearing_data record) /\
-      OwnerData7.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (special_trade_indicator record) = 1 /\
       Datatypes.length (price_type record) = 1 /\
       Datatypes.length (trade_type record) = 1 /\
@@ -3088,8 +2238,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 8 (quantity_traded record) ++
       encode_bytes 10 (trade_price record) ++
       encode_bytes 6 (time_trade_hhmmss record) ++
-      ClearingData7.encode (clearing_data record) ++
-      OwnerData7.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 1 (special_trade_indicator record) ++
       encode_bytes 1 (price_type record) ++
       encode_bytes 1 (trade_type record) ++
@@ -3134,10 +2284,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (time_trade_hhmmss_value, bytes) =>
-                                      match ClearingData7.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData7.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -3227,7 +2377,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 257.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData7.encode_length, !OwnerData7.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3245,8 +2395,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData7.decode_encode by exact bound_8.
-      rewrite OwnerData7.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -3269,7 +2419,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData7.eq_dec | apply OwnerData7.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End LegExecutionNotice.
 
@@ -3453,148 +2603,6 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
 
   End QualityMarketMakerNotification.
 
-  Module ClearingData8.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData8.
-
-  Module OwnerData8.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData8.
-
   Module ExecutionNotice.
 
     Record t := {
@@ -3606,8 +2614,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       quantity_traded : list byte;
       trade_price : list byte;
       time_of_the_trade_hhmmss : list byte;
-      clearing_data : ClearingData8.t;
-      owner_data : OwnerData8.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       special_trade_indicator : list byte;
       price_type : list byte;
       trade_type : list byte;
@@ -3633,8 +2641,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (quantity_traded record) = 8 /\
       Datatypes.length (trade_price record) = 10 /\
       Datatypes.length (time_of_the_trade_hhmmss record) = 6 /\
-      ClearingData8.bounded (clearing_data record) /\
-      OwnerData8.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (special_trade_indicator record) = 1 /\
       Datatypes.length (price_type record) = 1 /\
       Datatypes.length (trade_type record) = 1 /\
@@ -3658,8 +2666,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 8 (quantity_traded record) ++
       encode_bytes 10 (trade_price record) ++
       encode_bytes 6 (time_of_the_trade_hhmmss record) ++
-      ClearingData8.encode (clearing_data record) ++
-      OwnerData8.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 1 (special_trade_indicator record) ++
       encode_bytes 1 (price_type record) ++
       encode_bytes 1 (trade_type record) ++
@@ -3699,10 +2707,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (time_of_the_trade_hhmmss_value, bytes) =>
-                                      match ClearingData8.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData8.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -3772,7 +2780,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 240.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData8.encode_length, !OwnerData8.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3790,8 +2798,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData8.decode_encode by exact bound_8.
-      rewrite OwnerData8.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -3809,7 +2817,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData8.eq_dec | apply OwnerData8.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End ExecutionNotice.
 
@@ -3951,148 +2959,6 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
 
   End QuoteNotice.
 
-  Module ClearingData9.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData9.
-
-  Module OwnerData9.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData9.
-
   Module ExecutionCancellationNotice.
 
     (** Stated by the guide as having the same number of bytes and format as NT, whose fields are written out here. *)
@@ -4105,8 +2971,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       quantity_traded : list byte;
       trade_price : list byte;
       time_of_the_trade_hhmmss : list byte;
-      clearing_data : ClearingData9.t;
-      owner_data : OwnerData9.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       special_trade_indicator : list byte;
       price_type : list byte;
       trade_type : list byte;
@@ -4132,8 +2998,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (quantity_traded record) = 8 /\
       Datatypes.length (trade_price record) = 10 /\
       Datatypes.length (time_of_the_trade_hhmmss record) = 6 /\
-      ClearingData9.bounded (clearing_data record) /\
-      OwnerData9.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (special_trade_indicator record) = 1 /\
       Datatypes.length (price_type record) = 1 /\
       Datatypes.length (trade_type record) = 1 /\
@@ -4157,8 +3023,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 8 (quantity_traded record) ++
       encode_bytes 10 (trade_price record) ++
       encode_bytes 6 (time_of_the_trade_hhmmss record) ++
-      ClearingData9.encode (clearing_data record) ++
-      OwnerData9.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 1 (special_trade_indicator record) ++
       encode_bytes 1 (price_type record) ++
       encode_bytes 1 (trade_type record) ++
@@ -4198,10 +3064,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (time_of_the_trade_hhmmss_value, bytes) =>
-                                      match ClearingData9.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData9.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -4271,7 +3137,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 240.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData9.encode_length, !OwnerData9.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -4289,8 +3155,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData9.decode_encode by exact bound_8.
-      rewrite OwnerData9.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -4308,151 +3174,9 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData9.eq_dec | apply OwnerData9.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End ExecutionCancellationNotice.
-
-  Module ClearingData10.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData10.
-
-  Module OwnerData10.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData10.
 
   Module LegExecutionCancellationNotice.
 
@@ -4466,8 +3190,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       quantity_traded : list byte;
       trade_price : list byte;
       time_trade_hhmmss : list byte;
-      clearing_data : ClearingData10.t;
-      owner_data : OwnerData10.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       special_trade_indicator : list byte;
       price_type : list byte;
       trade_type : list byte;
@@ -4498,8 +3222,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (quantity_traded record) = 8 /\
       Datatypes.length (trade_price record) = 10 /\
       Datatypes.length (time_trade_hhmmss record) = 6 /\
-      ClearingData10.bounded (clearing_data record) /\
-      OwnerData10.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (special_trade_indicator record) = 1 /\
       Datatypes.length (price_type record) = 1 /\
       Datatypes.length (trade_type record) = 1 /\
@@ -4528,8 +3252,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 8 (quantity_traded record) ++
       encode_bytes 10 (trade_price record) ++
       encode_bytes 6 (time_trade_hhmmss record) ++
-      ClearingData10.encode (clearing_data record) ++
-      OwnerData10.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 1 (special_trade_indicator record) ++
       encode_bytes 1 (price_type record) ++
       encode_bytes 1 (trade_type record) ++
@@ -4574,10 +3298,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (time_trade_hhmmss_value, bytes) =>
-                                      match ClearingData10.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData10.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -4667,7 +3391,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 257.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData10.encode_length, !OwnerData10.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -4685,8 +3409,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData10.decode_encode by exact bound_8.
-      rewrite OwnerData10.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -4709,151 +3433,9 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData10.eq_dec | apply OwnerData10.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End LegExecutionCancellationNotice.
-
-  Module ClearingData11.
-
-    (** The guide states these fields once, as Clearing Data, for every message that carries them. *)
-    Record t := {
-      clearing_instruction : list byte;
-      account_type : list byte;
-      open_close : list byte;
-      hedge_spec : list byte;
-      clearing_operation_mode : list byte;
-      clearing_destination : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (clearing_instruction record) = 12 /\
-      Datatypes.length (account_type record) = 1 /\
-      Datatypes.length (open_close record) = 1 /\
-      Datatypes.length (hedge_spec record) = 1 /\
-      Datatypes.length (clearing_operation_mode record) = 1 /\
-      Datatypes.length (clearing_destination record) = 4.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 12 (clearing_instruction record) ++
-      encode_bytes 1 (account_type record) ++
-      encode_bytes 1 (open_close record) ++
-      encode_bytes 1 (hedge_spec record) ++
-      encode_bytes 1 (clearing_operation_mode record) ++
-      encode_bytes 4 (clearing_destination record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 12 bytes with
-      | None => None
-      | Some (clearing_instruction_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (account_type_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (open_close_value, bytes) =>
-                  match decode_bytes 1 bytes with
-                  | None => None
-                  | Some (hedge_spec_value, bytes) =>
-                      match decode_bytes 1 bytes with
-                      | None => None
-                      | Some (clearing_operation_mode_value, bytes) =>
-                          match decode_bytes 4 bytes with
-                          | None => None
-                          | Some (clearing_destination_value, bytes) =>
-                              Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; clearing_operation_mode := clearing_operation_mode_value; clearing_destination := clearing_destination_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ClearingData11.
-
-  Module OwnerData11.
-
-    (** The guide states these fields once, as Owner Data, for every message that carries them. *)
-    Record t := {
-      client_order_id : list byte;
-      pound_sign : list byte;
-      memo : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (pound_sign record) = 1 /\
-      Datatypes.length (memo record) = 50.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (pound_sign record) ++
-      encode_bytes 50 (memo record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 20 bytes with
-      | None => None
-      | Some (client_order_id_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (pound_sign_value, bytes) =>
-              match decode_bytes 50 bytes with
-              | None => None
-              | Some (memo_value, bytes) =>
-                  Some ({| client_order_id := client_order_id_value; pound_sign := pound_sign_value; memo := memo_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OwnerData11.
 
   Module OrderCancellationNoticeBySystem.
 
@@ -4867,8 +3449,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       verb_side : list byte;
       quantity : list byte;
       assigned_price : list byte;
-      clearing_data : ClearingData11.t;
-      owner_data : OwnerData11.t;
+      clearing_data : ClearingData.t;
+      owner_data : OwnerData.t;
       original_order_id : list byte;
       auction_i_d : list byte;
       additional_client_memo : list byte;
@@ -4885,8 +3467,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       Datatypes.length (verb_side record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (assigned_price record) = 10 /\
-      ClearingData11.bounded (clearing_data record) /\
-      OwnerData11.bounded (owner_data record) /\
+      ClearingData.bounded (clearing_data record) /\
+      OwnerData.bounded (owner_data record) /\
       Datatypes.length (original_order_id record) = 8 /\
       Datatypes.length (auction_i_d record) = 6 /\
       Datatypes.length (additional_client_memo record) = 16 /\
@@ -4901,8 +3483,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       encode_bytes 1 (verb_side record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (assigned_price record) ++
-      ClearingData11.encode (clearing_data record) ++
-      OwnerData11.encode (owner_data record) ++
+      ClearingData.encode (clearing_data record) ++
+      OwnerData.encode (owner_data record) ++
       encode_bytes 8 (original_order_id record) ++
       encode_bytes 6 (auction_i_d record) ++
       encode_bytes 16 (additional_client_memo record) ++
@@ -4933,10 +3515,10 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (assigned_price_value, bytes) =>
-                                      match ClearingData11.decode bytes with
+                                      match ClearingData.decode bytes with
                                       | None => None
                                       | Some (clearing_data_value, bytes) =>
-                                          match OwnerData11.decode bytes with
+                                          match OwnerData.decode bytes with
                                           | None => None
                                           | Some (owner_data_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -4970,7 +3552,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 167.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData11.encode_length, !OwnerData11.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -4988,8 +3570,8 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite ClearingData11.decode_encode by exact bound_8.
-      rewrite OwnerData11.decode_encode by exact bound_9.
+      rewrite ClearingData.decode_encode by exact bound_8.
+      rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -4998,7 +3580,7 @@ Module BoxOptionsSolaOrderEntryV225Exchange.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData11.eq_dec | apply OwnerData11.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ClearingData.eq_dec | apply OwnerData.eq_dec]. Defined.
 
   End OrderCancellationNoticeBySystem.
 

@@ -20,6 +20,8 @@ Import ListNotations.
 
     Each record is a module of its own, so two messages may both have a price and a
     consumer may read either.
+
+    License: MIT No Attribution
   *)
 
 Module CixAtsCixAspenRerequestV11.

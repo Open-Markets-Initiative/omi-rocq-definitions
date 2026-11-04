@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module SiacCtsInputV27F.
@@ -980,108 +982,6 @@ Module SiacCtsInputV27F.
 
   End PriorDayTradeCorrectionMessage.
 
-  Module CorrectedPriorDayTradeDateAndTime2.
-
-    (** Corrected Prior Day Trade Date and Time *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End CorrectedPriorDayTradeDateAndTime2.
-
-  Module OriginalPriorDayTradeDateAndTime2.
-
-    (** Original Prior Day Trade Date and Time *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End OriginalPriorDayTradeDateAndTime2.
-
   Module FractionalPriorDayTradeCorrectionMessage.
 
     (** Used to correct a prior day transaction when either the original or corrected volume is a fractional value. *)
@@ -1095,7 +995,7 @@ Module SiacCtsInputV27F.
       corrected_stop_stock_indicator : list byte;
       corrected_trade_through_exempt_indicator : list byte;
       corrected_short_sale_restriction_indicator : list byte;
-      corrected_prior_day_trade_date_and_time : CorrectedPriorDayTradeDateAndTime2.t;
+      corrected_prior_day_trade_date_and_time : CorrectedPriorDayTradeDateAndTime.t;
       trade_reporting_facility_id : list byte;
       original_sale_condition : list byte;
       original_trade_price : N;
@@ -1104,7 +1004,7 @@ Module SiacCtsInputV27F.
       original_stop_stock_indicator : list byte;
       original_trade_through_exempt_indicator : list byte;
       original_short_sale_restriction_indicator : list byte;
-      original_prior_day_trade_date_and_time : OriginalPriorDayTradeDateAndTime2.t;
+      original_prior_day_trade_date_and_time : OriginalPriorDayTradeDateAndTime.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1118,7 +1018,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (corrected_stop_stock_indicator record) = 1 /\
       Datatypes.length (corrected_trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (corrected_short_sale_restriction_indicator record) = 1 /\
-      CorrectedPriorDayTradeDateAndTime2.bounded (corrected_prior_day_trade_date_and_time record) /\
+      CorrectedPriorDayTradeDateAndTime.bounded (corrected_prior_day_trade_date_and_time record) /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
       Datatypes.length (original_sale_condition record) = 4 /\
       (original_trade_price record < 256 ^ N.of_nat 8)%N /\
@@ -1127,7 +1027,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (original_stop_stock_indicator record) = 1 /\
       Datatypes.length (original_trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (original_short_sale_restriction_indicator record) = 1 /\
-      OriginalPriorDayTradeDateAndTime2.bounded (original_prior_day_trade_date_and_time record).
+      OriginalPriorDayTradeDateAndTime.bounded (original_prior_day_trade_date_and_time record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 11 (security_symbol record) ++
@@ -1139,7 +1039,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (corrected_stop_stock_indicator record) ++
       encode_bytes 1 (corrected_trade_through_exempt_indicator record) ++
       encode_bytes 1 (corrected_short_sale_restriction_indicator record) ++
-      CorrectedPriorDayTradeDateAndTime2.encode (corrected_prior_day_trade_date_and_time record) ++
+      CorrectedPriorDayTradeDateAndTime.encode (corrected_prior_day_trade_date_and_time record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
       encode_bytes 4 (original_sale_condition record) ++
       encode_uint 8 (original_trade_price record) ++
@@ -1148,7 +1048,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (original_stop_stock_indicator record) ++
       encode_bytes 1 (original_trade_through_exempt_indicator record) ++
       encode_bytes 1 (original_short_sale_restriction_indicator record) ++
-      OriginalPriorDayTradeDateAndTime2.encode (original_prior_day_trade_date_and_time record).
+      OriginalPriorDayTradeDateAndTime.encode (original_prior_day_trade_date_and_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 11 bytes with
@@ -1178,7 +1078,7 @@ Module SiacCtsInputV27F.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (corrected_short_sale_restriction_indicator_value, bytes) =>
-                                          match CorrectedPriorDayTradeDateAndTime2.decode bytes with
+                                          match CorrectedPriorDayTradeDateAndTime.decode bytes with
                                           | None => None
                                           | Some (corrected_prior_day_trade_date_and_time_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -1205,7 +1105,7 @@ Module SiacCtsInputV27F.
                                                                           match decode_bytes 1 bytes with
                                                                           | None => None
                                                                           | Some (original_short_sale_restriction_indicator_value, bytes) =>
-                                                                              match OriginalPriorDayTradeDateAndTime2.decode bytes with
+                                                                              match OriginalPriorDayTradeDateAndTime.decode bytes with
                                                                               | None => None
                                                                               | Some (original_prior_day_trade_date_and_time_value, bytes) =>
                                                                                   Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; corrected_sale_condition := corrected_sale_condition_value; corrected_trade_price := corrected_trade_price_value; corrected_fractional_trade_volume := corrected_fractional_trade_volume_value; corrected_sellers_sale_days := corrected_sellers_sale_days_value; corrected_stop_stock_indicator := corrected_stop_stock_indicator_value; corrected_trade_through_exempt_indicator := corrected_trade_through_exempt_indicator_value; corrected_short_sale_restriction_indicator := corrected_short_sale_restriction_indicator_value; corrected_prior_day_trade_date_and_time := corrected_prior_day_trade_date_and_time_value; trade_reporting_facility_id := trade_reporting_facility_id_value; original_sale_condition := original_sale_condition_value; original_trade_price := original_trade_price_value; original_fractional_trade_volume := original_fractional_trade_volume_value; original_sellers_sale_days := original_sellers_sale_days_value; original_stop_stock_indicator := original_stop_stock_indicator_value; original_trade_through_exempt_indicator := original_trade_through_exempt_indicator_value; original_short_sale_restriction_indicator := original_short_sale_restriction_indicator_value; original_prior_day_trade_date_and_time := original_prior_day_trade_date_and_time_value |}, bytes)
@@ -1232,7 +1132,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 77.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !CorrectedPriorDayTradeDateAndTime2.encode_length, !OriginalPriorDayTradeDateAndTime2.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !CorrectedPriorDayTradeDateAndTime.encode_length, !OriginalPriorDayTradeDateAndTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1251,7 +1151,7 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite CorrectedPriorDayTradeDateAndTime2.decode_encode by exact bound_9.
+      rewrite CorrectedPriorDayTradeDateAndTime.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
@@ -1260,12 +1160,12 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite OriginalPriorDayTradeDateAndTime2.decode_encode by exact bound_18.
+      rewrite OriginalPriorDayTradeDateAndTime.decode_encode by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply CorrectedPriorDayTradeDateAndTime2.eq_dec | apply OriginalPriorDayTradeDateAndTime2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply CorrectedPriorDayTradeDateAndTime.eq_dec | apply OriginalPriorDayTradeDateAndTime.eq_dec]. Defined.
 
   End FractionalPriorDayTradeCorrectionMessage.
 
@@ -1443,57 +1343,6 @@ Module SiacCtsInputV27F.
 
   End PriorDayTradeMessage.
 
-  Module PriorDayTradeDateAndTime2.
-
-    (** Prior Day Trade Date and Time *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End PriorDayTradeDateAndTime2.
-
   Module FractionalPriorDayTradeMessage.
 
     (** Reports a trade with fractional volume which occurred earlier than the current trading day and was not reported. *)
@@ -1508,7 +1357,7 @@ Module SiacCtsInputV27F.
       trade_through_exempt_indicator : list byte;
       short_sale_restriction_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      prior_day_trade_date_and_time : PriorDayTradeDateAndTime2.t;
+      prior_day_trade_date_and_time : PriorDayTradeDateAndTime.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1523,7 +1372,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (short_sale_restriction_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      PriorDayTradeDateAndTime2.bounded (prior_day_trade_date_and_time record).
+      PriorDayTradeDateAndTime.bounded (prior_day_trade_date_and_time record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 11 (security_symbol record) ++
@@ -1536,7 +1385,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (short_sale_restriction_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      PriorDayTradeDateAndTime2.encode (prior_day_trade_date_and_time record).
+      PriorDayTradeDateAndTime.encode (prior_day_trade_date_and_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 11 bytes with
@@ -1569,7 +1418,7 @@ Module SiacCtsInputV27F.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (trade_reporting_facility_id_value, bytes) =>
-                                              match PriorDayTradeDateAndTime2.decode bytes with
+                                              match PriorDayTradeDateAndTime.decode bytes with
                                               | None => None
                                               | Some (prior_day_trade_date_and_time_value, bytes) =>
                                                   Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; sale_condition := sale_condition_value; trade_price := trade_price_value; fractional_trade_volume := fractional_trade_volume_value; sellers_sale_days := sellers_sale_days_value; stop_stock_indicator := stop_stock_indicator_value; trade_through_exempt_indicator := trade_through_exempt_indicator_value; short_sale_restriction_indicator := short_sale_restriction_indicator_value; trade_reporting_facility_id := trade_reporting_facility_id_value; prior_day_trade_date_and_time := prior_day_trade_date_and_time_value |}, bytes)
@@ -1588,7 +1437,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime2.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1608,65 +1457,14 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite PriorDayTradeDateAndTime2.decode_encode by exact bound_10.
+      rewrite PriorDayTradeDateAndTime.decode_encode by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime.eq_dec]. Defined.
 
   End FractionalPriorDayTradeMessage.
-
-  Module PriorDayTradeDateAndTime3.
-
-    (** Prior Day Trade Date and Time *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End PriorDayTradeDateAndTime3.
 
   Module PriorDayTradeCancelErrorMessage.
 
@@ -1682,7 +1480,7 @@ Module SiacCtsInputV27F.
       trade_through_exempt_indicator : list byte;
       short_sale_restriction_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      prior_day_trade_date_and_time : PriorDayTradeDateAndTime3.t;
+      prior_day_trade_date_and_time : PriorDayTradeDateAndTime.t;
       cancel_error_action : list byte;
     }.
 
@@ -1698,7 +1496,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (short_sale_restriction_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      PriorDayTradeDateAndTime3.bounded (prior_day_trade_date_and_time record) /\
+      PriorDayTradeDateAndTime.bounded (prior_day_trade_date_and_time record) /\
       Datatypes.length (cancel_error_action record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -1712,7 +1510,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (short_sale_restriction_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      PriorDayTradeDateAndTime3.encode (prior_day_trade_date_and_time record) ++
+      PriorDayTradeDateAndTime.encode (prior_day_trade_date_and_time record) ++
       encode_bytes 1 (cancel_error_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1746,7 +1544,7 @@ Module SiacCtsInputV27F.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (trade_reporting_facility_id_value, bytes) =>
-                                              match PriorDayTradeDateAndTime3.decode bytes with
+                                              match PriorDayTradeDateAndTime.decode bytes with
                                               | None => None
                                               | Some (prior_day_trade_date_and_time_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -1769,7 +1567,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime3.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1789,66 +1587,15 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite PriorDayTradeDateAndTime3.decode_encode by exact bound_10.
+      rewrite PriorDayTradeDateAndTime.decode_encode by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime.eq_dec]. Defined.
 
   End PriorDayTradeCancelErrorMessage.
-
-  Module PriorDayTradeDateAndTime4.
-
-    (** Prior Day Trade Date and Time *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End PriorDayTradeDateAndTime4.
 
   Module FractionalPriorDayTradeCancelErrorMessage.
 
@@ -1864,7 +1611,7 @@ Module SiacCtsInputV27F.
       trade_through_exempt_indicator : list byte;
       short_sale_restriction_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      prior_day_trade_date_and_time : PriorDayTradeDateAndTime4.t;
+      prior_day_trade_date_and_time : PriorDayTradeDateAndTime.t;
       cancel_error_action : list byte;
     }.
 
@@ -1880,7 +1627,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (short_sale_restriction_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      PriorDayTradeDateAndTime4.bounded (prior_day_trade_date_and_time record) /\
+      PriorDayTradeDateAndTime.bounded (prior_day_trade_date_and_time record) /\
       Datatypes.length (cancel_error_action record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -1894,7 +1641,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (short_sale_restriction_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      PriorDayTradeDateAndTime4.encode (prior_day_trade_date_and_time record) ++
+      PriorDayTradeDateAndTime.encode (prior_day_trade_date_and_time record) ++
       encode_bytes 1 (cancel_error_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1928,7 +1675,7 @@ Module SiacCtsInputV27F.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (trade_reporting_facility_id_value, bytes) =>
-                                              match PriorDayTradeDateAndTime4.decode bytes with
+                                              match PriorDayTradeDateAndTime.decode bytes with
                                               | None => None
                                               | Some (prior_day_trade_date_and_time_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -1951,7 +1698,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime4.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !PriorDayTradeDateAndTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1971,13 +1718,13 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite PriorDayTradeDateAndTime4.decode_encode by exact bound_10.
+      rewrite PriorDayTradeDateAndTime.decode_encode by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime4.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PriorDayTradeDateAndTime.eq_dec]. Defined.
 
   End FractionalPriorDayTradeCancelErrorMessage.
 
@@ -2254,57 +2001,6 @@ Module SiacCtsInputV27F.
 
   End TradeCorrectionMessage.
 
-  Module Timestamp22.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp22.
-
   Module FractionalTradeCorrectionMessage.
 
     (** Used to correct a trade when the corrected Trade Volume is a fractional value. *)
@@ -2319,7 +2015,7 @@ Module SiacCtsInputV27F.
       corrected_trade_through_exempt_indicator : list byte;
       corrected_short_sale_restriction_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      timestamp_2 : Timestamp22.t;
+      timestamp_2 : Timestamp2.t;
       original_participant_reference_number : N;
     }.
 
@@ -2335,7 +2031,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (corrected_trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (corrected_short_sale_restriction_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      Timestamp22.bounded (timestamp_2 record) /\
+      Timestamp2.bounded (timestamp_2 record) /\
       (original_participant_reference_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
@@ -2349,7 +2045,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (corrected_trade_through_exempt_indicator record) ++
       encode_bytes 1 (corrected_short_sale_restriction_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      Timestamp22.encode (timestamp_2 record) ++
+      Timestamp2.encode (timestamp_2 record) ++
       encode_uint 8 (original_participant_reference_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2383,7 +2079,7 @@ Module SiacCtsInputV27F.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (trade_reporting_facility_id_value, bytes) =>
-                                              match Timestamp22.decode bytes with
+                                              match Timestamp2.decode bytes with
                                               | None => None
                                               | Some (timestamp_2_value, bytes) =>
                                                   match decode_uint 8 bytes with
@@ -2406,7 +2102,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 53.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp22.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2426,66 +2122,15 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite Timestamp22.decode_encode by exact bound_10.
+      rewrite Timestamp2.decode_encode by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp22.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
 
   End FractionalTradeCorrectionMessage.
-
-  Module Timestamp23.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp23.
 
   Module LongTradeMessage.
 
@@ -2500,7 +2145,7 @@ Module SiacCtsInputV27F.
       stop_stock_indicator : list byte;
       trade_through_exempt_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      timestamp_2 : Timestamp23.t;
+      timestamp_2 : Timestamp2.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2514,7 +2159,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (stop_stock_indicator record) = 1 /\
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      Timestamp23.bounded (timestamp_2 record).
+      Timestamp2.bounded (timestamp_2 record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 11 (security_symbol record) ++
@@ -2526,7 +2171,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (stop_stock_indicator record) ++
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      Timestamp23.encode (timestamp_2 record).
+      Timestamp2.encode (timestamp_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 11 bytes with
@@ -2556,7 +2201,7 @@ Module SiacCtsInputV27F.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (trade_reporting_facility_id_value, bytes) =>
-                                          match Timestamp23.decode bytes with
+                                          match Timestamp2.decode bytes with
                                           | None => None
                                           | Some (timestamp_2_value, bytes) =>
                                               Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; sale_condition := sale_condition_value; trade_price := trade_price_value; trade_volume := trade_volume_value; sellers_sale_days := sellers_sale_days_value; stop_stock_indicator := stop_stock_indicator_value; trade_through_exempt_indicator := trade_through_exempt_indicator_value; trade_reporting_facility_id := trade_reporting_facility_id_value; timestamp_2 := timestamp_2_value |}, bytes)
@@ -2574,7 +2219,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp23.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2593,65 +2238,14 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite Timestamp23.decode_encode by exact bound_9.
+      rewrite Timestamp2.decode_encode by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp23.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
 
   End LongTradeMessage.
-
-  Module Timestamp24.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp24.
 
   Module FractionalLongTradeMessage.
 
@@ -2666,7 +2260,7 @@ Module SiacCtsInputV27F.
       stop_stock_indicator : list byte;
       trade_through_exempt_indicator : list byte;
       trade_reporting_facility_id : list byte;
-      timestamp_2 : Timestamp24.t;
+      timestamp_2 : Timestamp2.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2680,7 +2274,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (stop_stock_indicator record) = 1 /\
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
-      Timestamp24.bounded (timestamp_2 record).
+      Timestamp2.bounded (timestamp_2 record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 11 (security_symbol record) ++
@@ -2692,7 +2286,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (stop_stock_indicator record) ++
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
-      Timestamp24.encode (timestamp_2 record).
+      Timestamp2.encode (timestamp_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 11 bytes with
@@ -2722,7 +2316,7 @@ Module SiacCtsInputV27F.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (trade_reporting_facility_id_value, bytes) =>
-                                          match Timestamp24.decode bytes with
+                                          match Timestamp2.decode bytes with
                                           | None => None
                                           | Some (timestamp_2_value, bytes) =>
                                               Some ({| security_symbol := security_symbol_value; instrument_type := instrument_type_value; sale_condition := sale_condition_value; trade_price := trade_price_value; fractional_trade_volume := fractional_trade_volume_value; sellers_sale_days := sellers_sale_days_value; stop_stock_indicator := stop_stock_indicator_value; trade_through_exempt_indicator := trade_through_exempt_indicator_value; trade_reporting_facility_id := trade_reporting_facility_id_value; timestamp_2 := timestamp_2_value |}, bytes)
@@ -2740,7 +2334,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp24.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2759,12 +2353,12 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite Timestamp24.decode_encode by exact bound_9.
+      rewrite Timestamp2.decode_encode by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp24.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
 
   End FractionalLongTradeMessage.
 
@@ -3057,57 +2651,6 @@ Module SiacCtsInputV27F.
 
   End FractionalShortTradeMessage.
 
-  Module Timestamp25.
-
-    (** Timestamp 2 *)
-    Record t := {
-      seconds : N;
-      nanoseconds : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (seconds record < 256 ^ N.of_nat 4)%N /\
-      (nanoseconds record < 256 ^ N.of_nat 4)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
-          | None => None
-          | Some (nanoseconds_value, bytes) =>
-              Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End Timestamp25.
-
   Module TradeCancelErrorMessage.
 
     (** Allows a Participant to cancel or error trade reports for CTA eligible Equity, Local Issue or Bond originally reported using a fixed message format. *)
@@ -3117,7 +2660,7 @@ Module SiacCtsInputV27F.
       trade_through_exempt_indicator : list byte;
       trade_reporting_facility_id : list byte;
       original_participant_reference_number : N;
-      timestamp_2 : Timestamp25.t;
+      timestamp_2 : Timestamp2.t;
       cancel_error_action : list byte;
     }.
 
@@ -3128,7 +2671,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (trade_through_exempt_indicator record) = 1 /\
       Datatypes.length (trade_reporting_facility_id record) = 1 /\
       (original_participant_reference_number record < 256 ^ N.of_nat 8)%N /\
-      Timestamp25.bounded (timestamp_2 record) /\
+      Timestamp2.bounded (timestamp_2 record) /\
       Datatypes.length (cancel_error_action record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -3137,7 +2680,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (trade_through_exempt_indicator record) ++
       encode_bytes 1 (trade_reporting_facility_id record) ++
       encode_uint 8 (original_participant_reference_number record) ++
-      Timestamp25.encode (timestamp_2 record) ++
+      Timestamp2.encode (timestamp_2 record) ++
       encode_bytes 1 (cancel_error_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -3156,7 +2699,7 @@ Module SiacCtsInputV27F.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (original_participant_reference_number_value, bytes) =>
-                          match Timestamp25.decode bytes with
+                          match Timestamp2.decode bytes with
                           | None => None
                           | Some (timestamp_2_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -3174,7 +2717,7 @@ Module SiacCtsInputV27F.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp25.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !Timestamp2.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3189,13 +2732,13 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite Timestamp25.decode_encode by exact bound_5.
+      rewrite Timestamp2.decode_encode by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp25.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp2.eq_dec]. Defined.
 
   End TradeCancelErrorMessage.
 

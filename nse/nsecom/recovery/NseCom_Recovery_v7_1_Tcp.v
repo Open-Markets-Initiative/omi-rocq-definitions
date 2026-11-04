@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - the dispatch that chooses a message by its type
       - a Composite rule
+
+    License: MIT No Attribution
   *)
 
 Module NseComRecoveryV71Tcp.

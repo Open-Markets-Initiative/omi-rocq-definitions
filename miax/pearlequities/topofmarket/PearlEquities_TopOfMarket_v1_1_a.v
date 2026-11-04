@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a length prefix framing what follows
       - a field of no fixed width
+
+    License: MIT No Attribution
   *)
 
 Module PearlEquitiesTopOfMarketV11A.

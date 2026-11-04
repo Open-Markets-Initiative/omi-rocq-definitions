@@ -25,6 +25,8 @@ Import ListNotations.
       - a Reassemble rule
       - a run counted by a field
       - a Composite rule
+
+    License: MIT No Attribution
   *)
 
 Module NseComSnapshotV71Tcp.

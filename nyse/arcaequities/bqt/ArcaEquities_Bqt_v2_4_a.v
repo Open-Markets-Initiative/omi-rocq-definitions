@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - a field present only on a condition
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module ArcaEquitiesBqtV24A.

@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a field read in bits
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module LinkAtsQuoteInsideV4104.

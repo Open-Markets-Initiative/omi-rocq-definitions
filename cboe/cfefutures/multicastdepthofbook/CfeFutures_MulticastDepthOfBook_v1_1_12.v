@@ -26,6 +26,8 @@ Import ListNotations.
       - a run filling what frames it
       - a run counted by a field
       - a field read in bits
+
+    License: MIT No Attribution
   *)
 
 Module CfeFuturesMulticastDepthOfBookV1112.

@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - the dispatch that chooses a message by its type
+
+    License: MIT No Attribution
   *)
 
 Module BxEquitiesRashV10Client.

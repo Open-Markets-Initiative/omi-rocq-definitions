@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module CfeFuturesBinaryOrderEntryV1136Exchange.
@@ -494,64 +496,6 @@ Module CfeFuturesBinaryOrderEntryV1136Exchange.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PreventMatch.eq_dec]. Defined.
 
   End OrderAcknowledgement.
-
-  Module PreventMatch2.
-
-    Record t := {
-      mtp_modifier : list byte;
-      unique_id_level : list byte;
-      trading_group_id : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (mtp_modifier record) = 1 /\
-      Datatypes.length (unique_id_level record) = 1 /\
-      Datatypes.length (trading_group_id record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (mtp_modifier record) ++
-      encode_bytes 1 (unique_id_level record) ++
-      encode_bytes 1 (trading_group_id record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (mtp_modifier_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (unique_id_level_value, bytes) =>
-              match decode_bytes 1 bytes with
-              | None => None
-              | Some (trading_group_id_value, bytes) =>
-                  Some ({| mtp_modifier := mtp_modifier_value; unique_id_level := unique_id_level_value; trading_group_id := trading_group_id_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End PreventMatch2.
 
   Module OrderRejected.
 

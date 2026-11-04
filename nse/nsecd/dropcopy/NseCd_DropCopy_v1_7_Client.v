@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a Composite rule
+
+    License: MIT No Attribution
   *)
 
 Module NseCdDropCopyV17Client.

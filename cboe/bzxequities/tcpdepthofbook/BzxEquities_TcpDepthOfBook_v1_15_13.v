@@ -25,6 +25,8 @@ Import ListNotations.
       - a run filling what frames it
       - the dispatch that chooses a message by its type
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module BzxEquitiesTcpDepthOfBookV11513.

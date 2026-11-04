@@ -26,6 +26,8 @@ Import ListNotations.
       - the dispatch that chooses a message by its type
       - a field present only on a condition
       - a length prefix framing what follows
+
+    License: MIT No Attribution
   *)
 
 Module SiacOpraOutputV61.
@@ -386,65 +388,6 @@ Module SiacOpraOutputV61.
 
   End EquityAndIndexLastSaleMessage.
 
-  Module ExpirationBlock2.
-
-    (** Expiration Block *)
-    Record t := {
-      expiration_month : list byte;
-      expiration_day : N;
-      expiration_year : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (expiration_month record) = 1 /\
-      (expiration_day record < 256 ^ N.of_nat 1)%N /\
-      (expiration_year record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (expiration_month record) ++
-      encode_uint 1 (expiration_day record) ++
-      encode_uint 1 (expiration_year record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (expiration_month_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (expiration_day_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (expiration_year_value, bytes) =>
-                  Some ({| expiration_month := expiration_month_value; expiration_day := expiration_day_value; expiration_year := expiration_year_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ExpirationBlock2.
-
   Module OpenInterestMessage.
 
     (** The Open Interest message is used to report contract volume on current options that have not been exercised and have not yet reached expiration. *)
@@ -454,7 +397,7 @@ Module SiacOpraOutputV61.
       participant_reference_number : N;
       security_symbol : list byte;
       reserved_1 : N;
-      expiration_block : ExpirationBlock2.t;
+      expiration_block : ExpirationBlock.t;
       strike_price_denominator_code : list byte;
       strike_price : N;
       open_interest_volume : N;
@@ -467,7 +410,7 @@ Module SiacOpraOutputV61.
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
       (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      ExpirationBlock2.bounded (expiration_block record) /\
+      ExpirationBlock.bounded (expiration_block record) /\
       Datatypes.length (strike_price_denominator_code record) = 1 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
       (open_interest_volume record < 256 ^ N.of_nat 4)%N.
@@ -478,7 +421,7 @@ Module SiacOpraOutputV61.
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
       encode_uint 1 (reserved_1 record) ++
-      ExpirationBlock2.encode (expiration_block record) ++
+      ExpirationBlock.encode (expiration_block record) ++
       encode_bytes 1 (strike_price_denominator_code record) ++
       encode_uint 4 (strike_price record) ++
       encode_uint 4 (open_interest_volume record).
@@ -499,7 +442,7 @@ Module SiacOpraOutputV61.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match ExpirationBlock2.decode bytes with
+                          match ExpirationBlock.decode bytes with
                           | None => None
                           | Some (expiration_block_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -525,7 +468,7 @@ Module SiacOpraOutputV61.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !ExpirationBlock2.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !ExpirationBlock.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -540,7 +483,7 @@ Module SiacOpraOutputV61.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite ExpirationBlock2.decode_encode by exact bound_5.
+      rewrite ExpirationBlock.decode_encode by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -548,68 +491,9 @@ Module SiacOpraOutputV61.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ExpirationBlock2.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ExpirationBlock.eq_dec]. Defined.
 
   End OpenInterestMessage.
-
-  Module ExpirationBlock3.
-
-    (** Expiration Block *)
-    Record t := {
-      expiration_month : list byte;
-      expiration_day : N;
-      expiration_year : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (expiration_month record) = 1 /\
-      (expiration_day record < 256 ^ N.of_nat 1)%N /\
-      (expiration_year record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (expiration_month record) ++
-      encode_uint 1 (expiration_day record) ++
-      encode_uint 1 (expiration_year record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (expiration_month_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (expiration_day_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (expiration_year_value, bytes) =>
-                  Some ({| expiration_month := expiration_month_value; expiration_day := expiration_day_value; expiration_year := expiration_year_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ExpirationBlock3.
 
   Module EquityAndIndexEndOfDaySummaryMessage.
 
@@ -620,7 +504,7 @@ Module SiacOpraOutputV61.
       participant_reference_number : N;
       security_symbol : list byte;
       reserved_1 : N;
-      expiration_block : ExpirationBlock3.t;
+      expiration_block : ExpirationBlock.t;
       strike_price_denominator_code : list byte;
       strike_price : N;
       volume : N;
@@ -644,7 +528,7 @@ Module SiacOpraOutputV61.
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
       (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      ExpirationBlock3.bounded (expiration_block record) /\
+      ExpirationBlock.bounded (expiration_block record) /\
       Datatypes.length (strike_price_denominator_code record) = 1 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
       (volume record < 256 ^ N.of_nat 4)%N /\
@@ -666,7 +550,7 @@ Module SiacOpraOutputV61.
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
       encode_uint 1 (reserved_1 record) ++
-      ExpirationBlock3.encode (expiration_block record) ++
+      ExpirationBlock.encode (expiration_block record) ++
       encode_bytes 1 (strike_price_denominator_code record) ++
       encode_uint 4 (strike_price record) ++
       encode_uint 4 (volume record) ++
@@ -698,7 +582,7 @@ Module SiacOpraOutputV61.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match ExpirationBlock3.decode bytes with
+                          match ExpirationBlock.decode bytes with
                           | None => None
                           | Some (expiration_block_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -768,7 +652,7 @@ Module SiacOpraOutputV61.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !ExpirationBlock3.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !ExpirationBlock.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -783,7 +667,7 @@ Module SiacOpraOutputV61.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite ExpirationBlock3.decode_encode by exact bound_5.
+      rewrite ExpirationBlock.decode_encode by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -802,127 +686,9 @@ Module SiacOpraOutputV61.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ExpirationBlock3.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply ExpirationBlock.eq_dec]. Defined.
 
   End EquityAndIndexEndOfDaySummaryMessage.
-
-  Module ExpirationBlock4.
-
-    (** Expiration Block *)
-    Record t := {
-      expiration_month : list byte;
-      expiration_day : N;
-      expiration_year : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (expiration_month record) = 1 /\
-      (expiration_day record < 256 ^ N.of_nat 1)%N /\
-      (expiration_year record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (expiration_month record) ++
-      encode_uint 1 (expiration_day record) ++
-      encode_uint 1 (expiration_year record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (expiration_month_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (expiration_day_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (expiration_year_value, bytes) =>
-                  Some ({| expiration_month := expiration_month_value; expiration_day := expiration_day_value; expiration_year := expiration_year_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ExpirationBlock4.
-
-  Module ExpirationBlock5.
-
-    (** Expiration Block *)
-    Record t := {
-      expiration_month : list byte;
-      expiration_day : N;
-      expiration_year : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (expiration_month record) = 1 /\
-      (expiration_day record < 256 ^ N.of_nat 1)%N /\
-      (expiration_year record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 1 (expiration_month record) ++
-      encode_uint 1 (expiration_day record) ++
-      encode_uint 1 (expiration_year record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 1 bytes with
-      | None => None
-      | Some (expiration_month_value, bytes) =>
-          match decode_uint 1 bytes with
-          | None => None
-          | Some (expiration_day_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (expiration_year_value, bytes) =>
-                  Some ({| expiration_month := expiration_month_value; expiration_day := expiration_day_value; expiration_year := expiration_year_value |}, bytes)
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ExpirationBlock5.
 
   Module UnderlyingValueLastSaleMessage.
 

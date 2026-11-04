@@ -24,6 +24,8 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
       - a run filling what frames it
+
+    License: MIT No Attribution
   *)
 
 Module ArcaEquitiesIntegratedFeedRetransmissionV25H.

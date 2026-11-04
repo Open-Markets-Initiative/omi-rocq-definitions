@@ -25,6 +25,8 @@ Import ListNotations.
       - a length prefix framing what follows
       - a block whose stated length holds more than its fields
       - a run counted by a field
+
+    License: MIT No Attribution
   *)
 
 Module BrokerTecUsTreasuryV101Udp.

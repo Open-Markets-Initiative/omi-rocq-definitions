@@ -44,7 +44,7 @@ Import ListNotations.
 
 Definition bytes : list byte := [x00; x0a; x41; x42].
 
-Compute v24XEquitiesMemoV113Client.RepeatingGroupDimensions.decode bytes.
+Compute v24XEquitiesMemoV113Client.MassCancelRequestMessage.decode bytes.
 ```
 
 A packet frames its messages and dispatches between them. Those shapes need lemmas of their own before a proof could close, so a definition states the records it covers and says in its own header what it leaves to the model.
@@ -56,7 +56,7 @@ Updates are greatly appreciated; however, this entire repository is source gener
 
 | Protocol Count | Generated Lines |
 | --- | --- |
-| 1,648 | 3,569,494 |
+| 1,655 | 2,783,398 |
 
 ## Testing
 
@@ -145,6 +145,7 @@ Enjoy.
 [Omi.Encoding.Aspen]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Aspen.md "Aspen Encoding"
 [Omi.Encoding.TcpOut]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/TcpOut.md "TcpOut Encoding"
 [Omi.Encoding.Mmd]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Mmd.md "Mmd Encoding"
+[Omi.Encoding.Tcp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Tcp.md "Tcp Encoding"
 [Omi.Encoding.Cbp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Cbp.md "Cbp Encoding"
 [Omi.Encoding.Dbn]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Dbn.md "Dbn Encoding"
 [Omi.Encoding.Dfi]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Dfi.md "Dfi Encoding"
@@ -160,7 +161,6 @@ Enjoy.
 [Omi.Encoding.Exture]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Exture.md "Exture Encoding"
 [Omi.Encoding.LmeSource]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/LmeSource.md "LmeSource Encoding"
 [Omi.Encoding.Gtp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Gtp.md "Gtp Encoding"
-[Omi.Encoding.Tcp]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Tcp.md "Tcp Encoding"
 [Omi.Encoding.Mach]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Mach.md "Mach Encoding"
 [Omi.Encoding.SesM]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/SesM.md "SesM Encoding"
 [Omi.Encoding.Fei]: https://github.com/Open-Markets-Initiative/Directory/blob/main/Protocols/Fei.md "Fei Encoding"
@@ -391,6 +391,8 @@ Enjoy.
 [Cnsx.Cse2.Multicast]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Cnsx/Protocols/Cse2/Multicast.md "CSE2 Multicast Market Data Feed"
 [Cnsx.Cse2.Retransmission]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Cnsx/Protocols/Cse2/Retransmission.md "CSE2 Multicast Market Data Retransmission"
 [Coinbase.CoinbaseDerivatives.MarketDataApi]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Coinbase/Protocols/CoinbaseDerivatives/MarketDataApi.md "Market Data Api"
+[Coinbase.CoinbaseDerivatives.OrdersApi]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Coinbase/Protocols/CoinbaseDerivatives/OrdersApi.md "Orders Api"
+[Coinbase.CoinbaseDerivatives.Session]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Coinbase/Protocols/CoinbaseDerivatives/Session.md ""
 [Coinbase.Deribit.MarketDataApi]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Coinbase/Protocols/Deribit/MarketDataApi.md "Market Data Api"
 [Coinbase.Deribit.OrdersApi]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Coinbase/Protocols/Deribit/OrdersApi.md "Orders Api"
 [Currenex.CurrenexForex.Esp]: https://github.com/Open-Markets-Initiative/Open-Markets-Initiative/blob/main/Organizations/Currenex/Protocols/CurrenexForex/Esp.md "Executable Streaming Prices"
