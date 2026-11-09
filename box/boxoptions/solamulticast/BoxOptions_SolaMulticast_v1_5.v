@@ -23,7 +23,6 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - the dispatch that chooses a message by its type
       - a Composite rule
       - a run counted by a field
 
@@ -216,2355 +215,95 @@ Module BoxOptionsSolaMulticastV15.
 
   End SystemTimestampMessage.
 
-  Module StrikePriceNegativeWholePair.
+  Module InstrumentDescription.
 
     Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeWholePair.
-
-  Module StrikePriceNegativeTenPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeTenPair.
-
-  Module StrikePriceNegativeHundredPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeHundredPair.
-
-  Module StrikePriceNegativeThousandPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeThousandPair.
-
-  Module StrikePriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeTenThousandPair.
-
-  Module StrikePriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeHundredThousandPair.
-
-  Module StrikePriceNegativeMillionPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNegativeMillionPair.
-
-  Module StrikePriceNumericPair.
-
-    Record t := {
+      root_symbol : list byte;
+      expiry_month_code : list byte;
+      filler_1 : N;
       strike_price : list byte;
       strike_price_fraction_indicator : list byte;
+      expiry_year : list byte;
+      expiry_day : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
+      Datatypes.length (root_symbol record) = 6 /\
+      Datatypes.length (expiry_month_code record) = 1 /\
+      (filler_1 record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
+      Datatypes.length (strike_price_fraction_indicator record) = 1 /\
+      Datatypes.length (expiry_year record) = 2 /\
+      Datatypes.length (expiry_day record) = 2.
 
     Definition encode (record : t) : list byte :=
+      encode_bytes 6 (root_symbol record) ++
+      encode_bytes 1 (expiry_month_code record) ++
+      encode_uint 1 (filler_1 record) ++
       encode_bytes 7 (strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| strike_price := strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceNumericPair.
-
-  Module StrikePriceUnknownFractionPair.
-
-    Record t := {
-      raw_strike_price : list byte;
-      strike_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_strike_price record) = 7 /\
-      Datatypes.length (strike_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 7 (raw_strike_price record) ++
-      encode_bytes 1 (strike_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 7 bytes with
-      | None => None
-      | Some (raw_strike_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (strike_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_strike_price := raw_strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End StrikePriceUnknownFractionPair.
-
-  Module TradePriceNegativeWholePair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
+      encode_bytes 1 (strike_price_fraction_indicator record) ++
+      encode_bytes 2 (expiry_year record) ++
+      encode_bytes 2 (expiry_day record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 6 bytes with
       | None => None
-      | Some (raw_trade_price_value, bytes) =>
+      | Some (root_symbol_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
+          | Some (expiry_month_code_value, bytes) =>
+              match decode_uint 1 bytes with
+              | None => None
+              | Some (filler_1_value, bytes) =>
+                  match decode_bytes 7 bytes with
+                  | None => None
+                  | Some (strike_price_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (strike_price_fraction_indicator_value, bytes) =>
+                          match decode_bytes 2 bytes with
+                          | None => None
+                          | Some (expiry_year_value, bytes) =>
+                              match decode_bytes 2 bytes with
+                              | None => None
+                              | Some (expiry_day_value, bytes) =>
+                                  Some ({| root_symbol := root_symbol_value; expiry_month_code := expiry_month_code_value; filler_1 := filler_1_value; strike_price := strike_price_value; strike_price_fraction_indicator := strike_price_fraction_indicator_value; expiry_year := expiry_year_value; expiry_day := expiry_day_value |}, bytes)
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End TradePriceNegativeWholePair.
-
-  Module TradePriceNegativeTenPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeTenPair.
-
-  Module TradePriceNegativeHundredPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeHundredPair.
-
-  Module TradePriceNegativeThousandPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeThousandPair.
-
-  Module TradePriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeTenThousandPair.
-
-  Module TradePriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeHundredThousandPair.
-
-  Module TradePriceNegativeMillionPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNegativeMillionPair.
-
-  Module TradePriceNumericPair.
-
-    Record t := {
-      trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| trade_price := trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceNumericPair.
-
-  Module TradePriceUnknownFractionPair.
-
-    Record t := {
-      raw_trade_price : list byte;
-      trade_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_trade_price record) = 6 /\
-      Datatypes.length (trade_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_trade_price record) ++
-      encode_bytes 1 (trade_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_trade_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (trade_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_trade_price := raw_trade_price_value; trade_price_fraction_indicator := trade_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TradePriceUnknownFractionPair.
-
-  Module NetChangeNegativeWholePair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeWholePair.
-
-  Module NetChangeNegativeTenPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeTenPair.
-
-  Module NetChangeNegativeHundredPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeHundredPair.
-
-  Module NetChangeNegativeThousandPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeThousandPair.
-
-  Module NetChangeNegativeTenThousandPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeTenThousandPair.
-
-  Module NetChangeNegativeHundredThousandPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeHundredThousandPair.
-
-  Module NetChangeNegativeMillionPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNegativeMillionPair.
-
-  Module NetChangeNumericPair.
-
-    Record t := {
-      net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| net_change := net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeNumericPair.
-
-  Module NetChangeUnknownFractionPair.
-
-    Record t := {
-      raw_net_change : list byte;
-      net_change_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_net_change record) = 6 /\
-      Datatypes.length (net_change_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_net_change record) ++
-      encode_bytes 1 (net_change_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_net_change_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (net_change_fraction_indicator_value, bytes) =>
-              Some ({| raw_net_change := raw_net_change_value; net_change_fraction_indicator := net_change_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End NetChangeUnknownFractionPair.
-
-  Module BidPriceQuoteOpeningPair.
-
-    Record t := {
-      bid_price_quote_opening : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (bid_price_quote_opening record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (bid_price_quote_opening record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (bid_price_quote_opening_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| bid_price_quote_opening := bid_price_quote_opening_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteOpeningPair.
-
-  Module BidPriceQuoteNegativeWholePair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeWholePair.
-
-  Module BidPriceQuoteNegativeTenPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeTenPair.
-
-  Module BidPriceQuoteNegativeHundredPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeHundredPair.
-
-  Module BidPriceQuoteNegativeThousandPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeThousandPair.
-
-  Module BidPriceQuoteNegativeTenThousandPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeTenThousandPair.
-
-  Module BidPriceQuoteNegativeHundredThousandPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeHundredThousandPair.
-
-  Module BidPriceQuoteNegativeMillionPair.
-
-    Record t := {
-      raw_bid_price_quote : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote := raw_bid_price_quote_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNegativeMillionPair.
-
-  Module BidPriceQuoteNumericPair.
-
-    Record t := {
-      bid_price_quote_numeric : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (bid_price_quote_numeric record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (bid_price_quote_numeric record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (bid_price_quote_numeric_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| bid_price_quote_numeric := bid_price_quote_numeric_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteNumericPair.
-
-  Module BidPriceQuoteUnknownFractionPair.
-
-    Record t := {
-      raw_bid_price_quote_text : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price_quote_text record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price_quote_text record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_quote_text_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price_quote_text := raw_bid_price_quote_text_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceQuoteUnknownFractionPair.
-
-  Module AskPriceQuoteOpeningPair.
-
-    Record t := {
-      ask_price_quote_opening : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (ask_price_quote_opening record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (ask_price_quote_opening record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (ask_price_quote_opening_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| ask_price_quote_opening := ask_price_quote_opening_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteOpeningPair.
-
-  Module AskPriceQuoteNegativeWholePair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeWholePair.
-
-  Module AskPriceQuoteNegativeTenPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeTenPair.
-
-  Module AskPriceQuoteNegativeHundredPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeHundredPair.
-
-  Module AskPriceQuoteNegativeThousandPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeThousandPair.
-
-  Module AskPriceQuoteNegativeTenThousandPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeTenThousandPair.
-
-  Module AskPriceQuoteNegativeHundredThousandPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeHundredThousandPair.
-
-  Module AskPriceQuoteNegativeMillionPair.
-
-    Record t := {
-      raw_ask_price_quote : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote := raw_ask_price_quote_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNegativeMillionPair.
-
-  Module AskPriceQuoteNumericPair.
-
-    Record t := {
-      ask_price_quote_numeric : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (ask_price_quote_numeric record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (ask_price_quote_numeric record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (ask_price_quote_numeric_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| ask_price_quote_numeric := ask_price_quote_numeric_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteNumericPair.
-
-  Module AskPriceQuoteUnknownFractionPair.
-
-    Record t := {
-      raw_ask_price_quote_text : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price_quote_text record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price_quote_text record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_quote_text_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price_quote_text := raw_ask_price_quote_text_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceQuoteUnknownFractionPair.
+  End InstrumentDescription.
 
   Module GroupOpeningTimeMessage.
 
@@ -2751,1406 +490,6 @@ Module BoxOptionsSolaMulticastV15.
 
   End StrategiesGroupStatusMessage.
 
-  Module MaximumThresholdPriceNegativeWholePair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeWholePair.
-
-  Module MaximumThresholdPriceNegativeTenPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeTenPair.
-
-  Module MaximumThresholdPriceNegativeHundredPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeHundredPair.
-
-  Module MaximumThresholdPriceNegativeThousandPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeThousandPair.
-
-  Module MaximumThresholdPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeTenThousandPair.
-
-  Module MaximumThresholdPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeHundredThousandPair.
-
-  Module MaximumThresholdPriceNegativeMillionPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNegativeMillionPair.
-
-  Module MaximumThresholdPriceNumericPair.
-
-    Record t := {
-      maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| maximum_threshold_price := maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceNumericPair.
-
-  Module MaximumThresholdPriceUnknownFractionPair.
-
-    Record t := {
-      raw_maximum_threshold_price : list byte;
-      maximum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_maximum_threshold_price record) = 6 /\
-      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_maximum_threshold_price record) ++
-      encode_bytes 1 (maximum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_maximum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_maximum_threshold_price := raw_maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaximumThresholdPriceUnknownFractionPair.
-
-  Module MinimumThresholdPriceNegativeWholePair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeWholePair.
-
-  Module MinimumThresholdPriceNegativeTenPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeTenPair.
-
-  Module MinimumThresholdPriceNegativeHundredPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeHundredPair.
-
-  Module MinimumThresholdPriceNegativeThousandPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeThousandPair.
-
-  Module MinimumThresholdPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeTenThousandPair.
-
-  Module MinimumThresholdPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeHundredThousandPair.
-
-  Module MinimumThresholdPriceNegativeMillionPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNegativeMillionPair.
-
-  Module MinimumThresholdPriceNumericPair.
-
-    Record t := {
-      minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| minimum_threshold_price := minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceNumericPair.
-
-  Module MinimumThresholdPriceUnknownFractionPair.
-
-    Record t := {
-      raw_minimum_threshold_price : list byte;
-      minimum_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_minimum_threshold_price record) = 6 /\
-      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_minimum_threshold_price record) ++
-      encode_bytes 1 (minimum_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_minimum_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_minimum_threshold_price := raw_minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinimumThresholdPriceUnknownFractionPair.
-
-  Module TickIncrementTickTablePair.
-
-    Record t := {
-      raw_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| raw_tick_increment := raw_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementTickTablePair.
-
-  Module TickIncrementNegativeWholePair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeWholePair.
-
-  Module TickIncrementNegativeTenPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeTenPair.
-
-  Module TickIncrementNegativeHundredPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeHundredPair.
-
-  Module TickIncrementNegativeThousandPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeThousandPair.
-
-  Module TickIncrementNegativeTenThousandPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeTenThousandPair.
-
-  Module TickIncrementNegativeHundredThousandPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeHundredThousandPair.
-
-  Module TickIncrementNegativeMillionPair.
-
-    Record t := {
-      numeric_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (numeric_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (numeric_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (numeric_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| numeric_tick_increment := numeric_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNegativeMillionPair.
-
-  Module TickIncrementNumericPair.
-
-    Record t := {
-      tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| tick_increment := tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementNumericPair.
-
-  Module TickIncrementUnknownFractionPair.
-
-    Record t := {
-      raw_tick_increment : list byte;
-      tick_increment_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_tick_increment record) = 6 /\
-      Datatypes.length (tick_increment_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_tick_increment record) ++
-      encode_bytes 1 (tick_increment_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_tick_increment_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (tick_increment_fraction_indicator_value, bytes) =>
-              Some ({| raw_tick_increment := raw_tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End TickIncrementUnknownFractionPair.
-
   Module MarketFlowIndicator.
 
     Record t := {
@@ -4251,905 +590,184 @@ Module BoxOptionsSolaMulticastV15.
 
   End OptionMarker.
 
-  Module MaxThresholdPriceNegativeWholePair.
+  Module OptionInstrumentKeysMessage.
 
+    (** Option Instrument Keys *)
     Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
+      exchange_id : list byte;
+      instrument_description : InstrumentDescription.t;
+      strike_price_currency : list byte;
+      maximum_number_of_contracts_per_order : list byte;
+      minimum_number_of_contracts_per_order : list byte;
+      maximum_threshold_price : list byte;
+      maximum_threshold_price_fraction_indicator : list byte;
+      minimum_threshold_price : list byte;
+      minimum_threshold_price_fraction_indicator : list byte;
+      tick_increment : list byte;
+      tick_increment_fraction_indicator : list byte;
+      option_type : list byte;
+      market_flow_indicator : MarketFlowIndicator.t;
+      group_instrument : list byte;
+      instrument : list byte;
+      instrument_external_code : list byte;
+      option_marker : OptionMarker.t;
+      underlying_symbol_root : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
+      Datatypes.length (exchange_id record) = 1 /\
+      InstrumentDescription.bounded (instrument_description record) /\
+      Datatypes.length (strike_price_currency record) = 3 /\
+      Datatypes.length (maximum_number_of_contracts_per_order record) = 6 /\
+      Datatypes.length (minimum_number_of_contracts_per_order record) = 6 /\
+      Datatypes.length (maximum_threshold_price record) = 6 /\
+      Datatypes.length (maximum_threshold_price_fraction_indicator record) = 1 /\
+      Datatypes.length (minimum_threshold_price record) = 6 /\
+      Datatypes.length (minimum_threshold_price_fraction_indicator record) = 1 /\
+      Datatypes.length (tick_increment record) = 6 /\
+      Datatypes.length (tick_increment_fraction_indicator record) = 1 /\
+      Datatypes.length (option_type record) = 1 /\
+      MarketFlowIndicator.bounded (market_flow_indicator record) /\
+      Datatypes.length (group_instrument record) = 2 /\
+      Datatypes.length (instrument record) = 4 /\
+      Datatypes.length (instrument_external_code record) = 30 /\
+      OptionMarker.bounded (option_marker record) /\
+      Datatypes.length (underlying_symbol_root record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
+      encode_bytes 1 (exchange_id record) ++
+      InstrumentDescription.encode (instrument_description record) ++
+      encode_bytes 3 (strike_price_currency record) ++
+      encode_bytes 6 (maximum_number_of_contracts_per_order record) ++
+      encode_bytes 6 (minimum_number_of_contracts_per_order record) ++
+      encode_bytes 6 (maximum_threshold_price record) ++
+      encode_bytes 1 (maximum_threshold_price_fraction_indicator record) ++
+      encode_bytes 6 (minimum_threshold_price record) ++
+      encode_bytes 1 (minimum_threshold_price_fraction_indicator record) ++
+      encode_bytes 6 (tick_increment record) ++
+      encode_bytes 1 (tick_increment_fraction_indicator record) ++
+      encode_bytes 1 (option_type record) ++
+      MarketFlowIndicator.encode (market_flow_indicator record) ++
+      encode_bytes 2 (group_instrument record) ++
+      encode_bytes 4 (instrument record) ++
+      encode_bytes 30 (instrument_external_code record) ++
+      OptionMarker.encode (option_marker record) ++
+      encode_bytes 10 (underlying_symbol_root record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
+      match decode_bytes 1 bytes with
       | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (exchange_id_value, bytes) =>
+          match InstrumentDescription.decode bytes with
           | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
+          | Some (instrument_description_value, bytes) =>
+              match decode_bytes 3 bytes with
+              | None => None
+              | Some (strike_price_currency_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (maximum_number_of_contracts_per_order_value, bytes) =>
+                      match decode_bytes 6 bytes with
+                      | None => None
+                      | Some (minimum_number_of_contracts_per_order_value, bytes) =>
+                          match decode_bytes 6 bytes with
+                          | None => None
+                          | Some (maximum_threshold_price_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (maximum_threshold_price_fraction_indicator_value, bytes) =>
+                                  match decode_bytes 6 bytes with
+                                  | None => None
+                                  | Some (minimum_threshold_price_value, bytes) =>
+                                      match decode_bytes 1 bytes with
+                                      | None => None
+                                      | Some (minimum_threshold_price_fraction_indicator_value, bytes) =>
+                                          match decode_bytes 6 bytes with
+                                          | None => None
+                                          | Some (tick_increment_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (tick_increment_fraction_indicator_value, bytes) =>
+                                                  match decode_bytes 1 bytes with
+                                                  | None => None
+                                                  | Some (option_type_value, bytes) =>
+                                                      match MarketFlowIndicator.decode bytes with
+                                                      | None => None
+                                                      | Some (market_flow_indicator_value, bytes) =>
+                                                          match decode_bytes 2 bytes with
+                                                          | None => None
+                                                          | Some (group_instrument_value, bytes) =>
+                                                              match decode_bytes 4 bytes with
+                                                              | None => None
+                                                              | Some (instrument_value, bytes) =>
+                                                                  match decode_bytes 30 bytes with
+                                                                  | None => None
+                                                                  | Some (instrument_external_code_value, bytes) =>
+                                                                      match OptionMarker.decode bytes with
+                                                                      | None => None
+                                                                      | Some (option_marker_value, bytes) =>
+                                                                          match decode_bytes 10 bytes with
+                                                                          | None => None
+                                                                          | Some (underlying_symbol_root_value, bytes) =>
+                                                                              Some ({| exchange_id := exchange_id_value; instrument_description := instrument_description_value; strike_price_currency := strike_price_currency_value; maximum_number_of_contracts_per_order := maximum_number_of_contracts_per_order_value; minimum_number_of_contracts_per_order := minimum_number_of_contracts_per_order_value; maximum_threshold_price := maximum_threshold_price_value; maximum_threshold_price_fraction_indicator := maximum_threshold_price_fraction_indicator_value; minimum_threshold_price := minimum_threshold_price_value; minimum_threshold_price_fraction_indicator := minimum_threshold_price_fraction_indicator_value; tick_increment := tick_increment_value; tick_increment_fraction_indicator := tick_increment_fraction_indicator_value; option_type := option_type_value; market_flow_indicator := market_flow_indicator_value; group_instrument := group_instrument_value; instrument := instrument_value; instrument_external_code := instrument_external_code_value; option_marker := option_marker_value; underlying_symbol_root := underlying_symbol_root_value |}, bytes)
+                                                                          end
+                                                                      end
+                                                                  end
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 108.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length, !MarketFlowIndicator.encode_length, !OptionMarker.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
+      rewrite InstrumentDescription.decode_encode by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite MarketFlowIndicator.decode_encode by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
+      rewrite OptionMarker.decode_encode by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply InstrumentDescription.eq_dec | apply MarketFlowIndicator.eq_dec | apply OptionMarker.eq_dec]. Defined.
 
-  End MaxThresholdPriceNegativeWholePair.
-
-  Module MaxThresholdPriceNegativeTenPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeTenPair.
-
-  Module MaxThresholdPriceNegativeHundredPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeHundredPair.
-
-  Module MaxThresholdPriceNegativeThousandPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeThousandPair.
-
-  Module MaxThresholdPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeTenThousandPair.
-
-  Module MaxThresholdPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeHundredThousandPair.
-
-  Module MaxThresholdPriceNegativeMillionPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNegativeMillionPair.
-
-  Module MaxThresholdPriceNumericPair.
-
-    Record t := {
-      max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| max_threshold_price := max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceNumericPair.
-
-  Module MaxThresholdPriceUnknownFractionPair.
-
-    Record t := {
-      raw_max_threshold_price : list byte;
-      max_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_max_threshold_price record) = 6 /\
-      Datatypes.length (max_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_max_threshold_price record) ++
-      encode_bytes 1 (max_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_max_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (max_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_max_threshold_price := raw_max_threshold_price_value; max_threshold_price_fraction_indicator := max_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MaxThresholdPriceUnknownFractionPair.
-
-  Module MinThresholdPriceNegativeWholePair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeWholePair.
-
-  Module MinThresholdPriceNegativeTenPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeTenPair.
-
-  Module MinThresholdPriceNegativeHundredPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeHundredPair.
-
-  Module MinThresholdPriceNegativeThousandPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeThousandPair.
-
-  Module MinThresholdPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeTenThousandPair.
-
-  Module MinThresholdPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeHundredThousandPair.
-
-  Module MinThresholdPriceNegativeMillionPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNegativeMillionPair.
-
-  Module MinThresholdPriceNumericPair.
-
-    Record t := {
-      min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| min_threshold_price := min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceNumericPair.
-
-  Module MinThresholdPriceUnknownFractionPair.
-
-    Record t := {
-      raw_min_threshold_price : list byte;
-      min_threshold_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_min_threshold_price record) = 6 /\
-      Datatypes.length (min_threshold_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_min_threshold_price record) ++
-      encode_bytes 1 (min_threshold_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_min_threshold_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (min_threshold_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_min_threshold_price := raw_min_threshold_price_value; min_threshold_price_fraction_indicator := min_threshold_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End MinThresholdPriceUnknownFractionPair.
+  End OptionInstrumentKeysMessage.
 
   Module BulletinsMessage.
 
@@ -5217,3156 +835,6 @@ Module BoxOptionsSolaMulticastV15.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End BulletinsMessage.
-
-  Module BidPriceNegativeWholePair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeWholePair.
-
-  Module BidPriceNegativeTenPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeTenPair.
-
-  Module BidPriceNegativeHundredPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeHundredPair.
-
-  Module BidPriceNegativeThousandPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeThousandPair.
-
-  Module BidPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeTenThousandPair.
-
-  Module BidPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeHundredThousandPair.
-
-  Module BidPriceNegativeMillionPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNegativeMillionPair.
-
-  Module BidPriceNumericPair.
-
-    Record t := {
-      bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| bid_price := bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceNumericPair.
-
-  Module BidPriceUnknownFractionPair.
-
-    Record t := {
-      raw_bid_price : list byte;
-      bid_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_bid_price record) = 6 /\
-      Datatypes.length (bid_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_bid_price record) ++
-      encode_bytes 1 (bid_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_bid_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (bid_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_bid_price := raw_bid_price_value; bid_price_fraction_indicator := bid_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End BidPriceUnknownFractionPair.
-
-  Module AskPriceNegativeWholePair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeWholePair.
-
-  Module AskPriceNegativeTenPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeTenPair.
-
-  Module AskPriceNegativeHundredPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeHundredPair.
-
-  Module AskPriceNegativeThousandPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeThousandPair.
-
-  Module AskPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeTenThousandPair.
-
-  Module AskPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeHundredThousandPair.
-
-  Module AskPriceNegativeMillionPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNegativeMillionPair.
-
-  Module AskPriceNumericPair.
-
-    Record t := {
-      ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| ask_price := ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceNumericPair.
-
-  Module AskPriceUnknownFractionPair.
-
-    Record t := {
-      raw_ask_price : list byte;
-      ask_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_ask_price record) = 6 /\
-      Datatypes.length (ask_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_ask_price record) ++
-      encode_bytes 1 (ask_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_ask_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (ask_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_ask_price := raw_ask_price_value; ask_price_fraction_indicator := ask_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End AskPriceUnknownFractionPair.
-
-  Module LastPriceNegativeWholePair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeWholePair.
-
-  Module LastPriceNegativeTenPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeTenPair.
-
-  Module LastPriceNegativeHundredPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeHundredPair.
-
-  Module LastPriceNegativeThousandPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeThousandPair.
-
-  Module LastPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeTenThousandPair.
-
-  Module LastPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeHundredThousandPair.
-
-  Module LastPriceNegativeMillionPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNegativeMillionPair.
-
-  Module LastPriceNumericPair.
-
-    Record t := {
-      last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| last_price := last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceNumericPair.
-
-  Module LastPriceUnknownFractionPair.
-
-    Record t := {
-      raw_last_price : list byte;
-      last_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_last_price record) = 6 /\
-      Datatypes.length (last_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_last_price record) ++
-      encode_bytes 1 (last_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_last_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (last_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_last_price := raw_last_price_value; last_price_fraction_indicator := last_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LastPriceUnknownFractionPair.
-
-  Module OpenPriceNegativeWholePair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeWholePair.
-
-  Module OpenPriceNegativeTenPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeTenPair.
-
-  Module OpenPriceNegativeHundredPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeHundredPair.
-
-  Module OpenPriceNegativeThousandPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeThousandPair.
-
-  Module OpenPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeTenThousandPair.
-
-  Module OpenPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeHundredThousandPair.
-
-  Module OpenPriceNegativeMillionPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNegativeMillionPair.
-
-  Module OpenPriceNumericPair.
-
-    Record t := {
-      open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| open_price := open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceNumericPair.
-
-  Module OpenPriceUnknownFractionPair.
-
-    Record t := {
-      raw_open_price : list byte;
-      open_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_open_price record) = 6 /\
-      Datatypes.length (open_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_open_price record) ++
-      encode_bytes 1 (open_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_open_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (open_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_open_price := raw_open_price_value; open_price_fraction_indicator := open_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End OpenPriceUnknownFractionPair.
-
-  Module HighPriceNegativeWholePair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeWholePair.
-
-  Module HighPriceNegativeTenPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeTenPair.
-
-  Module HighPriceNegativeHundredPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeHundredPair.
-
-  Module HighPriceNegativeThousandPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeThousandPair.
-
-  Module HighPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeTenThousandPair.
-
-  Module HighPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeHundredThousandPair.
-
-  Module HighPriceNegativeMillionPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNegativeMillionPair.
-
-  Module HighPriceNumericPair.
-
-    Record t := {
-      high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| high_price := high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceNumericPair.
-
-  Module HighPriceUnknownFractionPair.
-
-    Record t := {
-      raw_high_price : list byte;
-      high_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_high_price record) = 6 /\
-      Datatypes.length (high_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_high_price record) ++
-      encode_bytes 1 (high_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_high_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (high_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_high_price := raw_high_price_value; high_price_fraction_indicator := high_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End HighPriceUnknownFractionPair.
-
-  Module LowPriceNegativeWholePair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeWholePair.
-
-  Module LowPriceNegativeTenPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeTenPair.
-
-  Module LowPriceNegativeHundredPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeHundredPair.
-
-  Module LowPriceNegativeThousandPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeThousandPair.
-
-  Module LowPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeTenThousandPair.
-
-  Module LowPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeHundredThousandPair.
-
-  Module LowPriceNegativeMillionPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNegativeMillionPair.
-
-  Module LowPriceNumericPair.
-
-    Record t := {
-      low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| low_price := low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceNumericPair.
-
-  Module LowPriceUnknownFractionPair.
-
-    Record t := {
-      raw_low_price : list byte;
-      low_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_low_price record) = 6 /\
-      Datatypes.length (low_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_low_price record) ++
-      encode_bytes 1 (low_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_low_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (low_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_low_price := raw_low_price_value; low_price_fraction_indicator := low_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LowPriceUnknownFractionPair.
-
-  Module ReferencePriceNegativeWholePair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeWholePair.
-
-  Module ReferencePriceNegativeTenPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeTenPair.
-
-  Module ReferencePriceNegativeHundredPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeHundredPair.
-
-  Module ReferencePriceNegativeThousandPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeThousandPair.
-
-  Module ReferencePriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeTenThousandPair.
-
-  Module ReferencePriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeHundredThousandPair.
-
-  Module ReferencePriceNegativeMillionPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNegativeMillionPair.
-
-  Module ReferencePriceNumericPair.
-
-    Record t := {
-      reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| reference_price := reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceNumericPair.
-
-  Module ReferencePriceUnknownFractionPair.
-
-    Record t := {
-      raw_reference_price : list byte;
-      reference_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_reference_price record) = 6 /\
-      Datatypes.length (reference_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_reference_price record) ++
-      encode_bytes 1 (reference_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_reference_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (reference_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_reference_price := raw_reference_price_value; reference_price_fraction_indicator := reference_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End ReferencePriceUnknownFractionPair.
 
   Module BeginningOfOptionsSummaryMessage.
 
@@ -8501,434 +969,251 @@ Module BoxOptionsSolaMulticastV15.
 
   End EndOfSalesMessage.
 
-  Module InitialOrderPriceNegativeWholePair.
+  Module OptionImprovementProcessBeginningMessage.
 
+    (** Start of Option Improvement Process *)
     Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeWholePair.
-
-  Module InitialOrderPriceNegativeTenPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeTenPair.
-
-  Module InitialOrderPriceNegativeHundredPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeHundredPair.
-
-  Module InitialOrderPriceNegativeThousandPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeThousandPair.
-
-  Module InitialOrderPriceNegativeTenThousandPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeTenThousandPair.
-
-  Module InitialOrderPriceNegativeHundredThousandPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeHundredThousandPair.
-
-  Module InitialOrderPriceNegativeMillionPair.
-
-    Record t := {
-      raw_initial_order_price : list byte;
-      initial_order_price_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End InitialOrderPriceNegativeMillionPair.
-
-  Module InitialOrderPriceNumericPair.
-
-    Record t := {
+      exchange_id : list byte;
+      instrument_description : InstrumentDescription.t;
+      improvement_phase_sequential_number : list byte;
       initial_order_price : list byte;
       initial_order_price_fraction_indicator : list byte;
+      initial_order_quantity : list byte;
+      initial_order_side : list byte;
+      improvement_phase_expiry_time : list byte;
+      improvement_process_expiry_duration : list byte;
+      minimum_quantity_for_improvement_order : list byte;
+      percentage_assured_to_initial_order : list byte;
+      auction_type : list byte;
+      filler_1 : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
+      Datatypes.length (exchange_id record) = 1 /\
+      InstrumentDescription.bounded (instrument_description record) /\
+      Datatypes.length (improvement_phase_sequential_number record) = 6 /\
       Datatypes.length (initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
+      Datatypes.length (initial_order_price_fraction_indicator record) = 1 /\
+      Datatypes.length (initial_order_quantity record) = 8 /\
+      Datatypes.length (initial_order_side record) = 1 /\
+      Datatypes.length (improvement_phase_expiry_time record) = 8 /\
+      Datatypes.length (improvement_process_expiry_duration record) = 4 /\
+      Datatypes.length (minimum_quantity_for_improvement_order record) = 8 /\
+      Datatypes.length (percentage_assured_to_initial_order record) = 8 /\
+      Datatypes.length (auction_type record) = 1 /\
+      (filler_1 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
+      encode_bytes 1 (exchange_id record) ++
+      InstrumentDescription.encode (instrument_description record) ++
+      encode_bytes 6 (improvement_phase_sequential_number record) ++
       encode_bytes 6 (initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
+      encode_bytes 1 (initial_order_price_fraction_indicator record) ++
+      encode_bytes 8 (initial_order_quantity record) ++
+      encode_bytes 1 (initial_order_side record) ++
+      encode_bytes 8 (improvement_phase_expiry_time record) ++
+      encode_bytes 4 (improvement_process_expiry_duration record) ++
+      encode_bytes 8 (minimum_quantity_for_improvement_order record) ++
+      encode_bytes 8 (percentage_assured_to_initial_order record) ++
+      encode_bytes 1 (auction_type record) ++
+      encode_uint 1 (filler_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
+      match decode_bytes 1 bytes with
       | None => None
-      | Some (initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (exchange_id_value, bytes) =>
+          match InstrumentDescription.decode bytes with
           | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| initial_order_price := initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
+          | Some (instrument_description_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (improvement_phase_sequential_number_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (initial_order_price_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (initial_order_price_fraction_indicator_value, bytes) =>
+                          match decode_bytes 8 bytes with
+                          | None => None
+                          | Some (initial_order_quantity_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (initial_order_side_value, bytes) =>
+                                  match decode_bytes 8 bytes with
+                                  | None => None
+                                  | Some (improvement_phase_expiry_time_value, bytes) =>
+                                      match decode_bytes 4 bytes with
+                                      | None => None
+                                      | Some (improvement_process_expiry_duration_value, bytes) =>
+                                          match decode_bytes 8 bytes with
+                                          | None => None
+                                          | Some (minimum_quantity_for_improvement_order_value, bytes) =>
+                                              match decode_bytes 8 bytes with
+                                              | None => None
+                                              | Some (percentage_assured_to_initial_order_value, bytes) =>
+                                                  match decode_bytes 1 bytes with
+                                                  | None => None
+                                                  | Some (auction_type_value, bytes) =>
+                                                      match decode_uint 1 bytes with
+                                                      | None => None
+                                                      | Some (filler_1_value, bytes) =>
+                                                          Some ({| exchange_id := exchange_id_value; instrument_description := instrument_description_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; initial_order_price := initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value; initial_order_quantity := initial_order_quantity_value; initial_order_side := initial_order_side_value; improvement_phase_expiry_time := improvement_phase_expiry_time_value; improvement_process_expiry_duration := improvement_process_expiry_duration_value; minimum_quantity_for_improvement_order := minimum_quantity_for_improvement_order_value; percentage_assured_to_initial_order := percentage_assured_to_initial_order_value; auction_type := auction_type_value; filler_1 := filler_1_value |}, bytes)
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 73.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
+      rewrite InstrumentDescription.decode_encode by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply InstrumentDescription.eq_dec]. Defined.
 
-  End InitialOrderPriceNumericPair.
+  End OptionImprovementProcessBeginningMessage.
 
-  Module InitialOrderPriceUnknownFractionPair.
+  Module ComplexOrderImprovementProcessBeginningMessageMessage.
 
+    (** Complex Order Improvement Process Beginning Message *)
     Record t := {
-      raw_initial_order_price : list byte;
+      exchange_id : list byte;
+      complex_order_instrument_symbol : list byte;
+      improvement_phase_sequential_number : list byte;
+      initial_order_price_sign : list byte;
+      initial_order_price : list byte;
       initial_order_price_fraction_indicator : list byte;
+      initial_order_quantity : list byte;
+      initial_order_side : list byte;
+      improvement_phase_expiry_time : list byte;
+      improvement_process_expiry_duration : list byte;
+      minimum_quantity_for_improvement_order : list byte;
+      percentage_assured_to_initial_order : list byte;
+      auction_type : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_initial_order_price record) = 6 /\
-      Datatypes.length (initial_order_price_fraction_indicator record) = 1.
+      Datatypes.length (exchange_id record) = 1 /\
+      Datatypes.length (complex_order_instrument_symbol record) = 30 /\
+      Datatypes.length (improvement_phase_sequential_number record) = 6 /\
+      Datatypes.length (initial_order_price_sign record) = 1 /\
+      Datatypes.length (initial_order_price record) = 6 /\
+      Datatypes.length (initial_order_price_fraction_indicator record) = 1 /\
+      Datatypes.length (initial_order_quantity record) = 8 /\
+      Datatypes.length (initial_order_side record) = 1 /\
+      Datatypes.length (improvement_phase_expiry_time record) = 8 /\
+      Datatypes.length (improvement_process_expiry_duration record) = 4 /\
+      Datatypes.length (minimum_quantity_for_improvement_order record) = 8 /\
+      Datatypes.length (percentage_assured_to_initial_order record) = 8 /\
+      Datatypes.length (auction_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_initial_order_price record) ++
-      encode_bytes 1 (initial_order_price_fraction_indicator record).
+      encode_bytes 1 (exchange_id record) ++
+      encode_bytes 30 (complex_order_instrument_symbol record) ++
+      encode_bytes 6 (improvement_phase_sequential_number record) ++
+      encode_bytes 1 (initial_order_price_sign record) ++
+      encode_bytes 6 (initial_order_price record) ++
+      encode_bytes 1 (initial_order_price_fraction_indicator record) ++
+      encode_bytes 8 (initial_order_quantity record) ++
+      encode_bytes 1 (initial_order_side record) ++
+      encode_bytes 8 (improvement_phase_expiry_time record) ++
+      encode_bytes 4 (improvement_process_expiry_duration record) ++
+      encode_bytes 8 (minimum_quantity_for_improvement_order record) ++
+      encode_bytes 8 (percentage_assured_to_initial_order record) ++
+      encode_bytes 1 (auction_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
+      match decode_bytes 1 bytes with
       | None => None
-      | Some (raw_initial_order_price_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (exchange_id_value, bytes) =>
+          match decode_bytes 30 bytes with
           | None => None
-          | Some (initial_order_price_fraction_indicator_value, bytes) =>
-              Some ({| raw_initial_order_price := raw_initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value |}, bytes)
+          | Some (complex_order_instrument_symbol_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (improvement_phase_sequential_number_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (initial_order_price_sign_value, bytes) =>
+                      match decode_bytes 6 bytes with
+                      | None => None
+                      | Some (initial_order_price_value, bytes) =>
+                          match decode_bytes 1 bytes with
+                          | None => None
+                          | Some (initial_order_price_fraction_indicator_value, bytes) =>
+                              match decode_bytes 8 bytes with
+                              | None => None
+                              | Some (initial_order_quantity_value, bytes) =>
+                                  match decode_bytes 1 bytes with
+                                  | None => None
+                                  | Some (initial_order_side_value, bytes) =>
+                                      match decode_bytes 8 bytes with
+                                      | None => None
+                                      | Some (improvement_phase_expiry_time_value, bytes) =>
+                                          match decode_bytes 4 bytes with
+                                          | None => None
+                                          | Some (improvement_process_expiry_duration_value, bytes) =>
+                                              match decode_bytes 8 bytes with
+                                              | None => None
+                                              | Some (minimum_quantity_for_improvement_order_value, bytes) =>
+                                                  match decode_bytes 8 bytes with
+                                                  | None => None
+                                                  | Some (percentage_assured_to_initial_order_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (auction_type_value, bytes) =>
+                                                          Some ({| exchange_id := exchange_id_value; complex_order_instrument_symbol := complex_order_instrument_symbol_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; initial_order_price_sign := initial_order_price_sign_value; initial_order_price := initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value; initial_order_quantity := initial_order_quantity_value; initial_order_side := initial_order_side_value; improvement_phase_expiry_time := improvement_phase_expiry_time_value; improvement_process_expiry_duration := improvement_process_expiry_duration_value; minimum_quantity_for_improvement_order := minimum_quantity_for_improvement_order_value; percentage_assured_to_initial_order := percentage_assured_to_initial_order_value; auction_type := auction_type_value |}, bytes)
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 83.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length. reflexivity.
@@ -8938,468 +1223,438 @@ Module BoxOptionsSolaMulticastV15.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End InitialOrderPriceUnknownFractionPair.
+  End ComplexOrderImprovementProcessBeginningMessageMessage.
 
-  Module LimitEnteredForAnOrderNegativeWholePair.
+  Module MarketSheetInitialAndImprovementOrderMessage.
 
+    (** Market Sheet Initial and Improvement Order *)
     Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeWholePair.
-
-  Module LimitEnteredForAnOrderNegativeTenPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeTenPair.
-
-  Module LimitEnteredForAnOrderNegativeHundredPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeHundredPair.
-
-  Module LimitEnteredForAnOrderNegativeThousandPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeThousandPair.
-
-  Module LimitEnteredForAnOrderNegativeTenThousandPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeTenThousandPair.
-
-  Module LimitEnteredForAnOrderNegativeHundredThousandPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeHundredThousandPair.
-
-  Module LimitEnteredForAnOrderNegativeMillionPair.
-
-    Record t := {
-      raw_limit_entered_for_an_order : list byte;
-      limit_fraction_indicator : list byte;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
-      | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LimitEnteredForAnOrderNegativeMillionPair.
-
-  Module LimitEnteredForAnOrderNumericPair.
-
-    Record t := {
+      exchange_id : list byte;
+      instrument_description : InstrumentDescription.t;
+      order_side : list byte;
+      type_of_order : list byte;
       limit_entered_for_an_order : list byte;
       limit_fraction_indicator : list byte;
+      order_quantity : list byte;
+      order_sequence_number : list byte;
+      improvement_phase_sequential_number : list byte;
+      type_of_clearing_account : list byte;
+      filler_1 : N;
+      end_of_the_exposition : list byte;
+      auction_type : list byte;
+      firm_id : list byte;
+      cmta : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
+      Datatypes.length (exchange_id record) = 1 /\
+      InstrumentDescription.bounded (instrument_description record) /\
+      Datatypes.length (order_side record) = 1 /\
+      Datatypes.length (type_of_order record) = 1 /\
       Datatypes.length (limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
+      Datatypes.length (limit_fraction_indicator record) = 1 /\
+      Datatypes.length (order_quantity record) = 8 /\
+      Datatypes.length (order_sequence_number record) = 6 /\
+      Datatypes.length (improvement_phase_sequential_number record) = 6 /\
+      Datatypes.length (type_of_clearing_account record) = 1 /\
+      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (end_of_the_exposition record) = 8 /\
+      Datatypes.length (auction_type record) = 1 /\
+      Datatypes.length (firm_id record) = 4 /\
+      Datatypes.length (cmta record) = 4.
 
     Definition encode (record : t) : list byte :=
+      encode_bytes 1 (exchange_id record) ++
+      InstrumentDescription.encode (instrument_description record) ++
+      encode_bytes 1 (order_side record) ++
+      encode_bytes 1 (type_of_order record) ++
       encode_bytes 6 (limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
+      encode_bytes 1 (limit_fraction_indicator record) ++
+      encode_bytes 8 (order_quantity record) ++
+      encode_bytes 6 (order_sequence_number record) ++
+      encode_bytes 6 (improvement_phase_sequential_number record) ++
+      encode_bytes 1 (type_of_clearing_account record) ++
+      encode_uint 1 (filler_1 record) ++
+      encode_bytes 8 (end_of_the_exposition record) ++
+      encode_bytes 1 (auction_type record) ++
+      encode_bytes 4 (firm_id record) ++
+      encode_bytes 4 (cmta record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
+      match decode_bytes 1 bytes with
       | None => None
-      | Some (limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (exchange_id_value, bytes) =>
+          match InstrumentDescription.decode bytes with
           | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| limit_entered_for_an_order := limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
+          | Some (instrument_description_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (order_side_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (type_of_order_value, bytes) =>
+                      match decode_bytes 6 bytes with
+                      | None => None
+                      | Some (limit_entered_for_an_order_value, bytes) =>
+                          match decode_bytes 1 bytes with
+                          | None => None
+                          | Some (limit_fraction_indicator_value, bytes) =>
+                              match decode_bytes 8 bytes with
+                              | None => None
+                              | Some (order_quantity_value, bytes) =>
+                                  match decode_bytes 6 bytes with
+                                  | None => None
+                                  | Some (order_sequence_number_value, bytes) =>
+                                      match decode_bytes 6 bytes with
+                                      | None => None
+                                      | Some (improvement_phase_sequential_number_value, bytes) =>
+                                          match decode_bytes 1 bytes with
+                                          | None => None
+                                          | Some (type_of_clearing_account_value, bytes) =>
+                                              match decode_uint 1 bytes with
+                                              | None => None
+                                              | Some (filler_1_value, bytes) =>
+                                                  match decode_bytes 8 bytes with
+                                                  | None => None
+                                                  | Some (end_of_the_exposition_value, bytes) =>
+                                                      match decode_bytes 1 bytes with
+                                                      | None => None
+                                                      | Some (auction_type_value, bytes) =>
+                                                          match decode_bytes 4 bytes with
+                                                          | None => None
+                                                          | Some (firm_id_value, bytes) =>
+                                                              match decode_bytes 4 bytes with
+                                                              | None => None
+                                                              | Some (cmta_value, bytes) =>
+                                                                  Some ({| exchange_id := exchange_id_value; instrument_description := instrument_description_value; order_side := order_side_value; type_of_order := type_of_order_value; limit_entered_for_an_order := limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value; order_quantity := order_quantity_value; order_sequence_number := order_sequence_number_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; type_of_clearing_account := type_of_clearing_account_value; filler_1 := filler_1_value; end_of_the_exposition := end_of_the_exposition_value; auction_type := auction_type_value; firm_id := firm_id_value; cmta := cmta_value |}, bytes)
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
+      rewrite InstrumentDescription.decode_encode by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply InstrumentDescription.eq_dec]. Defined.
 
-  End LimitEnteredForAnOrderNumericPair.
+  End MarketSheetInitialAndImprovementOrderMessage.
 
-  Module LimitEnteredForAnOrderUnknownFractionPair.
+  Module ComplexOrderMarketSheetInitialAndImprovementOrderMessage.
 
+    (** Market Sheet Initial and Improvement Order (Complex Order) / Exposed Order (Complex Order) *)
     Record t := {
-      raw_limit_entered_for_an_order : list byte;
+      exchange_id : list byte;
+      complex_order_instrument_symbol : list byte;
+      order_side : list byte;
+      type_of_order : list byte;
+      limit_entered_for_an_order_sign : list byte;
+      limit_entered_for_an_order : list byte;
       limit_fraction_indicator : list byte;
+      order_quantity : list byte;
+      order_sequence_number : list byte;
+      improvement_phase_sequential_number : list byte;
+      type_of_clearing_account : list byte;
+      filler_1 : N;
+      end_of_the_exposition : list byte;
+      auction_type : list byte;
+      firm_id : list byte;
+      cmta : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (raw_limit_entered_for_an_order record) = 6 /\
-      Datatypes.length (limit_fraction_indicator record) = 1.
+      Datatypes.length (exchange_id record) = 1 /\
+      Datatypes.length (complex_order_instrument_symbol record) = 30 /\
+      Datatypes.length (order_side record) = 1 /\
+      Datatypes.length (type_of_order record) = 1 /\
+      Datatypes.length (limit_entered_for_an_order_sign record) = 1 /\
+      Datatypes.length (limit_entered_for_an_order record) = 6 /\
+      Datatypes.length (limit_fraction_indicator record) = 1 /\
+      Datatypes.length (order_quantity record) = 8 /\
+      Datatypes.length (order_sequence_number record) = 6 /\
+      Datatypes.length (improvement_phase_sequential_number record) = 6 /\
+      Datatypes.length (type_of_clearing_account record) = 1 /\
+      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (end_of_the_exposition record) = 8 /\
+      Datatypes.length (auction_type record) = 1 /\
+      Datatypes.length (firm_id record) = 4 /\
+      Datatypes.length (cmta record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 6 (raw_limit_entered_for_an_order record) ++
-      encode_bytes 1 (limit_fraction_indicator record).
+      encode_bytes 1 (exchange_id record) ++
+      encode_bytes 30 (complex_order_instrument_symbol record) ++
+      encode_bytes 1 (order_side record) ++
+      encode_bytes 1 (type_of_order record) ++
+      encode_bytes 1 (limit_entered_for_an_order_sign record) ++
+      encode_bytes 6 (limit_entered_for_an_order record) ++
+      encode_bytes 1 (limit_fraction_indicator record) ++
+      encode_bytes 8 (order_quantity record) ++
+      encode_bytes 6 (order_sequence_number record) ++
+      encode_bytes 6 (improvement_phase_sequential_number record) ++
+      encode_bytes 1 (type_of_clearing_account record) ++
+      encode_uint 1 (filler_1 record) ++
+      encode_bytes 8 (end_of_the_exposition record) ++
+      encode_bytes 1 (auction_type record) ++
+      encode_bytes 4 (firm_id record) ++
+      encode_bytes 4 (cmta record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 6 bytes with
+      match decode_bytes 1 bytes with
       | None => None
-      | Some (raw_limit_entered_for_an_order_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (exchange_id_value, bytes) =>
+          match decode_bytes 30 bytes with
           | None => None
-          | Some (limit_fraction_indicator_value, bytes) =>
-              Some ({| raw_limit_entered_for_an_order := raw_limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value |}, bytes)
+          | Some (complex_order_instrument_symbol_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (order_side_value, bytes) =>
+                  match decode_bytes 1 bytes with
+                  | None => None
+                  | Some (type_of_order_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (limit_entered_for_an_order_sign_value, bytes) =>
+                          match decode_bytes 6 bytes with
+                          | None => None
+                          | Some (limit_entered_for_an_order_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (limit_fraction_indicator_value, bytes) =>
+                                  match decode_bytes 8 bytes with
+                                  | None => None
+                                  | Some (order_quantity_value, bytes) =>
+                                      match decode_bytes 6 bytes with
+                                      | None => None
+                                      | Some (order_sequence_number_value, bytes) =>
+                                          match decode_bytes 6 bytes with
+                                          | None => None
+                                          | Some (improvement_phase_sequential_number_value, bytes) =>
+                                              match decode_bytes 1 bytes with
+                                              | None => None
+                                              | Some (type_of_clearing_account_value, bytes) =>
+                                                  match decode_uint 1 bytes with
+                                                  | None => None
+                                                  | Some (filler_1_value, bytes) =>
+                                                      match decode_bytes 8 bytes with
+                                                      | None => None
+                                                      | Some (end_of_the_exposition_value, bytes) =>
+                                                          match decode_bytes 1 bytes with
+                                                          | None => None
+                                                          | Some (auction_type_value, bytes) =>
+                                                              match decode_bytes 4 bytes with
+                                                              | None => None
+                                                              | Some (firm_id_value, bytes) =>
+                                                                  match decode_bytes 4 bytes with
+                                                                  | None => None
+                                                                  | Some (cmta_value, bytes) =>
+                                                                      Some ({| exchange_id := exchange_id_value; complex_order_instrument_symbol := complex_order_instrument_symbol_value; order_side := order_side_value; type_of_order := type_of_order_value; limit_entered_for_an_order_sign := limit_entered_for_an_order_sign_value; limit_entered_for_an_order := limit_entered_for_an_order_value; limit_fraction_indicator := limit_fraction_indicator_value; order_quantity := order_quantity_value; order_sequence_number := order_sequence_number_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; type_of_clearing_account := type_of_clearing_account_value; filler_1 := filler_1_value; end_of_the_exposition := end_of_the_exposition_value; auction_type := auction_type_value; firm_id := firm_id_value; cmta := cmta_value |}, bytes)
+                                                                  end
+                                                              end
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 80.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 bound_1].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End LimitEnteredForAnOrderUnknownFractionPair.
+  End ComplexOrderMarketSheetInitialAndImprovementOrderMessage.
+
+  Module InitialAndImprovementOrderMessage.
+
+    (** Initial and Improvement Order (Options) / Exposed Order *)
+    Record t := {
+      exchange_id : list byte;
+      instrument_description : InstrumentDescription.t;
+      deletion_type : list byte;
+      order_sequence_number : list byte;
+      improvement_order_side : list byte;
+      improvement_phase_sequential_number : list byte;
+      auction_type : list byte;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (exchange_id record) = 1 /\
+      InstrumentDescription.bounded (instrument_description record) /\
+      Datatypes.length (deletion_type record) = 1 /\
+      Datatypes.length (order_sequence_number record) = 6 /\
+      Datatypes.length (improvement_order_side record) = 1 /\
+      Datatypes.length (improvement_phase_sequential_number record) = 6 /\
+      Datatypes.length (auction_type record) = 1.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 1 (exchange_id record) ++
+      InstrumentDescription.encode (instrument_description record) ++
+      encode_bytes 1 (deletion_type record) ++
+      encode_bytes 6 (order_sequence_number record) ++
+      encode_bytes 1 (improvement_order_side record) ++
+      encode_bytes 6 (improvement_phase_sequential_number record) ++
+      encode_bytes 1 (auction_type record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 1 bytes with
+      | None => None
+      | Some (exchange_id_value, bytes) =>
+          match InstrumentDescription.decode bytes with
+          | None => None
+          | Some (instrument_description_value, bytes) =>
+              match decode_bytes 1 bytes with
+              | None => None
+              | Some (deletion_type_value, bytes) =>
+                  match decode_bytes 6 bytes with
+                  | None => None
+                  | Some (order_sequence_number_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (improvement_order_side_value, bytes) =>
+                          match decode_bytes 6 bytes with
+                          | None => None
+                          | Some (improvement_phase_sequential_number_value, bytes) =>
+                              match decode_bytes 1 bytes with
+                              | None => None
+                              | Some (auction_type_value, bytes) =>
+                                  Some ({| exchange_id := exchange_id_value; instrument_description := instrument_description_value; deletion_type := deletion_type_value; order_sequence_number := order_sequence_number_value; improvement_order_side := improvement_order_side_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; auction_type := auction_type_value |}, bytes)
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite InstrumentDescription.decode_encode by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply InstrumentDescription.eq_dec]. Defined.
+
+  End InitialAndImprovementOrderMessage.
 
   Module ComplexOrderInitialAndImprovementOrderMessage.
 

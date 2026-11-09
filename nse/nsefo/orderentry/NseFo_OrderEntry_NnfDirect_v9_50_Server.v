@@ -27,7 +27,7 @@ Import ListNotations.
       - a field read in bits
       - the dispatch that chooses a message by its type
       - a length prefix framing what follows
-      - a run counted by a field
+      - a run of a stated number of entries
 
     License: MIT No Attribution
   *)

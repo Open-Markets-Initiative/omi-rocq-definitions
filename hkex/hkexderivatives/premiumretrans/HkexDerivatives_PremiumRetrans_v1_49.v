@@ -23,6 +23,7 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a Reassemble rule
+      - a field filling what is left of what holds it
       - a run counted by a field
       - a field read in bits
 

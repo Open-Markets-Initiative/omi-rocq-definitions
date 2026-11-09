@@ -25,6 +25,7 @@ Import ListNotations.
       - a run filling what frames it
       - a length prefix framing what follows
       - a run counted by a field
+      - a run of a stated number of entries
 
     License: MIT No Attribution
   *)

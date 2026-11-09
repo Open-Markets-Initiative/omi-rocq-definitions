@@ -24,7 +24,7 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a field read in bits
-      - a run counted by a field
+      - a run of a stated number of entries
 
     License: MIT No Attribution
   *)

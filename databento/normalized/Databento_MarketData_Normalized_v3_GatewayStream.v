@@ -26,6 +26,7 @@ Import ListNotations.
       - a run counted by a field
       - a run filling what frames it
       - a field read in bits
+      - a run of a stated number of entries
 
     License: MIT No Attribution
   *)

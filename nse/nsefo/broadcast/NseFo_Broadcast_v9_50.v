@@ -26,6 +26,7 @@ Import ListNotations.
       - a Conversion rule
       - a field read in bits
       - a Composite rule
+      - a run of a stated number of entries
       - the dispatch that chooses a message by its type
 
     License: MIT No Attribution

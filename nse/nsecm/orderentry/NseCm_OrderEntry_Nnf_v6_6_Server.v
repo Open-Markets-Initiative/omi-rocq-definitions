@@ -23,7 +23,7 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - a run counted by a field
+      - a run of a stated number of entries
       - a Composite rule
       - the dispatch that chooses a message by its type
       - a field read in bits

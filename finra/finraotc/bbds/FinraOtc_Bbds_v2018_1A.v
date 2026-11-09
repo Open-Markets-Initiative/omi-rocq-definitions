@@ -25,7 +25,7 @@ Import ListNotations.
       - a run filling what frames it
       - the dispatch that chooses a message by its type
       - a field present only on a condition
-      - a length prefix framing what follows
+      - a field ended by the first of several bytes it does not carry
 
     License: MIT No Attribution
   *)

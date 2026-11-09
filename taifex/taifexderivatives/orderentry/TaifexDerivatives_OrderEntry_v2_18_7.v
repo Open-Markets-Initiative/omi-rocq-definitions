@@ -25,6 +25,7 @@ Import ListNotations.
       - a Reassemble rule
       - a length prefix framing what follows
       - the dispatch that chooses a message by its type
+      - a run of a stated number of entries
       - a run counted by a field
 
     License: MIT No Attribution

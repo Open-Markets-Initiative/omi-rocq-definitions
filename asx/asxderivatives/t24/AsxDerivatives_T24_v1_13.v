@@ -24,6 +24,7 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
       - a run counted by a field
+      - a run of a stated number of entries
       - a field read in bits
 
     License: MIT No Attribution

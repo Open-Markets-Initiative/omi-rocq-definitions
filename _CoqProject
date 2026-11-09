@@ -11,6 +11,10 @@ a2x/tradingprotocol/A2XEquities_TradingProtocol_v2_9_2.v
 a2x/tradingprotocol/A2XEquities_TradingProtocol_v2_9_3.v
 a2x/tradingprotocol/A2XEquities_TradingProtocol_v3_0.v
 a2x/udpheader/A2XEquities_UdpHeader_v1.v
+aix/aixmarket/geniuminet/AixMarket_GeniumInet_v1_0_Client.v
+aix/aixmarket/geniuminet/AixMarket_GeniumInet_v1_0_Server.v
+aix/aixmarket/geniuminet/AixMarket_GeniumInet_v3_0_Client.v
+aix/aixmarket/geniuminet/AixMarket_GeniumInet_v3_0_Server.v
 aquis/realtime/AquisEquities_RealTime_v2_4_2.v
 aquis/realtime/AquisEquities_RealTime_v2_5.v
 aquis/realtime/AquisEquities_RealTime_v4_0.v
@@ -37,6 +41,10 @@ aquis/tradingprotocol/AquisEquities_TradingProtocol_v4_0.v
 aquis/tradingprotocol/AquisEquities_TradingProtocol_v4_2.v
 aquis/tradingprotocol/AquisEquities_TradingProtocol_v4_5.v
 aquis/udpheader/AquisEquities_UdpHeader_v1_0.v
+asianext/asianextderivatives/realtime/AsiaNextDerivatives_RealTime_v1_3.v
+asianext/asianextderivatives/replay/AsiaNextDerivatives_Replay_v1_3.v
+asianext/asianextderivatives/snapshot/AsiaNextDerivatives_Snapshot_v1_3.v
+asianext/asianextderivatives/tradingprotocol/AsiaNextDerivatives_TradingProtocol_v1_2.v
 asx/asxderivatives/ntp/AsxDerivatives_Ntp_v1_05.v
 asx/asxderivatives/t24/AsxDerivatives_T24_v1_13.v
 asx/asxsecurities/trade/AsxSecurities_Trade_Itch_v2_0.v

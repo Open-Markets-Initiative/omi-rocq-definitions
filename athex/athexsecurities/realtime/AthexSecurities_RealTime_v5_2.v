@@ -23,8 +23,9 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - the dispatch that chooses a message by its type
-      - a length prefix framing what follows
+      - a field filling what is left of what holds it
       - a run counted by a field
+      - a length prefix framing what follows
 
     License: MIT No Attribution
   *)

@@ -1395,7 +1395,7 @@ Module B3DerivativesBinaryEntryPointV84.
       sending_time : N;
       event_indicator : N;
       market_segment_id_optional : N;
-      padding : list byte;
+      padding_char_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1405,7 +1405,7 @@ Module B3DerivativesBinaryEntryPointV84.
       (sending_time record < 256 ^ N.of_nat 8)%N /\
       (event_indicator record < 256 ^ N.of_nat 1)%N /\
       (market_segment_id_optional record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (padding record) = 1.
+      Datatypes.length (padding_char_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (session_id record) ++
@@ -1413,7 +1413,7 @@ Module B3DerivativesBinaryEntryPointV84.
       encode_uint 8 (sending_time record) ++
       encode_uint 1 (event_indicator record) ++
       encode_uint 1 (market_segment_id_optional record) ++
-      encode_bytes 1 (padding record).
+      encode_bytes 2 (padding_char_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1431,10 +1431,10 @@ Module B3DerivativesBinaryEntryPointV84.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (market_segment_id_optional_value, bytes) =>
-                          match decode_bytes 1 bytes with
+                          match decode_bytes 2 bytes with
                           | None => None
-                          | Some (padding_value, bytes) =>
-                              Some ({| session_id := session_id_value; msg_seq_num := msg_seq_num_value; sending_time := sending_time_value; event_indicator := event_indicator_value; market_segment_id_optional := market_segment_id_optional_value; padding := padding_value |}, bytes)
+                          | Some (padding_char_2_value, bytes) =>
+                              Some ({| session_id := session_id_value; msg_seq_num := msg_seq_num_value; sending_time := sending_time_value; event_indicator := event_indicator_value; market_segment_id_optional := market_segment_id_optional_value; padding_char_2 := padding_char_2_value |}, bytes)
                           end
                       end
                   end
@@ -1442,7 +1442,7 @@ Module B3DerivativesBinaryEntryPointV84.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.

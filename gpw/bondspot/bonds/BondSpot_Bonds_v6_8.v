@@ -22,9 +22,9 @@ Import ListNotations.
     consumer may read either.
 
     What this definition does not state, and the model does:
-      - a length prefix framing what follows
+      - a field filling what is left of what holds it
       - a run filling what frames it
-      - a run counted by a field
+      - a run of a stated number of entries
 
     License: MIT No Attribution
   *)

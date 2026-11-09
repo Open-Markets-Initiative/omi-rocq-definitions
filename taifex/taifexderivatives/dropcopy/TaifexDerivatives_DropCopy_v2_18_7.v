@@ -24,6 +24,7 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a Reassemble rule
       - the dispatch that chooses a message by its type
+      - a run of a stated number of entries
       - a run counted by a field
 
     License: MIT No Attribution
