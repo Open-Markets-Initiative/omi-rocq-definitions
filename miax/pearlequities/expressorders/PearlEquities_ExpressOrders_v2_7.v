@@ -1372,23 +1372,23 @@ Module PearlEquitiesExpressOrdersV27.
 
   Module SynchronizationComplete.
 
-    (** The ESesM server sends a Login response packet in response a Login request packet from the client *)
+    (** The ESesM server sends a Synchronization complete packet when it is done replaying all the old packets and is ready to start sending new packets from the Matching Engine *)
     Record t := {
-      number_of_matching_engines : N;
+      matching_engine_id : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (number_of_matching_engines record < 256 ^ N.of_nat 1)%N.
+      (matching_engine_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (number_of_matching_engines record).
+      encode_uint 1 (matching_engine_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (number_of_matching_engines_value, bytes) =>
-          Some ({| number_of_matching_engines := number_of_matching_engines_value |}, bytes)
+      | Some (matching_engine_id_value, bytes) =>
+          Some ({| matching_engine_id := matching_engine_id_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -1461,5 +1461,56 @@ Module PearlEquitiesExpressOrdersV27.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End RetransmissionRequest.
+
+  Module TradingSessionUpdate.
+
+    (** The ESesM server sends a Trading Session Update packet to inform the client that a new trading session is starting on the specified Matching Engine *)
+    Record t := {
+      matching_engine_id : N;
+      trading_session_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (matching_engine_id record < 256 ^ N.of_nat 1)%N /\
+      (trading_session_id record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 1 (matching_engine_id record) ++
+      encode_uint 1 (trading_session_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 1 bytes with
+      | None => None
+      | Some (matching_engine_id_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (trading_session_id_value, bytes) =>
+              Some ({| matching_engine_id := matching_engine_id_value; trading_session_id := trading_session_id_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TradingSessionUpdate.
 
 End PearlEquitiesExpressOrdersV27.

@@ -23,8 +23,8 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
-      - a field read in bits
       - a run of a stated number of entries
+      - a field read in bits
 
     License: MIT No Attribution
   *)
@@ -153,57 +153,6 @@ Module WseStreamBboV17620.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End MessageHeader.
-
-  Module WeekPlan.
-
-    (** Trading week plan *)
-    Record t := {
-      calendar_id : N;
-      weekdays : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (calendar_id record < 256 ^ N.of_nat 4)%N /\
-      (weekdays record < 256 ^ N.of_nat 7)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 4 (calendar_id record) ++
-      encode_uint 7 (weekdays record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
-      | None => None
-      | Some (calendar_id_value, bytes) =>
-          match decode_uint 7 bytes with
-          | None => None
-          | Some (weekdays_value, bytes) =>
-              Some ({| calendar_id := calendar_id_value; weekdays := weekdays_value |}, bytes)
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 bound_1].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End WeekPlan.
 
   Module CalendarException.
 

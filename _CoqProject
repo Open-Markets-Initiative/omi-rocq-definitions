@@ -86,6 +86,9 @@ biva/bivaequities/orderentry/BivaEquities_OrderEntry_v1_05_Server.v
 biva/bivaequities/totalview/BivaEquities_TotalView_Glimpse_v1_12_Client.v
 biva/bivaequities/totalview/BivaEquities_TotalView_Glimpse_v1_12_Server.v
 biva/bivaequities/totalview/BivaEquities_TotalView_Itch_v1_12.v
+bjse/bjsesecurities/multicastmarketdata/BjseSecurities_MulticastMarketData_v1_1.v
+bjse/bjsesecurities/orderentry/BjseSecurities_OrderEntry_v1_1.v
+bjse/bjsesecurities/tcpmarketdata/BjseSecurities_TcpMarketData_v1_1.v
 blueoceanats/commonheader/BlueOceanAts_CommonHeader_v1_1.v
 blueoceanats/memo/BlueEquities_Memo_v1_13_Client.v
 blueoceanats/memo/BlueEquities_Memo_v1_13_Server.v
@@ -1662,6 +1665,9 @@ nasdaq/utp/snapshot/Nasdaq_Utp_Snapshot_v3_0_Client.v
 nasdaq/utp/snapshot/Nasdaq_Utp_Snapshot_v3_0_Server.v
 nasdaq/utp/snapshot/Nasdaq_Utp_Snapshot_v5_0_Client.v
 nasdaq/utp/snapshot/Nasdaq_Utp_Snapshot_v5_0_Server.v
+neeq/neeqsecurities/multicastmarketdata/NeeqSecurities_MulticastMarketData_v1_1.v
+neeq/neeqsecurities/orderentry/NeeqSecurities_OrderEntry_v1_1.v
+neeq/neeqsecurities/tcpmarketdata/NeeqSecurities_TcpMarketData_v1_1.v
 nextrade/etp10level/Nextrade_Etp10Level_NxtAscii_v2_12.v
 nextrade/etp10level/Nextrade_Etp10Level_NxtBinary_v2_12.v
 nextrade/etp3level/Nextrade_Etp3Level_NxtAscii_v2_12.v
@@ -2105,6 +2111,7 @@ siac/opra/output/Siac_Opra_Output_v6_1.v
 siac/opra/output/Siac_Opra_Output_v6_2.v
 siac/opra/output/Siac_Opra_Output_v6_3_a.v
 smallx/orderbookfeed/SmallFutures_OrderBookFeed_v2_2.v
+sse/ssesecurities/mdgw/SseSecurities_Mdgw_v0_63.v
 szse/szsesecurities/multicastmarketdata/SzseSecurities_MulticastMarketData_v1_17.v
 szse/szsesecurities/tcpmarketdata/SzseSecurities_TcpMarketData_v1_17.v
 taifex/taifexderivatives/clearingmember/TaifexDerivatives_ClearingMember_v2_18_7.v

@@ -231,7 +231,7 @@ Module SiacCtsOutputV191.
 
   End Timestamp1.
 
-  Module StartOfEndOfDayMessage.
+  Module StartOfEndOfDaySummaryMessage.
 
     (** The Start of End of Day message signals the start of Consolidated End of Day Summary and Participant End of Day Summary message iterations *)
     Record t := {
@@ -304,9 +304,9 @@ Module SiacCtsOutputV191.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp1.eq_dec]. Defined.
 
-  End StartOfEndOfDayMessage.
+  End StartOfEndOfDaySummaryMessage.
 
-  Module EndOfEndOfDayMessage.
+  Module EndOfEndOfDaySummaryMessage.
 
     (** The End of End of Day message signals the end of Consolidated End of Day Summary and Participant End of Day Summary message iterations *)
     Record t := {
@@ -379,9 +379,9 @@ Module SiacCtsOutputV191.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp1.eq_dec]. Defined.
 
-  End EndOfEndOfDayMessage.
+  End EndOfEndOfDaySummaryMessage.
 
-  Module StartOfStartOfDayMessage.
+  Module StartOfStartOfDaySummaryMessage.
 
     (** The Start of Start of Day message signals the end of Consolidated End of Day Summary and Participant End of Day Summary message iterations *)
     Record t := {
@@ -454,9 +454,9 @@ Module SiacCtsOutputV191.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp1.eq_dec]. Defined.
 
-  End StartOfStartOfDayMessage.
+  End StartOfStartOfDaySummaryMessage.
 
-  Module EndOfStartOfDayMessage.
+  Module EndOfStartOfDaySummaryMessage.
 
     (** The End of Start of Day message signals the start of Start of Day Summary message iterations *)
     Record t := {
@@ -529,7 +529,7 @@ Module SiacCtsOutputV191.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply Timestamp1.eq_dec]. Defined.
 
-  End EndOfStartOfDayMessage.
+  End EndOfStartOfDaySummaryMessage.
 
   Module AdministrativeUnformattedMessage.
 

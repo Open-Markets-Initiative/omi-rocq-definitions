@@ -24,6 +24,7 @@ Import ListNotations.
     What this definition does not state, and the model does:
       - a run filling what frames it
       - a length prefix framing what follows
+      - a run counted by a field
 
     License: MIT No Attribution
   *)
@@ -204,175 +205,25 @@ Module PearlEquitiesTopOfMarketV11CTcp.
 
   End EndOfRefreshNotificationMessage.
 
-  Module LoginRequest.
-
-    (** The SesM client must send a Login request packet immediately upon establishing a new TCP/IP socket connection to the server *)
-    Record t := {
-      esesm_version : list byte;
-      username : list byte;
-      computer_id : list byte;
-      application_protocol : list byte;
-      requested_trading_session_id : N;
-      requested_sequence_number : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (esesm_version record) = 5 /\
-      Datatypes.length (username record) = 5 /\
-      Datatypes.length (computer_id record) = 8 /\
-      Datatypes.length (application_protocol record) = 8 /\
-      (requested_trading_session_id record < 256 ^ N.of_nat 1)%N /\
-      (requested_sequence_number record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 5 (esesm_version record) ++
-      encode_bytes 5 (username record) ++
-      encode_bytes 8 (computer_id record) ++
-      encode_bytes 8 (application_protocol record) ++
-      encode_uint 1 (requested_trading_session_id record) ++
-      encode_uint 8 (requested_sequence_number record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 5 bytes with
-      | None => None
-      | Some (esesm_version_value, bytes) =>
-          match decode_bytes 5 bytes with
-          | None => None
-          | Some (username_value, bytes) =>
-              match decode_bytes 8 bytes with
-              | None => None
-              | Some (computer_id_value, bytes) =>
-                  match decode_bytes 8 bytes with
-                  | None => None
-                  | Some (application_protocol_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (requested_trading_session_id_value, bytes) =>
-                          match decode_uint 8 bytes with
-                          | None => None
-                          | Some (requested_sequence_number_value, bytes) =>
-                              Some ({| esesm_version := esesm_version_value; username := username_value; computer_id := computer_id_value; application_protocol := application_protocol_value; requested_trading_session_id := requested_trading_session_id_value; requested_sequence_number := requested_sequence_number_value |}, bytes)
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LoginRequest.
-
-  Module LoginResponse.
-
-    (** The SesM server sends a Login response packet in response a Login request packet from the client *)
-    Record t := {
-      number_of_matching_engines : N;
-      login_status : list byte;
-      trading_session_id : N;
-      highest_sequence_number : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (number_of_matching_engines record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (login_status record) = 1 /\
-      (trading_session_id record < 256 ^ N.of_nat 1)%N /\
-      (highest_sequence_number record < 256 ^ N.of_nat 8)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (number_of_matching_engines record) ++
-      encode_bytes 1 (login_status record) ++
-      encode_uint 1 (trading_session_id record) ++
-      encode_uint 8 (highest_sequence_number record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (number_of_matching_engines_value, bytes) =>
-          match decode_bytes 1 bytes with
-          | None => None
-          | Some (login_status_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (trading_session_id_value, bytes) =>
-                  match decode_uint 8 bytes with
-                  | None => None
-                  | Some (highest_sequence_number_value, bytes) =>
-                      Some ({| number_of_matching_engines := number_of_matching_engines_value; login_status := login_status_value; trading_session_id := trading_session_id_value; highest_sequence_number := highest_sequence_number_value |}, bytes)
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LoginResponse.
-
   Module SynchronizationComplete.
 
-    (** The ESesM server sends a Login response packet in response a Login request packet from the client *)
+    (** The ESesM server sends a Synchronization complete packet when it is done replaying all the old packets and is ready to start sending new packets from the Matching Engine *)
     Record t := {
-      number_of_matching_engines : N;
+      matching_engine_id : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (number_of_matching_engines record < 256 ^ N.of_nat 1)%N.
+      (matching_engine_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (number_of_matching_engines record).
+      encode_uint 1 (matching_engine_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (number_of_matching_engines_value, bytes) =>
-          Some ({| number_of_matching_engines := number_of_matching_engines_value |}, bytes)
+      | Some (matching_engine_id_value, bytes) =>
+          Some ({| matching_engine_id := matching_engine_id_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -445,5 +296,56 @@ Module PearlEquitiesTopOfMarketV11CTcp.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End RetransmissionRequest.
+
+  Module TradingSessionUpdate.
+
+    (** The ESesM server sends a Trading Session Update packet to inform the client that a new trading session is starting on the specified Matching Engine *)
+    Record t := {
+      matching_engine_id : N;
+      trading_session_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (matching_engine_id record < 256 ^ N.of_nat 1)%N /\
+      (trading_session_id record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 1 (matching_engine_id record) ++
+      encode_uint 1 (trading_session_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 1 bytes with
+      | None => None
+      | Some (matching_engine_id_value, bytes) =>
+          match decode_uint 1 bytes with
+          | None => None
+          | Some (trading_session_id_value, bytes) =>
+              Some ({| matching_engine_id := matching_engine_id_value; trading_session_id := trading_session_id_value |}, bytes)
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 bound_1].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End TradingSessionUpdate.
 
 End PearlEquitiesTopOfMarketV11CTcp.
