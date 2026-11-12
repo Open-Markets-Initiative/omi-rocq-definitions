@@ -151,7 +151,7 @@ Module C1OptionsOpeningProcessV1030.
     (** The Time Reference message is used to provide a midnight reference point for recipients of the feed. *)
     Record t := {
       midnight_reference : N;
-      time_reference : N;
+      time : N;
       time_offset : N;
       trade_date : N;
     }.
@@ -159,13 +159,13 @@ Module C1OptionsOpeningProcessV1030.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (midnight_reference record < 256 ^ N.of_nat 4)%N /\
-      (time_reference record < 256 ^ N.of_nat 4)%N /\
+      (time record < 256 ^ N.of_nat 4)%N /\
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (midnight_reference record) ++
-      encode_uint 4 (time_reference record) ++
+      encode_uint 4 (time record) ++
       encode_uint 4 (time_offset record) ++
       encode_uint 4 (trade_date record).
 
@@ -175,14 +175,14 @@ Module C1OptionsOpeningProcessV1030.
       | Some (midnight_reference_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (time_reference_value, bytes) =>
+          | Some (time_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
               | Some (time_offset_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (trade_date_value, bytes) =>
-                      Some ({| midnight_reference := midnight_reference_value; time_reference := time_reference_value; time_offset := time_offset_value; trade_date := trade_date_value |}, bytes)
+                      Some ({| midnight_reference := midnight_reference_value; time := time_value; time_offset := time_offset_value; trade_date := trade_date_value |}, bytes)
                   end
               end
           end

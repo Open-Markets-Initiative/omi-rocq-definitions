@@ -171,27 +171,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Wake up call message, which either Taifex or the futures commission merchant may initiate in the logon phase of the Link Subsystem. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       start_in_bound_num : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (start_in_bound_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 4 (start_in_bound_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
           | Some (start_in_bound_num_value, bytes) =>
-              Some ({| status_code_uint_81 := status_code_uint_81_value; start_in_bound_num := start_in_bound_num_value |}, bytes)
+              Some ({| status_code := status_code_value; start_in_bound_num := start_in_bound_num_value |}, bytes)
           end
       end.
 
@@ -263,7 +263,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Logon notice message, carrying the sequence No of the last message Taifex sent the futures commission merchant in the session. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       append_no : N;
       end_out_bound_num : N;
       system_type : N;
@@ -272,14 +272,14 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (append_no record < 256 ^ N.of_nat 2)%N /\
       (end_out_bound_num record < 256 ^ N.of_nat 4)%N /\
       (system_type record < 256 ^ N.of_nat 1)%N /\
       (encrypt_method record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 2 (append_no record) ++
       encode_uint 4 (end_out_bound_num record) ++
       encode_uint 1 (system_type record) ++
@@ -288,7 +288,7 @@ Module TaifexDerivativesOrderEntryV2187.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (append_no_value, bytes) =>
@@ -301,7 +301,7 @@ Module TaifexDerivativesOrderEntryV2187.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (encrypt_method_value, bytes) =>
-                          Some ({| status_code_uint_81 := status_code_uint_81_value; append_no := append_no_value; end_out_bound_num := end_out_bound_num_value; system_type := system_type_value; encrypt_method := encrypt_method_value |}, bytes)
+                          Some ({| status_code := status_code_value; append_no := append_no_value; end_out_bound_num := end_out_bound_num_value; system_type := system_type_value; encrypt_method := encrypt_method_value |}, bytes)
                       end
                   end
               end
@@ -398,7 +398,7 @@ Module TaifexDerivativesOrderEntryV2187.
     (** Final Sequential Number Notification Message for Group, transmitting the group's last report sequence number to the futures commission merchant. *)
     Record t := {
       sub_hdr : SubHdr.t;
-      status_code_uint_162 : N;
+      wide_status_code : N;
       part_id : N;
       end_out_bound_num : N;
       reserved_8 : N;
@@ -407,14 +407,14 @@ Module TaifexDerivativesOrderEntryV2187.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       SubHdr.bounded (sub_hdr record) /\
-      (status_code_uint_162 record < 256 ^ N.of_nat 2)%N /\
+      (wide_status_code record < 256 ^ N.of_nat 2)%N /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (end_out_bound_num record < 256 ^ N.of_nat 4)%N /\
       (reserved_8 record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       SubHdr.encode (sub_hdr record) ++
-      encode_uint 2 (status_code_uint_162 record) ++
+      encode_uint 2 (wide_status_code record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 4 (end_out_bound_num record) ++
       encode_uint 8 (reserved_8 record).
@@ -425,7 +425,7 @@ Module TaifexDerivativesOrderEntryV2187.
       | Some (sub_hdr_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
-          | Some (status_code_uint_162_value, bytes) =>
+          | Some (wide_status_code_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (part_id_value, bytes) =>
@@ -435,7 +435,7 @@ Module TaifexDerivativesOrderEntryV2187.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (reserved_8_value, bytes) =>
-                          Some ({| sub_hdr := sub_hdr_value; status_code_uint_162 := status_code_uint_162_value; part_id := part_id_value; end_out_bound_num := end_out_bound_num_value; reserved_8 := reserved_8_value |}, bytes)
+                          Some ({| sub_hdr := sub_hdr_value; wide_status_code := wide_status_code_value; part_id := part_id_value; end_out_bound_num := end_out_bound_num_value; reserved_8 := reserved_8_value |}, bytes)
                       end
                   end
               end
@@ -472,7 +472,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Request logon, sent by the futures commission merchant to Taifex with the start sequence of the messages it requests Taifex to resend. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       append_no : N;
       fcm_id : N;
       session_id : N;
@@ -485,7 +485,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (append_no record < 256 ^ N.of_nat 2)%N /\
       (fcm_id record < 256 ^ N.of_nat 2)%N /\
       (session_id record < 256 ^ N.of_nat 2)%N /\
@@ -496,7 +496,7 @@ Module TaifexDerivativesOrderEntryV2187.
       (cancel_order_sec record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 2 (append_no record) ++
       encode_uint 2 (fcm_id record) ++
       encode_uint 2 (session_id record) ++
@@ -509,7 +509,7 @@ Module TaifexDerivativesOrderEntryV2187.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (append_no_value, bytes) =>
@@ -534,7 +534,7 @@ Module TaifexDerivativesOrderEntryV2187.
                                       match decode_uint 1 bytes with
                                       | None => None
                                       | Some (cancel_order_sec_value, bytes) =>
-                                          Some ({| status_code_uint_81 := status_code_uint_81_value; append_no := append_no_value; fcm_id := fcm_id_value; session_id := session_id_value; system_type := system_type_value; ap_code := ap_code_value; key_value := key_value_value; request_start_seq := request_start_seq_value; cancel_order_sec := cancel_order_sec_value |}, bytes)
+                                          Some ({| status_code := status_code_value; append_no := append_no_value; fcm_id := fcm_id_value; session_id := session_id_value; system_type := system_type_value; ap_code := ap_code_value; key_value := key_value_value; request_start_seq := request_start_seq_value; cancel_order_sec := cancel_order_sec_value |}, bytes)
                                       end
                                   end
                               end
@@ -579,21 +579,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Resend report message confirmed, sent by the futures commission merchant to Taifex. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N.
+      (status_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record).
+      encode_uint 1 (status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
-          Some ({| status_code_uint_81 := status_code_uint_81_value |}, bytes)
+      | Some (status_code_value, bytes) =>
+          Some ({| status_code := status_code_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -620,33 +620,33 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Activate application system, sent by Taifex to the futures commission merchant. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       heart_bt_int : N;
       max_flow_ctrl_cnt : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (heart_bt_int record < 256 ^ N.of_nat 1)%N /\
       (max_flow_ctrl_cnt record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 1 (heart_bt_int record) ++
       encode_uint 2 (max_flow_ctrl_cnt record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (heart_bt_int_value, bytes) =>
               match decode_uint 2 bytes with
               | None => None
               | Some (max_flow_ctrl_cnt_value, bytes) =>
-                  Some ({| status_code_uint_81 := status_code_uint_81_value; heart_bt_int := heart_bt_int_value; max_flow_ctrl_cnt := max_flow_ctrl_cnt_value |}, bytes)
+                  Some ({| status_code := status_code_value; heart_bt_int := heart_bt_int_value; max_flow_ctrl_cnt := max_flow_ctrl_cnt_value |}, bytes)
               end
           end
       end.
@@ -679,21 +679,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Activate application system confirmed, from which Taifex calculates the round trip time of the L50 message to determine the maximum peak flow per second. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N.
+      (status_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record).
+      encode_uint 1 (status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
-          Some ({| status_code_uint_81 := status_code_uint_81_value |}, bytes)
+      | Some (status_code_value, bytes) =>
+          Some ({| status_code := status_code_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -720,21 +720,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Logout confirmed message, sent by Taifex to the futures commission merchant. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N.
+      (status_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record).
+      encode_uint 1 (status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
-          Some ({| status_code_uint_81 := status_code_uint_81_value |}, bytes)
+      | Some (status_code_value, bytes) =>
+          Some ({| status_code := status_code_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -761,21 +761,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Confirm connection message, which either party sends when no new message has arrived from the other after the number of seconds set in the HeartBtInt field of L50. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N.
+      (status_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record).
+      encode_uint 1 (status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
-          Some ({| status_code_uint_81 := status_code_uint_81_value |}, bytes)
+      | Some (status_code_value, bytes) =>
+          Some ({| status_code := status_code_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -802,21 +802,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Connection confirmed message, with which a party answers the confirm connection message of the other. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N.
+      (status_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record).
+      encode_uint 1 (status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
-          Some ({| status_code_uint_81 := status_code_uint_81_value |}, bytes)
+      | Some (status_code_value, bytes) =>
+          Some ({| status_code := status_code_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -843,7 +843,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Trade session status request, with which a futures commission merchant queries the trade session status and determines whether the trading system is halted. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       trade_req_id : N;
       flow_group_no : N;
       subscription_request_type : N;
@@ -851,13 +851,13 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (trade_req_id record < 256 ^ N.of_nat 2)%N /\
       (flow_group_no record < 256 ^ N.of_nat 1)%N /\
       (subscription_request_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 2 (trade_req_id record) ++
       encode_uint 1 (flow_group_no record) ++
       encode_uint 1 (subscription_request_type record).
@@ -865,7 +865,7 @@ Module TaifexDerivativesOrderEntryV2187.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (trade_req_id_value, bytes) =>
@@ -875,7 +875,7 @@ Module TaifexDerivativesOrderEntryV2187.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (subscription_request_type_value, bytes) =>
-                      Some ({| status_code_uint_81 := status_code_uint_81_value; trade_req_id := trade_req_id_value; flow_group_no := flow_group_no_value; subscription_request_type := subscription_request_type_value |}, bytes)
+                      Some ({| status_code := status_code_value; trade_req_id := trade_req_id_value; flow_group_no := flow_group_no_value; subscription_request_type := subscription_request_type_value |}, bytes)
                   end
               end
           end
@@ -910,7 +910,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Trade session status report, with which Taifex answers a trade session status request and reports each subsequent change of status. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       trade_req_id : N;
       flow_group_no : N;
       trade_status : N;
@@ -918,13 +918,13 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       (trade_req_id record < 256 ^ N.of_nat 2)%N /\
       (flow_group_no record < 256 ^ N.of_nat 1)%N /\
       (trade_status record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_uint 2 (trade_req_id record) ++
       encode_uint 1 (flow_group_no record) ++
       encode_uint 1 (trade_status record).
@@ -932,7 +932,7 @@ Module TaifexDerivativesOrderEntryV2187.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (trade_req_id_value, bytes) =>
@@ -942,7 +942,7 @@ Module TaifexDerivativesOrderEntryV2187.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (trade_status_value, bytes) =>
-                      Some ({| status_code_uint_81 := status_code_uint_81_value; trade_req_id := trade_req_id_value; flow_group_no := flow_group_no_value; trade_status := trade_status_value |}, bytes)
+                      Some ({| status_code := status_code_value; trade_req_id := trade_req_id_value; flow_group_no := flow_group_no_value; trade_status := trade_status_value |}, bytes)
                   end
               end
           end
@@ -977,21 +977,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Text product ID, naming a product by its Ascii character string symbol *)
     Record t := {
-      symbol_char_2020 : list byte;
+      symbol : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol_char_2020 record) = 20.
+      Datatypes.length (symbol record) = 20.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (symbol_char_2020 record).
+      encode_bytes 20 (symbol record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (symbol_char_2020_value, bytes) =>
-          Some ({| symbol_char_2020 := symbol_char_2020_value |}, bytes)
+      | Some (symbol_value, bytes) =>
+          Some ({| symbol := symbol_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
@@ -1018,21 +1018,21 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Text product ID in the long product format, naming a product by its Ascii character string symbol *)
     Record t := {
-      symbol_char_4040 : list byte;
+      long_symbol : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (symbol_char_4040 record) = 40.
+      Datatypes.length (long_symbol record) = 40.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 40 (symbol_char_4040 record).
+      encode_bytes 40 (long_symbol record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 40 bytes with
       | None => None
-      | Some (symbol_char_4040_value, bytes) =>
-          Some ({| symbol_char_4040 := symbol_char_4040_value |}, bytes)
+      | Some (long_symbol_value, bytes) =>
+          Some ({| long_symbol := long_symbol_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
@@ -1059,27 +1059,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
     Record t := {
-      epoch_s_int_324 : N;
+      msg_time_epoch_s : N;
       ms : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (ms record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 4 (msg_time_epoch_s record) ++
       encode_uint 2 (ms record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_int_324_value, bytes) =>
+      | Some (msg_time_epoch_s_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (ms_value, bytes) =>
-              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+              Some ({| msg_time_epoch_s := msg_time_epoch_s_value; ms := ms_value |}, bytes)
           end
       end.
 
@@ -1110,27 +1110,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
     Record t := {
-      epoch_s_int_324 : N;
+      msg_time_epoch_s : N;
       ms : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (ms record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 4 (msg_time_epoch_s record) ++
       encode_uint 2 (ms record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_int_324_value, bytes) =>
+      | Some (msg_time_epoch_s_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (ms_value, bytes) =>
-              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+              Some ({| msg_time_epoch_s := msg_time_epoch_s_value; ms := ms_value |}, bytes)
           end
       end.
 
@@ -1161,7 +1161,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Error report, with which Taifex rejects an order, quote or inquiry the futures commission merchant sent. *)
     Record t := {
-      status_code_uint_81 : N;
+      status_code : N;
       exec_type : list byte;
       fcm_id : N;
       order_no : list byte;
@@ -1173,7 +1173,7 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (status_code_uint_81 record < 256 ^ N.of_nat 1)%N /\
+      (status_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exec_type record) = 1 /\
       (fcm_id record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (order_no record) = 5 /\
@@ -1183,7 +1183,7 @@ Module TaifexDerivativesOrderEntryV2187.
       (side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (status_code_uint_81 record) ++
+      encode_uint 1 (status_code record) ++
       encode_bytes 1 (exec_type record) ++
       encode_uint 2 (fcm_id record) ++
       encode_bytes 5 (order_no record) ++
@@ -1195,7 +1195,7 @@ Module TaifexDerivativesOrderEntryV2187.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (status_code_uint_81_value, bytes) =>
+      | Some (status_code_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (exec_type_value, bytes) =>
@@ -1217,7 +1217,7 @@ Module TaifexDerivativesOrderEntryV2187.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (side_value, bytes) =>
-                                      Some ({| status_code_uint_81 := status_code_uint_81_value; exec_type := exec_type_value; fcm_id := fcm_id_value; order_no := order_no_value; ord_id := ord_id_value; user_define := user_define_value; rpt_seq := rpt_seq_value; side := side_value |}, bytes)
+                                      Some ({| status_code := status_code_value; exec_type := exec_type_value; fcm_id := fcm_id_value; order_no := order_no_value; ord_id := ord_id_value; user_define := user_define_value; rpt_seq := rpt_seq_value; side := side_value |}, bytes)
                                   end
                               end
                           end
@@ -1260,27 +1260,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp time format, the seconds since the epoch and the thousandth of a second *)
     Record t := {
-      epoch_s_int_324 : N;
+      msg_time_epoch_s : N;
       ms : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (ms record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_int_324 record) ++
+      encode_uint 4 (msg_time_epoch_s record) ++
       encode_uint 2 (ms record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_int_324_value, bytes) =>
+      | Some (msg_time_epoch_s_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (ms_value, bytes) =>
-              Some ({| epoch_s_int_324 := epoch_s_int_324_value; ms := ms_value |}, bytes)
+              Some ({| msg_time_epoch_s := msg_time_epoch_s_value; ms := ms_value |}, bytes)
           end
       end.
 
@@ -1724,27 +1724,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp Expanded Time Format, the seconds since the epoch and the billionth of a second, which the FLEX reports carry in place of msg_time *)
     Record t := {
-      epoch_s_uint_324 : N;
+      msg_time_x_epoch_s : N;
       nanosecond : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_uint_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_x_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (nanosecond record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_uint_324 record) ++
+      encode_uint 4 (msg_time_x_epoch_s record) ++
       encode_uint 4 (nanosecond record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_uint_324_value, bytes) =>
+      | Some (msg_time_x_epoch_s_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
           | Some (nanosecond_value, bytes) =>
-              Some ({| epoch_s_uint_324 := epoch_s_uint_324_value; nanosecond := nanosecond_value |}, bytes)
+              Some ({| msg_time_x_epoch_s := msg_time_x_epoch_s_value; nanosecond := nanosecond_value |}, bytes)
           end
       end.
 
@@ -1775,27 +1775,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp Expanded Time Format, the seconds since the epoch and the billionth of a second, which the FLEX reports carry in place of msg_time *)
     Record t := {
-      epoch_s_uint_324 : N;
+      msg_time_x_epoch_s : N;
       nanosecond : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_uint_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_x_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (nanosecond record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_uint_324 record) ++
+      encode_uint 4 (msg_time_x_epoch_s record) ++
       encode_uint 4 (nanosecond record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_uint_324_value, bytes) =>
+      | Some (msg_time_x_epoch_s_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
           | Some (nanosecond_value, bytes) =>
-              Some ({| epoch_s_uint_324 := epoch_s_uint_324_value; nanosecond := nanosecond_value |}, bytes)
+              Some ({| msg_time_x_epoch_s := msg_time_x_epoch_s_value; nanosecond := nanosecond_value |}, bytes)
           end
       end.
 
@@ -1829,7 +1829,7 @@ Module TaifexDerivativesOrderEntryV2187.
       sub_hdr : SubHdr.t;
       part_id : N;
       ori_message_type : N;
-      status_code_uint_162 : N;
+      wide_status_code : N;
       exec_type : list byte;
       fcm_id : N;
       order_no : list byte;
@@ -1845,7 +1845,7 @@ Module TaifexDerivativesOrderEntryV2187.
       SubHdr.bounded (sub_hdr record) /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (ori_message_type record < 256 ^ N.of_nat 1)%N /\
-      (status_code_uint_162 record < 256 ^ N.of_nat 2)%N /\
+      (wide_status_code record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (exec_type record) = 1 /\
       (fcm_id record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (order_no record) = 5 /\
@@ -1859,7 +1859,7 @@ Module TaifexDerivativesOrderEntryV2187.
       SubHdr.encode (sub_hdr record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 1 (ori_message_type record) ++
-      encode_uint 2 (status_code_uint_162 record) ++
+      encode_uint 2 (wide_status_code record) ++
       encode_bytes 1 (exec_type record) ++
       encode_uint 2 (fcm_id record) ++
       encode_bytes 5 (order_no record) ++
@@ -1881,7 +1881,7 @@ Module TaifexDerivativesOrderEntryV2187.
               | Some (ori_message_type_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
-                  | Some (status_code_uint_162_value, bytes) =>
+                  | Some (wide_status_code_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (exec_type_value, bytes) =>
@@ -1906,7 +1906,7 @@ Module TaifexDerivativesOrderEntryV2187.
                                                   match decode_bytes 12 bytes with
                                                   | None => None
                                                   | Some (reserved_12_value, bytes) =>
-                                                      Some ({| sub_hdr := sub_hdr_value; part_id := part_id_value; ori_message_type := ori_message_type_value; status_code_uint_162 := status_code_uint_162_value; exec_type := exec_type_value; fcm_id := fcm_id_value; order_no := order_no_value; ord_id := ord_id_value; user_define := user_define_value; rpt_seq := rpt_seq_value; side := side_value; reserved_12 := reserved_12_value |}, bytes)
+                                                      Some ({| sub_hdr := sub_hdr_value; part_id := part_id_value; ori_message_type := ori_message_type_value; wide_status_code := wide_status_code_value; exec_type := exec_type_value; fcm_id := fcm_id_value; order_no := order_no_value; ord_id := ord_id_value; user_define := user_define_value; rpt_seq := rpt_seq_value; side := side_value; reserved_12 := reserved_12_value |}, bytes)
                                                   end
                                               end
                                           end
@@ -1960,7 +1960,7 @@ Module TaifexDerivativesOrderEntryV2187.
       sub_hdr : SubHdr.t;
       security_request_type : list byte;
       security_req_id : N;
-      status_code_uint_162 : N;
+      wide_status_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1968,13 +1968,13 @@ Module TaifexDerivativesOrderEntryV2187.
       SubHdr.bounded (sub_hdr record) /\
       Datatypes.length (security_request_type record) = 1 /\
       (security_req_id record < 256 ^ N.of_nat 4)%N /\
-      (status_code_uint_162 record < 256 ^ N.of_nat 2)%N.
+      (wide_status_code record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
       SubHdr.encode (sub_hdr record) ++
       encode_bytes 1 (security_request_type record) ++
       encode_uint 4 (security_req_id record) ++
-      encode_uint 2 (status_code_uint_162 record).
+      encode_uint 2 (wide_status_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match SubHdr.decode bytes with
@@ -1988,8 +1988,8 @@ Module TaifexDerivativesOrderEntryV2187.
               | Some (security_req_id_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
-                  | Some (status_code_uint_162_value, bytes) =>
-                      Some ({| sub_hdr := sub_hdr_value; security_request_type := security_request_type_value; security_req_id := security_req_id_value; status_code_uint_162 := status_code_uint_162_value |}, bytes)
+                  | Some (wide_status_code_value, bytes) =>
+                      Some ({| sub_hdr := sub_hdr_value; security_request_type := security_request_type_value; security_req_id := security_req_id_value; wide_status_code := wide_status_code_value |}, bytes)
                   end
               end
           end
@@ -2024,27 +2024,27 @@ Module TaifexDerivativesOrderEntryV2187.
 
     (** Tmp Expanded Time Format, the seconds since the epoch and the billionth of a second, which the FLEX reports carry in place of msg_time *)
     Record t := {
-      epoch_s_uint_324 : N;
+      msg_time_x_epoch_s : N;
       nanosecond : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (epoch_s_uint_324 record < 256 ^ N.of_nat 4)%N /\
+      (msg_time_x_epoch_s record < 256 ^ N.of_nat 4)%N /\
       (nanosecond record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (epoch_s_uint_324 record) ++
+      encode_uint 4 (msg_time_x_epoch_s record) ++
       encode_uint 4 (nanosecond record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (epoch_s_uint_324_value, bytes) =>
+      | Some (msg_time_x_epoch_s_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
           | Some (nanosecond_value, bytes) =>
-              Some ({| epoch_s_uint_324 := epoch_s_uint_324_value; nanosecond := nanosecond_value |}, bytes)
+              Some ({| msg_time_x_epoch_s := msg_time_x_epoch_s_value; nanosecond := nanosecond_value |}, bytes)
           end
       end.
 

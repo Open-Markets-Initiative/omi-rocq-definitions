@@ -532,21 +532,21 @@ Module EdgxOptionsAuctionFeedV111.
 
     (** The Width Update message is used to communicate opening quote width multiplier. This message will be sent at the beginning of the day for all underlyings and in the event that the exchange decides to change the quote width multiplier on a per underlying basis. *)
     Record t := {
-      timestamp : N;
+      time_offset : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (timestamp record < 256 ^ N.of_nat 4)%N.
+      (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (timestamp record).
+      encode_uint 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (timestamp_value, bytes) =>
-          Some ({| timestamp := timestamp_value |}, bytes)
+      | Some (time_offset_value, bytes) =>
+          Some ({| time_offset := time_offset_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.

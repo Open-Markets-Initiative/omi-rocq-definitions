@@ -631,6 +631,7 @@ Module PsxEquitiesOrdersV42Server.
       quantity_prevented_from_trading : N;
       execution_price : N;
       liquidity_flag : list byte;
+      aiq_strategy : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -641,7 +642,8 @@ Module PsxEquitiesOrdersV42Server.
       Datatypes.length (aiq_canceled_reason record) = 1 /\
       (quantity_prevented_from_trading record < 256 ^ N.of_nat 4)%N /\
       (execution_price record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (liquidity_flag record) = 1.
+      Datatypes.length (liquidity_flag record) = 1 /\
+      Datatypes.length (aiq_strategy record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -650,7 +652,8 @@ Module PsxEquitiesOrdersV42Server.
       encode_bytes 1 (aiq_canceled_reason record) ++
       encode_uint 4 (quantity_prevented_from_trading record) ++
       encode_uint 4 (execution_price record) ++
-      encode_bytes 1 (liquidity_flag record).
+      encode_bytes 1 (liquidity_flag record) ++
+      encode_bytes 1 (aiq_strategy record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -674,7 +677,11 @@ Module PsxEquitiesOrdersV42Server.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (liquidity_flag_value, bytes) =>
-                                  Some ({| timestamp := timestamp_value; order_token := order_token_value; decrement_shares := decrement_shares_value; aiq_canceled_reason := aiq_canceled_reason_value; quantity_prevented_from_trading := quantity_prevented_from_trading_value; execution_price := execution_price_value; liquidity_flag := liquidity_flag_value |}, bytes)
+                                  match decode_bytes 1 bytes with
+                                  | None => None
+                                  | Some (aiq_strategy_value, bytes) =>
+                                      Some ({| timestamp := timestamp_value; order_token := order_token_value; decrement_shares := decrement_shares_value; aiq_canceled_reason := aiq_canceled_reason_value; quantity_prevented_from_trading := quantity_prevented_from_trading_value; execution_price := execution_price_value; liquidity_flag := liquidity_flag_value; aiq_strategy := aiq_strategy_value |}, bytes)
+                                  end
                               end
                           end
                       end
@@ -683,7 +690,7 @@ Module PsxEquitiesOrdersV42Server.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 37.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
@@ -693,7 +700,7 @@ Module PsxEquitiesOrdersV42Server.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
@@ -703,6 +710,7 @@ Module PsxEquitiesOrdersV42Server.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
