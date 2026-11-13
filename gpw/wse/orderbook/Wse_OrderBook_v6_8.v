@@ -195,7 +195,7 @@ Module WseOrderBookV68.
       order_priority_time : N;
       order_priority_micro_secs : N;
       order_origin : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -220,7 +220,7 @@ Module WseOrderBookV68.
       (order_priority_time record < 256 ^ N.of_nat 4)%N /\
       (order_priority_micro_secs record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (order_origin record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -243,7 +243,7 @@ Module WseOrderBookV68.
       encode_uint 4 (order_priority_time record) ++
       encode_uint 2 (order_priority_micro_secs record) ++
       encode_bytes 1 (order_origin record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -306,7 +306,7 @@ Module WseOrderBookV68.
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (order_origin_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (reserved_1_value, bytes) =>
                                                                                           Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; price := price_value; aggregated_volume := aggregated_volume_value; volume := volume_value; link_id := link_id_value; order_id := order_id_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; number_orders := number_orders_value; side := side_value; order_type := order_type_value; action_type := action_type_value; price_scale_code := price_scale_code_value; order_date := order_date_value; order_priority_date := order_priority_date_value; order_priority_time := order_priority_time_value; order_priority_micro_secs := order_priority_micro_secs_value; order_origin := order_origin_value; reserved_1 := reserved_1_value |}, bytes)
@@ -365,7 +365,7 @@ Module WseOrderBookV68.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       destruct record. reflexivity.
     Qed.
 

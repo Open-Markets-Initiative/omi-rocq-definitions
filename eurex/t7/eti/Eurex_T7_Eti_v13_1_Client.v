@@ -141,7 +141,7 @@ Module EurexT7EtiV131Client.
       maturity_month_year : N;
       basket_trade_report_type : N;
       basket_trade_report_text : list byte;
-      pad7 : N;
+      pad7 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -152,7 +152,7 @@ Module EurexT7EtiV131Client.
       (maturity_month_year record < 256 ^ N.of_nat 4)%N /\
       (basket_trade_report_type record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (basket_trade_report_text record) = 20 /\
-      (pad7 record < 256 ^ N.of_nat 7)%N.
+      Datatypes.length (pad7 record) = 7.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (basket_trd_match_id record) ++
@@ -161,7 +161,7 @@ Module EurexT7EtiV131Client.
       encode_uint 4 (maturity_month_year record) ++
       encode_uint 1 (basket_trade_report_type record) ++
       encode_bytes 20 (basket_trade_report_text record) ++
-      encode_uint 7 (pad7 record).
+      encode_bytes 7 (pad7 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -182,7 +182,7 @@ Module EurexT7EtiV131Client.
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (basket_trade_report_text_value, bytes) =>
-                              match decode_uint 7 bytes with
+                              match decode_bytes 7 bytes with
                               | None => None
                               | Some (pad7_value, bytes) =>
                                   Some ({| basket_trd_match_id := basket_trd_match_id_value; basket_exec_id := basket_exec_id_value; trade_report_id := trade_report_id_value; maturity_month_year := maturity_month_year_value; basket_trade_report_type := basket_trade_report_type_value; basket_trade_report_text := basket_trade_report_text_value; pad7 := pad7_value |}, bytes)
@@ -213,7 +213,7 @@ Module EurexT7EtiV131Client.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -229,7 +229,7 @@ Module EurexT7EtiV131Client.
       maturity_month_year : N;
       basket_trade_report_type : N;
       basket_trade_report_text : list byte;
-      pad3 : N;
+      pad3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -238,14 +238,14 @@ Module EurexT7EtiV131Client.
       (maturity_month_year record < 256 ^ N.of_nat 4)%N /\
       (basket_trade_report_type record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (basket_trade_report_text record) = 20 /\
-      (pad3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (pad3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (trade_report_id record) ++
       encode_uint 4 (maturity_month_year record) ++
       encode_uint 1 (basket_trade_report_type record) ++
       encode_bytes 20 (basket_trade_report_text record) ++
-      encode_uint 3 (pad3 record).
+      encode_bytes 3 (pad3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
@@ -260,7 +260,7 @@ Module EurexT7EtiV131Client.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (basket_trade_report_text_value, bytes) =>
-                      match decode_uint 3 bytes with
+                      match decode_bytes 3 bytes with
                       | None => None
                       | Some (pad3_value, bytes) =>
                           Some ({| trade_report_id := trade_report_id_value; maturity_month_year := maturity_month_year_value; basket_trade_report_type := basket_trade_report_type_value; basket_trade_report_text := basket_trade_report_text_value; pad3 := pad3_value |}, bytes)
@@ -287,7 +287,7 @@ Module EurexT7EtiV131Client.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

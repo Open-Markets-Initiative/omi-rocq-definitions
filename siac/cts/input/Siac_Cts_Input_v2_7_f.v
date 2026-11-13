@@ -166,7 +166,7 @@ Module SiacCtsInputV27F.
       participant_i_d : list byte;
       timestamp_1 : Timestamp1.t;
       message_i_d : N;
-      reserved : N;
+      reserved : list byte;
       participant_reference_number : N;
     }.
 
@@ -178,7 +178,7 @@ Module SiacCtsInputV27F.
       Datatypes.length (participant_i_d record) = 1 /\
       Timestamp1.bounded (timestamp_1 record) /\
       (message_i_d record < 256 ^ N.of_nat 1)%N /\
-      (reserved record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved record) = 4 /\
       (participant_reference_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
@@ -188,7 +188,7 @@ Module SiacCtsInputV27F.
       encode_bytes 1 (participant_i_d record) ++
       Timestamp1.encode (timestamp_1 record) ++
       encode_uint 1 (message_i_d record) ++
-      encode_uint 4 (reserved record) ++
+      encode_bytes 4 (reserved record) ++
       encode_uint 8 (participant_reference_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -210,7 +210,7 @@ Module SiacCtsInputV27F.
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (message_i_d_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_value, bytes) =>
                                   match decode_uint 8 bytes with
@@ -245,7 +245,7 @@ Module SiacCtsInputV27F.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite Timestamp1.decode_encode by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
     Qed.

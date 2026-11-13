@@ -172,7 +172,7 @@ Module GemxOptionsOttoV216Client.
       capacity : list byte;
       auction_type : list byte;
       auction_id : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       disclosure_mask : N;
       price_protection : list byte;
       display_qty : N;
@@ -184,7 +184,7 @@ Module GemxOptionsOttoV216Client.
       stock_leg_short_sale : list byte;
       stock_leg_mpid : list byte;
       stock_capacity : list byte;
-      second_reserved_1 : N;
+      second_reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -208,7 +208,7 @@ Module GemxOptionsOttoV216Client.
       Datatypes.length (capacity record) = 1 /\
       Datatypes.length (auction_type record) = 1 /\
       (auction_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (disclosure_mask record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (price_protection record) = 1 /\
       (display_qty record < 256 ^ N.of_nat 2)%N /\
@@ -220,7 +220,7 @@ Module GemxOptionsOttoV216Client.
       Datatypes.length (stock_leg_short_sale record) = 1 /\
       Datatypes.length (stock_leg_mpid record) = 4 /\
       Datatypes.length (stock_capacity record) = 1 /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (firm_id record) ++
@@ -242,7 +242,7 @@ Module GemxOptionsOttoV216Client.
       encode_bytes 1 (capacity record) ++
       encode_bytes 1 (auction_type record) ++
       encode_uint 4 (auction_id record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 1 (disclosure_mask record) ++
       encode_bytes 1 (price_protection record) ++
       encode_uint 2 (display_qty record) ++
@@ -254,7 +254,7 @@ Module GemxOptionsOttoV216Client.
       encode_bytes 1 (stock_leg_short_sale record) ++
       encode_bytes 4 (stock_leg_mpid record) ++
       encode_bytes 1 (stock_capacity record) ++
-      encode_uint 1 (second_reserved_1 record).
+      encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
@@ -314,7 +314,7 @@ Module GemxOptionsOttoV216Client.
                                                                               match decode_uint 4 bytes with
                                                                               | None => None
                                                                               | Some (auction_id_value, bytes) =>
-                                                                                  match decode_uint 1 bytes with
+                                                                                  match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (reserved_1_value, bytes) =>
                                                                                       match decode_uint 1 bytes with
@@ -350,7 +350,7 @@ Module GemxOptionsOttoV216Client.
                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (stock_capacity_value, bytes) =>
-                                                                                                                                  match decode_uint 1 bytes with
+                                                                                                                                  match decode_bytes 1 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (second_reserved_1_value, bytes) =>
                                                                                                                                       Some ({| firm_id := firm_id_value; instrument_id := instrument_id_value; cl_ord_id := cl_ord_id_value; cmta := cmta_value; clearing_account := clearing_account_value; occ_account := occ_account_value; cust_acct := cust_acct_value; preferred_party := preferred_party_value; alo_inst := alo_inst_value; iso := iso_value; side := side_value; order_type := order_type_value; price := price_value; quantity := quantity_value; min_qty := min_qty_value; tif := tif_value; capacity := capacity_value; auction_type := auction_type_value; auction_id := auction_id_value; reserved_1 := reserved_1_value; disclosure_mask := disclosure_mask_value; price_protection := price_protection_value; display_qty := display_qty_value; display_when := display_when_value; display_method := display_method_value; display_low_qty := display_low_qty_value; display_high_qty := display_high_qty_value; position_effect_mask := position_effect_mask_value; stock_leg_short_sale := stock_leg_short_sale_value; stock_leg_mpid := stock_leg_mpid_value; stock_capacity := stock_capacity_value; second_reserved_1 := second_reserved_1_value |}, bytes)
@@ -419,7 +419,7 @@ Module GemxOptionsOttoV216Client.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
@@ -431,7 +431,7 @@ Module GemxOptionsOttoV216Client.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
+      rewrite decode_encode_bytes by exact bound_31.
       destruct record. reflexivity.
     Qed.
 

@@ -89,9 +89,9 @@ Module SiacCqsSnapshotV10.
       block_size : N;
       block_sequence_number : N;
       messages_in_block : N;
-      delivery_flag : N;
-      last_seq_num : list byte;
-      tot_pub_seq_rollover : N;
+      deliveryflag : N;
+      lastseqnum : N;
+      totpubseqrollover : N;
       sip_block_timestamp : SipBlockTimestamp.t;
       block_checksum : N;
     }.
@@ -102,9 +102,9 @@ Module SiacCqsSnapshotV10.
       (block_size record < 256 ^ N.of_nat 2)%N /\
       (block_sequence_number record < 256 ^ N.of_nat 4)%N /\
       (messages_in_block record < 256 ^ N.of_nat 1)%N /\
-      (delivery_flag record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (last_seq_num record) = 1 /\
-      (tot_pub_seq_rollover record < 256 ^ N.of_nat 1)%N /\
+      (deliveryflag record < 256 ^ N.of_nat 1)%N /\
+      (lastseqnum record < 256 ^ N.of_nat 4)%N /\
+      (totpubseqrollover record < 256 ^ N.of_nat 1)%N /\
       SipBlockTimestamp.bounded (sip_block_timestamp record) /\
       (block_checksum record < 256 ^ N.of_nat 2)%N.
 
@@ -113,9 +113,9 @@ Module SiacCqsSnapshotV10.
       encode_uint 2 (block_size record) ++
       encode_uint 4 (block_sequence_number record) ++
       encode_uint 1 (messages_in_block record) ++
-      encode_uint 1 (delivery_flag record) ++
-      encode_bytes 1 (last_seq_num record) ++
-      encode_uint 1 (tot_pub_seq_rollover record) ++
+      encode_uint 1 (deliveryflag record) ++
+      encode_uint 4 (lastseqnum record) ++
+      encode_uint 1 (totpubseqrollover record) ++
       SipBlockTimestamp.encode (sip_block_timestamp record) ++
       encode_uint 2 (block_checksum record).
 
@@ -134,20 +134,20 @@ Module SiacCqsSnapshotV10.
                   | Some (messages_in_block_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (delivery_flag_value, bytes) =>
-                          match decode_bytes 1 bytes with
+                      | Some (deliveryflag_value, bytes) =>
+                          match decode_uint 4 bytes with
                           | None => None
-                          | Some (last_seq_num_value, bytes) =>
+                          | Some (lastseqnum_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
-                              | Some (tot_pub_seq_rollover_value, bytes) =>
+                              | Some (totpubseqrollover_value, bytes) =>
                                   match SipBlockTimestamp.decode bytes with
                                   | None => None
                                   | Some (sip_block_timestamp_value, bytes) =>
                                       match decode_uint 2 bytes with
                                       | None => None
                                       | Some (block_checksum_value, bytes) =>
-                                          Some ({| version := version_value; block_size := block_size_value; block_sequence_number := block_sequence_number_value; messages_in_block := messages_in_block_value; delivery_flag := delivery_flag_value; last_seq_num := last_seq_num_value; tot_pub_seq_rollover := tot_pub_seq_rollover_value; sip_block_timestamp := sip_block_timestamp_value; block_checksum := block_checksum_value |}, bytes)
+                                          Some ({| version := version_value; block_size := block_size_value; block_sequence_number := block_sequence_number_value; messages_in_block := messages_in_block_value; deliveryflag := deliveryflag_value; lastseqnum := lastseqnum_value; totpubseqrollover := totpubseqrollover_value; sip_block_timestamp := sip_block_timestamp_value; block_checksum := block_checksum_value |}, bytes)
                                       end
                                   end
                               end
@@ -158,10 +158,10 @@ Module SiacCqsSnapshotV10.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 21.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !SipBlockTimestamp.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !SipBlockTimestamp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -176,7 +176,7 @@ Module SiacCqsSnapshotV10.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite SipBlockTimestamp.decode_encode by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -184,7 +184,7 @@ Module SiacCqsSnapshotV10.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SipBlockTimestamp.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply SipBlockTimestamp.eq_dec]. Defined.
 
   End BlockHeader.
 
@@ -237,7 +237,7 @@ Module SiacCqsSnapshotV10.
       mwcb_level_1 : N;
       mwcb_level_2 : N;
       mwcb_level_3 : N;
-      reserved : N;
+      reserved : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -246,14 +246,14 @@ Module SiacCqsSnapshotV10.
       (mwcb_level_1 record < 256 ^ N.of_nat 8)%N /\
       (mwcb_level_2 record < 256 ^ N.of_nat 8)%N /\
       (mwcb_level_3 record < 256 ^ N.of_nat 8)%N /\
-      (reserved record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (participant_id record) ++
       encode_uint 8 (mwcb_level_1 record) ++
       encode_uint 8 (mwcb_level_2 record) ++
       encode_uint 8 (mwcb_level_3 record) ++
-      encode_uint 1 (reserved record).
+      encode_bytes 1 (reserved record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -268,7 +268,7 @@ Module SiacCqsSnapshotV10.
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (mwcb_level_3_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_value, bytes) =>
                           Some ({| participant_id := participant_id_value; mwcb_level_1 := mwcb_level_1_value; mwcb_level_2 := mwcb_level_2_value; mwcb_level_3 := mwcb_level_3_value; reserved := reserved_value |}, bytes)
@@ -295,7 +295,7 @@ Module SiacCqsSnapshotV10.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

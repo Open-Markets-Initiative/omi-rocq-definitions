@@ -192,7 +192,7 @@ Module BondSpotQuotesV68.
       quote_condition : list byte;
       quote_number : N;
       price_scale_code : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -214,7 +214,7 @@ Module BondSpotQuotesV68.
       Datatypes.length (quote_condition record) = 1 /\
       (quote_number record < 256 ^ N.of_nat 1)%N /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -234,7 +234,7 @@ Module BondSpotQuotesV68.
       encode_bytes 1 (quote_condition record) ++
       encode_uint 1 (quote_number record) ++
       encode_uint 1 (price_scale_code record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -288,7 +288,7 @@ Module BondSpotQuotesV68.
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (price_scale_code_value, bytes) =>
-                                                                          match decode_uint 1 bytes with
+                                                                          match decode_bytes 1 bytes with
                                                                           | None => None
                                                                           | Some (reserved_1_value, bytes) =>
                                                                               Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; quote_link_id := quote_link_id_value; ask_price := ask_price_value; ask_size := ask_size_value; bid_price := bid_price_value; bid_size := bid_size_value; system_id := system_id_value; number_ask_orders := number_ask_orders_value; number_bid_orders := number_bid_orders_value; source_time_micro_secs := source_time_micro_secs_value; type_of_ask_price := type_of_ask_price_value; type_of_bid_price := type_of_bid_price_value; quote_condition := quote_condition_value; quote_number := quote_number_value; price_scale_code := price_scale_code_value; reserved_1 := reserved_1_value |}, bytes)
@@ -341,7 +341,7 @@ Module BondSpotQuotesV68.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       destruct record. reflexivity.
     Qed.
 

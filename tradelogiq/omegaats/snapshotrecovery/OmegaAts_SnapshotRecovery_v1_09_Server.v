@@ -178,26 +178,26 @@ Module OmegaAtsSnapshotRecoveryV109Server.
     (** The spin consists of a Start-Of-Messages event, Add Order messages and an End-Of-Messages event, after which the Reallocation Server disconnects. *)
     Record t := {
       event_code : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       timestamp : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (event_code record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (event_code record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (event_code_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (reserved_2_value, bytes) =>
               match decode_uint 8 bytes with
@@ -222,7 +222,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -355,7 +355,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       security_type : list byte;
       expiry_date : list byte;
       description : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -372,7 +372,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       Datatypes.length (security_type record) = 1 /\
       Datatypes.length (expiry_date record) = 8 /\
       Datatypes.length (description record) = 20 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market record) ++
@@ -387,7 +387,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       encode_bytes 1 (security_type record) ++
       encode_bytes 8 (expiry_date record) ++
       encode_bytes 20 (description record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -426,7 +426,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
                                                   match decode_bytes 20 bytes with
                                                   | None => None
                                                   | Some (description_value, bytes) =>
-                                                      match decode_uint 3 bytes with
+                                                      match decode_bytes 3 bytes with
                                                       | None => None
                                                       | Some (reserved_3_value, bytes) =>
                                                           Some ({| market := market_value; stock := stock_value; timestamp := timestamp_value; board_lot_size := board_lot_size_value; instrument_id := instrument_id_value; shortable := shortable_value; frequency := frequency_value; reserved_9 := reserved_9_value; currency := currency_value; security_type := security_type_value; expiry_date := expiry_date_value; description := description_value; reserved_3 := reserved_3_value |}, bytes)
@@ -469,7 +469,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -556,7 +556,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       shares : N;
       price : N;
       exec_broker_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -568,7 +568,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       (shares record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 4)%N /\
       (exec_broker_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (buy_sell_indicator record) ++
@@ -578,7 +578,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       encode_uint 4 (shares record) ++
       encode_uint 4 (price record) ++
       encode_uint 2 (exec_broker_id record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -602,7 +602,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
                               match decode_uint 2 bytes with
                               | None => None
                               | Some (exec_broker_id_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (reserved_2_value, bytes) =>
                                       Some ({| buy_sell_indicator := buy_sell_indicator_value; instrument_id := instrument_id_value; timestamp := timestamp_value; order_reference_number := order_reference_number_value; shares := shares_value; price := price_value; exec_broker_id := exec_broker_id_value; reserved_2 := reserved_2_value |}, bytes)
@@ -635,7 +635,7 @@ Module OmegaAtsSnapshotRecoveryV109Server.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

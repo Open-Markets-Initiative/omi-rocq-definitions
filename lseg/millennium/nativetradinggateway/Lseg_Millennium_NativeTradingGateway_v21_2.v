@@ -375,18 +375,18 @@ Module LsegMillenniumNativeTradingGatewayV212.
       order_id : list byte;
       instrument_id : N;
       group_id : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       expire_date_time : N;
       order_qty : N;
       display_qty : N;
       limit_price : N;
       account : list byte;
-      second_reserved_1 : N;
+      second_reserved_1 : list byte;
       side : N;
       stop_price : N;
       passive_only_order : N;
       offset : N;
-      reserved_5 : N;
+      reserved_5 : list byte;
       minimum_quantity : N;
     }.
 
@@ -397,18 +397,18 @@ Module LsegMillenniumNativeTradingGatewayV212.
       Datatypes.length (order_id record) = 12 /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (group_id record < 256 ^ N.of_nat 1)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (expire_date_time record < 256 ^ N.of_nat 4)%N /\
       (order_qty record < 256 ^ N.of_nat 4)%N /\
       (display_qty record < 256 ^ N.of_nat 4)%N /\
       (limit_price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (account record) = 10 /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (second_reserved_1 record) = 1 /\
       (side record < 256 ^ N.of_nat 1)%N /\
       (stop_price record < 256 ^ N.of_nat 8)%N /\
       (passive_only_order record < 256 ^ N.of_nat 1)%N /\
       (offset record < 256 ^ N.of_nat 4)%N /\
-      (reserved_5 record < 256 ^ N.of_nat 5)%N /\
+      Datatypes.length (reserved_5 record) = 5 /\
       (minimum_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
@@ -417,18 +417,18 @@ Module LsegMillenniumNativeTradingGatewayV212.
       encode_bytes 12 (order_id record) ++
       encode_uint 4 (instrument_id record) ++
       encode_uint 1 (group_id record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 4 (expire_date_time record) ++
       encode_uint 4 (order_qty record) ++
       encode_uint 4 (display_qty record) ++
       encode_uint 8 (limit_price record) ++
       encode_bytes 10 (account record) ++
-      encode_uint 1 (second_reserved_1 record) ++
+      encode_bytes 1 (second_reserved_1 record) ++
       encode_uint 1 (side record) ++
       encode_uint 8 (stop_price record) ++
       encode_uint 1 (passive_only_order record) ++
       encode_uint 4 (offset record) ++
-      encode_uint 5 (reserved_5 record) ++
+      encode_bytes 5 (reserved_5 record) ++
       encode_uint 4 (minimum_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -447,7 +447,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (group_id_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_1_value, bytes) =>
                               match decode_uint 4 bytes with
@@ -465,7 +465,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
                                               match decode_bytes 10 bytes with
                                               | None => None
                                               | Some (account_value, bytes) =>
-                                                  match decode_uint 1 bytes with
+                                                  match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (second_reserved_1_value, bytes) =>
                                                       match decode_uint 1 bytes with
@@ -480,7 +480,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
                                                                   match decode_uint 4 bytes with
                                                                   | None => None
                                                                   | Some (offset_value, bytes) =>
-                                                                      match decode_uint 5 bytes with
+                                                                      match decode_bytes 5 bytes with
                                                                       | None => None
                                                                       | Some (reserved_5_value, bytes) =>
                                                                           match decode_uint 4 bytes with
@@ -524,18 +524,18 @@ Module LsegMillenniumNativeTradingGatewayV212.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       destruct record. reflexivity.
     Qed.
@@ -553,8 +553,8 @@ Module LsegMillenniumNativeTradingGatewayV212.
       original_client_order_id : list byte;
       order_id : list byte;
       instrument_id : N;
-      reserved_1 : N;
-      second_reserved_1 : N;
+      reserved_1 : list byte;
+      second_reserved_1 : list byte;
       side : N;
       rfq_id : list byte;
     }.
@@ -565,8 +565,8 @@ Module LsegMillenniumNativeTradingGatewayV212.
       Datatypes.length (original_client_order_id record) = 20 /\
       Datatypes.length (order_id record) = 12 /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (second_reserved_1 record) = 1 /\
       (side record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (rfq_id record) = 10.
 
@@ -575,8 +575,8 @@ Module LsegMillenniumNativeTradingGatewayV212.
       encode_bytes 20 (original_client_order_id record) ++
       encode_bytes 12 (order_id record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 1 (second_reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 1 (second_reserved_1 record) ++
       encode_uint 1 (side record) ++
       encode_bytes 10 (rfq_id record).
 
@@ -593,10 +593,10 @@ Module LsegMillenniumNativeTradingGatewayV212.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (instrument_id_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -632,8 +632,8 @@ Module LsegMillenniumNativeTradingGatewayV212.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -651,7 +651,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       client_order_id : list byte;
       mass_cancel_request_type : N;
       instrument_id : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       group_id : N;
       segment : list byte;
       order_mass_cancel_request_order_sub_type : N;
@@ -663,7 +663,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       Datatypes.length (client_order_id record) = 20 /\
       (mass_cancel_request_type record < 256 ^ N.of_nat 1)%N /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (group_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (segment record) = 4 /\
       (order_mass_cancel_request_order_sub_type record < 256 ^ N.of_nat 1)%N /\
@@ -673,7 +673,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       encode_bytes 20 (client_order_id record) ++
       encode_uint 1 (mass_cancel_request_type record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 1 (group_id record) ++
       encode_bytes 4 (segment record) ++
       encode_uint 1 (order_mass_cancel_request_order_sub_type record) ++
@@ -689,7 +689,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
               match decode_uint 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -730,7 +730,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -894,7 +894,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       client_order_id : list byte;
       mass_cancel_response : N;
       mass_cancel_reject_reason : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       transact_time : TransactTime.t;
       reserved_10 : list byte;
     }.
@@ -906,7 +906,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       Datatypes.length (client_order_id record) = 20 /\
       (mass_cancel_response record < 256 ^ N.of_nat 1)%N /\
       (mass_cancel_reject_reason record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       TransactTime.bounded (transact_time record) /\
       Datatypes.length (reserved_10 record) = 10.
 
@@ -916,7 +916,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       encode_bytes 20 (client_order_id record) ++
       encode_uint 1 (mass_cancel_response record) ++
       encode_uint 4 (mass_cancel_reject_reason record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       TransactTime.encode (transact_time record) ++
       encode_bytes 10 (reserved_10 record).
 
@@ -936,7 +936,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (mass_cancel_reject_reason_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_bytes 4 bytes with
                           | None => None
                           | Some (reserved_4_value, bytes) =>
                               match TransactTime.decode bytes with
@@ -973,7 +973,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite TransactTime.decode_encode by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -1371,7 +1371,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       offer_id : list byte;
       capacity : N;
       clearing_account : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1390,7 +1390,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       Datatypes.length (offer_id record) = 12 /\
       (capacity record < 256 ^ N.of_nat 1)%N /\
       (clearing_account record < 256 ^ N.of_nat 1)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
@@ -1407,7 +1407,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       encode_bytes 12 (offer_id record) ++
       encode_uint 1 (capacity record) ++
       encode_uint 1 (clearing_account record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1452,7 +1452,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
                                                           match decode_uint 1 bytes with
                                                           | None => None
                                                           | Some (clearing_account_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_bytes 8 bytes with
                                                               | None => None
                                                               | Some (reserved_8_value, bytes) =>
                                                                   Some ({| partition_id := partition_id_value; sequence_number := sequence_number_value; quote_msg_id := quote_msg_id_value; rfq_id := rfq_id_value; quote_resp_type := quote_resp_type_value; instrument_id := instrument_id_value; side := side_value; order_quantity := order_quantity_value; limit_price := limit_price_value; order_book := order_book_value; bid_id := bid_id_value; offer_id := offer_id_value; capacity := capacity_value; clearing_account := clearing_account_value; reserved_8 := reserved_8_value |}, bytes)
@@ -1499,7 +1499,7 @@ Module LsegMillenniumNativeTradingGatewayV212.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       destruct record. reflexivity.
     Qed.
 

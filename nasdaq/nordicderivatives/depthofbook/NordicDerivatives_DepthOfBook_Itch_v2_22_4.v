@@ -1272,10 +1272,10 @@ Module NordicDerivativesDepthOfBookV2224.
       available_bid_quantity_at_equilibrium_price : N;
       available_ask_quantity_at_equilibrium_price : N;
       equilibrium_price : N;
-      reserved_4_a : N;
-      reserved_4_b : N;
-      reserved_8_a : N;
-      reserved_8_b : N;
+      reserved_4_a : list byte;
+      reserved_4_b : list byte;
+      reserved_8_a : list byte;
+      reserved_8_b : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1285,10 +1285,10 @@ Module NordicDerivativesDepthOfBookV2224.
       (available_bid_quantity_at_equilibrium_price record < 256 ^ N.of_nat 8)%N /\
       (available_ask_quantity_at_equilibrium_price record < 256 ^ N.of_nat 8)%N /\
       (equilibrium_price record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_a record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_b record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8_a record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8_b record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_4_a record) = 4 /\
+      Datatypes.length (reserved_4_b record) = 4 /\
+      Datatypes.length (reserved_8_a record) = 8 /\
+      Datatypes.length (reserved_8_b record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -1296,10 +1296,10 @@ Module NordicDerivativesDepthOfBookV2224.
       encode_uint 8 (available_bid_quantity_at_equilibrium_price record) ++
       encode_uint 8 (available_ask_quantity_at_equilibrium_price record) ++
       encode_uint 4 (equilibrium_price record) ++
-      encode_uint 4 (reserved_4_a record) ++
-      encode_uint 4 (reserved_4_b record) ++
-      encode_uint 8 (reserved_8_a record) ++
-      encode_uint 8 (reserved_8_b record).
+      encode_bytes 4 (reserved_4_a record) ++
+      encode_bytes 4 (reserved_4_b record) ++
+      encode_bytes 8 (reserved_8_a record) ++
+      encode_bytes 8 (reserved_8_b record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1317,16 +1317,16 @@ Module NordicDerivativesDepthOfBookV2224.
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (equilibrium_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_bytes 4 bytes with
                           | None => None
                           | Some (reserved_4_a_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_b_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (reserved_8_a_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_bytes 8 bytes with
                                       | None => None
                                       | Some (reserved_8_b_value, bytes) =>
                                           Some ({| nanoseconds := nanoseconds_value; order_book_id := order_book_id_value; available_bid_quantity_at_equilibrium_price := available_bid_quantity_at_equilibrium_price_value; available_ask_quantity_at_equilibrium_price := available_ask_quantity_at_equilibrium_price_value; equilibrium_price := equilibrium_price_value; reserved_4_a := reserved_4_a_value; reserved_4_b := reserved_4_b_value; reserved_8_a := reserved_8_a_value; reserved_8_b := reserved_8_b_value |}, bytes)
@@ -1343,7 +1343,7 @@ Module NordicDerivativesDepthOfBookV2224.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1358,15 +1358,15 @@ Module NordicDerivativesDepthOfBookV2224.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End EquilibriumPriceUpdate.
 
@@ -1376,9 +1376,9 @@ Module NordicDerivativesDepthOfBookV2224.
     Record t := {
       nanoseconds : N;
       order_book_id : N;
-      reserved_7 : N;
-      reserved_5 : N;
-      reserved_1 : N;
+      reserved_7 : list byte;
+      reserved_5 : list byte;
+      reserved_1 : list byte;
       side : list byte;
       quantity : N;
     }.
@@ -1387,18 +1387,18 @@ Module NordicDerivativesDepthOfBookV2224.
     Definition bounded (record : t) : Prop :=
       (nanoseconds record < 256 ^ N.of_nat 4)%N /\
       (order_book_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_7 record < 256 ^ N.of_nat 7)%N /\
-      (reserved_5 record < 256 ^ N.of_nat 5)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_7 record) = 7 /\
+      Datatypes.length (reserved_5 record) = 5 /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (side record) = 1 /\
       (quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
       encode_uint 4 (order_book_id record) ++
-      encode_uint 7 (reserved_7 record) ++
-      encode_uint 5 (reserved_5 record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 7 (reserved_7 record) ++
+      encode_bytes 5 (reserved_5 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (side record) ++
       encode_uint 8 (quantity record).
 
@@ -1409,13 +1409,13 @@ Module NordicDerivativesDepthOfBookV2224.
           match decode_uint 4 bytes with
           | None => None
           | Some (order_book_id_value, bytes) =>
-              match decode_uint 7 bytes with
+              match decode_bytes 7 bytes with
               | None => None
               | Some (reserved_7_value, bytes) =>
-                  match decode_uint 5 bytes with
+                  match decode_bytes 5 bytes with
                   | None => None
                   | Some (reserved_5_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -1448,9 +1448,9 @@ Module NordicDerivativesDepthOfBookV2224.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.

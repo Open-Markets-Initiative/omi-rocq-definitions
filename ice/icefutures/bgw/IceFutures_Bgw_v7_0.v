@@ -583,8 +583,8 @@ Module IceFuturesBgwV70.
       security_req_id : N;
       security_response_type : N;
       security_request_type : N;
-      market_type_i_d_int_32 : N;
-      security_type_security_type_enum_null : N;
+      market_type_id : N;
+      security_type_optional : N;
       exchange_code : N;
       text : list byte;
     }.
@@ -594,8 +594,8 @@ Module IceFuturesBgwV70.
       (security_req_id record < 256 ^ N.of_nat 4)%N /\
       (security_response_type record < 256 ^ N.of_nat 1)%N /\
       (security_request_type record < 256 ^ N.of_nat 1)%N /\
-      (market_type_i_d_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (security_type_security_type_enum_null record < 256 ^ N.of_nat 1)%N /\
+      (market_type_id record < 256 ^ N.of_nat 4)%N /\
+      (security_type_optional record < 256 ^ N.of_nat 1)%N /\
       (exchange_code record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (text record) = 100.
 
@@ -603,8 +603,8 @@ Module IceFuturesBgwV70.
       encode_uint 4 (security_req_id record) ++
       encode_uint 1 (security_response_type record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_i_d_int_32 record) ++
-      encode_uint 1 (security_type_security_type_enum_null record) ++
+      encode_uint 4 (market_type_id record) ++
+      encode_uint 1 (security_type_optional record) ++
       encode_uint 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
@@ -620,17 +620,17 @@ Module IceFuturesBgwV70.
               | Some (security_request_type_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (market_type_i_d_int_32_value, bytes) =>
+                  | Some (market_type_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (security_type_security_type_enum_null_value, bytes) =>
+                      | Some (security_type_optional_value, bytes) =>
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (exchange_code_value, bytes) =>
                               match decode_bytes 100 bytes with
                               | None => None
                               | Some (text_value, bytes) =>
-                                  Some ({| security_req_id := security_req_id_value; security_response_type := security_response_type_value; security_request_type := security_request_type_value; market_type_i_d_int_32 := market_type_i_d_int_32_value; security_type_security_type_enum_null := security_type_security_type_enum_null_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
+                                  Some ({| security_req_id := security_req_id_value; security_response_type := security_response_type_value; security_request_type := security_request_type_value; market_type_id := market_type_id_value; security_type_optional := security_type_optional_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
                               end
                           end
                       end
@@ -673,19 +673,19 @@ Module IceFuturesBgwV70.
     Record t := {
       security_req_id : N;
       security_request_type : N;
-      market_type_i_d_int_32 : N;
+      market_type_id : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_req_id record < 256 ^ N.of_nat 4)%N /\
       (security_request_type record < 256 ^ N.of_nat 1)%N /\
-      (market_type_i_d_int_32 record < 256 ^ N.of_nat 4)%N.
+      (market_type_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (security_req_id record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_i_d_int_32 record).
+      encode_uint 4 (market_type_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -696,8 +696,8 @@ Module IceFuturesBgwV70.
           | Some (security_request_type_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (market_type_i_d_int_32_value, bytes) =>
-                  Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_i_d_int_32 := market_type_i_d_int_32_value |}, bytes)
+              | Some (market_type_id_value, bytes) =>
+                  Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_id := market_type_id_value |}, bytes)
               end
           end
       end.
@@ -1012,19 +1012,19 @@ Module IceFuturesBgwV70.
 
     (** NewOrderRequestMessage *)
     Record t := {
-      price_decimal_9_null : N;
-      order_qty_decimal_9 : N;
-      symbol_int_32 : N;
-      time_in_force_time_in_force_enum : N;
-      side_side_enum : N;
+      price_optional : N;
+      order_qty : N;
+      symbol : N;
+      time_in_force : N;
+      side : N;
       originator_user_id : list byte;
-      ord_type_order_type_enum : N;
+      ord_type : N;
       manual_order_indicator : N;
       cl_ord_id : N;
       max_show : N;
       stop_px : N;
       give_up_clearing_firm : N;
-      clearing_firm_int_32 : N;
+      clearing_firm : N;
       self_match_prevention_id : N;
       expire_date : N;
       self_match_prevention_instruction : list byte;
@@ -1041,30 +1041,30 @@ Module IceFuturesBgwV70.
       position_effect : list byte;
       alloc_handl_inst : list byte;
       price_type : N;
-      clearing_account_string_14 : list byte;
+      clearing_account : list byte;
       customer_account_ref_id : list byte;
       memo : list byte;
       allocation_account : list byte;
       on_behalf_of_comp_id : list byte;
-      on_behalf_of_sub_i_d_string_41 : list byte;
-      on_behalf_of_location_i_d_string_41 : list byte;
+      on_behalf_of_sub_id : list byte;
+      on_behalf_of_location_id : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (price_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_decimal_9 record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (time_in_force_time_in_force_enum record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (price_optional record < 256 ^ N.of_nat 8)%N /\
+      (order_qty record < 256 ^ N.of_nat 8)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (time_in_force record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (originator_user_id record) = 20 /\
-      (ord_type_order_type_enum record < 256 ^ N.of_nat 1)%N /\
+      (ord_type record < 256 ^ N.of_nat 1)%N /\
       (manual_order_indicator record < 256 ^ N.of_nat 1)%N /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
       (max_show record < 256 ^ N.of_nat 8)%N /\
       (stop_px record < 256 ^ N.of_nat 8)%N /\
       (give_up_clearing_firm record < 256 ^ N.of_nat 4)%N /\
-      (clearing_firm_int_32 record < 256 ^ N.of_nat 4)%N /\
+      (clearing_firm record < 256 ^ N.of_nat 4)%N /\
       (self_match_prevention_id record < 256 ^ N.of_nat 8)%N /\
       (expire_date record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (self_match_prevention_instruction record) = 1 /\
@@ -1081,28 +1081,28 @@ Module IceFuturesBgwV70.
       Datatypes.length (position_effect record) = 1 /\
       Datatypes.length (alloc_handl_inst record) = 1 /\
       (price_type record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (clearing_account_string_14 record) = 14 /\
+      Datatypes.length (clearing_account record) = 14 /\
       Datatypes.length (customer_account_ref_id record) = 12 /\
       Datatypes.length (memo record) = 30 /\
       Datatypes.length (allocation_account record) = 20 /\
       Datatypes.length (on_behalf_of_comp_id record) = 41 /\
-      Datatypes.length (on_behalf_of_sub_i_d_string_41 record) = 41 /\
-      Datatypes.length (on_behalf_of_location_i_d_string_41 record) = 41.
+      Datatypes.length (on_behalf_of_sub_id record) = 41 /\
+      Datatypes.length (on_behalf_of_location_id record) = 41.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price_decimal_9_null record) ++
-      encode_uint 8 (order_qty_decimal_9 record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (time_in_force_time_in_force_enum record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 8 (price_optional record) ++
+      encode_uint 8 (order_qty record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (time_in_force record) ++
+      encode_uint 1 (side record) ++
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 1 (ord_type_order_type_enum record) ++
+      encode_uint 1 (ord_type record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_uint 8 (cl_ord_id record) ++
       encode_uint 8 (max_show record) ++
       encode_uint 8 (stop_px record) ++
       encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm_int_32 record) ++
+      encode_uint 4 (clearing_firm record) ++
       encode_uint 8 (self_match_prevention_id record) ++
       encode_uint 2 (expire_date record) ++
       encode_bytes 1 (self_match_prevention_instruction record) ++
@@ -1119,36 +1119,36 @@ Module IceFuturesBgwV70.
       encode_bytes 1 (position_effect record) ++
       encode_bytes 1 (alloc_handl_inst record) ++
       encode_uint 1 (price_type record) ++
-      encode_bytes 14 (clearing_account_string_14 record) ++
+      encode_bytes 14 (clearing_account record) ++
       encode_bytes 12 (customer_account_ref_id record) ++
       encode_bytes 30 (memo record) ++
       encode_bytes 20 (allocation_account record) ++
       encode_bytes 41 (on_behalf_of_comp_id record) ++
-      encode_bytes 41 (on_behalf_of_sub_i_d_string_41 record) ++
-      encode_bytes 41 (on_behalf_of_location_i_d_string_41 record).
+      encode_bytes 41 (on_behalf_of_sub_id record) ++
+      encode_bytes 41 (on_behalf_of_location_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
       | None => None
-      | Some (price_decimal_9_null_value, bytes) =>
+      | Some (price_optional_value, bytes) =>
           match decode_uint 8 bytes with
           | None => None
-          | Some (order_qty_decimal_9_value, bytes) =>
+          | Some (order_qty_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (symbol_int_32_value, bytes) =>
+              | Some (symbol_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
-                  | Some (time_in_force_time_in_force_enum_value, bytes) =>
+                  | Some (time_in_force_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (side_side_enum_value, bytes) =>
+                      | Some (side_value, bytes) =>
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (originator_user_id_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
-                              | Some (ord_type_order_type_enum_value, bytes) =>
+                              | Some (ord_type_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (manual_order_indicator_value, bytes) =>
@@ -1166,7 +1166,7 @@ Module IceFuturesBgwV70.
                                                   | Some (give_up_clearing_firm_value, bytes) =>
                                                       match decode_uint 4 bytes with
                                                       | None => None
-                                                      | Some (clearing_firm_int_32_value, bytes) =>
+                                                      | Some (clearing_firm_value, bytes) =>
                                                           match decode_uint 8 bytes with
                                                           | None => None
                                                           | Some (self_match_prevention_id_value, bytes) =>
@@ -1217,7 +1217,7 @@ Module IceFuturesBgwV70.
                                                                                                                       | Some (price_type_value, bytes) =>
                                                                                                                           match decode_bytes 14 bytes with
                                                                                                                           | None => None
-                                                                                                                          | Some (clearing_account_string_14_value, bytes) =>
+                                                                                                                          | Some (clearing_account_value, bytes) =>
                                                                                                                               match decode_bytes 12 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (customer_account_ref_id_value, bytes) =>
@@ -1232,11 +1232,11 @@ Module IceFuturesBgwV70.
                                                                                                                                           | Some (on_behalf_of_comp_id_value, bytes) =>
                                                                                                                                               match decode_bytes 41 bytes with
                                                                                                                                               | None => None
-                                                                                                                                              | Some (on_behalf_of_sub_i_d_string_41_value, bytes) =>
+                                                                                                                                              | Some (on_behalf_of_sub_id_value, bytes) =>
                                                                                                                                                   match decode_bytes 41 bytes with
                                                                                                                                                   | None => None
-                                                                                                                                                  | Some (on_behalf_of_location_i_d_string_41_value, bytes) =>
-                                                                                                                                                      Some ({| price_decimal_9_null := price_decimal_9_null_value; order_qty_decimal_9 := order_qty_decimal_9_value; symbol_int_32 := symbol_int_32_value; time_in_force_time_in_force_enum := time_in_force_time_in_force_enum_value; side_side_enum := side_side_enum_value; originator_user_id := originator_user_id_value; ord_type_order_type_enum := ord_type_order_type_enum_value; manual_order_indicator := manual_order_indicator_value; cl_ord_id := cl_ord_id_value; max_show := max_show_value; stop_px := stop_px_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm_int_32 := clearing_firm_int_32_value; self_match_prevention_id := self_match_prevention_id_value; expire_date := expire_date_value; self_match_prevention_instruction := self_match_prevention_instruction_value; exec_inst := exec_inst_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; cust_order_handling_inst := cust_order_handling_inst_value; position_effect := position_effect_value; alloc_handl_inst := alloc_handl_inst_value; price_type := price_type_value; clearing_account_string_14 := clearing_account_string_14_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_i_d_string_41 := on_behalf_of_sub_i_d_string_41_value; on_behalf_of_location_i_d_string_41 := on_behalf_of_location_i_d_string_41_value |}, bytes)
+                                                                                                                                                  | Some (on_behalf_of_location_id_value, bytes) =>
+                                                                                                                                                      Some ({| price_optional := price_optional_value; order_qty := order_qty_value; symbol := symbol_value; time_in_force := time_in_force_value; side := side_value; originator_user_id := originator_user_id_value; ord_type := ord_type_value; manual_order_indicator := manual_order_indicator_value; cl_ord_id := cl_ord_id_value; max_show := max_show_value; stop_px := stop_px_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm := clearing_firm_value; self_match_prevention_id := self_match_prevention_id_value; expire_date := expire_date_value; self_match_prevention_instruction := self_match_prevention_instruction_value; exec_inst := exec_inst_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; cust_order_handling_inst := cust_order_handling_inst_value; position_effect := position_effect_value; alloc_handl_inst := alloc_handl_inst_value; price_type := price_type_value; clearing_account := clearing_account_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_id := on_behalf_of_sub_id_value; on_behalf_of_location_id := on_behalf_of_location_id_value |}, bytes)
                                                                                                                                                   end
                                                                                                                                               end
                                                                                                                                           end
@@ -1335,20 +1335,20 @@ Module IceFuturesBgwV70.
 
     (** CancelReplaceRequestMessage *)
     Record t := {
-      price_decimal_9_null : N;
-      order_qty_decimal_9 : N;
-      symbol_int_32 : N;
-      time_in_force_time_in_force_enum : N;
-      side_side_enum : N;
+      price_optional : N;
+      order_qty : N;
+      symbol : N;
+      time_in_force : N;
+      side : N;
       originator_user_id : list byte;
-      ord_type_order_type_enum : N;
+      ord_type : N;
       manual_order_indicator : N;
       cl_ord_id : N;
-      orig_cl_ord_i_d_int_64 : N;
+      orig_cl_ord_id : N;
       max_show : N;
       stop_px : N;
       give_up_clearing_firm : N;
-      clearing_firm_int_32 : N;
+      clearing_firm : N;
       self_match_prevention_id : N;
       expire_date : N;
       self_match_prevention_instruction : list byte;
@@ -1363,31 +1363,31 @@ Module IceFuturesBgwV70.
       mifid_id : N;
       alloc_handl_inst : list byte;
       price_type : N;
-      clearing_account_string_14 : list byte;
+      clearing_account : list byte;
       customer_account_ref_id : list byte;
       memo : list byte;
       allocation_account : list byte;
       on_behalf_of_comp_id : list byte;
-      on_behalf_of_sub_i_d_string_41 : list byte;
-      on_behalf_of_location_i_d_string_41 : list byte;
+      on_behalf_of_sub_id : list byte;
+      on_behalf_of_location_id : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (price_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_decimal_9 record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (time_in_force_time_in_force_enum record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (price_optional record < 256 ^ N.of_nat 8)%N /\
+      (order_qty record < 256 ^ N.of_nat 8)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (time_in_force record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (originator_user_id record) = 20 /\
-      (ord_type_order_type_enum record < 256 ^ N.of_nat 1)%N /\
+      (ord_type record < 256 ^ N.of_nat 1)%N /\
       (manual_order_indicator record < 256 ^ N.of_nat 1)%N /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (orig_cl_ord_i_d_int_64 record < 256 ^ N.of_nat 8)%N /\
+      (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N /\
       (max_show record < 256 ^ N.of_nat 8)%N /\
       (stop_px record < 256 ^ N.of_nat 8)%N /\
       (give_up_clearing_firm record < 256 ^ N.of_nat 4)%N /\
-      (clearing_firm_int_32 record < 256 ^ N.of_nat 4)%N /\
+      (clearing_firm record < 256 ^ N.of_nat 4)%N /\
       (self_match_prevention_id record < 256 ^ N.of_nat 8)%N /\
       (expire_date record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (self_match_prevention_instruction record) = 1 /\
@@ -1402,29 +1402,29 @@ Module IceFuturesBgwV70.
       (mifid_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (alloc_handl_inst record) = 1 /\
       (price_type record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (clearing_account_string_14 record) = 14 /\
+      Datatypes.length (clearing_account record) = 14 /\
       Datatypes.length (customer_account_ref_id record) = 12 /\
       Datatypes.length (memo record) = 30 /\
       Datatypes.length (allocation_account record) = 20 /\
       Datatypes.length (on_behalf_of_comp_id record) = 41 /\
-      Datatypes.length (on_behalf_of_sub_i_d_string_41 record) = 41 /\
-      Datatypes.length (on_behalf_of_location_i_d_string_41 record) = 41.
+      Datatypes.length (on_behalf_of_sub_id record) = 41 /\
+      Datatypes.length (on_behalf_of_location_id record) = 41.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price_decimal_9_null record) ++
-      encode_uint 8 (order_qty_decimal_9 record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (time_in_force_time_in_force_enum record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 8 (price_optional record) ++
+      encode_uint 8 (order_qty record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (time_in_force record) ++
+      encode_uint 1 (side record) ++
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 1 (ord_type_order_type_enum record) ++
+      encode_uint 1 (ord_type record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_int_64 record) ++
+      encode_uint 8 (orig_cl_ord_id record) ++
       encode_uint 8 (max_show record) ++
       encode_uint 8 (stop_px record) ++
       encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm_int_32 record) ++
+      encode_uint 4 (clearing_firm record) ++
       encode_uint 8 (self_match_prevention_id record) ++
       encode_uint 2 (expire_date record) ++
       encode_bytes 1 (self_match_prevention_instruction record) ++
@@ -1439,36 +1439,36 @@ Module IceFuturesBgwV70.
       encode_uint 8 (mifid_id record) ++
       encode_bytes 1 (alloc_handl_inst record) ++
       encode_uint 1 (price_type record) ++
-      encode_bytes 14 (clearing_account_string_14 record) ++
+      encode_bytes 14 (clearing_account record) ++
       encode_bytes 12 (customer_account_ref_id record) ++
       encode_bytes 30 (memo record) ++
       encode_bytes 20 (allocation_account record) ++
       encode_bytes 41 (on_behalf_of_comp_id record) ++
-      encode_bytes 41 (on_behalf_of_sub_i_d_string_41 record) ++
-      encode_bytes 41 (on_behalf_of_location_i_d_string_41 record).
+      encode_bytes 41 (on_behalf_of_sub_id record) ++
+      encode_bytes 41 (on_behalf_of_location_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
       | None => None
-      | Some (price_decimal_9_null_value, bytes) =>
+      | Some (price_optional_value, bytes) =>
           match decode_uint 8 bytes with
           | None => None
-          | Some (order_qty_decimal_9_value, bytes) =>
+          | Some (order_qty_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (symbol_int_32_value, bytes) =>
+              | Some (symbol_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
-                  | Some (time_in_force_time_in_force_enum_value, bytes) =>
+                  | Some (time_in_force_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (side_side_enum_value, bytes) =>
+                      | Some (side_value, bytes) =>
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (originator_user_id_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
-                              | Some (ord_type_order_type_enum_value, bytes) =>
+                              | Some (ord_type_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (manual_order_indicator_value, bytes) =>
@@ -1477,7 +1477,7 @@ Module IceFuturesBgwV70.
                                       | Some (cl_ord_id_value, bytes) =>
                                           match decode_uint 8 bytes with
                                           | None => None
-                                          | Some (orig_cl_ord_i_d_int_64_value, bytes) =>
+                                          | Some (orig_cl_ord_id_value, bytes) =>
                                               match decode_uint 8 bytes with
                                               | None => None
                                               | Some (max_show_value, bytes) =>
@@ -1489,7 +1489,7 @@ Module IceFuturesBgwV70.
                                                       | Some (give_up_clearing_firm_value, bytes) =>
                                                           match decode_uint 4 bytes with
                                                           | None => None
-                                                          | Some (clearing_firm_int_32_value, bytes) =>
+                                                          | Some (clearing_firm_value, bytes) =>
                                                               match decode_uint 8 bytes with
                                                               | None => None
                                                               | Some (self_match_prevention_id_value, bytes) =>
@@ -1534,7 +1534,7 @@ Module IceFuturesBgwV70.
                                                                                                                   | Some (price_type_value, bytes) =>
                                                                                                                       match decode_bytes 14 bytes with
                                                                                                                       | None => None
-                                                                                                                      | Some (clearing_account_string_14_value, bytes) =>
+                                                                                                                      | Some (clearing_account_value, bytes) =>
                                                                                                                           match decode_bytes 12 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (customer_account_ref_id_value, bytes) =>
@@ -1549,11 +1549,11 @@ Module IceFuturesBgwV70.
                                                                                                                                       | Some (on_behalf_of_comp_id_value, bytes) =>
                                                                                                                                           match decode_bytes 41 bytes with
                                                                                                                                           | None => None
-                                                                                                                                          | Some (on_behalf_of_sub_i_d_string_41_value, bytes) =>
+                                                                                                                                          | Some (on_behalf_of_sub_id_value, bytes) =>
                                                                                                                                               match decode_bytes 41 bytes with
                                                                                                                                               | None => None
-                                                                                                                                              | Some (on_behalf_of_location_i_d_string_41_value, bytes) =>
-                                                                                                                                                  Some ({| price_decimal_9_null := price_decimal_9_null_value; order_qty_decimal_9 := order_qty_decimal_9_value; symbol_int_32 := symbol_int_32_value; time_in_force_time_in_force_enum := time_in_force_time_in_force_enum_value; side_side_enum := side_side_enum_value; originator_user_id := originator_user_id_value; ord_type_order_type_enum := ord_type_order_type_enum_value; manual_order_indicator := manual_order_indicator_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_i_d_int_64 := orig_cl_ord_i_d_int_64_value; max_show := max_show_value; stop_px := stop_px_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm_int_32 := clearing_firm_int_32_value; self_match_prevention_id := self_match_prevention_id_value; expire_date := expire_date_value; self_match_prevention_instruction := self_match_prevention_instruction_value; exec_inst := exec_inst_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; alloc_handl_inst := alloc_handl_inst_value; price_type := price_type_value; clearing_account_string_14 := clearing_account_string_14_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_i_d_string_41 := on_behalf_of_sub_i_d_string_41_value; on_behalf_of_location_i_d_string_41 := on_behalf_of_location_i_d_string_41_value |}, bytes)
+                                                                                                                                              | Some (on_behalf_of_location_id_value, bytes) =>
+                                                                                                                                                  Some ({| price_optional := price_optional_value; order_qty := order_qty_value; symbol := symbol_value; time_in_force := time_in_force_value; side := side_value; originator_user_id := originator_user_id_value; ord_type := ord_type_value; manual_order_indicator := manual_order_indicator_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; max_show := max_show_value; stop_px := stop_px_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm := clearing_firm_value; self_match_prevention_id := self_match_prevention_id_value; expire_date := expire_date_value; self_match_prevention_instruction := self_match_prevention_instruction_value; exec_inst := exec_inst_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; alloc_handl_inst := alloc_handl_inst_value; price_type := price_type_value; clearing_account := clearing_account_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_id := on_behalf_of_sub_id_value; on_behalf_of_location_id := on_behalf_of_location_id_value |}, bytes)
                                                                                                                                               end
                                                                                                                                           end
                                                                                                                                       end
@@ -1650,32 +1650,32 @@ Module IceFuturesBgwV70.
 
     (** CancelRequestMessage *)
     Record t := {
-      symbol_int_32 : N;
+      symbol : N;
       originator_user_id : list byte;
       cl_ord_id : N;
-      orig_cl_ord_i_d_int_64 : N;
-      side_side_enum : N;
+      orig_cl_ord_id : N;
+      side : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (originator_user_id record) = 20 /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (orig_cl_ord_i_d_int_64 record < 256 ^ N.of_nat 8)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N.
+      (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N /\
+      (side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_int_32 record) ++
+      encode_uint 4 (symbol record) ++
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_int_64 record) ++
-      encode_uint 1 (side_side_enum record).
+      encode_uint 8 (orig_cl_ord_id record) ++
+      encode_uint 1 (side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (symbol_int_32_value, bytes) =>
+      | Some (symbol_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (originator_user_id_value, bytes) =>
@@ -1684,11 +1684,11 @@ Module IceFuturesBgwV70.
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (orig_cl_ord_i_d_int_64_value, bytes) =>
+                  | Some (orig_cl_ord_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (side_side_enum_value, bytes) =>
-                          Some ({| symbol_int_32 := symbol_int_32_value; originator_user_id := originator_user_id_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_i_d_int_64 := orig_cl_ord_i_d_int_64_value; side_side_enum := side_side_enum_value |}, bytes)
+                      | Some (side_value, bytes) =>
+                          Some ({| symbol := symbol_value; originator_user_id := originator_user_id_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; side := side_value |}, bytes)
                       end
                   end
               end
@@ -1726,41 +1726,41 @@ Module IceFuturesBgwV70.
     (** QuoteRequestMessage *)
     Record t := {
       originator_user_id : list byte;
-      side_side_enum_null : N;
-      order_qty_decimal_9_null : N;
+      side_optional : N;
+      order_qty_optional : N;
       rfq_req_id : N;
-      symbol_int_32 : N;
-      clearing_firm_int_32_null : N;
-      clearing_account_string_14_null : list byte;
+      symbol : N;
+      clearing_firm_optional : N;
+      clearing_account_optional : list byte;
       on_behalf_of_comp_id : list byte;
-      on_behalf_of_sub_i_d_string_41 : list byte;
-      on_behalf_of_location_i_d_string_41 : list byte;
+      on_behalf_of_sub_id : list byte;
+      on_behalf_of_location_id : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (originator_user_id record) = 20 /\
-      (side_side_enum_null record < 256 ^ N.of_nat 1)%N /\
-      (order_qty_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
+      (side_optional record < 256 ^ N.of_nat 1)%N /\
+      (order_qty_optional record < 256 ^ N.of_nat 8)%N /\
       (rfq_req_id record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (clearing_firm_int_32_null record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (clearing_account_string_14_null record) = 14 /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (clearing_firm_optional record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (clearing_account_optional record) = 14 /\
       Datatypes.length (on_behalf_of_comp_id record) = 41 /\
-      Datatypes.length (on_behalf_of_sub_i_d_string_41 record) = 41 /\
-      Datatypes.length (on_behalf_of_location_i_d_string_41 record) = 41.
+      Datatypes.length (on_behalf_of_sub_id record) = 41 /\
+      Datatypes.length (on_behalf_of_location_id record) = 41.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 1 (side_side_enum_null record) ++
-      encode_uint 8 (order_qty_decimal_9_null record) ++
+      encode_uint 1 (side_optional record) ++
+      encode_uint 8 (order_qty_optional record) ++
       encode_uint 8 (rfq_req_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 4 (clearing_firm_int_32_null record) ++
-      encode_bytes 14 (clearing_account_string_14_null record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 4 (clearing_firm_optional record) ++
+      encode_bytes 14 (clearing_account_optional record) ++
       encode_bytes 41 (on_behalf_of_comp_id record) ++
-      encode_bytes 41 (on_behalf_of_sub_i_d_string_41 record) ++
-      encode_bytes 41 (on_behalf_of_location_i_d_string_41 record).
+      encode_bytes 41 (on_behalf_of_sub_id record) ++
+      encode_bytes 41 (on_behalf_of_location_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
@@ -1768,32 +1768,32 @@ Module IceFuturesBgwV70.
       | Some (originator_user_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (side_side_enum_null_value, bytes) =>
+          | Some (side_optional_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (order_qty_decimal_9_null_value, bytes) =>
+              | Some (order_qty_optional_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (rfq_req_id_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
-                      | Some (symbol_int_32_value, bytes) =>
+                      | Some (symbol_value, bytes) =>
                           match decode_uint 4 bytes with
                           | None => None
-                          | Some (clearing_firm_int_32_null_value, bytes) =>
+                          | Some (clearing_firm_optional_value, bytes) =>
                               match decode_bytes 14 bytes with
                               | None => None
-                              | Some (clearing_account_string_14_null_value, bytes) =>
+                              | Some (clearing_account_optional_value, bytes) =>
                                   match decode_bytes 41 bytes with
                                   | None => None
                                   | Some (on_behalf_of_comp_id_value, bytes) =>
                                       match decode_bytes 41 bytes with
                                       | None => None
-                                      | Some (on_behalf_of_sub_i_d_string_41_value, bytes) =>
+                                      | Some (on_behalf_of_sub_id_value, bytes) =>
                                           match decode_bytes 41 bytes with
                                           | None => None
-                                          | Some (on_behalf_of_location_i_d_string_41_value, bytes) =>
-                                              Some ({| originator_user_id := originator_user_id_value; side_side_enum_null := side_side_enum_null_value; order_qty_decimal_9_null := order_qty_decimal_9_null_value; rfq_req_id := rfq_req_id_value; symbol_int_32 := symbol_int_32_value; clearing_firm_int_32_null := clearing_firm_int_32_null_value; clearing_account_string_14_null := clearing_account_string_14_null_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_i_d_string_41 := on_behalf_of_sub_i_d_string_41_value; on_behalf_of_location_i_d_string_41 := on_behalf_of_location_i_d_string_41_value |}, bytes)
+                                          | Some (on_behalf_of_location_id_value, bytes) =>
+                                              Some ({| originator_user_id := originator_user_id_value; side_optional := side_optional_value; order_qty_optional := order_qty_optional_value; rfq_req_id := rfq_req_id_value; symbol := symbol_value; clearing_firm_optional := clearing_firm_optional_value; clearing_account_optional := clearing_account_optional_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_id := on_behalf_of_sub_id_value; on_behalf_of_location_id := on_behalf_of_location_id_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1841,41 +1841,41 @@ Module IceFuturesBgwV70.
     (** OrderMassCancelRequestMessage *)
     Record t := {
       originator_user_id : list byte;
-      ord_type_order_type_enum_null : N;
-      side_side_enum_null : N;
-      symbol_int_32_null : N;
+      ord_type_optional : N;
+      side_optional : N;
+      symbol_optional : N;
       cl_ord_id : N;
-      market_type_i_d_int_32_null : N;
-      price_decimal_9_null : N;
+      market_type_i_d_optional : N;
+      price_optional : N;
       mass_cancel_request_type : N;
-      time_in_force_time_in_force_enum_null : N;
-      on_behalf_of_sub_i_d_string_41_null : list byte;
+      time_in_force_optional : N;
+      on_behalf_of_sub_i_d_optional : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (originator_user_id record) = 20 /\
-      (ord_type_order_type_enum_null record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum_null record < 256 ^ N.of_nat 1)%N /\
-      (symbol_int_32_null record < 256 ^ N.of_nat 4)%N /\
+      (ord_type_optional record < 256 ^ N.of_nat 1)%N /\
+      (side_optional record < 256 ^ N.of_nat 1)%N /\
+      (symbol_optional record < 256 ^ N.of_nat 4)%N /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (market_type_i_d_int_32_null record < 256 ^ N.of_nat 4)%N /\
-      (price_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
+      (market_type_i_d_optional record < 256 ^ N.of_nat 4)%N /\
+      (price_optional record < 256 ^ N.of_nat 8)%N /\
       (mass_cancel_request_type record < 256 ^ N.of_nat 1)%N /\
-      (time_in_force_time_in_force_enum_null record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (on_behalf_of_sub_i_d_string_41_null record) = 41.
+      (time_in_force_optional record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (on_behalf_of_sub_i_d_optional record) = 41.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 1 (ord_type_order_type_enum_null record) ++
-      encode_uint 1 (side_side_enum_null record) ++
-      encode_uint 4 (symbol_int_32_null record) ++
+      encode_uint 1 (ord_type_optional record) ++
+      encode_uint 1 (side_optional record) ++
+      encode_uint 4 (symbol_optional record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (market_type_i_d_int_32_null record) ++
-      encode_uint 8 (price_decimal_9_null record) ++
+      encode_uint 4 (market_type_i_d_optional record) ++
+      encode_uint 8 (price_optional record) ++
       encode_uint 1 (mass_cancel_request_type record) ++
-      encode_uint 1 (time_in_force_time_in_force_enum_null record) ++
-      encode_bytes 41 (on_behalf_of_sub_i_d_string_41_null record).
+      encode_uint 1 (time_in_force_optional record) ++
+      encode_bytes 41 (on_behalf_of_sub_i_d_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
@@ -1883,32 +1883,32 @@ Module IceFuturesBgwV70.
       | Some (originator_user_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (ord_type_order_type_enum_null_value, bytes) =>
+          | Some (ord_type_optional_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
-              | Some (side_side_enum_null_value, bytes) =>
+              | Some (side_optional_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (symbol_int_32_null_value, bytes) =>
+                  | Some (symbol_optional_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (cl_ord_id_value, bytes) =>
                           match decode_uint 4 bytes with
                           | None => None
-                          | Some (market_type_i_d_int_32_null_value, bytes) =>
+                          | Some (market_type_i_d_optional_value, bytes) =>
                               match decode_uint 8 bytes with
                               | None => None
-                              | Some (price_decimal_9_null_value, bytes) =>
+                              | Some (price_optional_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (mass_cancel_request_type_value, bytes) =>
                                       match decode_uint 1 bytes with
                                       | None => None
-                                      | Some (time_in_force_time_in_force_enum_null_value, bytes) =>
+                                      | Some (time_in_force_optional_value, bytes) =>
                                           match decode_bytes 41 bytes with
                                           | None => None
-                                          | Some (on_behalf_of_sub_i_d_string_41_null_value, bytes) =>
-                                              Some ({| originator_user_id := originator_user_id_value; ord_type_order_type_enum_null := ord_type_order_type_enum_null_value; side_side_enum_null := side_side_enum_null_value; symbol_int_32_null := symbol_int_32_null_value; cl_ord_id := cl_ord_id_value; market_type_i_d_int_32_null := market_type_i_d_int_32_null_value; price_decimal_9_null := price_decimal_9_null_value; mass_cancel_request_type := mass_cancel_request_type_value; time_in_force_time_in_force_enum_null := time_in_force_time_in_force_enum_null_value; on_behalf_of_sub_i_d_string_41_null := on_behalf_of_sub_i_d_string_41_null_value |}, bytes)
+                                          | Some (on_behalf_of_sub_i_d_optional_value, bytes) =>
+                                              Some ({| originator_user_id := originator_user_id_value; ord_type_optional := ord_type_optional_value; side_optional := side_optional_value; symbol_optional := symbol_optional_value; cl_ord_id := cl_ord_id_value; market_type_i_d_optional := market_type_i_d_optional_value; price_optional := price_optional_value; mass_cancel_request_type := mass_cancel_request_type_value; time_in_force_optional := time_in_force_optional_value; on_behalf_of_sub_i_d_optional := on_behalf_of_sub_i_d_optional_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1957,11 +1957,11 @@ Module IceFuturesBgwV70.
     Record t := {
       security_req_id : N;
       security_request_type : N;
-      market_type_i_d_int_32 : N;
-      security_type_security_type_enum : N;
+      market_type_id : N;
+      security_type : N;
       maturity_date : N;
-      product_i_d_int_32_null : N;
-      symbol_int_32_null : N;
+      product_i_d_optional : N;
+      symbol_optional : N;
       strike_price : N;
     }.
 
@@ -1969,21 +1969,21 @@ Module IceFuturesBgwV70.
     Definition bounded (record : t) : Prop :=
       (security_req_id record < 256 ^ N.of_nat 4)%N /\
       (security_request_type record < 256 ^ N.of_nat 1)%N /\
-      (market_type_i_d_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (security_type_security_type_enum record < 256 ^ N.of_nat 1)%N /\
+      (market_type_id record < 256 ^ N.of_nat 4)%N /\
+      (security_type record < 256 ^ N.of_nat 1)%N /\
       (maturity_date record < 256 ^ N.of_nat 2)%N /\
-      (product_i_d_int_32_null record < 256 ^ N.of_nat 4)%N /\
-      (symbol_int_32_null record < 256 ^ N.of_nat 4)%N /\
+      (product_i_d_optional record < 256 ^ N.of_nat 4)%N /\
+      (symbol_optional record < 256 ^ N.of_nat 4)%N /\
       (strike_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (security_req_id record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_i_d_int_32 record) ++
-      encode_uint 1 (security_type_security_type_enum record) ++
+      encode_uint 4 (market_type_id record) ++
+      encode_uint 1 (security_type record) ++
       encode_uint 2 (maturity_date record) ++
-      encode_uint 4 (product_i_d_int_32_null record) ++
-      encode_uint 4 (symbol_int_32_null record) ++
+      encode_uint 4 (product_i_d_optional record) ++
+      encode_uint 4 (symbol_optional record) ++
       encode_uint 8 (strike_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1995,23 +1995,23 @@ Module IceFuturesBgwV70.
           | Some (security_request_type_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (market_type_i_d_int_32_value, bytes) =>
+              | Some (market_type_id_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
-                  | Some (security_type_security_type_enum_value, bytes) =>
+                  | Some (security_type_value, bytes) =>
                       match decode_uint 2 bytes with
                       | None => None
                       | Some (maturity_date_value, bytes) =>
                           match decode_uint 4 bytes with
                           | None => None
-                          | Some (product_i_d_int_32_null_value, bytes) =>
+                          | Some (product_i_d_optional_value, bytes) =>
                               match decode_uint 4 bytes with
                               | None => None
-                              | Some (symbol_int_32_null_value, bytes) =>
+                              | Some (symbol_optional_value, bytes) =>
                                   match decode_uint 8 bytes with
                                   | None => None
                                   | Some (strike_price_value, bytes) =>
-                                      Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_i_d_int_32 := market_type_i_d_int_32_value; security_type_security_type_enum := security_type_security_type_enum_value; maturity_date := maturity_date_value; product_i_d_int_32_null := product_i_d_int_32_null_value; symbol_int_32_null := symbol_int_32_null_value; strike_price := strike_price_value |}, bytes)
+                                      Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_id := market_type_id_value; security_type := security_type_value; maturity_date := maturity_date_value; product_i_d_optional := product_i_d_optional_value; symbol_optional := symbol_optional_value; strike_price := strike_price_value |}, bytes)
                                   end
                               end
                           end
@@ -2167,13 +2167,13 @@ Module IceFuturesBgwV70.
       originator_user_id : list byte;
       exec_i_d_order_exec_id : ExecIDOrderExecId.t;
       cl_ord_id : N;
-      symbol_int_32 : N;
-      ord_type_order_type_enum : N;
-      side_side_enum : N;
+      symbol : N;
+      ord_type : N;
+      side : N;
       orig_order_id : OrigOrderId.t;
       leaves_qty : N;
-      price_decimal_9_null : N;
-      me_acceptance_time_utc_timestamp : N;
+      price_optional : N;
+      me_acceptance_time : N;
       time_priority : N;
       order_status : N;
       memo : list byte;
@@ -2184,13 +2184,13 @@ Module IceFuturesBgwV70.
       Datatypes.length (originator_user_id record) = 20 /\
       ExecIDOrderExecId.bounded (exec_i_d_order_exec_id record) /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (ord_type_order_type_enum record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (ord_type record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       OrigOrderId.bounded (orig_order_id record) /\
       (leaves_qty record < 256 ^ N.of_nat 8)%N /\
-      (price_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
-      (me_acceptance_time_utc_timestamp record < 256 ^ N.of_nat 8)%N /\
+      (price_optional record < 256 ^ N.of_nat 8)%N /\
+      (me_acceptance_time record < 256 ^ N.of_nat 8)%N /\
       (time_priority record < 256 ^ N.of_nat 8)%N /\
       (order_status record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (memo record) = 30.
@@ -2199,13 +2199,13 @@ Module IceFuturesBgwV70.
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (ord_type_order_type_enum record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (ord_type record) ++
+      encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
       encode_uint 8 (leaves_qty record) ++
-      encode_uint 8 (price_decimal_9_null record) ++
-      encode_uint 8 (me_acceptance_time_utc_timestamp record) ++
+      encode_uint 8 (price_optional record) ++
+      encode_uint 8 (me_acceptance_time record) ++
       encode_uint 8 (time_priority record) ++
       encode_uint 1 (order_status record) ++
       encode_bytes 30 (memo record).
@@ -2222,13 +2222,13 @@ Module IceFuturesBgwV70.
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (symbol_int_32_value, bytes) =>
+                  | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (ord_type_order_type_enum_value, bytes) =>
+                      | Some (ord_type_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
-                          | Some (side_side_enum_value, bytes) =>
+                          | Some (side_value, bytes) =>
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
@@ -2237,10 +2237,10 @@ Module IceFuturesBgwV70.
                                   | Some (leaves_qty_value, bytes) =>
                                       match decode_uint 8 bytes with
                                       | None => None
-                                      | Some (price_decimal_9_null_value, bytes) =>
+                                      | Some (price_optional_value, bytes) =>
                                           match decode_uint 8 bytes with
                                           | None => None
-                                          | Some (me_acceptance_time_utc_timestamp_value, bytes) =>
+                                          | Some (me_acceptance_time_value, bytes) =>
                                               match decode_uint 8 bytes with
                                               | None => None
                                               | Some (time_priority_value, bytes) =>
@@ -2250,7 +2250,7 @@ Module IceFuturesBgwV70.
                                                       match decode_bytes 30 bytes with
                                                       | None => None
                                                       | Some (memo_value, bytes) =>
-                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol_int_32 := symbol_int_32_value; ord_type_order_type_enum := ord_type_order_type_enum_value; side_side_enum := side_side_enum_value; orig_order_id := orig_order_id_value; leaves_qty := leaves_qty_value; price_decimal_9_null := price_decimal_9_null_value; me_acceptance_time_utc_timestamp := me_acceptance_time_utc_timestamp_value; time_priority := time_priority_value; order_status := order_status_value; memo := memo_value |}, bytes)
+                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; ord_type := ord_type_value; side := side_value; orig_order_id := orig_order_id_value; leaves_qty := leaves_qty_value; price_optional := price_optional_value; me_acceptance_time := me_acceptance_time_value; time_priority := time_priority_value; order_status := order_status_value; memo := memo_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -2306,15 +2306,15 @@ Module IceFuturesBgwV70.
       originator_user_id : list byte;
       exec_i_d_order_exec_id : ExecIDOrderExecId.t;
       cl_ord_id : N;
-      symbol_int_32 : N;
-      ord_type_order_type_enum : N;
-      side_side_enum : N;
+      symbol : N;
+      ord_type : N;
+      side : N;
       orig_order_id : OrigOrderId.t;
-      orig_cl_ord_i_d_int_64_null : N;
-      me_acceptance_time_utc_timestamp : N;
+      orig_cl_ord_i_d_optional : N;
+      me_acceptance_time : N;
       exchange_code : N;
       cancel_reason : N;
-      cross_i_d_int_64_null : N;
+      cross_i_d_optional : N;
       text : list byte;
     }.
 
@@ -2323,30 +2323,30 @@ Module IceFuturesBgwV70.
       Datatypes.length (originator_user_id record) = 20 /\
       ExecIDOrderExecId.bounded (exec_i_d_order_exec_id record) /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (ord_type_order_type_enum record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (ord_type record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       OrigOrderId.bounded (orig_order_id record) /\
-      (orig_cl_ord_i_d_int_64_null record < 256 ^ N.of_nat 8)%N /\
-      (me_acceptance_time_utc_timestamp record < 256 ^ N.of_nat 8)%N /\
+      (orig_cl_ord_i_d_optional record < 256 ^ N.of_nat 8)%N /\
+      (me_acceptance_time record < 256 ^ N.of_nat 8)%N /\
       (exchange_code record < 256 ^ N.of_nat 4)%N /\
       (cancel_reason record < 256 ^ N.of_nat 1)%N /\
-      (cross_i_d_int_64_null record < 256 ^ N.of_nat 8)%N /\
+      (cross_i_d_optional record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (text record) = 100.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (ord_type_order_type_enum record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (ord_type record) ++
+      encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_int_64_null record) ++
-      encode_uint 8 (me_acceptance_time_utc_timestamp record) ++
+      encode_uint 8 (orig_cl_ord_i_d_optional record) ++
+      encode_uint 8 (me_acceptance_time record) ++
       encode_uint 4 (exchange_code record) ++
       encode_uint 1 (cancel_reason record) ++
-      encode_uint 8 (cross_i_d_int_64_null record) ++
+      encode_uint 8 (cross_i_d_optional record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2361,22 +2361,22 @@ Module IceFuturesBgwV70.
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (symbol_int_32_value, bytes) =>
+                  | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (ord_type_order_type_enum_value, bytes) =>
+                      | Some (ord_type_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
-                          | Some (side_side_enum_value, bytes) =>
+                          | Some (side_value, bytes) =>
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
                                   match decode_uint 8 bytes with
                                   | None => None
-                                  | Some (orig_cl_ord_i_d_int_64_null_value, bytes) =>
+                                  | Some (orig_cl_ord_i_d_optional_value, bytes) =>
                                       match decode_uint 8 bytes with
                                       | None => None
-                                      | Some (me_acceptance_time_utc_timestamp_value, bytes) =>
+                                      | Some (me_acceptance_time_value, bytes) =>
                                           match decode_uint 4 bytes with
                                           | None => None
                                           | Some (exchange_code_value, bytes) =>
@@ -2385,11 +2385,11 @@ Module IceFuturesBgwV70.
                                               | Some (cancel_reason_value, bytes) =>
                                                   match decode_uint 8 bytes with
                                                   | None => None
-                                                  | Some (cross_i_d_int_64_null_value, bytes) =>
+                                                  | Some (cross_i_d_optional_value, bytes) =>
                                                       match decode_bytes 100 bytes with
                                                       | None => None
                                                       | Some (text_value, bytes) =>
-                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol_int_32 := symbol_int_32_value; ord_type_order_type_enum := ord_type_order_type_enum_value; side_side_enum := side_side_enum_value; orig_order_id := orig_order_id_value; orig_cl_ord_i_d_int_64_null := orig_cl_ord_i_d_int_64_null_value; me_acceptance_time_utc_timestamp := me_acceptance_time_utc_timestamp_value; exchange_code := exchange_code_value; cancel_reason := cancel_reason_value; cross_i_d_int_64_null := cross_i_d_int_64_null_value; text := text_value |}, bytes)
+                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; ord_type := ord_type_value; side := side_value; orig_order_id := orig_order_id_value; orig_cl_ord_i_d_optional := orig_cl_ord_i_d_optional_value; me_acceptance_time := me_acceptance_time_value; exchange_code := exchange_code_value; cancel_reason := cancel_reason_value; cross_i_d_optional := cross_i_d_optional_value; text := text_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -2445,11 +2445,11 @@ Module IceFuturesBgwV70.
       originator_user_id : list byte;
       exec_i_d_order_exec_id : ExecIDOrderExecId.t;
       cl_ord_id : N;
-      symbol_int_32 : N;
-      ord_type_order_type_enum_null : N;
-      side_side_enum : N;
+      symbol : N;
+      ord_type_optional : N;
+      side : N;
       orig_order_id : OrigOrderId.t;
-      orig_cl_ord_i_d_int_64_null : N;
+      orig_cl_ord_i_d_optional : N;
       order_status : N;
       reject_response_to : N;
       reject_reason : N;
@@ -2463,11 +2463,11 @@ Module IceFuturesBgwV70.
       Datatypes.length (originator_user_id record) = 20 /\
       ExecIDOrderExecId.bounded (exec_i_d_order_exec_id record) /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (ord_type_order_type_enum_null record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (ord_type_optional record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       OrigOrderId.bounded (orig_order_id record) /\
-      (orig_cl_ord_i_d_int_64_null record < 256 ^ N.of_nat 8)%N /\
+      (orig_cl_ord_i_d_optional record < 256 ^ N.of_nat 8)%N /\
       (order_status record < 256 ^ N.of_nat 1)%N /\
       (reject_response_to record < 256 ^ N.of_nat 1)%N /\
       (reject_reason record < 256 ^ N.of_nat 1)%N /\
@@ -2479,11 +2479,11 @@ Module IceFuturesBgwV70.
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (ord_type_order_type_enum_null record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (ord_type_optional record) ++
+      encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_int_64_null record) ++
+      encode_uint 8 (orig_cl_ord_i_d_optional record) ++
       encode_uint 1 (order_status record) ++
       encode_uint 1 (reject_response_to record) ++
       encode_uint 1 (reject_reason record) ++
@@ -2503,19 +2503,19 @@ Module IceFuturesBgwV70.
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (symbol_int_32_value, bytes) =>
+                  | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (ord_type_order_type_enum_null_value, bytes) =>
+                      | Some (ord_type_optional_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
-                          | Some (side_side_enum_value, bytes) =>
+                          | Some (side_value, bytes) =>
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
                                   match decode_uint 8 bytes with
                                   | None => None
-                                  | Some (orig_cl_ord_i_d_int_64_null_value, bytes) =>
+                                  | Some (orig_cl_ord_i_d_optional_value, bytes) =>
                                       match decode_uint 1 bytes with
                                       | None => None
                                       | Some (order_status_value, bytes) =>
@@ -2534,7 +2534,7 @@ Module IceFuturesBgwV70.
                                                           match decode_bytes 100 bytes with
                                                           | None => None
                                                           | Some (text_value, bytes) =>
-                                                              Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol_int_32 := symbol_int_32_value; ord_type_order_type_enum_null := ord_type_order_type_enum_null_value; side_side_enum := side_side_enum_value; orig_order_id := orig_order_id_value; orig_cl_ord_i_d_int_64_null := orig_cl_ord_i_d_int_64_null_value; order_status := order_status_value; reject_response_to := reject_response_to_value; reject_reason := reject_reason_value; exchange_code := exchange_code_value; memo := memo_value; text := text_value |}, bytes)
+                                                              Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; ord_type_optional := ord_type_optional_value; side := side_value; orig_order_id := orig_order_id_value; orig_cl_ord_i_d_optional := orig_cl_ord_i_d_optional_value; order_status := order_status_value; reject_response_to := reject_response_to_value; reject_reason := reject_reason_value; exchange_code := exchange_code_value; memo := memo_value; text := text_value |}, bytes)
                                                           end
                                                       end
                                                   end
@@ -2592,22 +2592,22 @@ Module IceFuturesBgwV70.
       originator_user_id : list byte;
       exec_i_d_order_exec_id : ExecIDOrderExecId.t;
       cl_ord_id : N;
-      symbol_int_32 : N;
-      ord_type_order_type_enum : N;
-      side_side_enum : N;
+      symbol : N;
+      ord_type : N;
+      side : N;
       orig_order_id : OrigOrderId.t;
       max_show : N;
       leaves_qty : N;
       cum_qty : N;
-      price_decimal_9_null : N;
+      price_optional : N;
       stop_px : N;
       expire_date : N;
       time_priority : N;
-      time_in_force_time_in_force_enum : N;
+      time_in_force : N;
       order_status : N;
       order_state : N;
       give_up_clearing_firm : N;
-      clearing_firm_int_32_null : N;
+      clearing_firm_optional : N;
       direct_electronic_access : N;
       trading_capacity : N;
       liquidity_provision : N;
@@ -2623,13 +2623,13 @@ Module IceFuturesBgwV70.
       cust_order_handling_inst : list byte;
       position_effect : list byte;
       alloc_handl_inst : list byte;
-      clearing_account_string_14_null : list byte;
+      clearing_account_optional : list byte;
       customer_account_ref_id : list byte;
       memo : list byte;
       allocation_account : list byte;
       on_behalf_of_comp_id : list byte;
-      on_behalf_of_sub_i_d_string_41_null : list byte;
-      on_behalf_of_location_i_d_string_41_null : list byte;
+      on_behalf_of_sub_i_d_optional : list byte;
+      on_behalf_of_location_i_d_optional : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2637,22 +2637,22 @@ Module IceFuturesBgwV70.
       Datatypes.length (originator_user_id record) = 20 /\
       ExecIDOrderExecId.bounded (exec_i_d_order_exec_id record) /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (ord_type_order_type_enum record < 256 ^ N.of_nat 1)%N /\
-      (side_side_enum record < 256 ^ N.of_nat 1)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (ord_type record < 256 ^ N.of_nat 1)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
       OrigOrderId.bounded (orig_order_id record) /\
       (max_show record < 256 ^ N.of_nat 8)%N /\
       (leaves_qty record < 256 ^ N.of_nat 8)%N /\
       (cum_qty record < 256 ^ N.of_nat 8)%N /\
-      (price_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
+      (price_optional record < 256 ^ N.of_nat 8)%N /\
       (stop_px record < 256 ^ N.of_nat 8)%N /\
       (expire_date record < 256 ^ N.of_nat 2)%N /\
       (time_priority record < 256 ^ N.of_nat 8)%N /\
-      (time_in_force_time_in_force_enum record < 256 ^ N.of_nat 1)%N /\
+      (time_in_force record < 256 ^ N.of_nat 1)%N /\
       (order_status record < 256 ^ N.of_nat 1)%N /\
       (order_state record < 256 ^ N.of_nat 1)%N /\
       (give_up_clearing_firm record < 256 ^ N.of_nat 4)%N /\
-      (clearing_firm_int_32_null record < 256 ^ N.of_nat 4)%N /\
+      (clearing_firm_optional record < 256 ^ N.of_nat 4)%N /\
       (direct_electronic_access record < 256 ^ N.of_nat 1)%N /\
       (trading_capacity record < 256 ^ N.of_nat 1)%N /\
       (liquidity_provision record < 256 ^ N.of_nat 1)%N /\
@@ -2668,34 +2668,34 @@ Module IceFuturesBgwV70.
       Datatypes.length (cust_order_handling_inst record) = 1 /\
       Datatypes.length (position_effect record) = 1 /\
       Datatypes.length (alloc_handl_inst record) = 1 /\
-      Datatypes.length (clearing_account_string_14_null record) = 14 /\
+      Datatypes.length (clearing_account_optional record) = 14 /\
       Datatypes.length (customer_account_ref_id record) = 12 /\
       Datatypes.length (memo record) = 30 /\
       Datatypes.length (allocation_account record) = 20 /\
       Datatypes.length (on_behalf_of_comp_id record) = 41 /\
-      Datatypes.length (on_behalf_of_sub_i_d_string_41_null record) = 41 /\
-      Datatypes.length (on_behalf_of_location_i_d_string_41_null record) = 41.
+      Datatypes.length (on_behalf_of_sub_i_d_optional record) = 41 /\
+      Datatypes.length (on_behalf_of_location_i_d_optional record) = 41.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 1 (ord_type_order_type_enum record) ++
-      encode_uint 1 (side_side_enum record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 1 (ord_type record) ++
+      encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
       encode_uint 8 (max_show record) ++
       encode_uint 8 (leaves_qty record) ++
       encode_uint 8 (cum_qty record) ++
-      encode_uint 8 (price_decimal_9_null record) ++
+      encode_uint 8 (price_optional record) ++
       encode_uint 8 (stop_px record) ++
       encode_uint 2 (expire_date record) ++
       encode_uint 8 (time_priority record) ++
-      encode_uint 1 (time_in_force_time_in_force_enum record) ++
+      encode_uint 1 (time_in_force record) ++
       encode_uint 1 (order_status record) ++
       encode_uint 1 (order_state record) ++
       encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm_int_32_null record) ++
+      encode_uint 4 (clearing_firm_optional record) ++
       encode_uint 1 (direct_electronic_access record) ++
       encode_uint 1 (trading_capacity record) ++
       encode_uint 1 (liquidity_provision record) ++
@@ -2711,13 +2711,13 @@ Module IceFuturesBgwV70.
       encode_bytes 1 (cust_order_handling_inst record) ++
       encode_bytes 1 (position_effect record) ++
       encode_bytes 1 (alloc_handl_inst record) ++
-      encode_bytes 14 (clearing_account_string_14_null record) ++
+      encode_bytes 14 (clearing_account_optional record) ++
       encode_bytes 12 (customer_account_ref_id record) ++
       encode_bytes 30 (memo record) ++
       encode_bytes 20 (allocation_account record) ++
       encode_bytes 41 (on_behalf_of_comp_id record) ++
-      encode_bytes 41 (on_behalf_of_sub_i_d_string_41_null record) ++
-      encode_bytes 41 (on_behalf_of_location_i_d_string_41_null record).
+      encode_bytes 41 (on_behalf_of_sub_i_d_optional record) ++
+      encode_bytes 41 (on_behalf_of_location_i_d_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
@@ -2731,13 +2731,13 @@ Module IceFuturesBgwV70.
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (symbol_int_32_value, bytes) =>
+                  | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
-                      | Some (ord_type_order_type_enum_value, bytes) =>
+                      | Some (ord_type_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
-                          | Some (side_side_enum_value, bytes) =>
+                          | Some (side_value, bytes) =>
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
@@ -2752,7 +2752,7 @@ Module IceFuturesBgwV70.
                                           | Some (cum_qty_value, bytes) =>
                                               match decode_uint 8 bytes with
                                               | None => None
-                                              | Some (price_decimal_9_null_value, bytes) =>
+                                              | Some (price_optional_value, bytes) =>
                                                   match decode_uint 8 bytes with
                                                   | None => None
                                                   | Some (stop_px_value, bytes) =>
@@ -2764,7 +2764,7 @@ Module IceFuturesBgwV70.
                                                           | Some (time_priority_value, bytes) =>
                                                               match decode_uint 1 bytes with
                                                               | None => None
-                                                              | Some (time_in_force_time_in_force_enum_value, bytes) =>
+                                                              | Some (time_in_force_value, bytes) =>
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (order_status_value, bytes) =>
@@ -2776,7 +2776,7 @@ Module IceFuturesBgwV70.
                                                                           | Some (give_up_clearing_firm_value, bytes) =>
                                                                               match decode_uint 4 bytes with
                                                                               | None => None
-                                                                              | Some (clearing_firm_int_32_null_value, bytes) =>
+                                                                              | Some (clearing_firm_optional_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (direct_electronic_access_value, bytes) =>
@@ -2824,7 +2824,7 @@ Module IceFuturesBgwV70.
                                                                                                                                           | Some (alloc_handl_inst_value, bytes) =>
                                                                                                                                               match decode_bytes 14 bytes with
                                                                                                                                               | None => None
-                                                                                                                                              | Some (clearing_account_string_14_null_value, bytes) =>
+                                                                                                                                              | Some (clearing_account_optional_value, bytes) =>
                                                                                                                                                   match decode_bytes 12 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (customer_account_ref_id_value, bytes) =>
@@ -2839,11 +2839,11 @@ Module IceFuturesBgwV70.
                                                                                                                                                               | Some (on_behalf_of_comp_id_value, bytes) =>
                                                                                                                                                                   match decode_bytes 41 bytes with
                                                                                                                                                                   | None => None
-                                                                                                                                                                  | Some (on_behalf_of_sub_i_d_string_41_null_value, bytes) =>
+                                                                                                                                                                  | Some (on_behalf_of_sub_i_d_optional_value, bytes) =>
                                                                                                                                                                       match decode_bytes 41 bytes with
                                                                                                                                                                       | None => None
-                                                                                                                                                                      | Some (on_behalf_of_location_i_d_string_41_null_value, bytes) =>
-                                                                                                                                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol_int_32 := symbol_int_32_value; ord_type_order_type_enum := ord_type_order_type_enum_value; side_side_enum := side_side_enum_value; orig_order_id := orig_order_id_value; max_show := max_show_value; leaves_qty := leaves_qty_value; cum_qty := cum_qty_value; price_decimal_9_null := price_decimal_9_null_value; stop_px := stop_px_value; expire_date := expire_date_value; time_priority := time_priority_value; time_in_force_time_in_force_enum := time_in_force_time_in_force_enum_value; order_status := order_status_value; order_state := order_state_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm_int_32_null := clearing_firm_int_32_null_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; self_match_prevention_id := self_match_prevention_id_value; self_match_prevention_instruction := self_match_prevention_instruction_value; manual_order_indicator := manual_order_indicator_value; exec_inst := exec_inst_value; cust_order_handling_inst := cust_order_handling_inst_value; position_effect := position_effect_value; alloc_handl_inst := alloc_handl_inst_value; clearing_account_string_14_null := clearing_account_string_14_null_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_i_d_string_41_null := on_behalf_of_sub_i_d_string_41_null_value; on_behalf_of_location_i_d_string_41_null := on_behalf_of_location_i_d_string_41_null_value |}, bytes)
+                                                                                                                                                                      | Some (on_behalf_of_location_i_d_optional_value, bytes) =>
+                                                                                                                                                                          Some ({| originator_user_id := originator_user_id_value; exec_i_d_order_exec_id := exec_i_d_order_exec_id_value; cl_ord_id := cl_ord_id_value; symbol := symbol_value; ord_type := ord_type_value; side := side_value; orig_order_id := orig_order_id_value; max_show := max_show_value; leaves_qty := leaves_qty_value; cum_qty := cum_qty_value; price_optional := price_optional_value; stop_px := stop_px_value; expire_date := expire_date_value; time_priority := time_priority_value; time_in_force := time_in_force_value; order_status := order_status_value; order_state := order_state_value; give_up_clearing_firm := give_up_clearing_firm_value; clearing_firm_optional := clearing_firm_optional_value; direct_electronic_access := direct_electronic_access_value; trading_capacity := trading_capacity_value; liquidity_provision := liquidity_provision_value; commodity_deriv_indicator := commodity_deriv_indicator_value; investment_decision := investment_decision_value; execution_decision := execution_decision_value; client_id_code := client_id_code_value; mifid_id := mifid_id_value; self_match_prevention_id := self_match_prevention_id_value; self_match_prevention_instruction := self_match_prevention_instruction_value; manual_order_indicator := manual_order_indicator_value; exec_inst := exec_inst_value; cust_order_handling_inst := cust_order_handling_inst_value; position_effect := position_effect_value; alloc_handl_inst := alloc_handl_inst_value; clearing_account_optional := clearing_account_optional_value; customer_account_ref_id := customer_account_ref_id_value; memo := memo_value; allocation_account := allocation_account_value; on_behalf_of_comp_id := on_behalf_of_comp_id_value; on_behalf_of_sub_i_d_optional := on_behalf_of_sub_i_d_optional_value; on_behalf_of_location_i_d_optional := on_behalf_of_location_i_d_optional_value |}, bytes)
                                                                                                                                                                       end
                                                                                                                                                                   end
                                                                                                                                                               end
@@ -2953,12 +2953,12 @@ Module IceFuturesBgwV70.
     (** QuoteReportMessage *)
     Record t := {
       originator_user_id : list byte;
-      side_side_enum_null : N;
-      symbol_int_32 : N;
+      side_optional : N;
+      symbol : N;
       rfq_req_id : N;
       rfq_system_id : N;
-      transact_time_utc_timestamp : N;
-      order_qty_decimal_9_null : N;
+      transact_time : N;
+      order_qty_optional : N;
       quote_ack_status : N;
       quote_reject_reason : N;
     }.
@@ -2966,23 +2966,23 @@ Module IceFuturesBgwV70.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (originator_user_id record) = 20 /\
-      (side_side_enum_null record < 256 ^ N.of_nat 1)%N /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
+      (side_optional record < 256 ^ N.of_nat 1)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
       (rfq_req_id record < 256 ^ N.of_nat 8)%N /\
       (rfq_system_id record < 256 ^ N.of_nat 8)%N /\
-      (transact_time_utc_timestamp record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_decimal_9_null record < 256 ^ N.of_nat 8)%N /\
+      (transact_time record < 256 ^ N.of_nat 8)%N /\
+      (order_qty_optional record < 256 ^ N.of_nat 8)%N /\
       (quote_ack_status record < 256 ^ N.of_nat 2)%N /\
       (quote_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 1 (side_side_enum_null record) ++
-      encode_uint 4 (symbol_int_32 record) ++
+      encode_uint 1 (side_optional record) ++
+      encode_uint 4 (symbol record) ++
       encode_uint 8 (rfq_req_id record) ++
       encode_uint 8 (rfq_system_id record) ++
-      encode_uint 8 (transact_time_utc_timestamp record) ++
-      encode_uint 8 (order_qty_decimal_9_null record) ++
+      encode_uint 8 (transact_time record) ++
+      encode_uint 8 (order_qty_optional record) ++
       encode_uint 2 (quote_ack_status record) ++
       encode_uint 1 (quote_reject_reason record).
 
@@ -2992,10 +2992,10 @@ Module IceFuturesBgwV70.
       | Some (originator_user_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (side_side_enum_null_value, bytes) =>
+          | Some (side_optional_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (symbol_int_32_value, bytes) =>
+              | Some (symbol_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (rfq_req_id_value, bytes) =>
@@ -3004,17 +3004,17 @@ Module IceFuturesBgwV70.
                       | Some (rfq_system_id_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
-                          | Some (transact_time_utc_timestamp_value, bytes) =>
+                          | Some (transact_time_value, bytes) =>
                               match decode_uint 8 bytes with
                               | None => None
-                              | Some (order_qty_decimal_9_null_value, bytes) =>
+                              | Some (order_qty_optional_value, bytes) =>
                                   match decode_uint 2 bytes with
                                   | None => None
                                   | Some (quote_ack_status_value, bytes) =>
                                       match decode_uint 1 bytes with
                                       | None => None
                                       | Some (quote_reject_reason_value, bytes) =>
-                                          Some ({| originator_user_id := originator_user_id_value; side_side_enum_null := side_side_enum_null_value; symbol_int_32 := symbol_int_32_value; rfq_req_id := rfq_req_id_value; rfq_system_id := rfq_system_id_value; transact_time_utc_timestamp := transact_time_utc_timestamp_value; order_qty_decimal_9_null := order_qty_decimal_9_null_value; quote_ack_status := quote_ack_status_value; quote_reject_reason := quote_reject_reason_value |}, bytes)
+                                          Some ({| originator_user_id := originator_user_id_value; side_optional := side_optional_value; symbol := symbol_value; rfq_req_id := rfq_req_id_value; rfq_system_id := rfq_system_id_value; transact_time := transact_time_value; order_qty_optional := order_qty_optional_value; quote_ack_status := quote_ack_status_value; quote_reject_reason := quote_reject_reason_value |}, bytes)
                                       end
                                   end
                               end
@@ -3060,9 +3060,9 @@ Module IceFuturesBgwV70.
     (** NewOrderCrossReportMessage *)
     Record t := {
       originator_user_id : list byte;
-      symbol_int_32 : N;
-      cross_i_d_int_64 : N;
-      transact_time_utc_timestamp : N;
+      symbol : N;
+      cross_id : N;
+      transact_time : N;
       rfc_status : N;
       exchange_code : N;
       text : list byte;
@@ -3071,18 +3071,18 @@ Module IceFuturesBgwV70.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (originator_user_id record) = 20 /\
-      (symbol_int_32 record < 256 ^ N.of_nat 4)%N /\
-      (cross_i_d_int_64 record < 256 ^ N.of_nat 8)%N /\
-      (transact_time_utc_timestamp record < 256 ^ N.of_nat 8)%N /\
+      (symbol record < 256 ^ N.of_nat 4)%N /\
+      (cross_id record < 256 ^ N.of_nat 8)%N /\
+      (transact_time record < 256 ^ N.of_nat 8)%N /\
       (rfc_status record < 256 ^ N.of_nat 1)%N /\
       (exchange_code record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (text record) = 100.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (symbol_int_32 record) ++
-      encode_uint 8 (cross_i_d_int_64 record) ++
-      encode_uint 8 (transact_time_utc_timestamp record) ++
+      encode_uint 4 (symbol record) ++
+      encode_uint 8 (cross_id record) ++
+      encode_uint 8 (transact_time record) ++
       encode_uint 1 (rfc_status record) ++
       encode_uint 4 (exchange_code record) ++
       encode_bytes 100 (text record).
@@ -3093,13 +3093,13 @@ Module IceFuturesBgwV70.
       | Some (originator_user_id_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (symbol_int_32_value, bytes) =>
+          | Some (symbol_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (cross_i_d_int_64_value, bytes) =>
+              | Some (cross_id_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (transact_time_utc_timestamp_value, bytes) =>
+                  | Some (transact_time_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (rfc_status_value, bytes) =>
@@ -3109,7 +3109,7 @@ Module IceFuturesBgwV70.
                               match decode_bytes 100 bytes with
                               | None => None
                               | Some (text_value, bytes) =>
-                                  Some ({| originator_user_id := originator_user_id_value; symbol_int_32 := symbol_int_32_value; cross_i_d_int_64 := cross_i_d_int_64_value; transact_time_utc_timestamp := transact_time_utc_timestamp_value; rfc_status := rfc_status_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
+                                  Some ({| originator_user_id := originator_user_id_value; symbol := symbol_value; cross_id := cross_id_value; transact_time := transact_time_value; rfc_status := rfc_status_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
                               end
                           end
                       end
@@ -3151,10 +3151,10 @@ Module IceFuturesBgwV70.
     (** OrderMassCancelReportMessage *)
     Record t := {
       originator_user_id : list byte;
-      symbol_int_32_null : N;
+      symbol_optional : N;
       cl_ord_id : N;
-      transact_time_utc_timestamp : N;
-      market_type_i_d_int_32_null : N;
+      transact_time : N;
+      market_type_i_d_optional : N;
       mass_cancel_request_type : N;
       mass_cancel_response : N;
       mass_cancel_reject_reason : N;
@@ -3165,10 +3165,10 @@ Module IceFuturesBgwV70.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (originator_user_id record) = 20 /\
-      (symbol_int_32_null record < 256 ^ N.of_nat 4)%N /\
+      (symbol_optional record < 256 ^ N.of_nat 4)%N /\
       (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
-      (transact_time_utc_timestamp record < 256 ^ N.of_nat 8)%N /\
-      (market_type_i_d_int_32_null record < 256 ^ N.of_nat 4)%N /\
+      (transact_time record < 256 ^ N.of_nat 8)%N /\
+      (market_type_i_d_optional record < 256 ^ N.of_nat 4)%N /\
       (mass_cancel_request_type record < 256 ^ N.of_nat 1)%N /\
       (mass_cancel_response record < 256 ^ N.of_nat 1)%N /\
       (mass_cancel_reject_reason record < 256 ^ N.of_nat 1)%N /\
@@ -3177,10 +3177,10 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (symbol_int_32_null record) ++
+      encode_uint 4 (symbol_optional record) ++
       encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (transact_time_utc_timestamp record) ++
-      encode_uint 4 (market_type_i_d_int_32_null record) ++
+      encode_uint 8 (transact_time record) ++
+      encode_uint 4 (market_type_i_d_optional record) ++
       encode_uint 1 (mass_cancel_request_type record) ++
       encode_uint 1 (mass_cancel_response record) ++
       encode_uint 1 (mass_cancel_reject_reason record) ++
@@ -3193,16 +3193,16 @@ Module IceFuturesBgwV70.
       | Some (originator_user_id_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (symbol_int_32_null_value, bytes) =>
+          | Some (symbol_optional_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (transact_time_utc_timestamp_value, bytes) =>
+                  | Some (transact_time_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
-                      | Some (market_type_i_d_int_32_null_value, bytes) =>
+                      | Some (market_type_i_d_optional_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (mass_cancel_request_type_value, bytes) =>
@@ -3218,7 +3218,7 @@ Module IceFuturesBgwV70.
                                           match decode_bytes 100 bytes with
                                           | None => None
                                           | Some (text_value, bytes) =>
-                                              Some ({| originator_user_id := originator_user_id_value; symbol_int_32_null := symbol_int_32_null_value; cl_ord_id := cl_ord_id_value; transact_time_utc_timestamp := transact_time_utc_timestamp_value; market_type_i_d_int_32_null := market_type_i_d_int_32_null_value; mass_cancel_request_type := mass_cancel_request_type_value; mass_cancel_response := mass_cancel_response_value; mass_cancel_reject_reason := mass_cancel_reject_reason_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
+                                              Some ({| originator_user_id := originator_user_id_value; symbol_optional := symbol_optional_value; cl_ord_id := cl_ord_id_value; transact_time := transact_time_value; market_type_i_d_optional := market_type_i_d_optional_value; mass_cancel_request_type := mass_cancel_request_type_value; mass_cancel_response := mass_cancel_response_value; mass_cancel_reject_reason := mass_cancel_reject_reason_value; exchange_code := exchange_code_value; text := text_value |}, bytes)
                                           end
                                       end
                                   end

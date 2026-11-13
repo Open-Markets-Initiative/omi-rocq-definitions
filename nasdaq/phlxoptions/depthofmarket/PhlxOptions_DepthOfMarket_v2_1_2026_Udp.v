@@ -425,7 +425,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       order_capacity : list byte;
       price_short : N;
       volume_short : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -438,7 +438,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       Datatypes.length (order_capacity record) = 1 /\
       (price_short record < 256 ^ N.of_nat 2)%N /\
       (volume_short record < 256 ^ N.of_nat 2)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
@@ -449,7 +449,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       encode_bytes 1 (order_capacity record) ++
       encode_uint 2 (price_short record) ++
       encode_uint 2 (volume_short record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -476,7 +476,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
                                   match decode_uint 2 bytes with
                                   | None => None
                                   | Some (volume_short_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (reserved_4_value, bytes) =>
                                           Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; instrument_id := instrument_id_value; order_reference_number := order_reference_number_value; side := side_value; order_capacity := order_capacity_value; price_short := price_short_value; volume_short := volume_short_value; reserved_4 := reserved_4_value |}, bytes)
@@ -511,7 +511,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -532,7 +532,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       order_capacity : list byte;
       price_long : N;
       volume_long : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -545,7 +545,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       Datatypes.length (order_capacity record) = 1 /\
       (price_long record < 256 ^ N.of_nat 4)%N /\
       (volume_long record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
@@ -556,7 +556,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       encode_bytes 1 (order_capacity record) ++
       encode_uint 4 (price_long record) ++
       encode_uint 4 (volume_long record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -583,7 +583,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
                                   match decode_uint 4 bytes with
                                   | None => None
                                   | Some (volume_long_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (reserved_4_value, bytes) =>
                                           Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; instrument_id := instrument_id_value; order_reference_number := order_reference_number_value; side := side_value; order_capacity := order_capacity_value; price_long := price_long_value; volume_long := volume_long_value; reserved_4 := reserved_4_value |}, bytes)
@@ -618,7 +618,7 @@ Module PhlxOptionsDepthOfMarketV212026Udp.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 

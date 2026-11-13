@@ -227,177 +227,177 @@ Module PsxEquitiesDropV22Server.
 
     (** New order accepted. *)
     Record t := {
-      separator_1 : N;
+      separator_1 : list byte;
       source : list byte;
-      separator_2 : N;
+      separator_2 : list byte;
       user : list byte;
-      separator_3 : N;
+      separator_3 : list byte;
       token : list byte;
-      separator_4 : N;
+      separator_4 : list byte;
       replaced_token : list byte;
-      separator_5 : N;
+      separator_5 : list byte;
       buy_sell : list byte;
-      separator_6 : N;
+      separator_6 : list byte;
       shares : list byte;
-      separator_7 : N;
+      separator_7 : list byte;
       stock : list byte;
-      separator_8 : N;
+      separator_8 : list byte;
       price : list byte;
-      separator_9 : N;
+      separator_9 : list byte;
       firm : list byte;
-      separator_10 : N;
+      separator_10 : list byte;
       reference : list byte;
-      separator_11 : N;
+      separator_11 : list byte;
       match_number : list byte;
-      separator_12 : N;
+      separator_12 : list byte;
       capacity : list byte;
-      separator_13 : N;
+      separator_13 : list byte;
       liquidity_code : list byte;
-      separator_14 : N;
+      separator_14 : list byte;
       clearing_code : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (separator_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_1 record) = 1 /\
       Datatypes.length (source record) = 6 /\
-      (separator_2 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_2 record) = 1 /\
       Datatypes.length (user record) = 4 /\
-      (separator_3 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_3 record) = 1 /\
       Datatypes.length (token record) = 10 /\
-      (separator_4 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_4 record) = 1 /\
       Datatypes.length (replaced_token record) = 10 /\
-      (separator_5 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_5 record) = 1 /\
       Datatypes.length (buy_sell record) = 1 /\
-      (separator_6 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_6 record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      (separator_7 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_7 record) = 1 /\
       Datatypes.length (stock record) = 8 /\
-      (separator_8 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_8 record) = 1 /\
       Datatypes.length (price record) = 11 /\
-      (separator_9 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_9 record) = 1 /\
       Datatypes.length (firm record) = 4 /\
-      (separator_10 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_10 record) = 1 /\
       Datatypes.length (reference record) = 12 /\
-      (separator_11 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_11 record) = 1 /\
       Datatypes.length (match_number record) = 12 /\
-      (separator_12 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_12 record) = 1 /\
       Datatypes.length (capacity record) = 1 /\
-      (separator_13 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_13 record) = 1 /\
       Datatypes.length (liquidity_code record) = 1 /\
-      (separator_14 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_14 record) = 1 /\
       Datatypes.length (clearing_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (separator_1 record) ++
+      encode_bytes 1 (separator_1 record) ++
       encode_bytes 6 (source record) ++
-      encode_uint 1 (separator_2 record) ++
+      encode_bytes 1 (separator_2 record) ++
       encode_bytes 4 (user record) ++
-      encode_uint 1 (separator_3 record) ++
+      encode_bytes 1 (separator_3 record) ++
       encode_bytes 10 (token record) ++
-      encode_uint 1 (separator_4 record) ++
+      encode_bytes 1 (separator_4 record) ++
       encode_bytes 10 (replaced_token record) ++
-      encode_uint 1 (separator_5 record) ++
+      encode_bytes 1 (separator_5 record) ++
       encode_bytes 1 (buy_sell record) ++
-      encode_uint 1 (separator_6 record) ++
+      encode_bytes 1 (separator_6 record) ++
       encode_bytes 6 (shares record) ++
-      encode_uint 1 (separator_7 record) ++
+      encode_bytes 1 (separator_7 record) ++
       encode_bytes 8 (stock record) ++
-      encode_uint 1 (separator_8 record) ++
+      encode_bytes 1 (separator_8 record) ++
       encode_bytes 11 (price record) ++
-      encode_uint 1 (separator_9 record) ++
+      encode_bytes 1 (separator_9 record) ++
       encode_bytes 4 (firm record) ++
-      encode_uint 1 (separator_10 record) ++
+      encode_bytes 1 (separator_10 record) ++
       encode_bytes 12 (reference record) ++
-      encode_uint 1 (separator_11 record) ++
+      encode_bytes 1 (separator_11 record) ++
       encode_bytes 12 (match_number record) ++
-      encode_uint 1 (separator_12 record) ++
+      encode_bytes 1 (separator_12 record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 1 (separator_13 record) ++
+      encode_bytes 1 (separator_13 record) ++
       encode_bytes 1 (liquidity_code record) ++
-      encode_uint 1 (separator_14 record) ++
+      encode_bytes 1 (separator_14 record) ++
       encode_bytes 1 (clearing_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (separator_1_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (source_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (separator_2_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (user_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (separator_3_value, bytes) =>
                           match decode_bytes 10 bytes with
                           | None => None
                           | Some (token_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (separator_4_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (replaced_token_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (separator_5_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (buy_sell_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (separator_6_value, bytes) =>
                                                   match decode_bytes 6 bytes with
                                                   | None => None
                                                   | Some (shares_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (separator_7_value, bytes) =>
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (stock_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (separator_8_value, bytes) =>
                                                                   match decode_bytes 11 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (separator_9_value, bytes) =>
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (firm_value, bytes) =>
-                                                                              match decode_uint 1 bytes with
+                                                                              match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (separator_10_value, bytes) =>
                                                                                   match decode_bytes 12 bytes with
                                                                                   | None => None
                                                                                   | Some (reference_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (separator_11_value, bytes) =>
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (match_number_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (separator_12_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (capacity_value, bytes) =>
-                                                                                                      match decode_uint 1 bytes with
+                                                                                                      match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (separator_13_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
                                                                                                           | None => None
                                                                                                           | Some (liquidity_code_value, bytes) =>
-                                                                                                              match decode_uint 1 bytes with
+                                                                                                              match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (separator_14_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -436,7 +436,7 @@ Module PsxEquitiesDropV22Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -446,33 +446,33 @@ Module PsxEquitiesDropV22Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       destruct record. reflexivity.
     Qed.
@@ -486,177 +486,177 @@ Module PsxEquitiesDropV22Server.
 
     (** Existing order executed. *)
     Record t := {
-      separator_1 : N;
+      separator_1 : list byte;
       source : list byte;
-      separator_2 : N;
+      separator_2 : list byte;
       user : list byte;
-      separator_3 : N;
+      separator_3 : list byte;
       token : list byte;
-      separator_4 : N;
+      separator_4 : list byte;
       replaced_token : list byte;
-      separator_5 : N;
+      separator_5 : list byte;
       buy_sell : list byte;
-      separator_6 : N;
+      separator_6 : list byte;
       shares : list byte;
-      separator_7 : N;
+      separator_7 : list byte;
       stock : list byte;
-      separator_8 : N;
+      separator_8 : list byte;
       price : list byte;
-      separator_9 : N;
+      separator_9 : list byte;
       firm : list byte;
-      separator_10 : N;
+      separator_10 : list byte;
       reference : list byte;
-      separator_11 : N;
+      separator_11 : list byte;
       match_number : list byte;
-      separator_12 : N;
+      separator_12 : list byte;
       capacity : list byte;
-      separator_13 : N;
+      separator_13 : list byte;
       liquidity_code : list byte;
-      separator_14 : N;
+      separator_14 : list byte;
       clearing_code : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (separator_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_1 record) = 1 /\
       Datatypes.length (source record) = 6 /\
-      (separator_2 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_2 record) = 1 /\
       Datatypes.length (user record) = 4 /\
-      (separator_3 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_3 record) = 1 /\
       Datatypes.length (token record) = 10 /\
-      (separator_4 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_4 record) = 1 /\
       Datatypes.length (replaced_token record) = 10 /\
-      (separator_5 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_5 record) = 1 /\
       Datatypes.length (buy_sell record) = 1 /\
-      (separator_6 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_6 record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      (separator_7 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_7 record) = 1 /\
       Datatypes.length (stock record) = 8 /\
-      (separator_8 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_8 record) = 1 /\
       Datatypes.length (price record) = 11 /\
-      (separator_9 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_9 record) = 1 /\
       Datatypes.length (firm record) = 4 /\
-      (separator_10 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_10 record) = 1 /\
       Datatypes.length (reference record) = 12 /\
-      (separator_11 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_11 record) = 1 /\
       Datatypes.length (match_number record) = 12 /\
-      (separator_12 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_12 record) = 1 /\
       Datatypes.length (capacity record) = 1 /\
-      (separator_13 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_13 record) = 1 /\
       Datatypes.length (liquidity_code record) = 1 /\
-      (separator_14 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_14 record) = 1 /\
       Datatypes.length (clearing_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (separator_1 record) ++
+      encode_bytes 1 (separator_1 record) ++
       encode_bytes 6 (source record) ++
-      encode_uint 1 (separator_2 record) ++
+      encode_bytes 1 (separator_2 record) ++
       encode_bytes 4 (user record) ++
-      encode_uint 1 (separator_3 record) ++
+      encode_bytes 1 (separator_3 record) ++
       encode_bytes 10 (token record) ++
-      encode_uint 1 (separator_4 record) ++
+      encode_bytes 1 (separator_4 record) ++
       encode_bytes 10 (replaced_token record) ++
-      encode_uint 1 (separator_5 record) ++
+      encode_bytes 1 (separator_5 record) ++
       encode_bytes 1 (buy_sell record) ++
-      encode_uint 1 (separator_6 record) ++
+      encode_bytes 1 (separator_6 record) ++
       encode_bytes 6 (shares record) ++
-      encode_uint 1 (separator_7 record) ++
+      encode_bytes 1 (separator_7 record) ++
       encode_bytes 8 (stock record) ++
-      encode_uint 1 (separator_8 record) ++
+      encode_bytes 1 (separator_8 record) ++
       encode_bytes 11 (price record) ++
-      encode_uint 1 (separator_9 record) ++
+      encode_bytes 1 (separator_9 record) ++
       encode_bytes 4 (firm record) ++
-      encode_uint 1 (separator_10 record) ++
+      encode_bytes 1 (separator_10 record) ++
       encode_bytes 12 (reference record) ++
-      encode_uint 1 (separator_11 record) ++
+      encode_bytes 1 (separator_11 record) ++
       encode_bytes 12 (match_number record) ++
-      encode_uint 1 (separator_12 record) ++
+      encode_bytes 1 (separator_12 record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 1 (separator_13 record) ++
+      encode_bytes 1 (separator_13 record) ++
       encode_bytes 1 (liquidity_code record) ++
-      encode_uint 1 (separator_14 record) ++
+      encode_bytes 1 (separator_14 record) ++
       encode_bytes 1 (clearing_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (separator_1_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (source_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (separator_2_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (user_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (separator_3_value, bytes) =>
                           match decode_bytes 10 bytes with
                           | None => None
                           | Some (token_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (separator_4_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (replaced_token_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (separator_5_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (buy_sell_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (separator_6_value, bytes) =>
                                                   match decode_bytes 6 bytes with
                                                   | None => None
                                                   | Some (shares_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (separator_7_value, bytes) =>
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (stock_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (separator_8_value, bytes) =>
                                                                   match decode_bytes 11 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (separator_9_value, bytes) =>
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (firm_value, bytes) =>
-                                                                              match decode_uint 1 bytes with
+                                                                              match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (separator_10_value, bytes) =>
                                                                                   match decode_bytes 12 bytes with
                                                                                   | None => None
                                                                                   | Some (reference_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (separator_11_value, bytes) =>
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (match_number_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (separator_12_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (capacity_value, bytes) =>
-                                                                                                      match decode_uint 1 bytes with
+                                                                                                      match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (separator_13_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
                                                                                                           | None => None
                                                                                                           | Some (liquidity_code_value, bytes) =>
-                                                                                                              match decode_uint 1 bytes with
+                                                                                                              match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (separator_14_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -695,7 +695,7 @@ Module PsxEquitiesDropV22Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -705,33 +705,33 @@ Module PsxEquitiesDropV22Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       destruct record. reflexivity.
     Qed.
@@ -745,177 +745,177 @@ Module PsxEquitiesDropV22Server.
 
     (** Existing order canceled. *)
     Record t := {
-      separator_1 : N;
+      separator_1 : list byte;
       source : list byte;
-      separator_2 : N;
+      separator_2 : list byte;
       user : list byte;
-      separator_3 : N;
+      separator_3 : list byte;
       token : list byte;
-      separator_4 : N;
+      separator_4 : list byte;
       replaced_token : list byte;
-      separator_5 : N;
+      separator_5 : list byte;
       buy_sell : list byte;
-      separator_6 : N;
+      separator_6 : list byte;
       shares : list byte;
-      separator_7 : N;
+      separator_7 : list byte;
       stock : list byte;
-      separator_8 : N;
+      separator_8 : list byte;
       price : list byte;
-      separator_9 : N;
+      separator_9 : list byte;
       firm : list byte;
-      separator_10 : N;
+      separator_10 : list byte;
       reference : list byte;
-      separator_11 : N;
+      separator_11 : list byte;
       match_number : list byte;
-      separator_12 : N;
+      separator_12 : list byte;
       capacity : list byte;
-      separator_13 : N;
+      separator_13 : list byte;
       liquidity_code : list byte;
-      separator_14 : N;
+      separator_14 : list byte;
       clearing_code : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (separator_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_1 record) = 1 /\
       Datatypes.length (source record) = 6 /\
-      (separator_2 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_2 record) = 1 /\
       Datatypes.length (user record) = 4 /\
-      (separator_3 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_3 record) = 1 /\
       Datatypes.length (token record) = 10 /\
-      (separator_4 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_4 record) = 1 /\
       Datatypes.length (replaced_token record) = 10 /\
-      (separator_5 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_5 record) = 1 /\
       Datatypes.length (buy_sell record) = 1 /\
-      (separator_6 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_6 record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      (separator_7 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_7 record) = 1 /\
       Datatypes.length (stock record) = 8 /\
-      (separator_8 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_8 record) = 1 /\
       Datatypes.length (price record) = 11 /\
-      (separator_9 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_9 record) = 1 /\
       Datatypes.length (firm record) = 4 /\
-      (separator_10 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_10 record) = 1 /\
       Datatypes.length (reference record) = 12 /\
-      (separator_11 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_11 record) = 1 /\
       Datatypes.length (match_number record) = 12 /\
-      (separator_12 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_12 record) = 1 /\
       Datatypes.length (capacity record) = 1 /\
-      (separator_13 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_13 record) = 1 /\
       Datatypes.length (liquidity_code record) = 1 /\
-      (separator_14 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_14 record) = 1 /\
       Datatypes.length (clearing_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (separator_1 record) ++
+      encode_bytes 1 (separator_1 record) ++
       encode_bytes 6 (source record) ++
-      encode_uint 1 (separator_2 record) ++
+      encode_bytes 1 (separator_2 record) ++
       encode_bytes 4 (user record) ++
-      encode_uint 1 (separator_3 record) ++
+      encode_bytes 1 (separator_3 record) ++
       encode_bytes 10 (token record) ++
-      encode_uint 1 (separator_4 record) ++
+      encode_bytes 1 (separator_4 record) ++
       encode_bytes 10 (replaced_token record) ++
-      encode_uint 1 (separator_5 record) ++
+      encode_bytes 1 (separator_5 record) ++
       encode_bytes 1 (buy_sell record) ++
-      encode_uint 1 (separator_6 record) ++
+      encode_bytes 1 (separator_6 record) ++
       encode_bytes 6 (shares record) ++
-      encode_uint 1 (separator_7 record) ++
+      encode_bytes 1 (separator_7 record) ++
       encode_bytes 8 (stock record) ++
-      encode_uint 1 (separator_8 record) ++
+      encode_bytes 1 (separator_8 record) ++
       encode_bytes 11 (price record) ++
-      encode_uint 1 (separator_9 record) ++
+      encode_bytes 1 (separator_9 record) ++
       encode_bytes 4 (firm record) ++
-      encode_uint 1 (separator_10 record) ++
+      encode_bytes 1 (separator_10 record) ++
       encode_bytes 12 (reference record) ++
-      encode_uint 1 (separator_11 record) ++
+      encode_bytes 1 (separator_11 record) ++
       encode_bytes 12 (match_number record) ++
-      encode_uint 1 (separator_12 record) ++
+      encode_bytes 1 (separator_12 record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 1 (separator_13 record) ++
+      encode_bytes 1 (separator_13 record) ++
       encode_bytes 1 (liquidity_code record) ++
-      encode_uint 1 (separator_14 record) ++
+      encode_bytes 1 (separator_14 record) ++
       encode_bytes 1 (clearing_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (separator_1_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (source_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (separator_2_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (user_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (separator_3_value, bytes) =>
                           match decode_bytes 10 bytes with
                           | None => None
                           | Some (token_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (separator_4_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (replaced_token_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (separator_5_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (buy_sell_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (separator_6_value, bytes) =>
                                                   match decode_bytes 6 bytes with
                                                   | None => None
                                                   | Some (shares_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (separator_7_value, bytes) =>
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (stock_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (separator_8_value, bytes) =>
                                                                   match decode_bytes 11 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (separator_9_value, bytes) =>
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (firm_value, bytes) =>
-                                                                              match decode_uint 1 bytes with
+                                                                              match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (separator_10_value, bytes) =>
                                                                                   match decode_bytes 12 bytes with
                                                                                   | None => None
                                                                                   | Some (reference_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (separator_11_value, bytes) =>
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (match_number_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (separator_12_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (capacity_value, bytes) =>
-                                                                                                      match decode_uint 1 bytes with
+                                                                                                      match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (separator_13_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
                                                                                                           | None => None
                                                                                                           | Some (liquidity_code_value, bytes) =>
-                                                                                                              match decode_uint 1 bytes with
+                                                                                                              match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (separator_14_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -954,7 +954,7 @@ Module PsxEquitiesDropV22Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -964,33 +964,33 @@ Module PsxEquitiesDropV22Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       destruct record. reflexivity.
     Qed.
@@ -1004,177 +1004,177 @@ Module PsxEquitiesDropV22Server.
 
     (** Previous execution broken. *)
     Record t := {
-      separator_1 : N;
+      separator_1 : list byte;
       source : list byte;
-      separator_2 : N;
+      separator_2 : list byte;
       user : list byte;
-      separator_3 : N;
+      separator_3 : list byte;
       token : list byte;
-      separator_4 : N;
+      separator_4 : list byte;
       replaced_token : list byte;
-      separator_5 : N;
+      separator_5 : list byte;
       buy_sell : list byte;
-      separator_6 : N;
+      separator_6 : list byte;
       shares : list byte;
-      separator_7 : N;
+      separator_7 : list byte;
       stock : list byte;
-      separator_8 : N;
+      separator_8 : list byte;
       price : list byte;
-      separator_9 : N;
+      separator_9 : list byte;
       firm : list byte;
-      separator_10 : N;
+      separator_10 : list byte;
       reference : list byte;
-      separator_11 : N;
+      separator_11 : list byte;
       match_number : list byte;
-      separator_12 : N;
+      separator_12 : list byte;
       capacity : list byte;
-      separator_13 : N;
+      separator_13 : list byte;
       liquidity_code : list byte;
-      separator_14 : N;
+      separator_14 : list byte;
       clearing_code : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (separator_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_1 record) = 1 /\
       Datatypes.length (source record) = 6 /\
-      (separator_2 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_2 record) = 1 /\
       Datatypes.length (user record) = 4 /\
-      (separator_3 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_3 record) = 1 /\
       Datatypes.length (token record) = 10 /\
-      (separator_4 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_4 record) = 1 /\
       Datatypes.length (replaced_token record) = 10 /\
-      (separator_5 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_5 record) = 1 /\
       Datatypes.length (buy_sell record) = 1 /\
-      (separator_6 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_6 record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      (separator_7 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_7 record) = 1 /\
       Datatypes.length (stock record) = 8 /\
-      (separator_8 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_8 record) = 1 /\
       Datatypes.length (price record) = 11 /\
-      (separator_9 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_9 record) = 1 /\
       Datatypes.length (firm record) = 4 /\
-      (separator_10 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_10 record) = 1 /\
       Datatypes.length (reference record) = 12 /\
-      (separator_11 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_11 record) = 1 /\
       Datatypes.length (match_number record) = 12 /\
-      (separator_12 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_12 record) = 1 /\
       Datatypes.length (capacity record) = 1 /\
-      (separator_13 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_13 record) = 1 /\
       Datatypes.length (liquidity_code record) = 1 /\
-      (separator_14 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_14 record) = 1 /\
       Datatypes.length (clearing_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (separator_1 record) ++
+      encode_bytes 1 (separator_1 record) ++
       encode_bytes 6 (source record) ++
-      encode_uint 1 (separator_2 record) ++
+      encode_bytes 1 (separator_2 record) ++
       encode_bytes 4 (user record) ++
-      encode_uint 1 (separator_3 record) ++
+      encode_bytes 1 (separator_3 record) ++
       encode_bytes 10 (token record) ++
-      encode_uint 1 (separator_4 record) ++
+      encode_bytes 1 (separator_4 record) ++
       encode_bytes 10 (replaced_token record) ++
-      encode_uint 1 (separator_5 record) ++
+      encode_bytes 1 (separator_5 record) ++
       encode_bytes 1 (buy_sell record) ++
-      encode_uint 1 (separator_6 record) ++
+      encode_bytes 1 (separator_6 record) ++
       encode_bytes 6 (shares record) ++
-      encode_uint 1 (separator_7 record) ++
+      encode_bytes 1 (separator_7 record) ++
       encode_bytes 8 (stock record) ++
-      encode_uint 1 (separator_8 record) ++
+      encode_bytes 1 (separator_8 record) ++
       encode_bytes 11 (price record) ++
-      encode_uint 1 (separator_9 record) ++
+      encode_bytes 1 (separator_9 record) ++
       encode_bytes 4 (firm record) ++
-      encode_uint 1 (separator_10 record) ++
+      encode_bytes 1 (separator_10 record) ++
       encode_bytes 12 (reference record) ++
-      encode_uint 1 (separator_11 record) ++
+      encode_bytes 1 (separator_11 record) ++
       encode_bytes 12 (match_number record) ++
-      encode_uint 1 (separator_12 record) ++
+      encode_bytes 1 (separator_12 record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 1 (separator_13 record) ++
+      encode_bytes 1 (separator_13 record) ++
       encode_bytes 1 (liquidity_code record) ++
-      encode_uint 1 (separator_14 record) ++
+      encode_bytes 1 (separator_14 record) ++
       encode_bytes 1 (clearing_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (separator_1_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (source_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (separator_2_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (user_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (separator_3_value, bytes) =>
                           match decode_bytes 10 bytes with
                           | None => None
                           | Some (token_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (separator_4_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (replaced_token_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (separator_5_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (buy_sell_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (separator_6_value, bytes) =>
                                                   match decode_bytes 6 bytes with
                                                   | None => None
                                                   | Some (shares_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (separator_7_value, bytes) =>
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (stock_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (separator_8_value, bytes) =>
                                                                   match decode_bytes 11 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (separator_9_value, bytes) =>
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (firm_value, bytes) =>
-                                                                              match decode_uint 1 bytes with
+                                                                              match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (separator_10_value, bytes) =>
                                                                                   match decode_bytes 12 bytes with
                                                                                   | None => None
                                                                                   | Some (reference_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (separator_11_value, bytes) =>
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (match_number_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (separator_12_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (capacity_value, bytes) =>
-                                                                                                      match decode_uint 1 bytes with
+                                                                                                      match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (separator_13_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
                                                                                                           | None => None
                                                                                                           | Some (liquidity_code_value, bytes) =>
-                                                                                                              match decode_uint 1 bytes with
+                                                                                                              match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (separator_14_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -1213,7 +1213,7 @@ Module PsxEquitiesDropV22Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1223,33 +1223,33 @@ Module PsxEquitiesDropV22Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       destruct record. reflexivity.
     Qed.
@@ -1263,177 +1263,177 @@ Module PsxEquitiesDropV22Server.
 
     (** Existing order replaced. *)
     Record t := {
-      separator_1 : N;
+      separator_1 : list byte;
       source : list byte;
-      separator_2 : N;
+      separator_2 : list byte;
       user : list byte;
-      separator_3 : N;
+      separator_3 : list byte;
       token : list byte;
-      separator_4 : N;
+      separator_4 : list byte;
       replaced_token : list byte;
-      separator_5 : N;
+      separator_5 : list byte;
       buy_sell : list byte;
-      separator_6 : N;
+      separator_6 : list byte;
       shares : list byte;
-      separator_7 : N;
+      separator_7 : list byte;
       stock : list byte;
-      separator_8 : N;
+      separator_8 : list byte;
       price : list byte;
-      separator_9 : N;
+      separator_9 : list byte;
       firm : list byte;
-      separator_10 : N;
+      separator_10 : list byte;
       reference : list byte;
-      separator_11 : N;
+      separator_11 : list byte;
       match_number : list byte;
-      separator_12 : N;
+      separator_12 : list byte;
       capacity : list byte;
-      separator_13 : N;
+      separator_13 : list byte;
       liquidity_code : list byte;
-      separator_14 : N;
+      separator_14 : list byte;
       clearing_code : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (separator_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_1 record) = 1 /\
       Datatypes.length (source record) = 6 /\
-      (separator_2 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_2 record) = 1 /\
       Datatypes.length (user record) = 4 /\
-      (separator_3 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_3 record) = 1 /\
       Datatypes.length (token record) = 10 /\
-      (separator_4 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_4 record) = 1 /\
       Datatypes.length (replaced_token record) = 10 /\
-      (separator_5 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_5 record) = 1 /\
       Datatypes.length (buy_sell record) = 1 /\
-      (separator_6 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_6 record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      (separator_7 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_7 record) = 1 /\
       Datatypes.length (stock record) = 8 /\
-      (separator_8 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_8 record) = 1 /\
       Datatypes.length (price record) = 11 /\
-      (separator_9 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_9 record) = 1 /\
       Datatypes.length (firm record) = 4 /\
-      (separator_10 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_10 record) = 1 /\
       Datatypes.length (reference record) = 12 /\
-      (separator_11 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_11 record) = 1 /\
       Datatypes.length (match_number record) = 12 /\
-      (separator_12 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_12 record) = 1 /\
       Datatypes.length (capacity record) = 1 /\
-      (separator_13 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_13 record) = 1 /\
       Datatypes.length (liquidity_code record) = 1 /\
-      (separator_14 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (separator_14 record) = 1 /\
       Datatypes.length (clearing_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (separator_1 record) ++
+      encode_bytes 1 (separator_1 record) ++
       encode_bytes 6 (source record) ++
-      encode_uint 1 (separator_2 record) ++
+      encode_bytes 1 (separator_2 record) ++
       encode_bytes 4 (user record) ++
-      encode_uint 1 (separator_3 record) ++
+      encode_bytes 1 (separator_3 record) ++
       encode_bytes 10 (token record) ++
-      encode_uint 1 (separator_4 record) ++
+      encode_bytes 1 (separator_4 record) ++
       encode_bytes 10 (replaced_token record) ++
-      encode_uint 1 (separator_5 record) ++
+      encode_bytes 1 (separator_5 record) ++
       encode_bytes 1 (buy_sell record) ++
-      encode_uint 1 (separator_6 record) ++
+      encode_bytes 1 (separator_6 record) ++
       encode_bytes 6 (shares record) ++
-      encode_uint 1 (separator_7 record) ++
+      encode_bytes 1 (separator_7 record) ++
       encode_bytes 8 (stock record) ++
-      encode_uint 1 (separator_8 record) ++
+      encode_bytes 1 (separator_8 record) ++
       encode_bytes 11 (price record) ++
-      encode_uint 1 (separator_9 record) ++
+      encode_bytes 1 (separator_9 record) ++
       encode_bytes 4 (firm record) ++
-      encode_uint 1 (separator_10 record) ++
+      encode_bytes 1 (separator_10 record) ++
       encode_bytes 12 (reference record) ++
-      encode_uint 1 (separator_11 record) ++
+      encode_bytes 1 (separator_11 record) ++
       encode_bytes 12 (match_number record) ++
-      encode_uint 1 (separator_12 record) ++
+      encode_bytes 1 (separator_12 record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 1 (separator_13 record) ++
+      encode_bytes 1 (separator_13 record) ++
       encode_bytes 1 (liquidity_code record) ++
-      encode_uint 1 (separator_14 record) ++
+      encode_bytes 1 (separator_14 record) ++
       encode_bytes 1 (clearing_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (separator_1_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (source_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (separator_2_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (user_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (separator_3_value, bytes) =>
                           match decode_bytes 10 bytes with
                           | None => None
                           | Some (token_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (separator_4_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (replaced_token_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (separator_5_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (buy_sell_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (separator_6_value, bytes) =>
                                                   match decode_bytes 6 bytes with
                                                   | None => None
                                                   | Some (shares_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (separator_7_value, bytes) =>
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (stock_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (separator_8_value, bytes) =>
                                                                   match decode_bytes 11 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (separator_9_value, bytes) =>
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (firm_value, bytes) =>
-                                                                              match decode_uint 1 bytes with
+                                                                              match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (separator_10_value, bytes) =>
                                                                                   match decode_bytes 12 bytes with
                                                                                   | None => None
                                                                                   | Some (reference_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (separator_11_value, bytes) =>
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (match_number_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (separator_12_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (capacity_value, bytes) =>
-                                                                                                      match decode_uint 1 bytes with
+                                                                                                      match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (separator_13_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
                                                                                                           | None => None
                                                                                                           | Some (liquidity_code_value, bytes) =>
-                                                                                                              match decode_uint 1 bytes with
+                                                                                                              match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (separator_14_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -1472,7 +1472,7 @@ Module PsxEquitiesDropV22Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1482,33 +1482,33 @@ Module PsxEquitiesDropV22Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       destruct record. reflexivity.
     Qed.

@@ -545,7 +545,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       data_seq_number : list byte;
       trading_number : list byte;
       trading_price : list byte;
-      trading_volume : list byte;
+      trading_volume_short : list byte;
       trading_time : list byte;
       ask_quote_number : list byte;
       bid_quote_number : list byte;
@@ -574,7 +574,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       Datatypes.length (data_seq_number record) = 8 /\
       Datatypes.length (trading_number record) = 6 /\
       Datatypes.length (trading_price record) = 9 /\
-      Datatypes.length (trading_volume record) = 12 /\
+      Datatypes.length (trading_volume_short record) = 10 /\
       Datatypes.length (trading_time record) = 6 /\
       Datatypes.length (ask_quote_number record) = 6 /\
       Datatypes.length (bid_quote_number record) = 6 /\
@@ -601,7 +601,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       encode_bytes 8 (data_seq_number record) ++
       encode_bytes 6 (trading_number record) ++
       encode_bytes 9 (trading_price record) ++
-      encode_bytes 12 (trading_volume record) ++
+      encode_bytes 10 (trading_volume_short record) ++
       encode_bytes 6 (trading_time record) ++
       encode_bytes 6 (ask_quote_number record) ++
       encode_bytes 6 (bid_quote_number record) ++
@@ -636,9 +636,9 @@ Module KoscomMdcsRealtimeKoscomV120.
                   match decode_bytes 9 bytes with
                   | None => None
                   | Some (trading_price_value, bytes) =>
-                      match decode_bytes 12 bytes with
+                      match decode_bytes 10 bytes with
                       | None => None
-                      | Some (trading_volume_value, bytes) =>
+                      | Some (trading_volume_short_value, bytes) =>
                           match decode_bytes 6 bytes with
                           | None => None
                           | Some (trading_time_value, bytes) =>
@@ -699,7 +699,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                                                                                                       match decode_uint 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (end_keyword_value, bytes) =>
-                                                                                                          Some ({| isin := isin_value; data_seq_number := data_seq_number_value; trading_number := trading_number_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_time := trading_time_value; ask_quote_number := ask_quote_number_value; bid_quote_number := bid_quote_number_value; high_price := high_price_value; low_price := low_price_value; weighted_average_stock_price := weighted_average_stock_price_value; total_trading_accumulated_volume := total_trading_accumulated_volume_value; total_trading_accumulated_value := total_trading_accumulated_value_value; total_remaining_quantity_of_ask := total_remaining_quantity_of_ask_value; total_remaining_quantity_of_bid := total_remaining_quantity_of_bid_value; best_ask_order := best_ask_order_value; remaining_quantity_of_best_ask_order := remaining_quantity_of_best_ask_order_value; best_bid_order := best_bid_order_value; remaining_quantity_of_best_bid_order := remaining_quantity_of_best_bid_order_value; compared_to_previous_day_type := compared_to_previous_day_type_value; compared_to_previous_day := compared_to_previous_day_value; trading_price_compare_remaining_quantity_of_ask := trading_price_compare_remaining_quantity_of_ask_value; trading_price_compare_remaining_quantity_of_bid := trading_price_compare_remaining_quantity_of_bid_value; filler_40 := filler_40_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                          Some ({| isin := isin_value; data_seq_number := data_seq_number_value; trading_number := trading_number_value; trading_price := trading_price_value; trading_volume_short := trading_volume_short_value; trading_time := trading_time_value; ask_quote_number := ask_quote_number_value; bid_quote_number := bid_quote_number_value; high_price := high_price_value; low_price := low_price_value; weighted_average_stock_price := weighted_average_stock_price_value; total_trading_accumulated_volume := total_trading_accumulated_volume_value; total_trading_accumulated_value := total_trading_accumulated_value_value; total_remaining_quantity_of_ask := total_remaining_quantity_of_ask_value; total_remaining_quantity_of_bid := total_remaining_quantity_of_bid_value; best_ask_order := best_ask_order_value; remaining_quantity_of_best_ask_order := remaining_quantity_of_best_ask_order_value; best_bid_order := best_bid_order_value; remaining_quantity_of_best_bid_order := remaining_quantity_of_best_bid_order_value; compared_to_previous_day_type := compared_to_previous_day_type_value; compared_to_previous_day := compared_to_previous_day_value; trading_price_compare_remaining_quantity_of_ask := trading_price_compare_remaining_quantity_of_ask_value; trading_price_compare_remaining_quantity_of_bid := trading_price_compare_remaining_quantity_of_bid_value; filler_40 := filler_40_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                       end
                                                                                                   end
                                                                                               end
@@ -726,7 +726,7 @@ Module KoscomMdcsRealtimeKoscomV120.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 247.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 245.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -1410,7 +1410,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       index : list byte;
       sign : list byte;
       comparison : list byte;
-      trading_volume : list byte;
+      trading_volume_long : list byte;
       trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
@@ -1424,7 +1424,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       Datatypes.length (index record) = 9 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (comparison record) = 9 /\
-      Datatypes.length (trading_volume record) = 12 /\
+      Datatypes.length (trading_volume_long record) = 12 /\
       Datatypes.length (trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
@@ -1436,7 +1436,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       encode_bytes 9 (index record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 9 (comparison record) ++
-      encode_bytes 12 (trading_volume record) ++
+      encode_bytes 12 (trading_volume_long record) ++
       encode_bytes 12 (trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
@@ -1462,7 +1462,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                           | Some (comparison_value, bytes) =>
                               match decode_bytes 12 bytes with
                               | None => None
-                              | Some (trading_volume_value, bytes) =>
+                              | Some (trading_volume_long_value, bytes) =>
                                   match decode_bytes 12 bytes with
                                   | None => None
                                   | Some (trading_value_value, bytes) =>
@@ -1472,7 +1472,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume := trading_volume_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume_long := trading_volume_long_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1525,7 +1525,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       index : list byte;
       sign : list byte;
       comparison : list byte;
-      trading_volume : list byte;
+      trading_volume_long : list byte;
       trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
@@ -1539,7 +1539,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       Datatypes.length (index record) = 9 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (comparison record) = 9 /\
-      Datatypes.length (trading_volume record) = 12 /\
+      Datatypes.length (trading_volume_long record) = 12 /\
       Datatypes.length (trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
@@ -1551,7 +1551,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       encode_bytes 9 (index record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 9 (comparison record) ++
-      encode_bytes 12 (trading_volume record) ++
+      encode_bytes 12 (trading_volume_long record) ++
       encode_bytes 12 (trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
@@ -1577,7 +1577,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                           | Some (comparison_value, bytes) =>
                               match decode_bytes 12 bytes with
                               | None => None
-                              | Some (trading_volume_value, bytes) =>
+                              | Some (trading_volume_long_value, bytes) =>
                                   match decode_bytes 12 bytes with
                                   | None => None
                                   | Some (trading_value_value, bytes) =>
@@ -1587,7 +1587,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume := trading_volume_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume_long := trading_volume_long_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1640,7 +1640,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       index : list byte;
       sign : list byte;
       comparison : list byte;
-      trading_volume : list byte;
+      trading_volume_long : list byte;
       trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
@@ -1654,7 +1654,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       Datatypes.length (index record) = 9 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (comparison record) = 9 /\
-      Datatypes.length (trading_volume record) = 12 /\
+      Datatypes.length (trading_volume_long record) = 12 /\
       Datatypes.length (trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
@@ -1666,7 +1666,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       encode_bytes 9 (index record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 9 (comparison record) ++
-      encode_bytes 12 (trading_volume record) ++
+      encode_bytes 12 (trading_volume_long record) ++
       encode_bytes 12 (trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
@@ -1692,7 +1692,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                           | Some (comparison_value, bytes) =>
                               match decode_bytes 12 bytes with
                               | None => None
-                              | Some (trading_volume_value, bytes) =>
+                              | Some (trading_volume_long_value, bytes) =>
                                   match decode_bytes 12 bytes with
                                   | None => None
                                   | Some (trading_value_value, bytes) =>
@@ -1702,7 +1702,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume := trading_volume_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume_long := trading_volume_long_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1755,7 +1755,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       index : list byte;
       sign : list byte;
       comparison : list byte;
-      trading_volume : list byte;
+      trading_volume_long : list byte;
       trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
@@ -1769,7 +1769,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       Datatypes.length (index record) = 9 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (comparison record) = 9 /\
-      Datatypes.length (trading_volume record) = 12 /\
+      Datatypes.length (trading_volume_long record) = 12 /\
       Datatypes.length (trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
@@ -1781,7 +1781,7 @@ Module KoscomMdcsRealtimeKoscomV120.
       encode_bytes 9 (index record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 9 (comparison record) ++
-      encode_bytes 12 (trading_volume record) ++
+      encode_bytes 12 (trading_volume_long record) ++
       encode_bytes 12 (trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
@@ -1807,7 +1807,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                           | Some (comparison_value, bytes) =>
                               match decode_bytes 12 bytes with
                               | None => None
-                              | Some (trading_volume_value, bytes) =>
+                              | Some (trading_volume_long_value, bytes) =>
                                   match decode_bytes 12 bytes with
                                   | None => None
                                   | Some (trading_value_value, bytes) =>
@@ -1817,7 +1817,7 @@ Module KoscomMdcsRealtimeKoscomV120.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume := trading_volume_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin := isin_value; time := time_value; index := index_value; sign := sign_value; comparison := comparison_value; trading_volume_long := trading_volume_long_value; trading_value := trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end

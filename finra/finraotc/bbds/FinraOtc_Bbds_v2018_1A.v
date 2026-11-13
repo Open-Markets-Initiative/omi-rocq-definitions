@@ -124,7 +124,7 @@ Module FinraOtcBbdsV20181A.
       message_sequence_number : list byte;
       market_center_originator_id : list byte;
       datetime : Datetime.t;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -134,7 +134,7 @@ Module FinraOtcBbdsV20181A.
       Datatypes.length (message_sequence_number record) = 8 /\
       Datatypes.length (market_center_originator_id record) = 1 /\
       Datetime.bounded (datetime record) /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (session_identifier record) ++
@@ -142,7 +142,7 @@ Module FinraOtcBbdsV20181A.
       encode_bytes 8 (message_sequence_number record) ++
       encode_bytes 1 (market_center_originator_id record) ++
       Datetime.encode (datetime record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -160,7 +160,7 @@ Module FinraOtcBbdsV20181A.
                       match Datetime.decode bytes with
                       | None => None
                       | Some (datetime_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_1_value, bytes) =>
                               Some ({| session_identifier := session_identifier_value; retransmission_requester := retransmission_requester_value; message_sequence_number := message_sequence_number_value; market_center_originator_id := market_center_originator_id_value; datetime := datetime_value; reserved_1 := reserved_1_value |}, bytes)
@@ -174,7 +174,7 @@ Module FinraOtcBbdsV20181A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !Datetime.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !Datetime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -189,7 +189,7 @@ Module FinraOtcBbdsV20181A.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite Datetime.decode_encode by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

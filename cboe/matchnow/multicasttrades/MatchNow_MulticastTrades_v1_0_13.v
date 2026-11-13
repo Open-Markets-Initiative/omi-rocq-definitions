@@ -151,18 +151,18 @@ Module MatchNowMulticastTradesV1013.
 
     (** Instructs feed recipients to clear all orders for the Cboe Canada order book in the unit specified in the Sequenced Unit Header. Distributed in rare recovery events such as a data center fail-over. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -171,7 +171,7 @@ Module MatchNowMulticastTradesV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,12 +179,12 @@ Module MatchNowMulticastTradesV1013.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UnitClearMessage.
 
@@ -196,7 +196,7 @@ Module MatchNowMulticastTradesV1013.
       symbol : list byte;
       listing_exchange : list byte;
       trading_status : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -205,14 +205,14 @@ Module MatchNowMulticastTradesV1013.
       Datatypes.length (symbol record) = 14 /\
       Datatypes.length (listing_exchange record) = 4 /\
       Datatypes.length (trading_status record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
       encode_bytes 14 (symbol record) ++
       encode_bytes 4 (listing_exchange record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -227,7 +227,7 @@ Module MatchNowMulticastTradesV1013.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 3 bytes with
+                      match decode_bytes 3 bytes with
                       | None => None
                       | Some (reserved_3_value, bytes) =>
                           Some ({| timestamp := timestamp_value; symbol := symbol_value; listing_exchange := listing_exchange_value; trading_status := trading_status_value; reserved_3 := reserved_3_value |}, bytes)
@@ -254,7 +254,7 @@ Module MatchNowMulticastTradesV1013.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -267,18 +267,18 @@ Module MatchNowMulticastTradesV1013.
 
     (** Sent for each unit when the unit shuts down. No additional sequenced messages will be delivered for this unit, but heartbeats from the unit may be received. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -287,7 +287,7 @@ Module MatchNowMulticastTradesV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -295,12 +295,12 @@ Module MatchNowMulticastTradesV1013.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End EndOfSessionMessage.
 

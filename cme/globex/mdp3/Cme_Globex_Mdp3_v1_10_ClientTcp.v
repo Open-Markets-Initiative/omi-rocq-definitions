@@ -300,7 +300,7 @@ Module CmeGlobexMdp3V110ClientTcp.
       uuid : N;
       request_timestamp : N;
       error_codes : N;
-      padding_5 : N;
+      padding_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -309,14 +309,14 @@ Module CmeGlobexMdp3V110ClientTcp.
       (uuid record < 256 ^ N.of_nat 8)%N /\
       (request_timestamp record < 256 ^ N.of_nat 8)%N /\
       (error_codes record < 256 ^ N.of_nat 1)%N /\
-      (padding_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (padding_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
       encode_uint 8 (uuid record) ++
       encode_uint 8 (request_timestamp record) ++
       encode_uint 1 (error_codes record) ++
-      encode_uint 5 (padding_5 record).
+      encode_bytes 5 (padding_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 48 bytes with
@@ -331,7 +331,7 @@ Module CmeGlobexMdp3V110ClientTcp.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (error_codes_value, bytes) =>
-                      match decode_uint 5 bytes with
+                      match decode_bytes 5 bytes with
                       | None => None
                       | Some (padding_5_value, bytes) =>
                           Some ({| reason := reason_value; uuid := uuid_value; request_timestamp := request_timestamp_value; error_codes := error_codes_value; padding_5 := padding_5_value |}, bytes)
@@ -358,7 +358,7 @@ Module CmeGlobexMdp3V110ClientTcp.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

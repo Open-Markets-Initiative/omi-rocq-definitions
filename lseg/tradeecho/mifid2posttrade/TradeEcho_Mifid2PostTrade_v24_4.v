@@ -428,7 +428,7 @@ Module TradeEchoMifid2PostTradeV244.
       instrument : N;
       transaction_identification_code : list byte;
       total_number_of_transactions : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       source_venue : N;
       mi_fid_price : list byte;
       mi_fid_quantity : list byte;
@@ -468,7 +468,7 @@ Module TradeEchoMifid2PostTradeV244.
       indefinite_aggregation_flag : list byte;
       volume_omission_for_sovereign_debt_flag : list byte;
       consecutive_aggregation_flag : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       venue_type : N;
       venue_book_definition_id : N;
       venue_measurement_unit_notation : list byte;
@@ -505,7 +505,7 @@ Module TradeEchoMifid2PostTradeV244.
       (instrument record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (transaction_identification_code record) = 52 /\
       (total_number_of_transactions record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (source_venue record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (mi_fid_price record) = 20 /\
       Datatypes.length (mi_fid_quantity record) = 20 /\
@@ -545,7 +545,7 @@ Module TradeEchoMifid2PostTradeV244.
       Datatypes.length (indefinite_aggregation_flag record) = 4 /\
       Datatypes.length (volume_omission_for_sovereign_debt_flag record) = 4 /\
       Datatypes.length (consecutive_aggregation_flag record) = 4 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (venue_type record < 256 ^ N.of_nat 1)%N /\
       (venue_book_definition_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (venue_measurement_unit_notation record) = 25 /\
@@ -580,7 +580,7 @@ Module TradeEchoMifid2PostTradeV244.
       encode_uint 8 (instrument record) ++
       encode_bytes 52 (transaction_identification_code record) ++
       encode_uint 4 (total_number_of_transactions record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 2 (source_venue record) ++
       encode_bytes 20 (mi_fid_price record) ++
       encode_bytes 20 (mi_fid_quantity record) ++
@@ -620,7 +620,7 @@ Module TradeEchoMifid2PostTradeV244.
       encode_bytes 4 (indefinite_aggregation_flag record) ++
       encode_bytes 4 (volume_omission_for_sovereign_debt_flag record) ++
       encode_bytes 4 (consecutive_aggregation_flag record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 1 (venue_type record) ++
       encode_uint 1 (venue_book_definition_id record) ++
       encode_bytes 25 (venue_measurement_unit_notation record) ++
@@ -663,7 +663,7 @@ Module TradeEchoMifid2PostTradeV244.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (total_number_of_transactions_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_bytes 8 bytes with
                       | None => None
                       | Some (reserved_8_value, bytes) =>
                           match decode_uint 2 bytes with
@@ -783,7 +783,7 @@ Module TradeEchoMifid2PostTradeV244.
                                                                                                                                                                                   match decode_bytes 4 bytes with
                                                                                                                                                                                   | None => None
                                                                                                                                                                                   | Some (consecutive_aggregation_flag_value, bytes) =>
-                                                                                                                                                                                      match decode_uint 1 bytes with
+                                                                                                                                                                                      match decode_bytes 1 bytes with
                                                                                                                                                                                       | None => None
                                                                                                                                                                                       | Some (reserved_1_value, bytes) =>
                                                                                                                                                                                           match decode_uint 1 bytes with
@@ -962,7 +962,7 @@ Module TradeEchoMifid2PostTradeV244.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -1002,7 +1002,7 @@ Module TradeEchoMifid2PostTradeV244.
       rewrite decode_encode_bytes by exact bound_41.
       rewrite decode_encode_bytes by exact bound_42.
       rewrite decode_encode_bytes by exact bound_43.
-      rewrite decode_encode_uint by exact bound_44.
+      rewrite decode_encode_bytes by exact bound_44.
       rewrite decode_encode_uint by exact bound_45.
       rewrite decode_encode_uint by exact bound_46.
       rewrite decode_encode_bytes by exact bound_47.

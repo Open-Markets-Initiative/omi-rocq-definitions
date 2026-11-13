@@ -462,7 +462,7 @@ Module B3DerivativesBinaryUmdfV22.
       tot_num_bids : N;
       tot_num_offers : N;
       tot_num_stats : N;
-      offset_26_padding_2 : N;
+      offset_26_padding_2 : list byte;
       last_rpt_seq : N;
       last_sequence_version : N;
     }.
@@ -475,7 +475,7 @@ Module B3DerivativesBinaryUmdfV22.
       (tot_num_bids record < 256 ^ N.of_nat 4)%N /\
       (tot_num_offers record < 256 ^ N.of_nat 4)%N /\
       (tot_num_stats record < 256 ^ N.of_nat 2)%N /\
-      (offset_26_padding_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (offset_26_padding_2 record) = 2 /\
       (last_rpt_seq record < 256 ^ N.of_nat 4)%N /\
       (last_sequence_version record < 256 ^ N.of_nat 2)%N.
 
@@ -486,7 +486,7 @@ Module B3DerivativesBinaryUmdfV22.
       encode_uint 4 (tot_num_bids record) ++
       encode_uint 4 (tot_num_offers record) ++
       encode_uint 2 (tot_num_stats record) ++
-      encode_uint 2 (offset_26_padding_2 record) ++
+      encode_bytes 2 (offset_26_padding_2 record) ++
       encode_uint 4 (last_rpt_seq record) ++
       encode_uint 2 (last_sequence_version record).
 
@@ -509,7 +509,7 @@ Module B3DerivativesBinaryUmdfV22.
                           match decode_uint 2 bytes with
                           | None => None
                           | Some (tot_num_stats_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (offset_26_padding_2_value, bytes) =>
                                   match decode_uint 4 bytes with
@@ -532,7 +532,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -548,14 +548,14 @@ Module B3DerivativesBinaryUmdfV22.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End SnapshotFullRefreshHeader30Message.
 
@@ -564,9 +564,9 @@ Module B3DerivativesBinaryUmdfV22.
     (** ExecutionSummary_55Message *)
     Record t := {
       security_id : N;
-      offset_8_padding_2 : N;
+      offset_8_padding_2 : list byte;
       aggressor_side : N;
-      offset_11_padding_1 : N;
+      offset_11_padding_1 : list byte;
       last_px : N;
       fill_qty : N;
       traded_hidden_qty : N;
@@ -579,9 +579,9 @@ Module B3DerivativesBinaryUmdfV22.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_id record < 256 ^ N.of_nat 8)%N /\
-      (offset_8_padding_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (offset_8_padding_2 record) = 2 /\
       (aggressor_side record < 256 ^ N.of_nat 1)%N /\
-      (offset_11_padding_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (offset_11_padding_1 record) = 1 /\
       (last_px record < 256 ^ N.of_nat 8)%N /\
       (fill_qty record < 256 ^ N.of_nat 8)%N /\
       (traded_hidden_qty record < 256 ^ N.of_nat 8)%N /\
@@ -592,9 +592,9 @@ Module B3DerivativesBinaryUmdfV22.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (security_id record) ++
-      encode_uint 2 (offset_8_padding_2 record) ++
+      encode_bytes 2 (offset_8_padding_2 record) ++
       encode_uint 1 (aggressor_side record) ++
-      encode_uint 1 (offset_11_padding_1 record) ++
+      encode_bytes 1 (offset_11_padding_1 record) ++
       encode_uint 8 (last_px record) ++
       encode_uint 8 (fill_qty record) ++
       encode_uint 8 (traded_hidden_qty record) ++
@@ -607,13 +607,13 @@ Module B3DerivativesBinaryUmdfV22.
       match decode_uint 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (offset_8_padding_2_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (aggressor_side_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (offset_11_padding_1_value, bytes) =>
                       match decode_uint 8 bytes with
@@ -653,7 +653,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -664,9 +664,9 @@ Module B3DerivativesBinaryUmdfV22.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -678,7 +678,7 @@ Module B3DerivativesBinaryUmdfV22.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ExecutionSummary55Message.
 

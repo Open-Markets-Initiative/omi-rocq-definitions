@@ -145,9 +145,9 @@ Module PearlEquitiesTopOfMarketV11A.
       nanoseconds : N;
       symbol_id : N;
       ticker_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       test_security_indicator : list byte;
-      second_reserved_1 : N;
+      second_reserved_1 : list byte;
       lot_size : N;
       opening_time : list byte;
       closing_time : list byte;
@@ -159,9 +159,9 @@ Module PearlEquitiesTopOfMarketV11A.
       (nanoseconds record < 256 ^ N.of_nat 4)%N /\
       (symbol_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ticker_symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (test_security_indicator record) = 1 /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (second_reserved_1 record) = 1 /\
       (lot_size record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (opening_time record) = 8 /\
       Datatypes.length (closing_time record) = 8 /\
@@ -171,9 +171,9 @@ Module PearlEquitiesTopOfMarketV11A.
       encode_uint 4 (nanoseconds record) ++
       encode_uint 4 (symbol_id record) ++
       encode_bytes 11 (ticker_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (test_security_indicator record) ++
-      encode_uint 1 (second_reserved_1 record) ++
+      encode_bytes 1 (second_reserved_1 record) ++
       encode_uint 2 (lot_size record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
@@ -189,13 +189,13 @@ Module PearlEquitiesTopOfMarketV11A.
               match decode_bytes 11 bytes with
               | None => None
               | Some (ticker_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (test_security_indicator_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
                               match decode_uint 2 bytes with
@@ -238,9 +238,9 @@ Module PearlEquitiesTopOfMarketV11A.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.

@@ -183,7 +183,7 @@ Module MiaxOptionsTopOfMarketV25Tcp.
       liquidity_acceptance_increment_indicator : list byte;
       opening_underlying_market_code : list byte;
       priority_quote_width : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -204,7 +204,7 @@ Module MiaxOptionsTopOfMarketV25Tcp.
       Datatypes.length (liquidity_acceptance_increment_indicator record) = 1 /\
       Datatypes.length (opening_underlying_market_code record) = 1 /\
       (priority_quote_width record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -223,7 +223,7 @@ Module MiaxOptionsTopOfMarketV25Tcp.
       encode_bytes 1 (liquidity_acceptance_increment_indicator record) ++
       encode_bytes 1 (opening_underlying_market_code record) ++
       encode_uint 4 (priority_quote_width record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -274,7 +274,7 @@ Module MiaxOptionsTopOfMarketV25Tcp.
                                                                   match decode_uint 4 bytes with
                                                                   | None => None
                                                                   | Some (priority_quote_width_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_bytes 8 bytes with
                                                                       | None => None
                                                                       | Some (reserved_8_value, bytes) =>
                                                                           Some ({| nanoseconds := nanoseconds_value; product_id := product_id_value; underlying_symbol := underlying_symbol_value; security_symbol := security_symbol_value; expiration_date := expiration_date_value; strike_price := strike_price_value; call_or_put := call_or_put_value; opening_time := opening_time_value; closing_time := closing_time_value; restricted_option := restricted_option_value; long_term_option := long_term_option_value; active_on_miax := active_on_miax_value; miax_bbo_posting_increment_indicator := miax_bbo_posting_increment_indicator_value; liquidity_acceptance_increment_indicator := liquidity_acceptance_increment_indicator_value; opening_underlying_market_code := opening_underlying_market_code_value; priority_quote_width := priority_quote_width_value; reserved_8 := reserved_8_value |}, bytes)
@@ -325,7 +325,7 @@ Module MiaxOptionsTopOfMarketV25Tcp.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
 

@@ -86,12 +86,12 @@ Module KoscomMdcsRealtimeBondAV2020.
     Record t := {
       index_id : list byte;
       isin_code : list byte;
-      calculation_time : list byte;
+      calculation_time_short : list byte;
       index : list byte;
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_short : list byte;
+      accumulated_trading_value_short : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -100,24 +100,24 @@ Module KoscomMdcsRealtimeBondAV2020.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (index_id record) = 6 /\
       Datatypes.length (isin_code record) = 12 /\
-      Datatypes.length (calculation_time record) = 9 /\
+      Datatypes.length (calculation_time_short record) = 6 /\
       Datatypes.length (index record) = 9 /\
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_short record) = 12 /\
+      Datatypes.length (accumulated_trading_value_short record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 6 (index_id record) ++
       encode_bytes 12 (isin_code record) ++
-      encode_bytes 9 (calculation_time record) ++
+      encode_bytes 6 (calculation_time_short record) ++
       encode_bytes 9 (index record) ++
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (accumulated_trading_volume_short record) ++
+      encode_bytes 12 (accumulated_trading_value_short record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -128,9 +128,9 @@ Module KoscomMdcsRealtimeBondAV2020.
           match decode_bytes 12 bytes with
           | None => None
           | Some (isin_code_value, bytes) =>
-              match decode_bytes 9 bytes with
+              match decode_bytes 6 bytes with
               | None => None
-              | Some (calculation_time_value, bytes) =>
+              | Some (calculation_time_short_value, bytes) =>
                   match decode_bytes 9 bytes with
                   | None => None
                   | Some (index_value, bytes) =>
@@ -140,19 +140,19 @@ Module KoscomMdcsRealtimeBondAV2020.
                           match decode_bytes 9 bytes with
                           | None => None
                           | Some (index_change_against_the_previous_day_value, bytes) =>
-                              match decode_bytes 15 bytes with
+                              match decode_bytes 12 bytes with
                               | None => None
-                              | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                              | Some (accumulated_trading_volume_short_value, bytes) =>
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (accumulated_trading_value_short_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time_short := calculation_time_short_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume_short := accumulated_trading_volume_short_value; accumulated_trading_value_short := accumulated_trading_value_short_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -164,7 +164,7 @@ Module KoscomMdcsRealtimeBondAV2020.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -201,12 +201,12 @@ Module KoscomMdcsRealtimeBondAV2020.
     Record t := {
       index_id : list byte;
       isin_code : list byte;
-      calculation_time : list byte;
+      calculation_time_short : list byte;
       index : list byte;
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_short : list byte;
+      accumulated_trading_value_short : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -215,24 +215,24 @@ Module KoscomMdcsRealtimeBondAV2020.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (index_id record) = 6 /\
       Datatypes.length (isin_code record) = 12 /\
-      Datatypes.length (calculation_time record) = 9 /\
+      Datatypes.length (calculation_time_short record) = 6 /\
       Datatypes.length (index record) = 9 /\
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_short record) = 12 /\
+      Datatypes.length (accumulated_trading_value_short record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 6 (index_id record) ++
       encode_bytes 12 (isin_code record) ++
-      encode_bytes 9 (calculation_time record) ++
+      encode_bytes 6 (calculation_time_short record) ++
       encode_bytes 9 (index record) ++
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (accumulated_trading_volume_short record) ++
+      encode_bytes 12 (accumulated_trading_value_short record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -243,9 +243,9 @@ Module KoscomMdcsRealtimeBondAV2020.
           match decode_bytes 12 bytes with
           | None => None
           | Some (isin_code_value, bytes) =>
-              match decode_bytes 9 bytes with
+              match decode_bytes 6 bytes with
               | None => None
-              | Some (calculation_time_value, bytes) =>
+              | Some (calculation_time_short_value, bytes) =>
                   match decode_bytes 9 bytes with
                   | None => None
                   | Some (index_value, bytes) =>
@@ -255,19 +255,19 @@ Module KoscomMdcsRealtimeBondAV2020.
                           match decode_bytes 9 bytes with
                           | None => None
                           | Some (index_change_against_the_previous_day_value, bytes) =>
-                              match decode_bytes 15 bytes with
+                              match decode_bytes 12 bytes with
                               | None => None
-                              | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                              | Some (accumulated_trading_volume_short_value, bytes) =>
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (accumulated_trading_value_short_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time_short := calculation_time_short_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume_short := accumulated_trading_volume_short_value; accumulated_trading_value_short := accumulated_trading_value_short_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -279,7 +279,7 @@ Module KoscomMdcsRealtimeBondAV2020.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -317,7 +317,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       index_id : list byte;
       isin_code : list byte;
       business_date : list byte;
-      calculation_time : list byte;
+      calculation_time_short : list byte;
       index : list byte;
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
@@ -331,7 +331,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (index_id record) = 6 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (business_date record) = 8 /\
-      Datatypes.length (calculation_time record) = 9 /\
+      Datatypes.length (calculation_time_short record) = 6 /\
       Datatypes.length (index record) = 9 /\
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
@@ -343,7 +343,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 6 (index_id record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 8 (business_date record) ++
-      encode_bytes 9 (calculation_time record) ++
+      encode_bytes 6 (calculation_time_short record) ++
       encode_bytes 9 (index record) ++
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
@@ -361,9 +361,9 @@ Module KoscomMdcsRealtimeBondAV2020.
               match decode_bytes 8 bytes with
               | None => None
               | Some (business_date_value, bytes) =>
-                  match decode_bytes 9 bytes with
+                  match decode_bytes 6 bytes with
                   | None => None
-                  | Some (calculation_time_value, bytes) =>
+                  | Some (calculation_time_short_value, bytes) =>
                       match decode_bytes 9 bytes with
                       | None => None
                       | Some (index_value, bytes) =>
@@ -382,7 +382,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; business_date := business_date_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; currency_code := currency_code_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; business_date := business_date_value; calculation_time_short := calculation_time_short_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; currency_code := currency_code_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -394,7 +394,7 @@ Module KoscomMdcsRealtimeBondAV2020.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -442,7 +442,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       average_duration : list byte;
       average_convexity : list byte;
       average_yld : list byte;
-      transmission_time : list byte;
+      transmission_time_short : list byte;
       end_keyword : N;
     }.
 
@@ -461,7 +461,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (average_duration record) = 16 /\
       Datatypes.length (average_convexity record) = 16 /\
       Datatypes.length (average_yld record) = 16 /\
-      Datatypes.length (transmission_time record) = 9 /\
+      Datatypes.length (transmission_time_short record) = 8 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
@@ -478,7 +478,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 16 (average_duration record) ++
       encode_bytes 16 (average_convexity record) ++
       encode_bytes 16 (average_yld record) ++
-      encode_bytes 9 (transmission_time record) ++
+      encode_bytes 8 (transmission_time_short record) ++
       encode_uint 1 (end_keyword record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -521,13 +521,13 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                       match decode_bytes 16 bytes with
                                                       | None => None
                                                       | Some (average_yld_value, bytes) =>
-                                                          match decode_bytes 9 bytes with
+                                                          match decode_bytes 8 bytes with
                                                           | None => None
-                                                          | Some (transmission_time_value, bytes) =>
+                                                          | Some (transmission_time_short_value, bytes) =>
                                                               match decode_uint 1 bytes with
                                                               | None => None
                                                               | Some (end_keyword_value, bytes) =>
-                                                                  Some ({| calculating_date := calculating_date_value; calculating_time := calculating_time_value; group_code := group_code_value; maturity_code := maturity_code_value; clean_price_index_krx := clean_price_index_krx_value; total_earnings_index := total_earnings_index_value; clean_price_index_weight := clean_price_index_weight_value; total_earnings_index_weight := total_earnings_index_weight_value; weight_of_clean_index_value_for_integrity_index_weight := weight_of_clean_index_value_for_integrity_index_weight_value; weight_of_sum_index_value_for_integrity_index_weight := weight_of_sum_index_value_for_integrity_index_weight_value; average_duration := average_duration_value; average_convexity := average_convexity_value; average_yld := average_yld_value; transmission_time := transmission_time_value; end_keyword := end_keyword_value |}, bytes)
+                                                                  Some ({| calculating_date := calculating_date_value; calculating_time := calculating_time_value; group_code := group_code_value; maturity_code := maturity_code_value; clean_price_index_krx := clean_price_index_krx_value; total_earnings_index := total_earnings_index_value; clean_price_index_weight := clean_price_index_weight_value; total_earnings_index_weight := total_earnings_index_weight_value; weight_of_clean_index_value_for_integrity_index_weight := weight_of_clean_index_value_for_integrity_index_weight_value; weight_of_sum_index_value_for_integrity_index_weight := weight_of_sum_index_value_for_integrity_index_weight_value; average_duration := average_duration_value; average_convexity := average_convexity_value; average_yld := average_yld_value; transmission_time_short := transmission_time_short_value; end_keyword := end_keyword_value |}, bytes)
                                                               end
                                                           end
                                                       end
@@ -544,7 +544,7 @@ Module KoscomMdcsRealtimeBondAV2020.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 178.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 177.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -1976,8 +1976,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       yield_opening_price : list byte;
       yield_todays_high : list byte;
       yield_todays_low : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_long : list byte;
+      accumulated_trading_value_long : list byte;
       settlement_date : list byte;
       end_keyword : N;
     }.
@@ -2000,8 +2000,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (yield_opening_price record) = 13 /\
       Datatypes.length (yield_todays_high record) = 13 /\
       Datatypes.length (yield_todays_low record) = 13 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (settlement_date record) = 8 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -2022,8 +2022,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 13 (yield_opening_price record) ++
       encode_bytes 13 (yield_todays_high record) ++
       encode_bytes 13 (yield_todays_low record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 8 (settlement_date record) ++
       encode_uint 1 (end_keyword record).
 
@@ -2078,17 +2078,17 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                   | Some (yield_todays_low_value, bytes) =>
                                                                       match decode_bytes 15 bytes with
                                                                       | None => None
-                                                                      | Some (accumulated_trading_volume_value, bytes) =>
+                                                                      | Some (accumulated_trading_volume_long_value, bytes) =>
                                                                           match decode_bytes 22 bytes with
                                                                           | None => None
-                                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                                               match decode_bytes 8 bytes with
                                                                               | None => None
                                                                               | Some (settlement_date_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (end_keyword_value, bytes) =>
-                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; settlement_date := settlement_date_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; accumulated_trading_value_long := accumulated_trading_value_long_value; settlement_date := settlement_date_value; end_keyword := end_keyword_value |}, bytes)
                                                                                   end
                                                                               end
                                                                           end
@@ -2171,8 +2171,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       yield_opening_price : list byte;
       yield_todays_high : list byte;
       yield_todays_low : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_long : list byte;
+      accumulated_trading_value_long : list byte;
       settlement_date : list byte;
       ask_level_1_price : list byte;
       bid_level_1_price : list byte;
@@ -2227,8 +2227,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (yield_opening_price record) = 13 /\
       Datatypes.length (yield_todays_high record) = 13 /\
       Datatypes.length (yield_todays_low record) = 13 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (settlement_date record) = 8 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
       Datatypes.length (bid_level_1_price record) = 11 /\
@@ -2281,8 +2281,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 13 (yield_opening_price record) ++
       encode_bytes 13 (yield_todays_high record) ++
       encode_bytes 13 (yield_todays_low record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 8 (settlement_date record) ++
       encode_bytes 11 (ask_level_1_price record) ++
       encode_bytes 11 (bid_level_1_price record) ++
@@ -2369,10 +2369,10 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                   | Some (yield_todays_low_value, bytes) =>
                                                                       match decode_bytes 15 bytes with
                                                                       | None => None
-                                                                      | Some (accumulated_trading_volume_value, bytes) =>
+                                                                      | Some (accumulated_trading_volume_long_value, bytes) =>
                                                                           match decode_bytes 22 bytes with
                                                                           | None => None
-                                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                                               match decode_bytes 8 bytes with
                                                                               | None => None
                                                                               | Some (settlement_date_value, bytes) =>
@@ -2475,7 +2475,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                   | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; settlement_date := settlement_date_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_yield := ask_level_1_yield_value; bid_level_1_yield := bid_level_1_yield_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_yield := ask_level_2_yield_value; bid_level_2_yield := bid_level_2_yield_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_yield := ask_level_3_yield_value; bid_level_3_yield := bid_level_3_yield_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_yield := ask_level_4_yield_value; bid_level_4_yield := bid_level_4_yield_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_yield := ask_level_5_yield_value; bid_level_5_yield := bid_level_5_yield_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; accumulated_trading_value_long := accumulated_trading_value_long_value; settlement_date := settlement_date_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_yield := ask_level_1_yield_value; bid_level_1_yield := bid_level_1_yield_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_yield := ask_level_2_yield_value; bid_level_2_yield := bid_level_2_yield_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_yield := ask_level_3_yield_value; bid_level_3_yield := bid_level_3_yield_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_yield := ask_level_4_yield_value; bid_level_4_yield := bid_level_4_yield_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_yield := ask_level_5_yield_value; bid_level_5_yield := bid_level_5_yield_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                   end
                                                                                                                                                                                                               end
                                                                                                                                                                                                           end
@@ -2609,7 +2609,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       board_id : list byte;
       isin_code : list byte;
       a_designated_number_for_an_issue : list byte;
-      accumulated_trading_volume : list byte;
+      accumulated_trading_volume_long : list byte;
       end_keyword : N;
     }.
 
@@ -2618,14 +2618,14 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (board_id record) = 2 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (a_designated_number_for_an_issue record) = 6 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (board_id record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 6 (a_designated_number_for_an_issue record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
       encode_uint 1 (end_keyword record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2640,11 +2640,11 @@ Module KoscomMdcsRealtimeBondAV2020.
               | Some (a_designated_number_for_an_issue_value, bytes) =>
                   match decode_bytes 15 bytes with
                   | None => None
-                  | Some (accumulated_trading_volume_value, bytes) =>
+                  | Some (accumulated_trading_volume_long_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (end_keyword_value, bytes) =>
-                          Some ({| board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; accumulated_trading_volume := accumulated_trading_volume_value; end_keyword := end_keyword_value |}, bytes)
+                          Some ({| board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; end_keyword := end_keyword_value |}, bytes)
                       end
                   end
               end
@@ -4018,8 +4018,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       isin_code : list byte;
       trading_date : list byte;
       bid_closing_date : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_long : list byte;
+      accumulated_trading_value_long : list byte;
       cancellation : list byte;
       end_keyword : N;
     }.
@@ -4029,8 +4029,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (trading_date record) = 8 /\
       Datatypes.length (bid_closing_date record) = 8 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (cancellation record) = 1 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -4038,8 +4038,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 12 (isin_code record) ++
       encode_bytes 8 (trading_date record) ++
       encode_bytes 8 (bid_closing_date record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (cancellation record) ++
       encode_uint 1 (end_keyword record).
 
@@ -4055,17 +4055,17 @@ Module KoscomMdcsRealtimeBondAV2020.
               | Some (bid_closing_date_value, bytes) =>
                   match decode_bytes 15 bytes with
                   | None => None
-                  | Some (accumulated_trading_volume_value, bytes) =>
+                  | Some (accumulated_trading_volume_long_value, bytes) =>
                       match decode_bytes 22 bytes with
                       | None => None
-                      | Some (accumulated_trading_value_value, bytes) =>
+                      | Some (accumulated_trading_value_long_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (cancellation_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (end_keyword_value, bytes) =>
-                                  Some ({| isin_code := isin_code_value; trading_date := trading_date_value; bid_closing_date := bid_closing_date_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; cancellation := cancellation_value; end_keyword := end_keyword_value |}, bytes)
+                                  Some ({| isin_code := isin_code_value; trading_date := trading_date_value; bid_closing_date := bid_closing_date_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; accumulated_trading_value_long := accumulated_trading_value_long_value; cancellation := cancellation_value; end_keyword := end_keyword_value |}, bytes)
                               end
                           end
                       end
@@ -4107,7 +4107,7 @@ Module KoscomMdcsRealtimeBondAV2020.
     (** KTB Short-term Yield reference. *)
     Record t := {
       transmission_date : list byte;
-      calculation_time : list byte;
+      calculation_time_long : list byte;
       short_term_interest_rates_type_code : list byte;
       short_term_yield : list byte;
       end_keyword : N;
@@ -4116,14 +4116,14 @@ Module KoscomMdcsRealtimeBondAV2020.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (transmission_date record) = 8 /\
-      Datatypes.length (calculation_time record) = 9 /\
+      Datatypes.length (calculation_time_long record) = 9 /\
       Datatypes.length (short_term_interest_rates_type_code record) = 1 /\
       Datatypes.length (short_term_yield record) = 13 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 8 (transmission_date record) ++
-      encode_bytes 9 (calculation_time record) ++
+      encode_bytes 9 (calculation_time_long record) ++
       encode_bytes 1 (short_term_interest_rates_type_code record) ++
       encode_bytes 13 (short_term_yield record) ++
       encode_uint 1 (end_keyword record).
@@ -4134,7 +4134,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       | Some (transmission_date_value, bytes) =>
           match decode_bytes 9 bytes with
           | None => None
-          | Some (calculation_time_value, bytes) =>
+          | Some (calculation_time_long_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (short_term_interest_rates_type_code_value, bytes) =>
@@ -4144,7 +4144,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (end_keyword_value, bytes) =>
-                          Some ({| transmission_date := transmission_date_value; calculation_time := calculation_time_value; short_term_interest_rates_type_code := short_term_interest_rates_type_code_value; short_term_yield := short_term_yield_value; end_keyword := end_keyword_value |}, bytes)
+                          Some ({| transmission_date := transmission_date_value; calculation_time_long := calculation_time_long_value; short_term_interest_rates_type_code := short_term_interest_rates_type_code_value; short_term_yield := short_term_yield_value; end_keyword := end_keyword_value |}, bytes)
                       end
                   end
               end
@@ -4182,7 +4182,7 @@ Module KoscomMdcsRealtimeBondAV2020.
     (** KTB Average Yield reference. *)
     Record t := {
       transmission_date : list byte;
-      calculation_time : list byte;
+      calculation_time_long : list byte;
       short_term_interest_rates_type_code : list byte;
       average_yield : list byte;
       end_keyword : N;
@@ -4191,14 +4191,14 @@ Module KoscomMdcsRealtimeBondAV2020.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (transmission_date record) = 8 /\
-      Datatypes.length (calculation_time record) = 9 /\
+      Datatypes.length (calculation_time_long record) = 9 /\
       Datatypes.length (short_term_interest_rates_type_code record) = 1 /\
       Datatypes.length (average_yield record) = 13 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 8 (transmission_date record) ++
-      encode_bytes 9 (calculation_time record) ++
+      encode_bytes 9 (calculation_time_long record) ++
       encode_bytes 1 (short_term_interest_rates_type_code record) ++
       encode_bytes 13 (average_yield record) ++
       encode_uint 1 (end_keyword record).
@@ -4209,7 +4209,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       | Some (transmission_date_value, bytes) =>
           match decode_bytes 9 bytes with
           | None => None
-          | Some (calculation_time_value, bytes) =>
+          | Some (calculation_time_long_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (short_term_interest_rates_type_code_value, bytes) =>
@@ -4219,7 +4219,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (end_keyword_value, bytes) =>
-                          Some ({| transmission_date := transmission_date_value; calculation_time := calculation_time_value; short_term_interest_rates_type_code := short_term_interest_rates_type_code_value; average_yield := average_yield_value; end_keyword := end_keyword_value |}, bytes)
+                          Some ({| transmission_date := transmission_date_value; calculation_time_long := calculation_time_long_value; short_term_interest_rates_type_code := short_term_interest_rates_type_code_value; average_yield := average_yield_value; end_keyword := end_keyword_value |}, bytes)
                       end
                   end
               end
@@ -4588,7 +4588,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       message_sequence_number : list byte;
       isin_code : list byte;
       transmission_date : list byte;
-      transmission_time : list byte;
+      transmission_time_long : list byte;
       record_process_category : list byte;
       abbreviated_issue_name : list byte;
       abbreviated_issue_name_in_en : list byte;
@@ -4647,7 +4647,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       bond_delisted_date : list byte;
       equity_linked_bond_rights_type_code : list byte;
       isin : list byte;
-      issue_name : list byte;
+      issue_name_short : list byte;
       equity_linked_bond_exercise_price : list byte;
       exercise_ratio : list byte;
       date_to_start_exercising : list byte;
@@ -4704,7 +4704,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (message_sequence_number record) = 8 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (transmission_date record) = 8 /\
-      Datatypes.length (transmission_time record) = 9 /\
+      Datatypes.length (transmission_time_long record) = 9 /\
       Datatypes.length (record_process_category record) = 1 /\
       Datatypes.length (abbreviated_issue_name record) = 40 /\
       Datatypes.length (abbreviated_issue_name_in_en record) = 40 /\
@@ -4763,7 +4763,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (bond_delisted_date record) = 8 /\
       Datatypes.length (equity_linked_bond_rights_type_code record) = 2 /\
       Datatypes.length (isin record) = 12 /\
-      Datatypes.length (issue_name record) = 80 /\
+      Datatypes.length (issue_name_short record) = 60 /\
       Datatypes.length (equity_linked_bond_exercise_price record) = 11 /\
       Datatypes.length (exercise_ratio record) = 7 /\
       Datatypes.length (date_to_start_exercising record) = 8 /\
@@ -4818,7 +4818,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 8 (message_sequence_number record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 8 (transmission_date record) ++
-      encode_bytes 9 (transmission_time record) ++
+      encode_bytes 9 (transmission_time_long record) ++
       encode_bytes 1 (record_process_category record) ++
       encode_bytes 40 (abbreviated_issue_name record) ++
       encode_bytes 40 (abbreviated_issue_name_in_en record) ++
@@ -4877,7 +4877,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 8 (bond_delisted_date record) ++
       encode_bytes 2 (equity_linked_bond_rights_type_code record) ++
       encode_bytes 12 (isin record) ++
-      encode_bytes 80 (issue_name record) ++
+      encode_bytes 60 (issue_name_short record) ++
       encode_bytes 11 (equity_linked_bond_exercise_price record) ++
       encode_bytes 7 (exercise_ratio record) ++
       encode_bytes 8 (date_to_start_exercising record) ++
@@ -4940,7 +4940,7 @@ Module KoscomMdcsRealtimeBondAV2020.
               | Some (transmission_date_value, bytes) =>
                   match decode_bytes 9 bytes with
                   | None => None
-                  | Some (transmission_time_value, bytes) =>
+                  | Some (transmission_time_long_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (record_process_category_value, bytes) =>
@@ -5115,9 +5115,9 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                                                                                                                                                                                                           match decode_bytes 12 bytes with
                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                           | Some (isin_value, bytes) =>
-                                                                                                                                                                                                                                                              match decode_bytes 80 bytes with
+                                                                                                                                                                                                                                                              match decode_bytes 60 bytes with
                                                                                                                                                                                                                                                               | None => None
-                                                                                                                                                                                                                                                              | Some (issue_name_value, bytes) =>
+                                                                                                                                                                                                                                                              | Some (issue_name_short_value, bytes) =>
                                                                                                                                                                                                                                                                   match decode_bytes 11 bytes with
                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                   | Some (equity_linked_bond_exercise_price_value, bytes) =>
@@ -5265,7 +5265,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; transmission_date := transmission_date_value; transmission_time := transmission_time_value; record_process_category := record_process_category_value; abbreviated_issue_name := abbreviated_issue_name_value; abbreviated_issue_name_in_en := abbreviated_issue_name_in_en_value; issuer_code := issuer_code_value; bond_listing_type_code := bond_listing_type_code_value; bond_category_code := bond_category_code_value; bond_type_code := bond_type_code_value; special_bond_issue_code := special_bond_issue_code_value; mb_type_code := mb_type_code_value; bond_guaranteed_type_code := bond_guaranteed_type_code_value; guaranteed_rate_for_payment := guaranteed_rate_for_payment_value; other_types_of_bond := other_types_of_bond_value; option_embedded_type_code := option_embedded_type_code_value; coupon_payment_type_code := coupon_payment_type_code_value; risk_bond_redemption_type_code := risk_bond_redemption_type_code_value; bond_issuance_type_code := bond_issuance_type_code_value; securitization_type_code := securitization_type_code_value; redemption_priority_type_code := redemption_priority_type_code_value; listing_date := listing_date_value; issue_date := issue_date_value; redemption_date := redemption_date_value; sale_date := sale_date_value; the_1_st_coupon_payment_date := the_1_st_coupon_payment_date_value; bond_issuance_rate := bond_issuance_rate_value; coupon_rate := coupon_rate_value; monthly_cycle_of_coupon_payment := monthly_cycle_of_coupon_payment_value; coupon_payment_timing_code := coupon_payment_timing_code_value; interest_payment := interest_payment_value; coupon_payment_date_type_code := coupon_payment_date_type_code_value; decimal_point_of_coupon_type_code := decimal_point_of_coupon_type_code_value; number_of_months_to_pay_interest := number_of_months_to_pay_interest_value; bond_sale_type_code := bond_sale_type_code_value; pre_issue_sale_coupon_payment_type_code := pre_issue_sale_coupon_payment_type_code_value; issuing_amount := issuing_amount_value; listed_amount := listed_amount_value; confirmation_of_lump_sum_payment := confirmation_of_lump_sum_payment_value; currency_type_code := currency_type_code_value; redemption_ratio_at_maturity := redemption_ratio_at_maturity_value; yield_to_maturity := yield_to_maturity_value; guaranteed_yield_effective_date := guaranteed_yield_effective_date_value; additional_yield := additional_yield_value; additional_yield_effective_date := additional_yield_effective_date_value; facility_fund := facility_fund_value; maintenance_fund := maintenance_fund_value; loan_fund := loan_fund_value; other_funds := other_funds_value; inscription_type_of_bond := inscription_type_of_bond_value; taxation := taxation_value; bond_lead_manager_company_code := bond_lead_manager_company_code_value; payment_guarantor_code := payment_guarantor_code_value; trustee_code := trustee_code_value; register_institute_code := register_institute_code_value; payment_agent_code := payment_agent_code_value; abbreviated_issue_code := abbreviated_issue_code_value; bond_delisting_reason_code := bond_delisting_reason_code_value; bond_delisted_date := bond_delisted_date_value; equity_linked_bond_rights_type_code := equity_linked_bond_rights_type_code_value; isin := isin_value; issue_name := issue_name_value; equity_linked_bond_exercise_price := equity_linked_bond_exercise_price_value; exercise_ratio := exercise_ratio_value; date_to_start_exercising := date_to_start_exercising_value; date_to_end_exercising := date_to_end_exercising_value; institution_code := institution_code_value; record_date_of_dividend_payout := record_date_of_dividend_payout_value; profit_participating_accum_status := profit_participating_accum_status_value; issue_code_of_post_exercise := issue_code_of_post_exercise_value; amortization_type_code := amortization_type_code_value; level_payment_amount := level_payment_amount_value; number_of_months_for_grace := number_of_months_for_grace_value; interest_type_code_during_amortization := interest_type_code_during_amortization_value; number_of_amortization := number_of_amortization_value; interest_rate_decision_other_base_rate_name := interest_rate_decision_other_base_rate_name_value; spread := spread_value; timing_of_interest_rate_decision_type_code := timing_of_interest_rate_decision_type_code_value; upper_limit_coupon_rate := upper_limit_coupon_rate_value; lower_limit_coupon_rate := lower_limit_coupon_rate_value; the_date_to_decide_interest_rate := the_date_to_decide_interest_rate_value; first_call_exercise_start_date := first_call_exercise_start_date_value; first_call_exercise_end_date := first_call_exercise_end_date_value; second_call_exercise_start_date := second_call_exercise_start_date_value; second_call_exercise_end_date := second_call_exercise_end_date_value; first_put_exercise_start_date := first_put_exercise_start_date_value; first_put_exercise_end_date := first_put_exercise_end_date_value; second_put_exercise_start_date := second_put_exercise_start_date_value; second_put_exercise_end_date := second_put_exercise_end_date_value; coupon_payment_decision_code_for_bank_holidays := coupon_payment_decision_code_for_bank_holidays_value; hybrid_bond := hybrid_bond_value; co_cos_type_code := co_cos_type_code_value; coupon_rate_confirmation := coupon_rate_confirmation_value; principal_guranteed_rate := principal_guranteed_rate_value; participating_rate := participating_rate_value; maximum_yield := maximum_yield_value; strip_bond_type_code := strip_bond_type_code_value; original_bond_type_code_subjec_to_strip := original_bond_type_code_subjec_to_strip_value; unstripped_balance := unstripped_balance_value; inflation_indexed_category := inflation_indexed_category_value; reference_index_for_issue_date := reference_index_for_issue_date_value; coupon_rate_decision_base_rate_type_code := coupon_rate_decision_base_rate_type_code_value; bond_odd_lot_days_base_interest_type_code := bond_odd_lot_days_base_interest_type_code_value; base_interest_rate_on_bank_holidays_type_code := base_interest_rate_on_bank_holidays_type_code_value; accrued_interest_rate_on_bank_holidays_type_code := accrued_interest_rate_on_bank_holidays_type_code_value; principal_payment_methods_on_bank_holidays_type_code := principal_payment_methods_on_bank_holidays_type_code_value; principal_base_rate_on_bank_holidays_type_code := principal_base_rate_on_bank_holidays_type_code_value; principal_accrued_interest_rate_on_bank_holidays_type_code := principal_accrued_interest_rate_on_bank_holidays_type_code_value; stop_out_rate := stop_out_rate_value; crowdfunding := crowdfunding_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; transmission_date := transmission_date_value; transmission_time_long := transmission_time_long_value; record_process_category := record_process_category_value; abbreviated_issue_name := abbreviated_issue_name_value; abbreviated_issue_name_in_en := abbreviated_issue_name_in_en_value; issuer_code := issuer_code_value; bond_listing_type_code := bond_listing_type_code_value; bond_category_code := bond_category_code_value; bond_type_code := bond_type_code_value; special_bond_issue_code := special_bond_issue_code_value; mb_type_code := mb_type_code_value; bond_guaranteed_type_code := bond_guaranteed_type_code_value; guaranteed_rate_for_payment := guaranteed_rate_for_payment_value; other_types_of_bond := other_types_of_bond_value; option_embedded_type_code := option_embedded_type_code_value; coupon_payment_type_code := coupon_payment_type_code_value; risk_bond_redemption_type_code := risk_bond_redemption_type_code_value; bond_issuance_type_code := bond_issuance_type_code_value; securitization_type_code := securitization_type_code_value; redemption_priority_type_code := redemption_priority_type_code_value; listing_date := listing_date_value; issue_date := issue_date_value; redemption_date := redemption_date_value; sale_date := sale_date_value; the_1_st_coupon_payment_date := the_1_st_coupon_payment_date_value; bond_issuance_rate := bond_issuance_rate_value; coupon_rate := coupon_rate_value; monthly_cycle_of_coupon_payment := monthly_cycle_of_coupon_payment_value; coupon_payment_timing_code := coupon_payment_timing_code_value; interest_payment := interest_payment_value; coupon_payment_date_type_code := coupon_payment_date_type_code_value; decimal_point_of_coupon_type_code := decimal_point_of_coupon_type_code_value; number_of_months_to_pay_interest := number_of_months_to_pay_interest_value; bond_sale_type_code := bond_sale_type_code_value; pre_issue_sale_coupon_payment_type_code := pre_issue_sale_coupon_payment_type_code_value; issuing_amount := issuing_amount_value; listed_amount := listed_amount_value; confirmation_of_lump_sum_payment := confirmation_of_lump_sum_payment_value; currency_type_code := currency_type_code_value; redemption_ratio_at_maturity := redemption_ratio_at_maturity_value; yield_to_maturity := yield_to_maturity_value; guaranteed_yield_effective_date := guaranteed_yield_effective_date_value; additional_yield := additional_yield_value; additional_yield_effective_date := additional_yield_effective_date_value; facility_fund := facility_fund_value; maintenance_fund := maintenance_fund_value; loan_fund := loan_fund_value; other_funds := other_funds_value; inscription_type_of_bond := inscription_type_of_bond_value; taxation := taxation_value; bond_lead_manager_company_code := bond_lead_manager_company_code_value; payment_guarantor_code := payment_guarantor_code_value; trustee_code := trustee_code_value; register_institute_code := register_institute_code_value; payment_agent_code := payment_agent_code_value; abbreviated_issue_code := abbreviated_issue_code_value; bond_delisting_reason_code := bond_delisting_reason_code_value; bond_delisted_date := bond_delisted_date_value; equity_linked_bond_rights_type_code := equity_linked_bond_rights_type_code_value; isin := isin_value; issue_name_short := issue_name_short_value; equity_linked_bond_exercise_price := equity_linked_bond_exercise_price_value; exercise_ratio := exercise_ratio_value; date_to_start_exercising := date_to_start_exercising_value; date_to_end_exercising := date_to_end_exercising_value; institution_code := institution_code_value; record_date_of_dividend_payout := record_date_of_dividend_payout_value; profit_participating_accum_status := profit_participating_accum_status_value; issue_code_of_post_exercise := issue_code_of_post_exercise_value; amortization_type_code := amortization_type_code_value; level_payment_amount := level_payment_amount_value; number_of_months_for_grace := number_of_months_for_grace_value; interest_type_code_during_amortization := interest_type_code_during_amortization_value; number_of_amortization := number_of_amortization_value; interest_rate_decision_other_base_rate_name := interest_rate_decision_other_base_rate_name_value; spread := spread_value; timing_of_interest_rate_decision_type_code := timing_of_interest_rate_decision_type_code_value; upper_limit_coupon_rate := upper_limit_coupon_rate_value; lower_limit_coupon_rate := lower_limit_coupon_rate_value; the_date_to_decide_interest_rate := the_date_to_decide_interest_rate_value; first_call_exercise_start_date := first_call_exercise_start_date_value; first_call_exercise_end_date := first_call_exercise_end_date_value; second_call_exercise_start_date := second_call_exercise_start_date_value; second_call_exercise_end_date := second_call_exercise_end_date_value; first_put_exercise_start_date := first_put_exercise_start_date_value; first_put_exercise_end_date := first_put_exercise_end_date_value; second_put_exercise_start_date := second_put_exercise_start_date_value; second_put_exercise_end_date := second_put_exercise_end_date_value; coupon_payment_decision_code_for_bank_holidays := coupon_payment_decision_code_for_bank_holidays_value; hybrid_bond := hybrid_bond_value; co_cos_type_code := co_cos_type_code_value; coupon_rate_confirmation := coupon_rate_confirmation_value; principal_guranteed_rate := principal_guranteed_rate_value; participating_rate := participating_rate_value; maximum_yield := maximum_yield_value; strip_bond_type_code := strip_bond_type_code_value; original_bond_type_code_subjec_to_strip := original_bond_type_code_subjec_to_strip_value; unstripped_balance := unstripped_balance_value; inflation_indexed_category := inflation_indexed_category_value; reference_index_for_issue_date := reference_index_for_issue_date_value; coupon_rate_decision_base_rate_type_code := coupon_rate_decision_base_rate_type_code_value; bond_odd_lot_days_base_interest_type_code := bond_odd_lot_days_base_interest_type_code_value; base_interest_rate_on_bank_holidays_type_code := base_interest_rate_on_bank_holidays_type_code_value; accrued_interest_rate_on_bank_holidays_type_code := accrued_interest_rate_on_bank_holidays_type_code_value; principal_payment_methods_on_bank_holidays_type_code := principal_payment_methods_on_bank_holidays_type_code_value; principal_base_rate_on_bank_holidays_type_code := principal_base_rate_on_bank_holidays_type_code_value; principal_accrued_interest_rate_on_bank_holidays_type_code := principal_accrued_interest_rate_on_bank_holidays_type_code_value; stop_out_rate := stop_out_rate_value; crowdfunding := crowdfunding_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                                                                                                                                                                                                                                               end
                                                                                                                                                                                                                                                                                                                                                                                                                                                           end
@@ -5379,7 +5379,7 @@ Module KoscomMdcsRealtimeBondAV2020.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 918.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 898.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -5519,7 +5519,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       message_sequence_number : list byte;
       isin_code : list byte;
       transmission_date : list byte;
-      issue_name : list byte;
+      issue_name_long : list byte;
       english_issue_name : list byte;
       unusual_issuance_condition : list byte;
       reason_for_exercising_a_call : list byte;
@@ -5535,7 +5535,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (message_sequence_number record) = 8 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (transmission_date record) = 8 /\
-      Datatypes.length (issue_name record) = 80 /\
+      Datatypes.length (issue_name_long record) = 80 /\
       Datatypes.length (english_issue_name record) = 80 /\
       Datatypes.length (unusual_issuance_condition record) = 60 /\
       Datatypes.length (reason_for_exercising_a_call record) = 50 /\
@@ -5549,7 +5549,7 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 8 (message_sequence_number record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 8 (transmission_date record) ++
-      encode_bytes 80 (issue_name record) ++
+      encode_bytes 80 (issue_name_long record) ++
       encode_bytes 80 (english_issue_name record) ++
       encode_bytes 60 (unusual_issuance_condition record) ++
       encode_bytes 50 (reason_for_exercising_a_call record) ++
@@ -5571,7 +5571,7 @@ Module KoscomMdcsRealtimeBondAV2020.
               | Some (transmission_date_value, bytes) =>
                   match decode_bytes 80 bytes with
                   | None => None
-                  | Some (issue_name_value, bytes) =>
+                  | Some (issue_name_long_value, bytes) =>
                       match decode_bytes 80 bytes with
                       | None => None
                       | Some (english_issue_name_value, bytes) =>
@@ -5596,7 +5596,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                   match decode_uint 1 bytes with
                                                   | None => None
                                                   | Some (end_keyword_value, bytes) =>
-                                                      Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; transmission_date := transmission_date_value; issue_name := issue_name_value; english_issue_name := english_issue_name_value; unusual_issuance_condition := unusual_issuance_condition_value; reason_for_exercising_a_call := reason_for_exercising_a_call_value; reason_for_exercising_a_put := reason_for_exercising_a_put_value; contents_of_underlying_asset := contents_of_underlying_asset_value; els_condition_1 := els_condition_1_value; els_condition_2 := els_condition_2_value; end_keyword := end_keyword_value |}, bytes)
+                                                      Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; transmission_date := transmission_date_value; issue_name_long := issue_name_long_value; english_issue_name := english_issue_name_value; unusual_issuance_condition := unusual_issuance_condition_value; reason_for_exercising_a_call := reason_for_exercising_a_call_value; reason_for_exercising_a_put := reason_for_exercising_a_put_value; contents_of_underlying_asset := contents_of_underlying_asset_value; els_condition_1 := els_condition_1_value; els_condition_2 := els_condition_2_value; end_keyword := end_keyword_value |}, bytes)
                                                   end
                                               end
                                           end
@@ -7272,8 +7272,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       yield_opening_price : list byte;
       yield_todays_high : list byte;
       yield_todays_low : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_long : list byte;
+      accumulated_trading_value_long : list byte;
       settlement_date : list byte;
       ask_level_1_price : list byte;
       bid_level_1_price : list byte;
@@ -7360,8 +7360,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (yield_opening_price record) = 13 /\
       Datatypes.length (yield_todays_high record) = 13 /\
       Datatypes.length (yield_todays_low record) = 13 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (settlement_date record) = 8 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
       Datatypes.length (bid_level_1_price record) = 11 /\
@@ -7446,8 +7446,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 13 (yield_opening_price record) ++
       encode_bytes 13 (yield_todays_high record) ++
       encode_bytes 13 (yield_todays_low record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 8 (settlement_date record) ++
       encode_bytes 11 (ask_level_1_price record) ++
       encode_bytes 11 (bid_level_1_price record) ++
@@ -7566,10 +7566,10 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                   | Some (yield_todays_low_value, bytes) =>
                                                                       match decode_bytes 15 bytes with
                                                                       | None => None
-                                                                      | Some (accumulated_trading_volume_value, bytes) =>
+                                                                      | Some (accumulated_trading_volume_long_value, bytes) =>
                                                                           match decode_bytes 22 bytes with
                                                                           | None => None
-                                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                                               match decode_bytes 8 bytes with
                                                                               | None => None
                                                                               | Some (settlement_date_value, bytes) =>
@@ -7768,7 +7768,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                                                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                                   | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; settlement_date := settlement_date_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_yield := ask_level_1_yield_value; bid_level_1_yield := bid_level_1_yield_value; ask_per_type_level_1_price := ask_per_type_level_1_price_value; bid_per_type_level_1_price := bid_per_type_level_1_price_value; ask_per_type_level_1_remaining_quantity := ask_per_type_level_1_remaining_quantity_value; bid_per_type_level_1_remaining_quantity := bid_per_type_level_1_remaining_quantity_value; ask_per_type_level_1_yield := ask_per_type_level_1_yield_value; bid_per_type_level_1_yield := bid_per_type_level_1_yield_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_yield := ask_level_2_yield_value; bid_level_2_yield := bid_level_2_yield_value; ask_per_type_level_2_price := ask_per_type_level_2_price_value; bid_per_type_level_2_price := bid_per_type_level_2_price_value; ask_per_type_level_2_remaining_quantity := ask_per_type_level_2_remaining_quantity_value; bid_per_type_level_2_remaining_quantity := bid_per_type_level_2_remaining_quantity_value; ask_per_type_level_2_yield := ask_per_type_level_2_yield_value; bid_per_type_level_2_yield := bid_per_type_level_2_yield_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_yield := ask_level_3_yield_value; bid_level_3_yield := bid_level_3_yield_value; ask_per_type_level_3_price := ask_per_type_level_3_price_value; bid_per_type_level_3_price := bid_per_type_level_3_price_value; ask_per_type_level_3_remaining_quantity := ask_per_type_level_3_remaining_quantity_value; bid_per_type_level_3_remaining_quantity := bid_per_type_level_3_remaining_quantity_value; ask_per_type_level_3_yield := ask_per_type_level_3_yield_value; bid_per_type_level_3_yield := bid_per_type_level_3_yield_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_yield := ask_level_4_yield_value; bid_level_4_yield := bid_level_4_yield_value; ask_per_type_level_4_price := ask_per_type_level_4_price_value; bid_per_type_level_4_price := bid_per_type_level_4_price_value; ask_per_type_level_4_remaining_quantity := ask_per_type_level_4_remaining_quantity_value; bid_per_type_level_4_remaining_quantity := bid_per_type_level_4_remaining_quantity_value; ask_per_type_level_4_yield := ask_per_type_level_4_yield_value; bid_per_type_level_4_yield := bid_per_type_level_4_yield_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_yield := ask_level_5_yield_value; bid_level_5_yield := bid_level_5_yield_value; ask_per_type_level_5_price := ask_per_type_level_5_price_value; bid_per_type_level_5_price := bid_per_type_level_5_price_value; ask_per_type_level_5_remaining_quantity := ask_per_type_level_5_remaining_quantity_value; bid_per_type_level_5_remaining_quantity := bid_per_type_level_5_remaining_quantity_value; ask_per_type_level_5_yield := ask_per_type_level_5_yield_value; bid_per_type_level_5_yield := bid_per_type_level_5_yield_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; ask_per_type_total_remaining_quantity := ask_per_type_total_remaining_quantity_value; bid_per_type_total_remaining_quantity := bid_per_type_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; bond_yield := bond_yield_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; yield_opening_price := yield_opening_price_value; yield_todays_high := yield_todays_high_value; yield_todays_low := yield_todays_low_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; accumulated_trading_value_long := accumulated_trading_value_long_value; settlement_date := settlement_date_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_yield := ask_level_1_yield_value; bid_level_1_yield := bid_level_1_yield_value; ask_per_type_level_1_price := ask_per_type_level_1_price_value; bid_per_type_level_1_price := bid_per_type_level_1_price_value; ask_per_type_level_1_remaining_quantity := ask_per_type_level_1_remaining_quantity_value; bid_per_type_level_1_remaining_quantity := bid_per_type_level_1_remaining_quantity_value; ask_per_type_level_1_yield := ask_per_type_level_1_yield_value; bid_per_type_level_1_yield := bid_per_type_level_1_yield_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_yield := ask_level_2_yield_value; bid_level_2_yield := bid_level_2_yield_value; ask_per_type_level_2_price := ask_per_type_level_2_price_value; bid_per_type_level_2_price := bid_per_type_level_2_price_value; ask_per_type_level_2_remaining_quantity := ask_per_type_level_2_remaining_quantity_value; bid_per_type_level_2_remaining_quantity := bid_per_type_level_2_remaining_quantity_value; ask_per_type_level_2_yield := ask_per_type_level_2_yield_value; bid_per_type_level_2_yield := bid_per_type_level_2_yield_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_yield := ask_level_3_yield_value; bid_level_3_yield := bid_level_3_yield_value; ask_per_type_level_3_price := ask_per_type_level_3_price_value; bid_per_type_level_3_price := bid_per_type_level_3_price_value; ask_per_type_level_3_remaining_quantity := ask_per_type_level_3_remaining_quantity_value; bid_per_type_level_3_remaining_quantity := bid_per_type_level_3_remaining_quantity_value; ask_per_type_level_3_yield := ask_per_type_level_3_yield_value; bid_per_type_level_3_yield := bid_per_type_level_3_yield_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_yield := ask_level_4_yield_value; bid_level_4_yield := bid_level_4_yield_value; ask_per_type_level_4_price := ask_per_type_level_4_price_value; bid_per_type_level_4_price := bid_per_type_level_4_price_value; ask_per_type_level_4_remaining_quantity := ask_per_type_level_4_remaining_quantity_value; bid_per_type_level_4_remaining_quantity := bid_per_type_level_4_remaining_quantity_value; ask_per_type_level_4_yield := ask_per_type_level_4_yield_value; bid_per_type_level_4_yield := bid_per_type_level_4_yield_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_yield := ask_level_5_yield_value; bid_level_5_yield := bid_level_5_yield_value; ask_per_type_level_5_price := ask_per_type_level_5_price_value; bid_per_type_level_5_price := bid_per_type_level_5_price_value; ask_per_type_level_5_remaining_quantity := ask_per_type_level_5_remaining_quantity_value; bid_per_type_level_5_remaining_quantity := bid_per_type_level_5_remaining_quantity_value; ask_per_type_level_5_yield := ask_per_type_level_5_yield_value; bid_per_type_level_5_yield := bid_per_type_level_5_yield_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; ask_per_type_total_remaining_quantity := ask_per_type_total_remaining_quantity_value; bid_per_type_total_remaining_quantity := bid_per_type_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                                                                                                                               end
                                                                                                                                                                                                                                                                                                                                           end
@@ -7982,8 +7982,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       category_opening_price : list byte;
       category_todays_high : list byte;
       category_todays_low : list byte;
-      accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_volume_long : list byte;
+      accumulated_trading_value_long : list byte;
       category_accumulated_trading_volume : list byte;
       category_accumulated_trading_value : list byte;
       ask_level_1_price : list byte;
@@ -8111,8 +8111,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       Datatypes.length (category_opening_price record) = 11 /\
       Datatypes.length (category_todays_high record) = 11 /\
       Datatypes.length (category_todays_low record) = 11 /\
-      Datatypes.length (accumulated_trading_volume record) = 15 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_volume_long record) = 15 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (category_accumulated_trading_volume record) = 15 /\
       Datatypes.length (category_accumulated_trading_value record) = 22 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
@@ -8238,8 +8238,8 @@ Module KoscomMdcsRealtimeBondAV2020.
       encode_bytes 11 (category_opening_price record) ++
       encode_bytes 11 (category_todays_high record) ++
       encode_bytes 11 (category_todays_low record) ++
-      encode_bytes 15 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 15 (accumulated_trading_volume_long record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 15 (category_accumulated_trading_volume record) ++
       encode_bytes 22 (category_accumulated_trading_value record) ++
       encode_bytes 11 (ask_level_1_price record) ++
@@ -8405,10 +8405,10 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                               | Some (category_todays_low_value, bytes) =>
                                                                                   match decode_bytes 15 bytes with
                                                                                   | None => None
-                                                                                  | Some (accumulated_trading_volume_value, bytes) =>
+                                                                                  | Some (accumulated_trading_volume_long_value, bytes) =>
                                                                                       match decode_bytes 22 bytes with
                                                                                       | None => None
-                                                                                      | Some (accumulated_trading_value_value, bytes) =>
+                                                                                      | Some (accumulated_trading_value_long_value, bytes) =>
                                                                                           match decode_bytes 15 bytes with
                                                                                           | None => None
                                                                                           | Some (category_accumulated_trading_volume_value, bytes) =>
@@ -8721,7 +8721,7 @@ Module KoscomMdcsRealtimeBondAV2020.
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; ask_repo_type_code := ask_repo_type_code_value; ask_duration_of_term_repo := ask_duration_of_term_repo_value; bid_repo_type_code := bid_repo_type_code_value; bid_duration_of_term_repo := bid_duration_of_term_repo_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; category_opening_price := category_opening_price_value; category_todays_high := category_todays_high_value; category_todays_low := category_todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; category_accumulated_trading_volume := category_accumulated_trading_volume_value; category_accumulated_trading_value := category_accumulated_trading_value_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_trading_amount := ask_level_1_trading_amount_value; total_bid_level_1_price := total_bid_level_1_price_value; total_bid_level_1_remaining_quantity := total_bid_level_1_remaining_quantity_value; bid_level_1_including_gc := bid_level_1_including_gc_value; ask_per_type_level_1_price := ask_per_type_level_1_price_value; bid_per_type_level_1_price := bid_per_type_level_1_price_value; ask_per_type_level_1_remaining_quantity := ask_per_type_level_1_remaining_quantity_value; bid_per_type_level_1_remaining_quantity := bid_per_type_level_1_remaining_quantity_value; ask_per_type_level_1_trading_amount := ask_per_type_level_1_trading_amount_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_trading_amount := ask_level_2_trading_amount_value; total_bid_level_2_price := total_bid_level_2_price_value; total_bid_level_2_remaining_quantity := total_bid_level_2_remaining_quantity_value; bid_level_2_including_gc := bid_level_2_including_gc_value; ask_per_type_level_2_price := ask_per_type_level_2_price_value; bid_per_type_level_2_price := bid_per_type_level_2_price_value; ask_per_type_level_2_remaining_quantity := ask_per_type_level_2_remaining_quantity_value; bid_per_type_level_2_remaining_quantity := bid_per_type_level_2_remaining_quantity_value; ask_per_type_level_2_trading_amount := ask_per_type_level_2_trading_amount_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_trading_amount := ask_level_3_trading_amount_value; total_bid_level_3_price := total_bid_level_3_price_value; total_bid_level_3_remaining_quantity := total_bid_level_3_remaining_quantity_value; bid_level_3_including_gc := bid_level_3_including_gc_value; ask_per_type_level_3_price := ask_per_type_level_3_price_value; bid_per_type_level_3_price := bid_per_type_level_3_price_value; ask_per_type_level_3_remaining_quantity := ask_per_type_level_3_remaining_quantity_value; bid_per_type_level_3_remaining_quantity := bid_per_type_level_3_remaining_quantity_value; ask_per_type_level_3_trading_amount := ask_per_type_level_3_trading_amount_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_trading_amount := ask_level_4_trading_amount_value; total_bid_level_4_price := total_bid_level_4_price_value; total_bid_level_4_remaining_quantity := total_bid_level_4_remaining_quantity_value; bid_level_4_including_gc := bid_level_4_including_gc_value; ask_per_type_level_4_price := ask_per_type_level_4_price_value; bid_per_type_level_4_price := bid_per_type_level_4_price_value; ask_per_type_level_4_remaining_quantity := ask_per_type_level_4_remaining_quantity_value; bid_per_type_level_4_remaining_quantity := bid_per_type_level_4_remaining_quantity_value; ask_per_type_level_4_trading_amount := ask_per_type_level_4_trading_amount_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_trading_amount := ask_level_5_trading_amount_value; total_bid_level_5_price := total_bid_level_5_price_value; total_bid_level_5_remaining_quantity := total_bid_level_5_remaining_quantity_value; bid_level_5_including_gc := bid_level_5_including_gc_value; ask_per_type_level_5_price := ask_per_type_level_5_price_value; bid_per_type_level_5_price := bid_per_type_level_5_price_value; ask_per_type_level_5_remaining_quantity := ask_per_type_level_5_remaining_quantity_value; bid_per_type_level_5_remaining_quantity := bid_per_type_level_5_remaining_quantity_value; ask_per_type_level_5_trading_amount := ask_per_type_level_5_trading_amount_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; ask_per_type_total_remaining_quantity := ask_per_type_total_remaining_quantity_value; bid_per_type_total_remaining_quantity := bid_per_type_total_remaining_quantity_value; designated_bid_level_1_price := designated_bid_level_1_price_value; designated_bid_level_1_repo_remaining_quantity := designated_bid_level_1_repo_remaining_quantity_value; designated_bid_level_1_isin := designated_bid_level_1_isin_value; designated_bid_level_2_price := designated_bid_level_2_price_value; designated_bid_level_2_repo_remaining_quantity := designated_bid_level_2_repo_remaining_quantity_value; designated_bid_level_2_isin := designated_bid_level_2_isin_value; designated_bid_level_3_price := designated_bid_level_3_price_value; designated_bid_level_3_repo_remaining_quantity := designated_bid_level_3_repo_remaining_quantity_value; designated_bid_level_3_isin := designated_bid_level_3_isin_value; designated_bid_level_4_price := designated_bid_level_4_price_value; designated_bid_level_4_repo_remaining_quantity := designated_bid_level_4_repo_remaining_quantity_value; designated_bid_level_4_isin := designated_bid_level_4_isin_value; designated_bid_level_5_price := designated_bid_level_5_price_value; designated_bid_level_5_repo_remaining_quantity := designated_bid_level_5_repo_remaining_quantity_value; designated_bid_level_5_isin := designated_bid_level_5_isin_value; designated_bid_level_6_price := designated_bid_level_6_price_value; designated_bid_level_6_repo_remaining_quantity := designated_bid_level_6_repo_remaining_quantity_value; designated_bid_level_6_isin := designated_bid_level_6_isin_value; designated_bid_level_7_price := designated_bid_level_7_price_value; designated_bid_level_7_repo_remaining_quantity := designated_bid_level_7_repo_remaining_quantity_value; designated_bid_level_7_isin := designated_bid_level_7_isin_value; designated_bid_level_8_price := designated_bid_level_8_price_value; designated_bid_level_8_repo_remaining_quantity := designated_bid_level_8_repo_remaining_quantity_value; designated_bid_level_8_isin := designated_bid_level_8_isin_value; designated_bid_level_9_price := designated_bid_level_9_price_value; designated_bid_level_9_repo_remaining_quantity := designated_bid_level_9_repo_remaining_quantity_value; designated_bid_level_9_isin := designated_bid_level_9_isin_value; designated_bid_level_10_price := designated_bid_level_10_price_value; designated_bid_level_10_repo_remaining_quantity := designated_bid_level_10_repo_remaining_quantity_value; designated_bid_level_10_isin := designated_bid_level_10_isin_value; designated_best_bid_price := designated_best_bid_price_value; net_bid_per_type_total_remaining_quantity := net_bid_per_type_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; trading_date := trading_date_value; trading_value := trading_value_value; ask_repo_type_code := ask_repo_type_code_value; ask_duration_of_term_repo := ask_duration_of_term_repo_value; bid_repo_type_code := bid_repo_type_code_value; bid_duration_of_term_repo := bid_duration_of_term_repo_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; category_opening_price := category_opening_price_value; category_todays_high := category_todays_high_value; category_todays_low := category_todays_low_value; accumulated_trading_volume_long := accumulated_trading_volume_long_value; accumulated_trading_value_long := accumulated_trading_value_long_value; category_accumulated_trading_volume := category_accumulated_trading_volume_value; category_accumulated_trading_value := category_accumulated_trading_value_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_remaining_quantity := ask_level_1_remaining_quantity_value; bid_level_1_remaining_quantity := bid_level_1_remaining_quantity_value; ask_level_1_trading_amount := ask_level_1_trading_amount_value; total_bid_level_1_price := total_bid_level_1_price_value; total_bid_level_1_remaining_quantity := total_bid_level_1_remaining_quantity_value; bid_level_1_including_gc := bid_level_1_including_gc_value; ask_per_type_level_1_price := ask_per_type_level_1_price_value; bid_per_type_level_1_price := bid_per_type_level_1_price_value; ask_per_type_level_1_remaining_quantity := ask_per_type_level_1_remaining_quantity_value; bid_per_type_level_1_remaining_quantity := bid_per_type_level_1_remaining_quantity_value; ask_per_type_level_1_trading_amount := ask_per_type_level_1_trading_amount_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_remaining_quantity := ask_level_2_remaining_quantity_value; bid_level_2_remaining_quantity := bid_level_2_remaining_quantity_value; ask_level_2_trading_amount := ask_level_2_trading_amount_value; total_bid_level_2_price := total_bid_level_2_price_value; total_bid_level_2_remaining_quantity := total_bid_level_2_remaining_quantity_value; bid_level_2_including_gc := bid_level_2_including_gc_value; ask_per_type_level_2_price := ask_per_type_level_2_price_value; bid_per_type_level_2_price := bid_per_type_level_2_price_value; ask_per_type_level_2_remaining_quantity := ask_per_type_level_2_remaining_quantity_value; bid_per_type_level_2_remaining_quantity := bid_per_type_level_2_remaining_quantity_value; ask_per_type_level_2_trading_amount := ask_per_type_level_2_trading_amount_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_remaining_quantity := ask_level_3_remaining_quantity_value; bid_level_3_remaining_quantity := bid_level_3_remaining_quantity_value; ask_level_3_trading_amount := ask_level_3_trading_amount_value; total_bid_level_3_price := total_bid_level_3_price_value; total_bid_level_3_remaining_quantity := total_bid_level_3_remaining_quantity_value; bid_level_3_including_gc := bid_level_3_including_gc_value; ask_per_type_level_3_price := ask_per_type_level_3_price_value; bid_per_type_level_3_price := bid_per_type_level_3_price_value; ask_per_type_level_3_remaining_quantity := ask_per_type_level_3_remaining_quantity_value; bid_per_type_level_3_remaining_quantity := bid_per_type_level_3_remaining_quantity_value; ask_per_type_level_3_trading_amount := ask_per_type_level_3_trading_amount_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_remaining_quantity := ask_level_4_remaining_quantity_value; bid_level_4_remaining_quantity := bid_level_4_remaining_quantity_value; ask_level_4_trading_amount := ask_level_4_trading_amount_value; total_bid_level_4_price := total_bid_level_4_price_value; total_bid_level_4_remaining_quantity := total_bid_level_4_remaining_quantity_value; bid_level_4_including_gc := bid_level_4_including_gc_value; ask_per_type_level_4_price := ask_per_type_level_4_price_value; bid_per_type_level_4_price := bid_per_type_level_4_price_value; ask_per_type_level_4_remaining_quantity := ask_per_type_level_4_remaining_quantity_value; bid_per_type_level_4_remaining_quantity := bid_per_type_level_4_remaining_quantity_value; ask_per_type_level_4_trading_amount := ask_per_type_level_4_trading_amount_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_remaining_quantity := ask_level_5_remaining_quantity_value; bid_level_5_remaining_quantity := bid_level_5_remaining_quantity_value; ask_level_5_trading_amount := ask_level_5_trading_amount_value; total_bid_level_5_price := total_bid_level_5_price_value; total_bid_level_5_remaining_quantity := total_bid_level_5_remaining_quantity_value; bid_level_5_including_gc := bid_level_5_including_gc_value; ask_per_type_level_5_price := ask_per_type_level_5_price_value; bid_per_type_level_5_price := bid_per_type_level_5_price_value; ask_per_type_level_5_remaining_quantity := ask_per_type_level_5_remaining_quantity_value; bid_per_type_level_5_remaining_quantity := bid_per_type_level_5_remaining_quantity_value; ask_per_type_level_5_trading_amount := ask_per_type_level_5_trading_amount_value; ask_total_remaining_quantity := ask_total_remaining_quantity_value; bid_total_remaining_quantity := bid_total_remaining_quantity_value; ask_per_type_total_remaining_quantity := ask_per_type_total_remaining_quantity_value; bid_per_type_total_remaining_quantity := bid_per_type_total_remaining_quantity_value; designated_bid_level_1_price := designated_bid_level_1_price_value; designated_bid_level_1_repo_remaining_quantity := designated_bid_level_1_repo_remaining_quantity_value; designated_bid_level_1_isin := designated_bid_level_1_isin_value; designated_bid_level_2_price := designated_bid_level_2_price_value; designated_bid_level_2_repo_remaining_quantity := designated_bid_level_2_repo_remaining_quantity_value; designated_bid_level_2_isin := designated_bid_level_2_isin_value; designated_bid_level_3_price := designated_bid_level_3_price_value; designated_bid_level_3_repo_remaining_quantity := designated_bid_level_3_repo_remaining_quantity_value; designated_bid_level_3_isin := designated_bid_level_3_isin_value; designated_bid_level_4_price := designated_bid_level_4_price_value; designated_bid_level_4_repo_remaining_quantity := designated_bid_level_4_repo_remaining_quantity_value; designated_bid_level_4_isin := designated_bid_level_4_isin_value; designated_bid_level_5_price := designated_bid_level_5_price_value; designated_bid_level_5_repo_remaining_quantity := designated_bid_level_5_repo_remaining_quantity_value; designated_bid_level_5_isin := designated_bid_level_5_isin_value; designated_bid_level_6_price := designated_bid_level_6_price_value; designated_bid_level_6_repo_remaining_quantity := designated_bid_level_6_repo_remaining_quantity_value; designated_bid_level_6_isin := designated_bid_level_6_isin_value; designated_bid_level_7_price := designated_bid_level_7_price_value; designated_bid_level_7_repo_remaining_quantity := designated_bid_level_7_repo_remaining_quantity_value; designated_bid_level_7_isin := designated_bid_level_7_isin_value; designated_bid_level_8_price := designated_bid_level_8_price_value; designated_bid_level_8_repo_remaining_quantity := designated_bid_level_8_repo_remaining_quantity_value; designated_bid_level_8_isin := designated_bid_level_8_isin_value; designated_bid_level_9_price := designated_bid_level_9_price_value; designated_bid_level_9_repo_remaining_quantity := designated_bid_level_9_repo_remaining_quantity_value; designated_bid_level_9_isin := designated_bid_level_9_isin_value; designated_bid_level_10_price := designated_bid_level_10_price_value; designated_bid_level_10_repo_remaining_quantity := designated_bid_level_10_repo_remaining_quantity_value; designated_bid_level_10_isin := designated_bid_level_10_isin_value; designated_best_bid_price := designated_best_bid_price_value; net_bid_per_type_total_remaining_quantity := net_bid_per_type_total_remaining_quantity_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       end
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               end

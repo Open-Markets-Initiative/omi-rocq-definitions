@@ -38,54 +38,54 @@ Module NseFoBroadcastV950.
 
     (** BCAST_HEADER *)
     Record t := {
-      reserved_0 : N;
-      reserved_2 : N;
+      reserved_0 : list byte;
+      reserved_2 : list byte;
       log_time : N;
       alpha_char : list byte;
       transaction_code : N;
       error_code : N;
       bc_seq_no : N;
-      reserved_18 : N;
-      reserved_19 : N;
+      reserved_18 : list byte;
+      reserved_19 : list byte;
       time_stamp_2 : list byte;
-      filler_2 : N;
+      filler_2 : list byte;
       message_length : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_0 record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_0 record) = 2 /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (log_time record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (alpha_char record) = 2 /\
       (transaction_code record < 256 ^ N.of_nat 2)%N /\
       (error_code record < 256 ^ N.of_nat 2)%N /\
       (bc_seq_no record < 256 ^ N.of_nat 4)%N /\
-      (reserved_18 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_19 record < 256 ^ N.of_nat 3)%N /\
+      Datatypes.length (reserved_18 record) = 1 /\
+      Datatypes.length (reserved_19 record) = 3 /\
       Datatypes.length (time_stamp_2 record) = 8 /\
-      (filler_2 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (filler_2 record) = 8 /\
       (message_length record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_0 record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_0 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 4 (log_time record) ++
       encode_bytes 2 (alpha_char record) ++
       encode_uint 2 (transaction_code record) ++
       encode_uint 2 (error_code record) ++
       encode_uint 4 (bc_seq_no record) ++
-      encode_uint 1 (reserved_18 record) ++
-      encode_uint 3 (reserved_19 record) ++
+      encode_bytes 1 (reserved_18 record) ++
+      encode_bytes 3 (reserved_19 record) ++
       encode_bytes 8 (time_stamp_2 record) ++
-      encode_uint 8 (filler_2 record) ++
+      encode_bytes 8 (filler_2 record) ++
       encode_uint 2 (message_length record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_0_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (reserved_2_value, bytes) =>
               match decode_uint 4 bytes with
@@ -103,16 +103,16 @@ Module NseFoBroadcastV950.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (bc_seq_no_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (reserved_18_value, bytes) =>
-                                      match decode_uint 3 bytes with
+                                      match decode_bytes 3 bytes with
                                       | None => None
                                       | Some (reserved_19_value, bytes) =>
                                           match decode_bytes 8 bytes with
                                           | None => None
                                           | Some (time_stamp_2_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (filler_2_value, bytes) =>
                                                   match decode_uint 2 bytes with
@@ -135,7 +135,7 @@ Module NseFoBroadcastV950.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,17 +145,17 @@ Module NseFoBroadcastV950.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       destruct record. reflexivity.
     Qed.

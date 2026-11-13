@@ -183,7 +183,7 @@ Module BondSpotMarketInformationV68.
       instrument_group_code : list byte;
       instrument_group_state : list byte;
       session_type : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       class_state : list byte;
     }.
 
@@ -196,7 +196,7 @@ Module BondSpotMarketInformationV68.
       Datatypes.length (instrument_group_code record) = 3 /\
       Datatypes.length (instrument_group_state record) = 1 /\
       Datatypes.length (session_type record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (class_state record) = 4.
 
     Definition encode (record : t) : list byte :=
@@ -207,7 +207,7 @@ Module BondSpotMarketInformationV68.
       encode_bytes 3 (instrument_group_code record) ++
       encode_bytes 1 (instrument_group_state record) ++
       encode_bytes 1 (session_type record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (class_state record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -232,7 +232,7 @@ Module BondSpotMarketInformationV68.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (session_type_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (reserved_1_value, bytes) =>
                                       match decode_bytes 4 bytes with
@@ -269,7 +269,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -290,7 +290,7 @@ Module BondSpotMarketInformationV68.
       scope : list byte;
       title : list byte;
       text : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -302,7 +302,7 @@ Module BondSpotMarketInformationV68.
       Datatypes.length (scope record) = 1 /\
       Datatypes.length (title record) = 80 /\
       Datatypes.length (text record) = 1000 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_seq_num record) ++
@@ -312,7 +312,7 @@ Module BondSpotMarketInformationV68.
       encode_bytes 1 (scope record) ++
       encode_bytes 80 (title record) ++
       encode_bytes 1000 (text record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -336,7 +336,7 @@ Module BondSpotMarketInformationV68.
                               match decode_bytes 1000 bytes with
                               | None => None
                               | Some (text_value, bytes) =>
-                                  match decode_uint 3 bytes with
+                                  match decode_bytes 3 bytes with
                                   | None => None
                                   | Some (reserved_3_value, bytes) =>
                                       Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; scope := scope_value; title := title_value; text := text_value; reserved_3 := reserved_3_value |}, bytes)
@@ -369,7 +369,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -392,7 +392,7 @@ Module BondSpotMarketInformationV68.
       high_scale_code : N;
       low_scale_code : N;
       collar_type : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -407,7 +407,7 @@ Module BondSpotMarketInformationV68.
       (high_scale_code record < 256 ^ N.of_nat 1)%N /\
       (low_scale_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (collar_type record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -420,7 +420,7 @@ Module BondSpotMarketInformationV68.
       encode_uint 1 (high_scale_code record) ++
       encode_uint 1 (low_scale_code record) ++
       encode_bytes 1 (collar_type record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -453,7 +453,7 @@ Module BondSpotMarketInformationV68.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (collar_type_value, bytes) =>
-                                              match decode_uint 3 bytes with
+                                              match decode_bytes 3 bytes with
                                               | None => None
                                               | Some (reserved_3_value, bytes) =>
                                                   Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; high_collar := high_collar_value; low_collar := low_collar_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; high_scale_code := high_scale_code_value; low_scale_code := low_scale_code_value; collar_type := collar_type_value; reserved_3 := reserved_3_value |}, bytes)
@@ -492,7 +492,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -506,23 +506,23 @@ Module BondSpotMarketInformationV68.
     (** The Start referential message is sent to signal the start of transmission of the Instrument Reference Data Flow *)
     Record t := {
       indicator : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (indicator record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (indicator record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (indicator_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (reserved_3_value, bytes) =>
               Some ({| indicator := indicator_value; reserved_3 := reserved_3_value |}, bytes)
@@ -532,7 +532,7 @@ Module BondSpotMarketInformationV68.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -543,7 +543,7 @@ Module BondSpotMarketInformationV68.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -557,23 +557,23 @@ Module BondSpotMarketInformationV68.
     (** The End referential message is sent to signal the end of transmission of the Instrument Reference Data Flow *)
     Record t := {
       indicator : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (indicator record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (indicator record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (indicator_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (reserved_3_value, bytes) =>
               Some ({| indicator := indicator_value; reserved_3 := reserved_3_value |}, bytes)
@@ -583,7 +583,7 @@ Module BondSpotMarketInformationV68.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -594,7 +594,7 @@ Module BondSpotMarketInformationV68.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -624,7 +624,7 @@ Module BondSpotMarketInformationV68.
       dividend_rate : N;
       settlement_price : N;
       settlement_value : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       open_positions : N;
       trading_volume : N;
       transactions_number : N;
@@ -667,7 +667,7 @@ Module BondSpotMarketInformationV68.
       dividend_rate_scale_code : N;
       settlement_price_scale_code : N;
       settlement_value_scale_code : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       trading_value_scale_code : N;
       currency_price_scale_code : N;
       delta_scale_code : N;
@@ -688,7 +688,7 @@ Module BondSpotMarketInformationV68.
       status_indicator : list byte;
       sector : list byte;
       market : list byte;
-      second_reserved_1 : N;
+      second_reserved_1 : list byte;
       short_sale : list byte;
       marker_pct_change_price : list byte;
       symbol_delta : list byte;
@@ -696,12 +696,12 @@ Module BondSpotMarketInformationV68.
       symbol_rho : list byte;
       symbol_theta : list byte;
       symbol_vega : list byte;
-      third_reserved_1 : N;
-      fourth_reserved_1 : N;
-      fifth_reserved_1 : N;
-      sixth_reserved_1 : N;
-      seventh_reserved_1 : N;
-      eighth_reserved_1 : N;
+      third_reserved_1 : list byte;
+      fourth_reserved_1 : list byte;
+      fifth_reserved_1 : list byte;
+      sixth_reserved_1 : list byte;
+      seventh_reserved_1 : list byte;
+      eighth_reserved_1 : list byte;
       segment : list byte;
       lower_liquidity : list byte;
       dividend : list byte;
@@ -710,7 +710,7 @@ Module BondSpotMarketInformationV68.
       interim_dividend_right : list byte;
       quotation_system : list byte;
       liquidity_support_pge : list byte;
-      ninth_reserved_1 : N;
+      ninth_reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -732,7 +732,7 @@ Module BondSpotMarketInformationV68.
       (dividend_rate record < 256 ^ N.of_nat 4)%N /\
       (settlement_price record < 256 ^ N.of_nat 4)%N /\
       (settlement_value record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (open_positions record < 256 ^ N.of_nat 4)%N /\
       (trading_volume record < 256 ^ N.of_nat 4)%N /\
       (transactions_number record < 256 ^ N.of_nat 4)%N /\
@@ -775,7 +775,7 @@ Module BondSpotMarketInformationV68.
       (dividend_rate_scale_code record < 256 ^ N.of_nat 1)%N /\
       (settlement_price_scale_code record < 256 ^ N.of_nat 1)%N /\
       (settlement_value_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (trading_value_scale_code record < 256 ^ N.of_nat 1)%N /\
       (currency_price_scale_code record < 256 ^ N.of_nat 1)%N /\
       (delta_scale_code record < 256 ^ N.of_nat 1)%N /\
@@ -796,7 +796,7 @@ Module BondSpotMarketInformationV68.
       Datatypes.length (status_indicator record) = 1 /\
       Datatypes.length (sector record) = 3 /\
       Datatypes.length (market record) = 1 /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (second_reserved_1 record) = 1 /\
       Datatypes.length (short_sale record) = 1 /\
       Datatypes.length (marker_pct_change_price record) = 1 /\
       Datatypes.length (symbol_delta record) = 1 /\
@@ -804,12 +804,12 @@ Module BondSpotMarketInformationV68.
       Datatypes.length (symbol_rho record) = 1 /\
       Datatypes.length (symbol_theta record) = 1 /\
       Datatypes.length (symbol_vega record) = 1 /\
-      (third_reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (fourth_reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (fifth_reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (sixth_reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (seventh_reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (eighth_reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (third_reserved_1 record) = 1 /\
+      Datatypes.length (fourth_reserved_1 record) = 1 /\
+      Datatypes.length (fifth_reserved_1 record) = 1 /\
+      Datatypes.length (sixth_reserved_1 record) = 1 /\
+      Datatypes.length (seventh_reserved_1 record) = 1 /\
+      Datatypes.length (eighth_reserved_1 record) = 1 /\
       Datatypes.length (segment record) = 2 /\
       Datatypes.length (lower_liquidity record) = 1 /\
       Datatypes.length (dividend record) = 2 /\
@@ -818,7 +818,7 @@ Module BondSpotMarketInformationV68.
       Datatypes.length (interim_dividend_right record) = 2 /\
       Datatypes.length (quotation_system record) = 2 /\
       Datatypes.length (liquidity_support_pge record) = 2 /\
-      (ninth_reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (ninth_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -838,7 +838,7 @@ Module BondSpotMarketInformationV68.
       encode_uint 4 (dividend_rate record) ++
       encode_uint 4 (settlement_price record) ++
       encode_uint 4 (settlement_value record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (open_positions record) ++
       encode_uint 4 (trading_volume record) ++
       encode_uint 4 (transactions_number record) ++
@@ -881,7 +881,7 @@ Module BondSpotMarketInformationV68.
       encode_uint 1 (dividend_rate_scale_code record) ++
       encode_uint 1 (settlement_price_scale_code record) ++
       encode_uint 1 (settlement_value_scale_code record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 1 (trading_value_scale_code record) ++
       encode_uint 1 (currency_price_scale_code record) ++
       encode_uint 1 (delta_scale_code record) ++
@@ -902,7 +902,7 @@ Module BondSpotMarketInformationV68.
       encode_bytes 1 (status_indicator record) ++
       encode_bytes 3 (sector record) ++
       encode_bytes 1 (market record) ++
-      encode_uint 1 (second_reserved_1 record) ++
+      encode_bytes 1 (second_reserved_1 record) ++
       encode_bytes 1 (short_sale record) ++
       encode_bytes 1 (marker_pct_change_price record) ++
       encode_bytes 1 (symbol_delta record) ++
@@ -910,12 +910,12 @@ Module BondSpotMarketInformationV68.
       encode_bytes 1 (symbol_rho record) ++
       encode_bytes 1 (symbol_theta record) ++
       encode_bytes 1 (symbol_vega record) ++
-      encode_uint 1 (third_reserved_1 record) ++
-      encode_uint 1 (fourth_reserved_1 record) ++
-      encode_uint 1 (fifth_reserved_1 record) ++
-      encode_uint 1 (sixth_reserved_1 record) ++
-      encode_uint 1 (seventh_reserved_1 record) ++
-      encode_uint 1 (eighth_reserved_1 record) ++
+      encode_bytes 1 (third_reserved_1 record) ++
+      encode_bytes 1 (fourth_reserved_1 record) ++
+      encode_bytes 1 (fifth_reserved_1 record) ++
+      encode_bytes 1 (sixth_reserved_1 record) ++
+      encode_bytes 1 (seventh_reserved_1 record) ++
+      encode_bytes 1 (eighth_reserved_1 record) ++
       encode_bytes 2 (segment record) ++
       encode_bytes 1 (lower_liquidity record) ++
       encode_bytes 2 (dividend record) ++
@@ -924,7 +924,7 @@ Module BondSpotMarketInformationV68.
       encode_bytes 2 (interim_dividend_right record) ++
       encode_bytes 2 (quotation_system record) ++
       encode_bytes 2 (liquidity_support_pge record) ++
-      encode_uint 1 (ninth_reserved_1 record).
+      encode_bytes 1 (ninth_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -978,7 +978,7 @@ Module BondSpotMarketInformationV68.
                                                                       match decode_uint 4 bytes with
                                                                       | None => None
                                                                       | Some (settlement_value_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (reserved_4_value, bytes) =>
                                                                               match decode_uint 4 bytes with
@@ -1107,7 +1107,7 @@ Module BondSpotMarketInformationV68.
                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                   | Some (settlement_value_scale_code_value, bytes) =>
-                                                                                                                                                                                                                                                      match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                      match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                       | Some (reserved_1_value, bytes) =>
                                                                                                                                                                                                                                                           match decode_uint 1 bytes with
@@ -1170,7 +1170,7 @@ Module BondSpotMarketInformationV68.
                                                                                                                                                                                                                                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                       | Some (market_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                                                                           | Some (second_reserved_1_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                               match decode_bytes 1 bytes with
@@ -1194,22 +1194,22 @@ Module BondSpotMarketInformationV68.
                                                                                                                                                                                                                                                                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                                                       | Some (symbol_vega_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                                                                                                           | Some (third_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                              match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                              match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                                                                                                               | Some (fourth_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                  match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                                  match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                                                                   | Some (fifth_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                      match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                                      match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                                                                       | Some (sixth_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                                                                                                                           | Some (seventh_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                              match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                                              match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                                                                                                                               | Some (eighth_reserved_1_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                                                                                   match decode_bytes 2 bytes with
@@ -1236,7 +1236,7 @@ Module BondSpotMarketInformationV68.
                                                                                                                                                                                                                                                                                                                                                                                                                               match decode_bytes 2 bytes with
                                                                                                                                                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                                                                                                                                                               | Some (liquidity_support_pge_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                                                                  match decode_uint 1 bytes with
+                                                                                                                                                                                                                                                                                                                                                                                                                                  match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                                                                                                                   | Some (ninth_reserved_1_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                                                                                                                       Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; date := date_value; multiplier := multiplier_value; accumulated_interest := accumulated_interest_value; opening_price := opening_price_value; maximum_price := maximum_price_value; minimum_price := minimum_price_value; closing_price := closing_price_value; implied_volatility := implied_volatility_value; average_weighted_price := average_weighted_price_value; reference_price := reference_price_value; pct_change_price := pct_change_price_value; dividend_rate := dividend_rate_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; reserved_4 := reserved_4_value; open_positions := open_positions_value; trading_volume := trading_volume_value; transactions_number := transactions_number_value; trading_value := trading_value_value; currency_price := currency_price_value; delta := delta_value; gamma := gamma_value; rho := rho_value; theta := theta_value; vega := vega_value; end_trading := end_trading_value; number_of_instruments := number_of_instruments_value; trading_value_currency := trading_value_currency_value; interest_rate := interest_rate_value; volatility := volatility_value; strike_price := strike_price_value; short_selling_trades_number := short_selling_trades_number_value; volume_short_selling_trades := volume_short_selling_trades_value; value_short_selling_trades := value_short_selling_trades_value; last_trade_date := last_trade_date_value; last_trade_price := last_trade_price_value; block_trades_number := block_trades_number_value; volume_block_trades := volume_block_trades_value; value_block_trades := value_block_trades_value; vwap_blocktrade := vwap_blocktrade_value; maximum_block_price := maximum_block_price_value; minimum_block_price := minimum_block_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; multiplier_scale_code := multiplier_scale_code_value; accumulated_interest_scale_code := accumulated_interest_scale_code_value; opening_price_scale_code := opening_price_scale_code_value; maximum_price_scale_code := maximum_price_scale_code_value; minimum_price_scale_code := minimum_price_scale_code_value; closing_price_scale_code := closing_price_scale_code_value; implied_volatility_scale_code := implied_volatility_scale_code_value; average_weighted_price_scale_code := average_weighted_price_scale_code_value; reference_price_scale_code := reference_price_scale_code_value; pct_change_price_scale_code := pct_change_price_scale_code_value; dividend_rate_scale_code := dividend_rate_scale_code_value; settlement_price_scale_code := settlement_price_scale_code_value; settlement_value_scale_code := settlement_value_scale_code_value; reserved_1 := reserved_1_value; trading_value_scale_code := trading_value_scale_code_value; currency_price_scale_code := currency_price_scale_code_value; delta_scale_code := delta_scale_code_value; gamma_scale_code := gamma_scale_code_value; rho_scale_code := rho_scale_code_value; theta_scale_code := theta_scale_code_value; vega_scale_code := vega_scale_code_value; trading_value_currency_scale_code := trading_value_currency_scale_code_value; interest_rate_scale_code := interest_rate_scale_code_value; volatility_scale_code := volatility_scale_code_value; strike_price_scale_code := strike_price_scale_code_value; value_short_selling_trades_scale_code := value_short_selling_trades_scale_code_value; last_trade_price_scale_code := last_trade_price_scale_code_value; value_block_trades_scale_code := value_block_trades_scale_code_value; vwap_blocktrade_scale_code := vwap_blocktrade_scale_code_value; maximum_block_price_scale_code := maximum_block_price_scale_code_value; minimum_block_price_scale_code := minimum_block_price_scale_code_value; status_indicator := status_indicator_value; sector := sector_value; market := market_value; second_reserved_1 := second_reserved_1_value; short_sale := short_sale_value; marker_pct_change_price := marker_pct_change_price_value; symbol_delta := symbol_delta_value; symbol_gamma := symbol_gamma_value; symbol_rho := symbol_rho_value; symbol_theta := symbol_theta_value; symbol_vega := symbol_vega_value; third_reserved_1 := third_reserved_1_value; fourth_reserved_1 := fourth_reserved_1_value; fifth_reserved_1 := fifth_reserved_1_value; sixth_reserved_1 := sixth_reserved_1_value; seventh_reserved_1 := seventh_reserved_1_value; eighth_reserved_1 := eighth_reserved_1_value; segment := segment_value; lower_liquidity := lower_liquidity_value; dividend := dividend_value; subscription_right := subscription_right_value; split := split_value; interim_dividend_right := interim_dividend_right_value; quotation_system := quotation_system_value; liquidity_support_pge := liquidity_support_pge_value; ninth_reserved_1 := ninth_reserved_1_value |}, bytes)
@@ -1375,7 +1375,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
@@ -1418,7 +1418,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_uint by exact bound_57.
       rewrite decode_encode_uint by exact bound_58.
       rewrite decode_encode_uint by exact bound_59.
-      rewrite decode_encode_uint by exact bound_60.
+      rewrite decode_encode_bytes by exact bound_60.
       rewrite decode_encode_uint by exact bound_61.
       rewrite decode_encode_uint by exact bound_62.
       rewrite decode_encode_uint by exact bound_63.
@@ -1439,7 +1439,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_bytes by exact bound_78.
       rewrite decode_encode_bytes by exact bound_79.
       rewrite decode_encode_bytes by exact bound_80.
-      rewrite decode_encode_uint by exact bound_81.
+      rewrite decode_encode_bytes by exact bound_81.
       rewrite decode_encode_bytes by exact bound_82.
       rewrite decode_encode_bytes by exact bound_83.
       rewrite decode_encode_bytes by exact bound_84.
@@ -1447,12 +1447,12 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_bytes by exact bound_86.
       rewrite decode_encode_bytes by exact bound_87.
       rewrite decode_encode_bytes by exact bound_88.
-      rewrite decode_encode_uint by exact bound_89.
-      rewrite decode_encode_uint by exact bound_90.
-      rewrite decode_encode_uint by exact bound_91.
-      rewrite decode_encode_uint by exact bound_92.
-      rewrite decode_encode_uint by exact bound_93.
-      rewrite decode_encode_uint by exact bound_94.
+      rewrite decode_encode_bytes by exact bound_89.
+      rewrite decode_encode_bytes by exact bound_90.
+      rewrite decode_encode_bytes by exact bound_91.
+      rewrite decode_encode_bytes by exact bound_92.
+      rewrite decode_encode_bytes by exact bound_93.
+      rewrite decode_encode_bytes by exact bound_94.
       rewrite decode_encode_bytes by exact bound_95.
       rewrite decode_encode_bytes by exact bound_96.
       rewrite decode_encode_bytes by exact bound_97.
@@ -1461,7 +1461,7 @@ Module BondSpotMarketInformationV68.
       rewrite decode_encode_bytes by exact bound_100.
       rewrite decode_encode_bytes by exact bound_101.
       rewrite decode_encode_bytes by exact bound_102.
-      rewrite decode_encode_uint by exact bound_103.
+      rewrite decode_encode_bytes by exact bound_103.
       destruct record. reflexivity.
     Qed.
 

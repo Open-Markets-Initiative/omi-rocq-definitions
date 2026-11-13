@@ -202,9 +202,9 @@ Module NseComDropCopyV15Server.
     (** Confirms the logon. Alpha Char carries the number of streams the drop copy feed is sent from, one download request being needed per stream. On an error the same transaction code carries the Error Response layout instead, distinguished only by a non zero Error Code *)
     Record t := {
       user_id : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       password : list byte;
-      second_reserved_8 : N;
+      second_reserved_8 : list byte;
       reserved_38 : list byte;
       broker_id : list byte;
       reserved_119 : list byte;
@@ -216,9 +216,9 @@ Module NseComDropCopyV15Server.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       Datatypes.length (password record) = 8 /\
-      (second_reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (second_reserved_8 record) = 8 /\
       Datatypes.length (reserved_38 record) = 38 /\
       Datatypes.length (broker_id record) = 5 /\
       Datatypes.length (reserved_119 record) = 119 /\
@@ -228,9 +228,9 @@ Module NseComDropCopyV15Server.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_bytes 8 (password record) ++
-      encode_uint 8 (second_reserved_8 record) ++
+      encode_bytes 8 (second_reserved_8 record) ++
       encode_bytes 38 (reserved_38 record) ++
       encode_bytes 5 (broker_id record) ++
       encode_bytes 119 (reserved_119 record) ++
@@ -242,13 +242,13 @@ Module NseComDropCopyV15Server.
       match decode_uint 4 bytes with
       | None => None
       | Some (user_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_bytes 8 bytes with
           | None => None
           | Some (reserved_8_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
               | Some (password_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_bytes 8 bytes with
                   | None => None
                   | Some (second_reserved_8_value, bytes) =>
                       match decode_bytes 38 bytes with
@@ -295,9 +295,9 @@ Module NseComDropCopyV15Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.

@@ -151,18 +151,18 @@ Module NeoEquitiesMulticastFullDepthV1014.
 
     (** Instructs feed recipients to clear all orders for the Cboe Canada order book in the unit specified in the Sequenced Unit Header. Distributed in rare recovery events such as a data center fail-over. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -171,7 +171,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,12 +179,12 @@ Module NeoEquitiesMulticastFullDepthV1014.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UnitClearMessage.
 
@@ -285,7 +285,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       broker_id : N;
       settlement_type : N;
       settlement_date : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -300,7 +300,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       (broker_id record < 256 ^ N.of_nat 2)%N /\
       (settlement_type record < 256 ^ N.of_nat 1)%N /\
       (settlement_date record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -313,7 +313,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       encode_uint 2 (broker_id record) ++
       encode_uint 1 (settlement_type record) ++
       encode_uint 4 (settlement_date record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -346,7 +346,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
                                           match decode_uint 4 bytes with
                                           | None => None
                                           | Some (settlement_date_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (reserved_1_value, bytes) =>
                                                   Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity := quantity_value; symbol := symbol_value; price := price_value; broker_id := broker_id_value; settlement_type := settlement_type_value; settlement_date := settlement_date_value; reserved_1 := reserved_1_value |}, bytes)
@@ -385,7 +385,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -529,7 +529,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       order_id : N;
       quantity : N;
       price : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -539,7 +539,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -547,7 +547,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       encode_uint 8 (order_id record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 8 (price record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -565,7 +565,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_1_value, bytes) =>
                               Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; order_id := order_id_value; quantity := quantity_value; price := price_value; reserved_1 := reserved_1_value |}, bytes)
@@ -579,7 +579,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -594,12 +594,12 @@ Module NeoEquitiesMulticastFullDepthV1014.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ModifyOrderMessage.
 
@@ -831,7 +831,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       matched_shares : N;
       indicative_price : N;
       auction_only_price : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -846,7 +846,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       (matched_shares record < 256 ^ N.of_nat 4)%N /\
       (indicative_price record < 256 ^ N.of_nat 8)%N /\
       (auction_only_price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -859,7 +859,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       encode_uint 4 (matched_shares record) ++
       encode_uint 8 (indicative_price record) ++
       encode_uint 8 (auction_only_price record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -892,7 +892,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
                                           match decode_uint 8 bytes with
                                           | None => None
                                           | Some (auction_only_price_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (reserved_1_value, bytes) =>
                                                   Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; symbol := symbol_value; auction_type := auction_type_value; reference_price := reference_price_value; imbalance_quantity := imbalance_quantity_value; imbalance_side_indicator := imbalance_side_indicator_value; matched_shares := matched_shares_value; indicative_price := indicative_price_value; auction_only_price := auction_only_price_value; reserved_1 := reserved_1_value |}, bytes)
@@ -931,7 +931,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -950,7 +950,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       auction_type : list byte;
       price : N;
       shares : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -961,7 +961,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       Datatypes.length (auction_type record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (shares record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -970,7 +970,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       encode_bytes 1 (auction_type record) ++
       encode_uint 8 (price record) ++
       encode_uint 4 (shares record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -991,7 +991,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (shares_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_1_value, bytes) =>
                                   Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; symbol := symbol_value; auction_type := auction_type_value; price := price_value; shares := shares_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1022,7 +1022,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -1035,18 +1035,18 @@ Module NeoEquitiesMulticastFullDepthV1014.
 
     (** Sent for each unit when the unit shuts down. No additional sequenced messages will be delivered for this unit, but heartbeats from the unit may be received. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -1055,7 +1055,7 @@ Module NeoEquitiesMulticastFullDepthV1014.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1063,12 +1063,12 @@ Module NeoEquitiesMulticastFullDepthV1014.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End EndOfSessionMessage.
 

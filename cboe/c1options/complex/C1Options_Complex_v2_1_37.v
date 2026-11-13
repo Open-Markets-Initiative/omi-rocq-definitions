@@ -465,7 +465,7 @@ Module C1OptionsComplexV2137.
       quantity : N;
       complex_instrument_id : list byte;
       price : N;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -476,7 +476,7 @@ Module C1OptionsComplexV2137.
       (quantity record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (complex_instrument_id record) = 6 /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (padding record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -485,7 +485,7 @@ Module C1OptionsComplexV2137.
       encode_uint 4 (quantity record) ++
       encode_bytes 6 (complex_instrument_id record) ++
       encode_uint 8 (price record) ++
-      encode_uint 1 (padding record).
+      encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -506,7 +506,7 @@ Module C1OptionsComplexV2137.
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (padding_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity := quantity_value; complex_instrument_id := complex_instrument_id_value; price := price_value; padding := padding_value |}, bytes)
@@ -537,7 +537,7 @@ Module C1OptionsComplexV2137.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -556,7 +556,7 @@ Module C1OptionsComplexV2137.
       quantity_short : N;
       complex_instrument_id : list byte;
       price_short : N;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -567,7 +567,7 @@ Module C1OptionsComplexV2137.
       (quantity_short record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (complex_instrument_id record) = 6 /\
       (price_short record < 256 ^ N.of_nat 2)%N /\
-      (padding record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -576,7 +576,7 @@ Module C1OptionsComplexV2137.
       encode_uint 2 (quantity_short record) ++
       encode_bytes 6 (complex_instrument_id record) ++
       encode_uint 2 (price_short record) ++
-      encode_uint 1 (padding record).
+      encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -597,7 +597,7 @@ Module C1OptionsComplexV2137.
                           match decode_uint 2 bytes with
                           | None => None
                           | Some (price_short_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (padding_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_short := quantity_short_value; complex_instrument_id := complex_instrument_id_value; price_short := price_short_value; padding := padding_value |}, bytes)
@@ -628,7 +628,7 @@ Module C1OptionsComplexV2137.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -647,7 +647,7 @@ Module C1OptionsComplexV2137.
       quantity : N;
       complex_instrument_id_8 : list byte;
       price : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       participant_id : list byte;
       customer_indicator : list byte;
       client_id : list byte;
@@ -661,7 +661,7 @@ Module C1OptionsComplexV2137.
       (quantity record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (complex_instrument_id_8 record) = 8 /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (participant_id record) = 4 /\
       Datatypes.length (customer_indicator record) = 1 /\
       Datatypes.length (client_id record) = 4.
@@ -673,7 +673,7 @@ Module C1OptionsComplexV2137.
       encode_uint 4 (quantity record) ++
       encode_bytes 8 (complex_instrument_id_8 record) ++
       encode_uint 8 (price record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (participant_id record) ++
       encode_bytes 1 (customer_indicator record) ++
       encode_bytes 4 (client_id record).
@@ -697,7 +697,7 @@ Module C1OptionsComplexV2137.
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_1_value, bytes) =>
                                   match decode_bytes 4 bytes with
@@ -740,7 +740,7 @@ Module C1OptionsComplexV2137.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1044,7 +1044,7 @@ Module C1OptionsComplexV2137.
       order_id : N;
       quantity : N;
       price : N;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1053,14 +1053,14 @@ Module C1OptionsComplexV2137.
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (padding record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_uint 8 (order_id record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 8 (price record) ++
-      encode_uint 1 (padding record).
+      encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1075,7 +1075,7 @@ Module C1OptionsComplexV2137.
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (padding_value, bytes) =>
                           Some ({| time_offset := time_offset_value; order_id := order_id_value; quantity := quantity_value; price := price_value; padding := padding_value |}, bytes)
@@ -1088,7 +1088,7 @@ Module C1OptionsComplexV2137.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1102,12 +1102,12 @@ Module C1OptionsComplexV2137.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ModifyOrderLongMessage.
 
@@ -1119,7 +1119,7 @@ Module C1OptionsComplexV2137.
       order_id : N;
       quantity_short : N;
       price_short : N;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1128,14 +1128,14 @@ Module C1OptionsComplexV2137.
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (quantity_short record < 256 ^ N.of_nat 2)%N /\
       (price_short record < 256 ^ N.of_nat 2)%N /\
-      (padding record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_uint 8 (order_id record) ++
       encode_uint 2 (quantity_short record) ++
       encode_uint 2 (price_short record) ++
-      encode_uint 1 (padding record).
+      encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1150,7 +1150,7 @@ Module C1OptionsComplexV2137.
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (price_short_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (padding_value, bytes) =>
                           Some ({| time_offset := time_offset_value; order_id := order_id_value; quantity_short := quantity_short_value; price_short := price_short_value; padding := padding_value |}, bytes)
@@ -1163,7 +1163,7 @@ Module C1OptionsComplexV2137.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1177,12 +1177,12 @@ Module C1OptionsComplexV2137.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ModifyOrderShortMessage.
 
@@ -1690,31 +1690,31 @@ Module C1OptionsComplexV2137.
     Record t := {
       time_offset : N;
       complex_symbol_id : list byte;
-      unused : N;
+      unused : list byte;
       trading_status : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       gth_trading_status : list byte;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (complex_symbol_id record) = 6 /\
-      (unused record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (unused record) = 2 /\
       Datatypes.length (trading_status record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (gth_trading_status record) = 1 /\
-      (padding record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 6 (complex_symbol_id record) ++
-      encode_uint 2 (unused record) ++
+      encode_bytes 2 (unused record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (gth_trading_status record) ++
-      encode_uint 1 (padding record).
+      encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1723,19 +1723,19 @@ Module C1OptionsComplexV2137.
           match decode_bytes 6 bytes with
           | None => None
           | Some (complex_symbol_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (unused_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (gth_trading_status_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (padding_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; complex_symbol_id := complex_symbol_id_value; unused := unused_value; trading_status := trading_status_value; reserved_1 := reserved_1_value; gth_trading_status := gth_trading_status_value; padding := padding_value |}, bytes)
@@ -1762,11 +1762,11 @@ Module C1OptionsComplexV2137.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 

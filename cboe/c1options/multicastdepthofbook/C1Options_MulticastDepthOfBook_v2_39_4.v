@@ -1020,8 +1020,8 @@ Module C1OptionsMulticastDepthOfBookV2394.
       expanded_symbol : list byte;
       trading_status : list byte;
       reg_sho_action : list byte;
-      reserved_1 : N;
-      second_reserved_1 : N;
+      reserved_1 : list byte;
+      second_reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1030,16 +1030,16 @@ Module C1OptionsMulticastDepthOfBookV2394.
       Datatypes.length (expanded_symbol record) = 8 /\
       Datatypes.length (trading_status record) = 1 /\
       Datatypes.length (reg_sho_action record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 8 (expanded_symbol record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (reg_sho_action record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 1 (second_reserved_1 record).
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1054,10 +1054,10 @@ Module C1OptionsMulticastDepthOfBookV2394.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reg_sho_action_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
                               Some ({| time_offset := time_offset_value; expanded_symbol := expanded_symbol_value; trading_status := trading_status_value; reg_sho_action := reg_sho_action_value; reserved_1 := reserved_1_value; second_reserved_1 := second_reserved_1_value |}, bytes)
@@ -1085,8 +1085,8 @@ Module C1OptionsMulticastDepthOfBookV2394.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

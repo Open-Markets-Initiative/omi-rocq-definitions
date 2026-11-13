@@ -1002,7 +1002,7 @@ Module SiacCqsOutputV191.
       mwcb_level_1 : N;
       mwcb_level_2 : N;
       mwcb_level_3 : N;
-      reserved : N;
+      reserved : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1015,7 +1015,7 @@ Module SiacCqsOutputV191.
       (mwcb_level_1 record < 256 ^ N.of_nat 8)%N /\
       (mwcb_level_2 record < 256 ^ N.of_nat 8)%N /\
       (mwcb_level_3 record < 256 ^ N.of_nat 8)%N /\
-      (reserved record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (participant_id record) ++
@@ -1026,7 +1026,7 @@ Module SiacCqsOutputV191.
       encode_uint 8 (mwcb_level_1 record) ++
       encode_uint 8 (mwcb_level_2 record) ++
       encode_uint 8 (mwcb_level_3 record) ++
-      encode_uint 1 (reserved record).
+      encode_bytes 1 (reserved record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -1053,7 +1053,7 @@ Module SiacCqsOutputV191.
                                   match decode_uint 8 bytes with
                                   | None => None
                                   | Some (mwcb_level_3_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_value, bytes) =>
                                           Some ({| participant_id := participant_id_value; participant_timestamp := participant_timestamp_value; message_id := message_id_value; transaction_id := transaction_id_value; participant_reference_number := participant_reference_number_value; mwcb_level_1 := mwcb_level_1_value; mwcb_level_2 := mwcb_level_2_value; mwcb_level_3 := mwcb_level_3_value; reserved := reserved_value |}, bytes)
@@ -1088,7 +1088,7 @@ Module SiacCqsOutputV191.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1107,7 +1107,7 @@ Module SiacCqsOutputV191.
       transaction_id : N;
       participant_reference_number : N;
       market_wide_circuit_breaker_level_indicator : list byte;
-      reserved : N;
+      reserved : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1118,7 +1118,7 @@ Module SiacCqsOutputV191.
       (transaction_id record < 256 ^ N.of_nat 4)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (market_wide_circuit_breaker_level_indicator record) = 1 /\
-      (reserved record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (participant_id record) ++
@@ -1127,7 +1127,7 @@ Module SiacCqsOutputV191.
       encode_uint 4 (transaction_id record) ++
       encode_uint 8 (participant_reference_number record) ++
       encode_bytes 1 (market_wide_circuit_breaker_level_indicator record) ++
-      encode_uint 1 (reserved record).
+      encode_bytes 1 (reserved record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -1148,7 +1148,7 @@ Module SiacCqsOutputV191.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (market_wide_circuit_breaker_level_indicator_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_value, bytes) =>
                                   Some ({| participant_id := participant_id_value; participant_timestamp := participant_timestamp_value; message_id := message_id_value; transaction_id := transaction_id_value; participant_reference_number := participant_reference_number_value; market_wide_circuit_breaker_level_indicator := market_wide_circuit_breaker_level_indicator_value; reserved := reserved_value |}, bytes)
@@ -1179,7 +1179,7 @@ Module SiacCqsOutputV191.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 

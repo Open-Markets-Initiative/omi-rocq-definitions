@@ -1464,7 +1464,7 @@ Module NairobiEquitiesRealTimeV122.
       volume : N;
       turnover : N;
       trades : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       sub_book : N;
       notional_exposure : N;
       notional_delta_exposure : N;
@@ -1483,7 +1483,7 @@ Module NairobiEquitiesRealTimeV122.
       (volume record < 256 ^ N.of_nat 4)%N /\
       (turnover record < 256 ^ N.of_nat 8)%N /\
       (trades record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (sub_book record < 256 ^ N.of_nat 1)%N /\
       (notional_exposure record < 256 ^ N.of_nat 8)%N /\
       (notional_delta_exposure record < 256 ^ N.of_nat 8)%N /\
@@ -1500,7 +1500,7 @@ Module NairobiEquitiesRealTimeV122.
       encode_uint 4 (volume record) ++
       encode_uint 8 (turnover record) ++
       encode_uint 4 (trades record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 1 (sub_book record) ++
       encode_uint 8 (notional_exposure record) ++
       encode_uint 8 (notional_delta_exposure record) ++
@@ -1533,7 +1533,7 @@ Module NairobiEquitiesRealTimeV122.
                                   match decode_uint 4 bytes with
                                   | None => None
                                   | Some (trades_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_bytes 8 bytes with
                                       | None => None
                                       | Some (reserved_8_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -1592,7 +1592,7 @@ Module NairobiEquitiesRealTimeV122.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.

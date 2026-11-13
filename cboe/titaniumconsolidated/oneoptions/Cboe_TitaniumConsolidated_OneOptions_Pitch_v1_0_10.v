@@ -157,7 +157,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       consolidated_best_bid_quantity_short : N;
       consolidated_best_ask_price_short : N;
       consolidated_best_ask_quantity_short : N;
-      reserved_5 : N;
+      reserved_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -169,7 +169,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       (consolidated_best_bid_quantity_short record < 256 ^ N.of_nat 4)%N /\
       (consolidated_best_ask_price_short record < 256 ^ N.of_nat 4)%N /\
       (consolidated_best_ask_quantity_short record < 256 ^ N.of_nat 4)%N /\
-      (reserved_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (reserved_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (last_update_timestamp record) ++
@@ -179,7 +179,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       encode_uint 4 (consolidated_best_bid_quantity_short record) ++
       encode_uint 4 (consolidated_best_ask_price_short record) ++
       encode_uint 4 (consolidated_best_ask_quantity_short record) ++
-      encode_uint 5 (reserved_5 record).
+      encode_bytes 5 (reserved_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -203,7 +203,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (consolidated_best_ask_quantity_short_value, bytes) =>
-                                  match decode_uint 5 bytes with
+                                  match decode_bytes 5 bytes with
                                   | None => None
                                   | Some (reserved_5_value, bytes) =>
                                       Some ({| last_update_timestamp := last_update_timestamp_value; symbol := symbol_value; cboe_cumulative_executed_volume_short := cboe_cumulative_executed_volume_short_value; consolidated_best_bid_price_short := consolidated_best_bid_price_short_value; consolidated_best_bid_quantity_short := consolidated_best_bid_quantity_short_value; consolidated_best_ask_price_short := consolidated_best_ask_price_short_value; consolidated_best_ask_quantity_short := consolidated_best_ask_quantity_short_value; reserved_5 := reserved_5_value |}, bytes)
@@ -236,7 +236,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -426,7 +426,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       timestamp : N;
       market_center : list byte;
       market_status : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -434,13 +434,13 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (market_center record) = 1 /\
       Datatypes.length (market_status record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (market_status record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -452,7 +452,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_status_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       Some ({| timestamp := timestamp_value; market_center := market_center_value; market_status := market_status_value; reserved_1 := reserved_1_value |}, bytes)
@@ -477,7 +477,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -498,7 +498,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       last_quantity : N;
       cboe_cumulative_executed_volume_long : N;
       trade_condition : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -511,7 +511,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       (last_quantity record < 256 ^ N.of_nat 8)%N /\
       (cboe_cumulative_executed_volume_long record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (trade_condition record) = 1 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (transaction_time record) ++
@@ -522,7 +522,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       encode_uint 8 (last_quantity record) ++
       encode_uint 8 (cboe_cumulative_executed_volume_long record) ++
       encode_bytes 1 (trade_condition record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -549,7 +549,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (trade_condition_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_bytes 8 bytes with
                                       | None => None
                                       | Some (reserved_8_value, bytes) =>
                                           Some ({| transaction_time := transaction_time_value; symbol := symbol_value; market_center := market_center_value; market_center_execution_id := market_center_execution_id_value; last_price := last_price_value; last_quantity := last_quantity_value; cboe_cumulative_executed_volume_long := cboe_cumulative_executed_volume_long_value; trade_condition := trade_condition_value; reserved_8 := reserved_8_value |}, bytes)
@@ -584,7 +584,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -684,7 +684,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       symbol : list byte;
       market_center : list byte;
       halt_status : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -693,14 +693,14 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       Datatypes.length (symbol record) = 8 /\
       Datatypes.length (market_center record) = 1 /\
       Datatypes.length (halt_status record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (halt_status record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -715,7 +715,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (halt_status_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           Some ({| timestamp := timestamp_value; symbol := symbol_value; market_center := market_center_value; halt_status := halt_status_value; reserved_1 := reserved_1_value |}, bytes)
@@ -742,7 +742,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

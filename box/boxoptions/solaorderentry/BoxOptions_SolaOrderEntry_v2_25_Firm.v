@@ -354,9 +354,9 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       group : list byte;
       clearing_data : ClearingData.t;
       owner_data : OwnerData.t;
-      reserved_2 : N;
-      reserved_8 : N;
-      second_reserved_2 : N;
+      reserved_2 : list byte;
+      reserved_8 : list byte;
+      second_reserved_2 : list byte;
       calculation_time_interval : list byte;
       maximum_total_volume : list byte;
       maximum_total_value : list byte;
@@ -371,9 +371,9 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       Datatypes.length (group record) = 2 /\
       ClearingData.bounded (clearing_data record) /\
       OwnerData.bounded (owner_data record) /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (second_reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
+      Datatypes.length (reserved_8 record) = 8 /\
+      Datatypes.length (second_reserved_2 record) = 2 /\
       Datatypes.length (calculation_time_interval record) = 8 /\
       Datatypes.length (maximum_total_volume record) = 8 /\
       Datatypes.length (maximum_total_value record) = 8 /\
@@ -386,9 +386,9 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       encode_bytes 2 (group record) ++
       ClearingData.encode (clearing_data record) ++
       OwnerData.encode (owner_data record) ++
-      encode_uint 2 (reserved_2 record) ++
-      encode_uint 8 (reserved_8 record) ++
-      encode_uint 2 (second_reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
+      encode_bytes 8 (reserved_8 record) ++
+      encode_bytes 2 (second_reserved_2 record) ++
       encode_bytes 8 (calculation_time_interval record) ++
       encode_bytes 8 (maximum_total_volume record) ++
       encode_bytes 8 (maximum_total_value record) ++
@@ -407,13 +407,13 @@ Module BoxOptionsSolaOrderEntryV225Firm.
               match OwnerData.decode bytes with
               | None => None
               | Some (owner_data_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_bytes 2 bytes with
                   | None => None
                   | Some (reserved_2_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_bytes 8 bytes with
                       | None => None
                       | Some (reserved_8_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_bytes 2 bytes with
                           | None => None
                           | Some (second_reserved_2_value, bytes) =>
                               match decode_bytes 8 bytes with
@@ -455,7 +455,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 203.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -468,9 +468,9 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite ClearingData.decode_encode by exact bound_1.
       rewrite OwnerData.decode_encode by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1013,7 +1013,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       selling_post_trading_instruction : list byte;
       buying_additional_client_memo : list byte;
       selling_additional_client_memo : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1036,7 +1036,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       Datatypes.length (selling_post_trading_instruction record) = 50 /\
       Datatypes.length (buying_additional_client_memo record) = 16 /\
       Datatypes.length (selling_additional_client_memo record) = 16 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (group record) ++
@@ -1057,7 +1057,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       encode_bytes 50 (selling_post_trading_instruction record) ++
       encode_bytes 16 (buying_additional_client_memo record) ++
       encode_bytes 16 (selling_additional_client_memo record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1114,7 +1114,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
                                                                           match decode_bytes 16 bytes with
                                                                           | None => None
                                                                           | Some (selling_additional_client_memo_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_bytes 4 bytes with
                                                                               | None => None
                                                                               | Some (reserved_4_value, bytes) =>
                                                                                   Some ({| group := group_value; instrument_optional := instrument_optional_value; verb_side := verb_side_value; quantity := quantity_value; price := price_value; buying_clearing_data := buying_clearing_data_value; selling_clearing_data := selling_clearing_data_value; buying_owner_data := buying_owner_data_value; selling_owner_data := selling_owner_data_value; iml_handling := iml_handling_value; special_price_term := special_price_term_value; additional_price := additional_price_value; quantity_term := quantity_term_value; additional_quantity := additional_quantity_value; buying_post_trading_instruction := buying_post_trading_instruction_value; selling_post_trading_instruction := selling_post_trading_instruction_value; buying_additional_client_memo := buying_additional_client_memo_value; selling_additional_client_memo := selling_additional_client_memo_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1141,7 +1141,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 364.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1169,7 +1169,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
@@ -1463,7 +1463,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       owner_data : OwnerData.t;
       post_trading_instructions : list byte;
       additional_client_memo : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1486,7 +1486,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.bounded (owner_data record) /\
       Datatypes.length (post_trading_instructions record) = 50 /\
       Datatypes.length (additional_client_memo record) = 16 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (group record) ++
@@ -1507,7 +1507,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.encode (owner_data record) ++
       encode_bytes 50 (post_trading_instructions record) ++
       encode_bytes 16 (additional_client_memo record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1564,7 +1564,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
                                                                           match decode_bytes 16 bytes with
                                                                           | None => None
                                                                           | Some (additional_client_memo_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_bytes 4 bytes with
                                                                               | None => None
                                                                               | Some (reserved_4_value, bytes) =>
                                                                                   Some ({| group := group_value; instrument_optional := instrument_optional_value; price_type := price_type_value; verb_side := verb_side_value; quantity := quantity_value; price := price_value; special_price_term := special_price_term_value; reserved_10 := reserved_10_value; quantity_term := quantity_term_value; additional_quantity := additional_quantity_value; duration_type := duration_type_value; gtd_date := gtd_date_value; executing_participant := executing_participant_value; iml_handling := iml_handling_value; clearing_data := clearing_data_value; owner_data := owner_data_value; post_trading_instructions := post_trading_instructions_value; additional_client_memo := additional_client_memo_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1591,7 +1591,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 221.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1619,7 +1619,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite OwnerData.decode_encode by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
@@ -1643,7 +1643,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       owner_data : OwnerData.t;
       post_trading_instructions : list byte;
       additional_client_memo : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1660,7 +1660,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.bounded (owner_data record) /\
       Datatypes.length (post_trading_instructions record) = 50 /\
       Datatypes.length (additional_client_memo record) = 16 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (group record) ++
@@ -1675,7 +1675,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.encode (owner_data record) ++
       encode_bytes 50 (post_trading_instructions record) ++
       encode_bytes 16 (additional_client_memo record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1714,7 +1714,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
                                                   match decode_bytes 16 bytes with
                                                   | None => None
                                                   | Some (additional_client_memo_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_bytes 4 bytes with
                                                       | None => None
                                                       | Some (reserved_4_value, bytes) =>
                                                           Some ({| group := group_value; instrument_optional := instrument_optional_value; verb_side := verb_side_value; quantity_sign := quantity_sign_value; quantity := quantity_value; price := price_value; auction_i_d_optional := auction_i_d_optional_value; reserved_17 := reserved_17_value; clearing_data := clearing_data_value; owner_data := owner_data_value; post_trading_instructions := post_trading_instructions_value; additional_client_memo := additional_client_memo_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1735,7 +1735,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 210.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1757,7 +1757,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite OwnerData.decode_encode by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -1778,8 +1778,8 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       price : list byte;
       special_price_term : list byte;
       reserved_10 : list byte;
-      reserved_1 : N;
-      reserved_8 : N;
+      reserved_1 : list byte;
+      reserved_8 : list byte;
       duration_type : list byte;
       gtd_date : list byte;
       firm_id : list byte;
@@ -1789,7 +1789,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       owner_data : OwnerData.t;
       post_trading_instruction : list byte;
       additional_client_memo : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1803,8 +1803,8 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       Datatypes.length (price record) = 10 /\
       Datatypes.length (special_price_term record) = 1 /\
       Datatypes.length (reserved_10 record) = 10 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (reserved_8 record) = 8 /\
       Datatypes.length (duration_type record) = 1 /\
       Datatypes.length (gtd_date record) = 8 /\
       Datatypes.length (firm_id record) = 4 /\
@@ -1814,7 +1814,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.bounded (owner_data record) /\
       Datatypes.length (post_trading_instruction record) = 50 /\
       Datatypes.length (additional_client_memo record) = 16 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (group record) ++
@@ -1826,8 +1826,8 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       encode_bytes 10 (price record) ++
       encode_bytes 1 (special_price_term record) ++
       encode_bytes 10 (reserved_10 record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_bytes 1 (duration_type record) ++
       encode_bytes 8 (gtd_date record) ++
       encode_bytes 4 (firm_id record) ++
@@ -1837,7 +1837,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       OwnerData.encode (owner_data record) ++
       encode_bytes 50 (post_trading_instruction record) ++
       encode_bytes 16 (additional_client_memo record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -1867,10 +1867,10 @@ Module BoxOptionsSolaOrderEntryV225Firm.
                                       match decode_bytes 10 bytes with
                                       | None => None
                                       | Some (reserved_10_value, bytes) =>
-                                          match decode_uint 1 bytes with
+                                          match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (reserved_1_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (reserved_8_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -1900,7 +1900,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
                                                                                   match decode_bytes 16 bytes with
                                                                                   | None => None
                                                                                   | Some (additional_client_memo_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_bytes 4 bytes with
                                                                                       | None => None
                                                                                       | Some (reserved_4_value, bytes) =>
                                                                                           Some ({| group := group_value; instrument_optional := instrument_optional_value; price_type := price_type_value; verb_side := verb_side_value; quantity_sign := quantity_sign_value; quantity := quantity_value; price := price_value; special_price_term := special_price_term_value; reserved_10 := reserved_10_value; reserved_1 := reserved_1_value; reserved_8 := reserved_8_value; duration_type := duration_type_value; gtd_date := gtd_date_value; firm_id := firm_id_value; iml_handling := iml_handling_value; modified_order_id := modified_order_id_value; clearing_data := clearing_data_value; owner_data := owner_data_value; post_trading_instruction := post_trading_instruction_value; additional_client_memo := additional_client_memo_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1929,7 +1929,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 230.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1948,8 +1948,8 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
@@ -1959,7 +1959,7 @@ Module BoxOptionsSolaOrderEntryV225Firm.
       rewrite OwnerData.decode_encode by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       destruct record. reflexivity.
     Qed.
 

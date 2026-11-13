@@ -607,7 +607,7 @@ Module LseLevel2MbpRecoveryV262.
       size : N;
       instrument : N;
       price : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       source_venue : N;
       order_book_type : N;
       splits : N;
@@ -621,7 +621,7 @@ Module LseLevel2MbpRecoveryV262.
       (size record < 256 ^ N.of_nat 8)%N /\
       (instrument record < 256 ^ N.of_nat 8)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (source_venue record < 256 ^ N.of_nat 2)%N /\
       (order_book_type record < 256 ^ N.of_nat 1)%N /\
       (splits record < 256 ^ N.of_nat 2)%N /\
@@ -633,7 +633,7 @@ Module LseLevel2MbpRecoveryV262.
       encode_uint 8 (size record) ++
       encode_uint 8 (instrument record) ++
       encode_uint 8 (price record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 2 (source_venue record) ++
       encode_uint 1 (order_book_type record) ++
       encode_uint 2 (splits record) ++
@@ -655,7 +655,7 @@ Module LseLevel2MbpRecoveryV262.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_bytes 8 bytes with
                           | None => None
                           | Some (reserved_8_value, bytes) =>
                               match decode_uint 2 bytes with
@@ -700,7 +700,7 @@ Module LseLevel2MbpRecoveryV262.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -719,7 +719,7 @@ Module LseLevel2MbpRecoveryV262.
     Record t := {
       size : N;
       price : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       splits : N;
     }.
 
@@ -727,13 +727,13 @@ Module LseLevel2MbpRecoveryV262.
     Definition bounded (record : t) : Prop :=
       (size record < 256 ^ N.of_nat 8)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (splits record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (size record) ++
       encode_uint 8 (price record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 2 (splits record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -743,7 +743,7 @@ Module LseLevel2MbpRecoveryV262.
           match decode_uint 8 bytes with
           | None => None
           | Some (price_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_bytes 8 bytes with
               | None => None
               | Some (reserved_8_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -758,7 +758,7 @@ Module LseLevel2MbpRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -770,13 +770,13 @@ Module LseLevel2MbpRecoveryV262.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End AddOrderShortMbpMessage.
 
@@ -880,10 +880,10 @@ Module LseLevel2MbpRecoveryV262.
       best_closing_ask_price : N;
       best_closing_bid_size : N;
       best_closing_ask_size : N;
-      reserved_8 : N;
-      second_reserved_8 : N;
-      third_reserved_8 : N;
-      fourth_reserved_8 : N;
+      reserved_8 : list byte;
+      second_reserved_8 : list byte;
+      third_reserved_8 : list byte;
+      fourth_reserved_8 : list byte;
       auction_type : list byte;
       last_trade_price : N;
       last_trade_quantity : N;
@@ -923,10 +923,10 @@ Module LseLevel2MbpRecoveryV262.
       (best_closing_ask_price record < 256 ^ N.of_nat 8)%N /\
       (best_closing_bid_size record < 256 ^ N.of_nat 8)%N /\
       (best_closing_ask_size record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (second_reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (third_reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (fourth_reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
+      Datatypes.length (second_reserved_8 record) = 8 /\
+      Datatypes.length (third_reserved_8 record) = 8 /\
+      Datatypes.length (fourth_reserved_8 record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
       (last_trade_price record < 256 ^ N.of_nat 8)%N /\
       (last_trade_quantity record < 256 ^ N.of_nat 8)%N /\
@@ -964,10 +964,10 @@ Module LseLevel2MbpRecoveryV262.
       encode_uint 8 (best_closing_ask_price record) ++
       encode_uint 8 (best_closing_bid_size record) ++
       encode_uint 8 (best_closing_ask_size record) ++
-      encode_uint 8 (reserved_8 record) ++
-      encode_uint 8 (second_reserved_8 record) ++
-      encode_uint 8 (third_reserved_8 record) ++
-      encode_uint 8 (fourth_reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
+      encode_bytes 8 (second_reserved_8 record) ++
+      encode_bytes 8 (third_reserved_8 record) ++
+      encode_bytes 8 (fourth_reserved_8 record) ++
       encode_bytes 1 (auction_type record) ++
       encode_uint 8 (last_trade_price record) ++
       encode_uint 8 (last_trade_quantity record) ++
@@ -1063,16 +1063,16 @@ Module LseLevel2MbpRecoveryV262.
                                                                                                                       match decode_uint 8 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (best_closing_ask_size_value, bytes) =>
-                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                          match decode_bytes 8 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (reserved_8_value, bytes) =>
-                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                              match decode_bytes 8 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (second_reserved_8_value, bytes) =>
-                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                  match decode_bytes 8 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (third_reserved_8_value, bytes) =>
-                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                      match decode_bytes 8 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (fourth_reserved_8_value, bytes) =>
                                                                                                                                           match decode_bytes 1 bytes with
@@ -1176,10 +1176,10 @@ Module LseLevel2MbpRecoveryV262.
       rewrite decode_encode_uint by exact bound_26.
       rewrite decode_encode_uint by exact bound_27.
       rewrite decode_encode_uint by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
-      rewrite decode_encode_uint by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
+      rewrite decode_encode_bytes by exact bound_29.
+      rewrite decode_encode_bytes by exact bound_30.
+      rewrite decode_encode_bytes by exact bound_31.
+      rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
       rewrite decode_encode_uint by exact bound_34.
       rewrite decode_encode_uint by exact bound_35.

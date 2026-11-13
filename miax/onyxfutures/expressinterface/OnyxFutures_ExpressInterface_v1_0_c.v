@@ -538,7 +538,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       version : list byte;
       session_id : N;
       system_status : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -547,14 +547,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (version record) = 8 /\
       (session_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (system_status record) = 1 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (matching_engine_time record) ++
       encode_bytes 8 (version record) ++
       encode_uint 1 (session_id record) ++
       encode_bytes 1 (system_status record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -569,7 +569,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (system_status_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_bytes 8 bytes with
                       | None => None
                       | Some (reserved_8_value, bytes) =>
                           Some ({| matching_engine_time := matching_engine_time_value; version := version_value; session_id := session_id_value; system_status := system_status_value; reserved_8 := reserved_8_value |}, bytes)
@@ -596,7 +596,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -621,7 +621,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       cancel_reason : list byte;
       last_price : N;
       last_size : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -638,7 +638,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (cancel_reason record) = 1 /\
       (last_price record < 256 ^ N.of_nat 8)%N /\
       (last_size record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (matching_engine_time record) ++
@@ -653,7 +653,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 1 (cancel_reason record) ++
       encode_uint 8 (last_price record) ++
       encode_uint 4 (last_size record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -692,7 +692,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                                                   match decode_uint 4 bytes with
                                                   | None => None
                                                   | Some (last_size_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_bytes 8 bytes with
                                                       | None => None
                                                       | Some (reserved_8_value, bytes) =>
                                                           Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; operator_id := operator_id_value; operator_location := operator_location_value; client_order_id := client_order_id_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; client_send_time := client_send_time_value; leaves_qty := leaves_qty_value; cancel_reason := cancel_reason_value; last_price := last_price_value; last_size := last_size_value; reserved_8 := reserved_8_value |}, bytes)
@@ -735,7 +735,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 

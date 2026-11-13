@@ -494,7 +494,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       origin : list byte;
       openclose_indicator : list byte;
       order_instruction : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -512,7 +512,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (origin record) = 1 /\
       Datatypes.length (openclose_indicator record) = 1 /\
       Datatypes.length (order_instruction record) = 1 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -528,7 +528,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       encode_bytes 1 (origin record) ++
       encode_bytes 1 (openclose_indicator record) ++
       encode_bytes 1 (order_instruction record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -570,7 +570,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (order_instruction_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (reserved_8_value, bytes) =>
                                                               Some ({| nanoseconds := nanoseconds_value; action := action_value; product_id := product_id_value; order_id := order_id_value; order_side := order_side_value; order_type := order_type_value; order_price_short := order_price_short_value; order_original_volume := order_original_volume_value; remaining_volume_open := remaining_volume_open_value; time_in_force_tif := time_in_force_tif_value; origin := origin_value; openclose_indicator := openclose_indicator_value; order_instruction := order_instruction_value; reserved_8 := reserved_8_value |}, bytes)
@@ -615,7 +615,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       destruct record. reflexivity.
     Qed.
 

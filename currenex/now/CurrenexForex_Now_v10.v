@@ -43,19 +43,19 @@ Module CurrenexForexNowV10.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (sequence_number record < 256 ^ N.of_nat 4)%N /\
-      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (timestamp record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (message_type record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (sequence_number record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint 4 (timestamp record) ++
       encode_bytes 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint 4 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -66,7 +66,7 @@ Module CurrenexForexNowV10.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
@@ -840,7 +840,7 @@ Module CurrenexForexNowV10.
       conf_factor_75 : ConfFactor75.t;
       conf_factor_50 : ConfFactor50.t;
       conf_factor_25 : ConfFactor25.t;
-      timestamp : N;
+      calculation_timestamp : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -850,7 +850,7 @@ Module CurrenexForexNowV10.
       ConfFactor75.bounded (conf_factor_75 record) /\
       ConfFactor50.bounded (conf_factor_50 record) /\
       ConfFactor25.bounded (conf_factor_25 record) /\
-      (timestamp record < 256 ^ N.of_nat 8)%N.
+      (calculation_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (instrument_index record) ++
@@ -858,7 +858,7 @@ Module CurrenexForexNowV10.
       ConfFactor75.encode (conf_factor_75 record) ++
       ConfFactor50.encode (conf_factor_50 record) ++
       ConfFactor25.encode (conf_factor_25 record) ++
-      encode_uint 8 (timestamp record).
+      encode_uint 8 (calculation_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -878,8 +878,8 @@ Module CurrenexForexNowV10.
                       | Some (conf_factor_25_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
-                          | Some (timestamp_value, bytes) =>
-                              Some ({| instrument_index := instrument_index_value; price := price_value; conf_factor_75 := conf_factor_75_value; conf_factor_50 := conf_factor_50_value; conf_factor_25 := conf_factor_25_value; timestamp := timestamp_value |}, bytes)
+                          | Some (calculation_timestamp_value, bytes) =>
+                              Some ({| instrument_index := instrument_index_value; price := price_value; conf_factor_75 := conf_factor_75_value; conf_factor_50 := conf_factor_50_value; conf_factor_25 := conf_factor_25_value; calculation_timestamp := calculation_timestamp_value |}, bytes)
                           end
                       end
                   end

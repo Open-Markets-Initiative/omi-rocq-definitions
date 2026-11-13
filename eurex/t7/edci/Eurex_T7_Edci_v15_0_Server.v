@@ -93,7 +93,7 @@ Module EurexT7EdciV150Server.
       appl_resend_flag : N;
       appl_id : N;
       last_fragment : N;
-      pad3 : N;
+      pad3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -106,7 +106,7 @@ Module EurexT7EdciV150Server.
       (appl_resend_flag record < 256 ^ N.of_nat 1)%N /\
       (appl_id record < 256 ^ N.of_nat 1)%N /\
       (last_fragment record < 256 ^ N.of_nat 1)%N /\
-      (pad3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (pad3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (sending_time record) ++
@@ -117,7 +117,7 @@ Module EurexT7EdciV150Server.
       encode_uint 1 (appl_resend_flag record) ++
       encode_uint 1 (appl_id record) ++
       encode_uint 1 (last_fragment record) ++
-      encode_uint 3 (pad3 record).
+      encode_bytes 3 (pad3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -144,7 +144,7 @@ Module EurexT7EdciV150Server.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (last_fragment_value, bytes) =>
-                                      match decode_uint 3 bytes with
+                                      match decode_bytes 3 bytes with
                                       | None => None
                                       | Some (pad3_value, bytes) =>
                                           Some ({| sending_time := sending_time_value; appl_seq_num := appl_seq_num_value; party_id_executing_unit := party_id_executing_unit_value; party_id_group := party_id_group_value; partition_id := partition_id_value; appl_resend_flag := appl_resend_flag_value; appl_id := appl_id_value; last_fragment := last_fragment_value; pad3 := pad3_value |}, bytes)
@@ -161,7 +161,7 @@ Module EurexT7EdciV150Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,12 +179,12 @@ Module EurexT7EdciV150Server.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End RbcHeaderComp.
 
@@ -235,7 +235,7 @@ Module EurexT7EdciV150Server.
       sending_time : N;
       msg_seq_num : N;
       last_fragment : N;
-      pad3 : N;
+      pad3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -244,14 +244,14 @@ Module EurexT7EdciV150Server.
       (sending_time record < 256 ^ N.of_nat 8)%N /\
       (msg_seq_num record < 256 ^ N.of_nat 4)%N /\
       (last_fragment record < 256 ^ N.of_nat 1)%N /\
-      (pad3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (pad3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (request_time record) ++
       encode_uint 8 (sending_time record) ++
       encode_uint 4 (msg_seq_num record) ++
       encode_uint 1 (last_fragment record) ++
-      encode_uint 3 (pad3 record).
+      encode_bytes 3 (pad3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -266,7 +266,7 @@ Module EurexT7EdciV150Server.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (last_fragment_value, bytes) =>
-                      match decode_uint 3 bytes with
+                      match decode_bytes 3 bytes with
                       | None => None
                       | Some (pad3_value, bytes) =>
                           Some ({| request_time := request_time_value; sending_time := sending_time_value; msg_seq_num := msg_seq_num_value; last_fragment := last_fragment_value; pad3 := pad3_value |}, bytes)
@@ -279,7 +279,7 @@ Module EurexT7EdciV150Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -293,12 +293,12 @@ Module EurexT7EdciV150Server.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ResponseHeaderComp.
 

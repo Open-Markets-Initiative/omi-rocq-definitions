@@ -173,7 +173,7 @@ Module IceFuturesMdfV1143.
       last_trade_date_time : N;
       settle_price_date_time : N;
       last_message_sequence_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       open_interest_date : list byte;
       is_settle_price_official : list byte;
       settlement_price : N;
@@ -202,7 +202,7 @@ Module IceFuturesMdfV1143.
       (last_trade_date_time record < 256 ^ N.of_nat 8)%N /\
       (settle_price_date_time record < 256 ^ N.of_nat 8)%N /\
       (last_message_sequence_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (open_interest_date record) = 10 /\
       Datatypes.length (is_settle_price_official record) = 1 /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
@@ -229,7 +229,7 @@ Module IceFuturesMdfV1143.
       encode_uint 8 (last_trade_date_time record) ++
       encode_uint 8 (settle_price_date_time record) ++
       encode_uint 4 (last_message_sequence_id record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 10 (open_interest_date record) ++
       encode_bytes 1 (is_settle_price_official record) ++
       encode_uint 8 (settlement_price record) ++
@@ -294,7 +294,7 @@ Module IceFuturesMdfV1143.
                                                                               match decode_uint 4 bytes with
                                                                               | None => None
                                                                               | Some (last_message_sequence_id_value, bytes) =>
-                                                                                  match decode_uint 2 bytes with
+                                                                                  match decode_bytes 2 bytes with
                                                                                   | None => None
                                                                                   | Some (reserved_2_value, bytes) =>
                                                                                       match decode_bytes 10 bytes with
@@ -371,7 +371,7 @@ Module IceFuturesMdfV1143.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
@@ -1193,7 +1193,7 @@ Module IceFuturesMdfV1143.
       published_date_time : N;
       valuation_date_applying_date : list byte;
       status : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       index_price_denominator : list byte;
     }.
 
@@ -1205,7 +1205,7 @@ Module IceFuturesMdfV1143.
       (published_date_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (valuation_date_applying_date record) = 10 /\
       Datatypes.length (status record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (index_price_denominator record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -1215,7 +1215,7 @@ Module IceFuturesMdfV1143.
       encode_uint 8 (published_date_time record) ++
       encode_bytes 10 (valuation_date_applying_date record) ++
       encode_bytes 1 (status record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (index_price_denominator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1237,7 +1237,7 @@ Module IceFuturesMdfV1143.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (status_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (reserved_2_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1272,7 +1272,7 @@ Module IceFuturesMdfV1143.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.

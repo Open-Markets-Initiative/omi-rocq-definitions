@@ -204,7 +204,7 @@ Module BondSpotPricesAndTradesV68.
       quantity : list byte;
       notional_amount : list byte;
       notional_currency : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       transaction_id_code : list byte;
       mmt_market_mechanism : list byte;
       mmt_trading_mode : list byte;
@@ -247,7 +247,7 @@ Module BondSpotPricesAndTradesV68.
       Datatypes.length (quantity record) = 20 /\
       Datatypes.length (notional_amount record) = 20 /\
       Datatypes.length (notional_currency record) = 3 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (transaction_id_code record) = 52 /\
       Datatypes.length (mmt_market_mechanism record) = 1 /\
       Datatypes.length (mmt_trading_mode record) = 1 /\
@@ -288,7 +288,7 @@ Module BondSpotPricesAndTradesV68.
       encode_bytes 20 (quantity record) ++
       encode_bytes 20 (notional_amount record) ++
       encode_bytes 3 (notional_currency record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 52 (transaction_id_code record) ++
       encode_bytes 1 (mmt_market_mechanism record) ++
       encode_bytes 1 (mmt_trading_mode record) ++
@@ -387,7 +387,7 @@ Module BondSpotPricesAndTradesV68.
                                                                                                                       match decode_bytes 3 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (notional_currency_value, bytes) =>
-                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (reserved_1_value, bytes) =>
                                                                                                                               match decode_bytes 52 bytes with
@@ -500,7 +500,7 @@ Module BondSpotPricesAndTradesV68.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
+      rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
@@ -532,7 +532,7 @@ Module BondSpotPricesAndTradesV68.
       system_id : N;
       source_time_micro_secs : N;
       type_of_price : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       price_scale_code : N;
       variation_scale_code : N;
     }.
@@ -549,7 +549,7 @@ Module BondSpotPricesAndTradesV68.
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       (type_of_price record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
       (variation_scale_code record < 256 ^ N.of_nat 1)%N.
 
@@ -564,7 +564,7 @@ Module BondSpotPricesAndTradesV68.
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
       encode_uint 2 (type_of_price record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 1 (price_scale_code record) ++
       encode_uint 1 (variation_scale_code record).
 
@@ -599,7 +599,7 @@ Module BondSpotPricesAndTradesV68.
                                           match decode_uint 2 bytes with
                                           | None => None
                                           | Some (type_of_price_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (reserved_2_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -626,7 +626,7 @@ Module BondSpotPricesAndTradesV68.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -646,14 +646,14 @@ Module BondSpotPricesAndTradesV68.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End PriceUpdateMessage.
 

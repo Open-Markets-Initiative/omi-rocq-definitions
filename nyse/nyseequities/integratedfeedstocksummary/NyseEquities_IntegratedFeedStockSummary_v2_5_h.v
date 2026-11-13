@@ -339,7 +339,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
     Record t := {
       symbol_index : N;
       symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
       system_id : N;
       exchange_code : list byte;
@@ -360,7 +360,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
     Definition bounded (record : t) : Prop :=
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exchange_code record) = 1 /\
@@ -379,7 +379,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
@@ -402,7 +402,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
           match decode_bytes 11 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -481,7 +481,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -581,7 +581,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
       symbol_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       price_1 : N;
       price_2 : N;
       ssr_triggering_exchange_id : list byte;
@@ -600,7 +600,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (price_1 record < 256 ^ N.of_nat 4)%N /\
       (price_2 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ssr_triggering_exchange_id record) = 1 /\
@@ -617,7 +617,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (price_1 record) ++
       encode_uint 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
@@ -646,7 +646,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
                                   match decode_uint 4 bytes with
@@ -709,7 +709,7 @@ Module NyseEquitiesIntegratedFeedStockSummaryV25H.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.

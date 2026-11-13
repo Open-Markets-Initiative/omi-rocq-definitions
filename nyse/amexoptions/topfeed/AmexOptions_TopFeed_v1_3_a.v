@@ -219,8 +219,8 @@ Module AmexOptionsTopFeedV13A.
       ask_customer_volume : N;
       bid_customer_volume : N;
       quote_condition : list byte;
-      reserved_1 : N;
-      reserved_2 : N;
+      reserved_1 : list byte;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -236,8 +236,8 @@ Module AmexOptionsTopFeedV13A.
       (ask_customer_volume record < 256 ^ N.of_nat 2)%N /\
       (bid_customer_volume record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (quote_condition record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -251,8 +251,8 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 2 (ask_customer_volume record) ++
       encode_uint 2 (bid_customer_volume record) ++
       encode_bytes 1 (quote_condition record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -288,10 +288,10 @@ Module AmexOptionsTopFeedV13A.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (quote_condition_value, bytes) =>
-                                                  match decode_uint 1 bytes with
+                                                  match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (reserved_1_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_bytes 2 bytes with
                                                       | None => None
                                                       | Some (reserved_2_value, bytes) =>
                                                           Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; ask_price := ask_price_value; bid_price := bid_price_value; ask_volume := ask_volume_value; bid_volume := bid_volume_value; ask_customer_volume := ask_customer_volume_value; bid_customer_volume := bid_customer_volume_value; quote_condition := quote_condition_value; reserved_1 := reserved_1_value; reserved_2 := reserved_2_value |}, bytes)
@@ -333,8 +333,8 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -356,7 +356,7 @@ Module AmexOptionsTopFeedV13A.
       volume_4 : N;
       trade_cond_1 : list byte;
       trade_cond_2 : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -370,7 +370,7 @@ Module AmexOptionsTopFeedV13A.
       (volume_4 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trade_cond_1 record) = 1 /\
       Datatypes.length (trade_cond_2 record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -382,7 +382,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (volume_4 record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (trade_cond_2 record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -412,7 +412,7 @@ Module AmexOptionsTopFeedV13A.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (trade_cond_2_value, bytes) =>
-                                          match decode_uint 2 bytes with
+                                          match decode_bytes 2 bytes with
                                           | None => None
                                           | Some (reserved_2_value, bytes) =>
                                               Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; trade_id := trade_id_value; price := price_value; volume_4 := volume_4_value; trade_cond_1 := trade_cond_1_value; trade_cond_2 := trade_cond_2_value; reserved_2 := reserved_2_value |}, bytes)
@@ -449,7 +449,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -547,7 +547,7 @@ Module AmexOptionsTopFeedV13A.
       volume_4 : N;
       trade_cond_1 : list byte;
       trade_cond_2 : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -562,7 +562,7 @@ Module AmexOptionsTopFeedV13A.
       (volume_4 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trade_cond_1 record) = 1 /\
       Datatypes.length (trade_cond_2 record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -575,7 +575,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (volume_4 record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (trade_cond_2 record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -608,7 +608,7 @@ Module AmexOptionsTopFeedV13A.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (trade_cond_2_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (reserved_2_value, bytes) =>
                                                   Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; original_trade_id := original_trade_id_value; trade_id := trade_id_value; price := price_value; volume_4 := volume_4_value; trade_cond_1 := trade_cond_1_value; trade_cond_2 := trade_cond_2_value; reserved_2 := reserved_2_value |}, bytes)
@@ -647,7 +647,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -671,7 +671,7 @@ Module AmexOptionsTopFeedV13A.
       auction_type : list byte;
       imbalance_side : list byte;
       market_imbalance_side : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -687,7 +687,7 @@ Module AmexOptionsTopFeedV13A.
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (imbalance_side record) = 1 /\
       Datatypes.length (market_imbalance_side record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -701,7 +701,7 @@ Module AmexOptionsTopFeedV13A.
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (imbalance_side record) ++
       encode_bytes 1 (market_imbalance_side record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -737,7 +737,7 @@ Module AmexOptionsTopFeedV13A.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (market_imbalance_side_value, bytes) =>
-                                                  match decode_uint 3 bytes with
+                                                  match decode_bytes 3 bytes with
                                                   | None => None
                                                   | Some (reserved_3_value, bytes) =>
                                                       Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; reference_price := reference_price_value; paired_qty := paired_qty_value; total_imbalance_qty := total_imbalance_qty_value; market_imbalance_qty := market_imbalance_qty_value; auction_type := auction_type_value; imbalance_side := imbalance_side_value; market_imbalance_side := market_imbalance_side_value; reserved_3 := reserved_3_value |}, bytes)
@@ -778,7 +778,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -796,7 +796,7 @@ Module AmexOptionsTopFeedV13A.
       series_index : N;
       symbol_seq_num : N;
       side : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       volume_2 : N;
       price : N;
     }.
@@ -808,7 +808,7 @@ Module AmexOptionsTopFeedV13A.
       (series_index record < 256 ^ N.of_nat 4)%N /\
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (side record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (volume_2 record < 256 ^ N.of_nat 2)%N /\
       (price record < 256 ^ N.of_nat 4)%N.
 
@@ -818,7 +818,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (series_index record) ++
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (volume_2 record) ++
       encode_uint 4 (price record).
 
@@ -838,7 +838,7 @@ Module AmexOptionsTopFeedV13A.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_1_value, bytes) =>
                               match decode_uint 2 bytes with
@@ -875,7 +875,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
@@ -1110,7 +1110,7 @@ Module AmexOptionsTopFeedV13A.
       underlying_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1121,7 +1121,7 @@ Module AmexOptionsTopFeedV13A.
       (underlying_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1130,7 +1130,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (underlying_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1151,7 +1151,7 @@ Module AmexOptionsTopFeedV13A.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (reserved_2_value, bytes) =>
                                   Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; underlying_index := underlying_index_value; underlying_seq_num := underlying_seq_num_value; security_status := security_status_value; halt_condition := halt_condition_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1182,7 +1182,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -1201,7 +1201,7 @@ Module AmexOptionsTopFeedV13A.
       symbol_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1212,7 +1212,7 @@ Module AmexOptionsTopFeedV13A.
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1221,7 +1221,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1242,7 +1242,7 @@ Module AmexOptionsTopFeedV13A.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (reserved_2_value, bytes) =>
                                   Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; security_status := security_status_value; halt_condition := halt_condition_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1273,7 +1273,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -1297,8 +1297,8 @@ Module AmexOptionsTopFeedV13A.
       ask_customer_volume : N;
       bid_customer_volume : N;
       quote_condition : list byte;
-      reserved_1 : N;
-      reserved_2 : N;
+      reserved_1 : list byte;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1314,8 +1314,8 @@ Module AmexOptionsTopFeedV13A.
       (ask_customer_volume record < 256 ^ N.of_nat 2)%N /\
       (bid_customer_volume record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (quote_condition record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1329,8 +1329,8 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 2 (ask_customer_volume record) ++
       encode_uint 2 (bid_customer_volume record) ++
       encode_bytes 1 (quote_condition record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1366,10 +1366,10 @@ Module AmexOptionsTopFeedV13A.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (quote_condition_value, bytes) =>
-                                                  match decode_uint 1 bytes with
+                                                  match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (reserved_1_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_bytes 2 bytes with
                                                       | None => None
                                                       | Some (reserved_2_value, bytes) =>
                                                           Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; ask_price := ask_price_value; bid_price := bid_price_value; ask_volume := ask_volume_value; bid_volume := bid_volume_value; ask_customer_volume := ask_customer_volume_value; bid_customer_volume := bid_customer_volume_value; quote_condition := quote_condition_value; reserved_1 := reserved_1_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1411,8 +1411,8 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -1434,7 +1434,7 @@ Module AmexOptionsTopFeedV13A.
       volume_4 : N;
       trade_cond_1 : list byte;
       trade_cond_2 : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1448,7 +1448,7 @@ Module AmexOptionsTopFeedV13A.
       (volume_4 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trade_cond_1 record) = 1 /\
       Datatypes.length (trade_cond_2 record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1460,7 +1460,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 4 (volume_4 record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (trade_cond_2 record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1490,7 +1490,7 @@ Module AmexOptionsTopFeedV13A.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (trade_cond_2_value, bytes) =>
-                                          match decode_uint 2 bytes with
+                                          match decode_bytes 2 bytes with
                                           | None => None
                                           | Some (reserved_2_value, bytes) =>
                                               Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; trade_id := trade_id_value; price := price_value; volume_4 := volume_4_value; trade_cond_1 := trade_cond_1_value; trade_cond_2 := trade_cond_2_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1527,7 +1527,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -1551,7 +1551,7 @@ Module AmexOptionsTopFeedV13A.
       auction_type : list byte;
       imbalance_side : list byte;
       market_imbalance_side : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1567,7 +1567,7 @@ Module AmexOptionsTopFeedV13A.
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (imbalance_side record) = 1 /\
       Datatypes.length (market_imbalance_side record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1581,7 +1581,7 @@ Module AmexOptionsTopFeedV13A.
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (imbalance_side record) ++
       encode_bytes 1 (market_imbalance_side record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1617,7 +1617,7 @@ Module AmexOptionsTopFeedV13A.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (market_imbalance_side_value, bytes) =>
-                                                  match decode_uint 3 bytes with
+                                                  match decode_bytes 3 bytes with
                                                   | None => None
                                                   | Some (reserved_3_value, bytes) =>
                                                       Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; symbol_seq_num := symbol_seq_num_value; reference_price := reference_price_value; paired_qty := paired_qty_value; total_imbalance_qty := total_imbalance_qty_value; market_imbalance_qty := market_imbalance_qty_value; auction_type := auction_type_value; imbalance_side := imbalance_side_value; market_imbalance_side := market_imbalance_side_value; reserved_3 := reserved_3_value |}, bytes)
@@ -1658,7 +1658,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -1680,7 +1680,7 @@ Module AmexOptionsTopFeedV13A.
       price_scale_code : N;
       security_type : list byte;
       price_resolution : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1694,7 +1694,7 @@ Module AmexOptionsTopFeedV13A.
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (security_type record) = 1 /\
       (price_resolution record < 256 ^ N.of_nat 1)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (underlying_index record) ++
@@ -1706,7 +1706,7 @@ Module AmexOptionsTopFeedV13A.
       encode_uint 1 (price_scale_code record) ++
       encode_bytes 1 (security_type record) ++
       encode_uint 1 (price_resolution record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1736,7 +1736,7 @@ Module AmexOptionsTopFeedV13A.
                                       match decode_uint 1 bytes with
                                       | None => None
                                       | Some (price_resolution_value, bytes) =>
-                                          match decode_uint 1 bytes with
+                                          match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (reserved_1_value, bytes) =>
                                               Some ({| underlying_index := underlying_index_value; underlying_symbol := underlying_symbol_value; channel_id := channel_id_value; market_id := market_id_value; system_id := system_id_value; exchange_code := exchange_code_value; price_scale_code := price_scale_code_value; security_type := security_type_value; price_resolution := price_resolution_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1773,7 +1773,7 @@ Module AmexOptionsTopFeedV13A.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -1788,10 +1788,10 @@ Module AmexOptionsTopFeedV13A.
     Record t := {
       series_index : N;
       channel_id : N;
-      reserved_a_1 : N;
+      reserved_a_1 : list byte;
       market_id : N;
       system_id : N;
-      reserved_b_1 : N;
+      reserved_b_1 : list byte;
       stream_id : N;
       underlying_index : N;
       contract_multiplier : N;
@@ -1808,10 +1808,10 @@ Module AmexOptionsTopFeedV13A.
     Definition bounded (record : t) : Prop :=
       (series_index record < 256 ^ N.of_nat 4)%N /\
       (channel_id record < 256 ^ N.of_nat 1)%N /\
-      (reserved_a_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_b_1 record) = 1 /\
       (stream_id record < 256 ^ N.of_nat 2)%N /\
       (underlying_index record < 256 ^ N.of_nat 4)%N /\
       (contract_multiplier record < 256 ^ N.of_nat 2)%N /\
@@ -1826,10 +1826,10 @@ Module AmexOptionsTopFeedV13A.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (series_index record) ++
       encode_uint 1 (channel_id record) ++
-      encode_uint 1 (reserved_a_1 record) ++
+      encode_bytes 1 (reserved_a_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
-      encode_uint 1 (reserved_b_1 record) ++
+      encode_bytes 1 (reserved_b_1 record) ++
       encode_uint 2 (stream_id record) ++
       encode_uint 4 (underlying_index record) ++
       encode_uint 2 (contract_multiplier record) ++
@@ -1848,7 +1848,7 @@ Module AmexOptionsTopFeedV13A.
           match decode_uint 1 bytes with
           | None => None
           | Some (channel_id_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_a_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -1857,7 +1857,7 @@ Module AmexOptionsTopFeedV13A.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (system_id_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_b_1_value, bytes) =>
                               match decode_uint 2 bytes with
@@ -1923,10 +1923,10 @@ Module AmexOptionsTopFeedV13A.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -1950,23 +1950,23 @@ Module AmexOptionsTopFeedV13A.
     (** In all multicast channels, a Stream ID Message is sent immediately after each packet header to uniquely identify the source or Stream ID of the data in the packet. *)
     Record t := {
       stream_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (stream_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (stream_id record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (reserved_2_value, bytes) =>
               Some ({| stream_id := stream_id_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1976,7 +1976,7 @@ Module AmexOptionsTopFeedV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1987,12 +1987,12 @@ Module AmexOptionsTopFeedV13A.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End StreamIdMessage.
 

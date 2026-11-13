@@ -195,9 +195,9 @@ Module SgxTitanDtDepthOfBookV14.
       trading_currency : list byte;
       number_of_decimals_in_price : N;
       number_of_decimals_in_nominal_value : N;
-      reserved_4_a : N;
-      reserved_4_b : N;
-      reserved_4_c : N;
+      reserved_4_a : list byte;
+      reserved_4_b : list byte;
+      reserved_4_c : list byte;
       nominal_value : N;
     }.
 
@@ -212,9 +212,9 @@ Module SgxTitanDtDepthOfBookV14.
       Datatypes.length (trading_currency record) = 3 /\
       (number_of_decimals_in_price record < 256 ^ N.of_nat 2)%N /\
       (number_of_decimals_in_nominal_value record < 256 ^ N.of_nat 2)%N /\
-      (reserved_4_a record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_b record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_c record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4_a record) = 4 /\
+      Datatypes.length (reserved_4_b record) = 4 /\
+      Datatypes.length (reserved_4_c record) = 4 /\
       (nominal_value record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
@@ -227,9 +227,9 @@ Module SgxTitanDtDepthOfBookV14.
       encode_bytes 3 (trading_currency record) ++
       encode_uint 2 (number_of_decimals_in_price record) ++
       encode_uint 2 (number_of_decimals_in_nominal_value record) ++
-      encode_uint 4 (reserved_4_a record) ++
-      encode_uint 4 (reserved_4_b record) ++
-      encode_uint 4 (reserved_4_c record) ++
+      encode_bytes 4 (reserved_4_a record) ++
+      encode_bytes 4 (reserved_4_b record) ++
+      encode_bytes 4 (reserved_4_c record) ++
       encode_uint 8 (nominal_value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -260,13 +260,13 @@ Module SgxTitanDtDepthOfBookV14.
                                       match decode_uint 2 bytes with
                                       | None => None
                                       | Some (number_of_decimals_in_nominal_value_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_bytes 4 bytes with
                                           | None => None
                                           | Some (reserved_4_a_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (reserved_4_b_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (reserved_4_c_value, bytes) =>
                                                       match decode_uint 8 bytes with
@@ -309,9 +309,9 @@ Module SgxTitanDtDepthOfBookV14.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
@@ -334,9 +334,9 @@ Module SgxTitanDtDepthOfBookV14.
       trading_currency : list byte;
       number_of_decimals_in_price : N;
       number_of_decimals_in_nominal_value : N;
-      reserved_4_a : N;
-      reserved_4_b : N;
-      reserved_4_c : N;
+      reserved_4_a : list byte;
+      reserved_4_b : list byte;
+      reserved_4_c : list byte;
       nominal_value : N;
       leg_1_symbol : list byte;
       leg_1_side : list byte;
@@ -363,9 +363,9 @@ Module SgxTitanDtDepthOfBookV14.
       Datatypes.length (trading_currency record) = 3 /\
       (number_of_decimals_in_price record < 256 ^ N.of_nat 2)%N /\
       (number_of_decimals_in_nominal_value record < 256 ^ N.of_nat 2)%N /\
-      (reserved_4_a record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_b record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4_c record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4_a record) = 4 /\
+      Datatypes.length (reserved_4_b record) = 4 /\
+      Datatypes.length (reserved_4_c record) = 4 /\
       (nominal_value record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (leg_1_symbol record) = 32 /\
       Datatypes.length (leg_1_side record) = 1 /\
@@ -390,9 +390,9 @@ Module SgxTitanDtDepthOfBookV14.
       encode_bytes 3 (trading_currency record) ++
       encode_uint 2 (number_of_decimals_in_price record) ++
       encode_uint 2 (number_of_decimals_in_nominal_value record) ++
-      encode_uint 4 (reserved_4_a record) ++
-      encode_uint 4 (reserved_4_b record) ++
-      encode_uint 4 (reserved_4_c record) ++
+      encode_bytes 4 (reserved_4_a record) ++
+      encode_bytes 4 (reserved_4_b record) ++
+      encode_bytes 4 (reserved_4_c record) ++
       encode_uint 8 (nominal_value record) ++
       encode_bytes 32 (leg_1_symbol record) ++
       encode_bytes 1 (leg_1_side record) ++
@@ -435,13 +435,13 @@ Module SgxTitanDtDepthOfBookV14.
                                       match decode_uint 2 bytes with
                                       | None => None
                                       | Some (number_of_decimals_in_nominal_value_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_bytes 4 bytes with
                                           | None => None
                                           | Some (reserved_4_a_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (reserved_4_b_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (reserved_4_c_value, bytes) =>
                                                       match decode_uint 8 bytes with
@@ -532,9 +532,9 @@ Module SgxTitanDtDepthOfBookV14.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
@@ -752,8 +752,8 @@ Module SgxTitanDtDepthOfBookV14.
       executed_quantity : N;
       match_id : N;
       combo_group_id : N;
-      reserved_7_a : N;
-      reserved_7_b : N;
+      reserved_7_a : list byte;
+      reserved_7_b : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -765,8 +765,8 @@ Module SgxTitanDtDepthOfBookV14.
       (executed_quantity record < 256 ^ N.of_nat 8)%N /\
       (match_id record < 256 ^ N.of_nat 8)%N /\
       (combo_group_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_7_a record < 256 ^ N.of_nat 7)%N /\
-      (reserved_7_b record < 256 ^ N.of_nat 7)%N.
+      Datatypes.length (reserved_7_a record) = 7 /\
+      Datatypes.length (reserved_7_b record) = 7.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -776,8 +776,8 @@ Module SgxTitanDtDepthOfBookV14.
       encode_uint 8 (executed_quantity record) ++
       encode_uint 8 (match_id record) ++
       encode_uint 4 (combo_group_id record) ++
-      encode_uint 7 (reserved_7_a record) ++
-      encode_uint 7 (reserved_7_b record).
+      encode_bytes 7 (reserved_7_a record) ++
+      encode_bytes 7 (reserved_7_b record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -801,10 +801,10 @@ Module SgxTitanDtDepthOfBookV14.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (combo_group_id_value, bytes) =>
-                                  match decode_uint 7 bytes with
+                                  match decode_bytes 7 bytes with
                                   | None => None
                                   | Some (reserved_7_a_value, bytes) =>
-                                      match decode_uint 7 bytes with
+                                      match decode_bytes 7 bytes with
                                       | None => None
                                       | Some (reserved_7_b_value, bytes) =>
                                           Some ({| nanoseconds := nanoseconds_value; order_id := order_id_value; order_book_id := order_book_id_value; side := side_value; executed_quantity := executed_quantity_value; match_id := match_id_value; combo_group_id := combo_group_id_value; reserved_7_a := reserved_7_a_value; reserved_7_b := reserved_7_b_value |}, bytes)
@@ -838,8 +838,8 @@ Module SgxTitanDtDepthOfBookV14.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -859,8 +859,8 @@ Module SgxTitanDtDepthOfBookV14.
       executed_quantity : N;
       match_id : N;
       combo_group_id : N;
-      reserved_7_a : N;
-      reserved_7_b : N;
+      reserved_7_a : list byte;
+      reserved_7_b : list byte;
       trade_price : N;
       occurred_at_cross : list byte;
       printable : list byte;
@@ -875,8 +875,8 @@ Module SgxTitanDtDepthOfBookV14.
       (executed_quantity record < 256 ^ N.of_nat 8)%N /\
       (match_id record < 256 ^ N.of_nat 8)%N /\
       (combo_group_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_7_a record < 256 ^ N.of_nat 7)%N /\
-      (reserved_7_b record < 256 ^ N.of_nat 7)%N /\
+      Datatypes.length (reserved_7_a record) = 7 /\
+      Datatypes.length (reserved_7_b record) = 7 /\
       (trade_price record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (occurred_at_cross record) = 1 /\
       Datatypes.length (printable record) = 1.
@@ -889,8 +889,8 @@ Module SgxTitanDtDepthOfBookV14.
       encode_uint 8 (executed_quantity record) ++
       encode_uint 8 (match_id record) ++
       encode_uint 4 (combo_group_id record) ++
-      encode_uint 7 (reserved_7_a record) ++
-      encode_uint 7 (reserved_7_b record) ++
+      encode_bytes 7 (reserved_7_a record) ++
+      encode_bytes 7 (reserved_7_b record) ++
       encode_uint 4 (trade_price record) ++
       encode_bytes 1 (occurred_at_cross record) ++
       encode_bytes 1 (printable record).
@@ -917,10 +917,10 @@ Module SgxTitanDtDepthOfBookV14.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (combo_group_id_value, bytes) =>
-                                  match decode_uint 7 bytes with
+                                  match decode_bytes 7 bytes with
                                   | None => None
                                   | Some (reserved_7_a_value, bytes) =>
-                                      match decode_uint 7 bytes with
+                                      match decode_bytes 7 bytes with
                                       | None => None
                                       | Some (reserved_7_b_value, bytes) =>
                                           match decode_uint 4 bytes with
@@ -966,8 +966,8 @@ Module SgxTitanDtDepthOfBookV14.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -1057,8 +1057,8 @@ Module SgxTitanDtDepthOfBookV14.
       quantity : N;
       order_book_id : N;
       trade_price : N;
-      reserved_7_a : N;
-      reserved_7_b : N;
+      reserved_7_a : list byte;
+      reserved_7_b : list byte;
       printable : list byte;
       occurred_at_cross : list byte;
     }.
@@ -1072,8 +1072,8 @@ Module SgxTitanDtDepthOfBookV14.
       (quantity record < 256 ^ N.of_nat 8)%N /\
       (order_book_id record < 256 ^ N.of_nat 4)%N /\
       (trade_price record < 256 ^ N.of_nat 4)%N /\
-      (reserved_7_a record < 256 ^ N.of_nat 7)%N /\
-      (reserved_7_b record < 256 ^ N.of_nat 7)%N /\
+      Datatypes.length (reserved_7_a record) = 7 /\
+      Datatypes.length (reserved_7_b record) = 7 /\
       Datatypes.length (printable record) = 1 /\
       Datatypes.length (occurred_at_cross record) = 1.
 
@@ -1085,8 +1085,8 @@ Module SgxTitanDtDepthOfBookV14.
       encode_uint 8 (quantity record) ++
       encode_uint 4 (order_book_id record) ++
       encode_uint 4 (trade_price record) ++
-      encode_uint 7 (reserved_7_a record) ++
-      encode_uint 7 (reserved_7_b record) ++
+      encode_bytes 7 (reserved_7_a record) ++
+      encode_bytes 7 (reserved_7_b record) ++
       encode_bytes 1 (printable record) ++
       encode_bytes 1 (occurred_at_cross record).
 
@@ -1112,10 +1112,10 @@ Module SgxTitanDtDepthOfBookV14.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (trade_price_value, bytes) =>
-                                  match decode_uint 7 bytes with
+                                  match decode_bytes 7 bytes with
                                   | None => None
                                   | Some (reserved_7_a_value, bytes) =>
-                                      match decode_uint 7 bytes with
+                                      match decode_bytes 7 bytes with
                                       | None => None
                                       | Some (reserved_7_b_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -1157,8 +1157,8 @@ Module SgxTitanDtDepthOfBookV14.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.

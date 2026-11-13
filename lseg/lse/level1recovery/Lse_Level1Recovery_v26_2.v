@@ -698,10 +698,10 @@ Module LseLevel1RecoveryV262.
       best_closing_ask_price : N;
       best_closing_bid_size : N;
       best_closing_ask_size : N;
-      reserved_8 : N;
-      second_reserved_8 : N;
-      third_reserved_8 : N;
-      fourth_reserved_8 : N;
+      reserved_8 : list byte;
+      second_reserved_8 : list byte;
+      third_reserved_8 : list byte;
+      fourth_reserved_8 : list byte;
       auction_type : list byte;
       last_trade_price : N;
       last_trade_quantity : N;
@@ -741,10 +741,10 @@ Module LseLevel1RecoveryV262.
       (best_closing_ask_price record < 256 ^ N.of_nat 8)%N /\
       (best_closing_bid_size record < 256 ^ N.of_nat 8)%N /\
       (best_closing_ask_size record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (second_reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (third_reserved_8 record < 256 ^ N.of_nat 8)%N /\
-      (fourth_reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
+      Datatypes.length (second_reserved_8 record) = 8 /\
+      Datatypes.length (third_reserved_8 record) = 8 /\
+      Datatypes.length (fourth_reserved_8 record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
       (last_trade_price record < 256 ^ N.of_nat 8)%N /\
       (last_trade_quantity record < 256 ^ N.of_nat 8)%N /\
@@ -782,10 +782,10 @@ Module LseLevel1RecoveryV262.
       encode_uint 8 (best_closing_ask_price record) ++
       encode_uint 8 (best_closing_bid_size record) ++
       encode_uint 8 (best_closing_ask_size record) ++
-      encode_uint 8 (reserved_8 record) ++
-      encode_uint 8 (second_reserved_8 record) ++
-      encode_uint 8 (third_reserved_8 record) ++
-      encode_uint 8 (fourth_reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
+      encode_bytes 8 (second_reserved_8 record) ++
+      encode_bytes 8 (third_reserved_8 record) ++
+      encode_bytes 8 (fourth_reserved_8 record) ++
       encode_bytes 1 (auction_type record) ++
       encode_uint 8 (last_trade_price record) ++
       encode_uint 8 (last_trade_quantity record) ++
@@ -881,16 +881,16 @@ Module LseLevel1RecoveryV262.
                                                                                                                       match decode_uint 8 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (best_closing_ask_size_value, bytes) =>
-                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                          match decode_bytes 8 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (reserved_8_value, bytes) =>
-                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                              match decode_bytes 8 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (second_reserved_8_value, bytes) =>
-                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                  match decode_bytes 8 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (third_reserved_8_value, bytes) =>
-                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                      match decode_bytes 8 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (fourth_reserved_8_value, bytes) =>
                                                                                                                                           match decode_bytes 1 bytes with
@@ -994,10 +994,10 @@ Module LseLevel1RecoveryV262.
       rewrite decode_encode_uint by exact bound_26.
       rewrite decode_encode_uint by exact bound_27.
       rewrite decode_encode_uint by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
-      rewrite decode_encode_uint by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
+      rewrite decode_encode_bytes by exact bound_29.
+      rewrite decode_encode_bytes by exact bound_30.
+      rewrite decode_encode_bytes by exact bound_31.
+      rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
       rewrite decode_encode_uint by exact bound_34.
       rewrite decode_encode_uint by exact bound_35.

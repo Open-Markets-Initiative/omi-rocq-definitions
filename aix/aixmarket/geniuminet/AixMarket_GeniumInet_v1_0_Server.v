@@ -231,7 +231,7 @@ Module AixMarketGeniumInetV10Server.
       round_lot_size : N;
       block_lot_size : N;
       nominal_value : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       underlying_order_book_id : N;
       strike_price : N;
       expiration_date : N;
@@ -255,7 +255,7 @@ Module AixMarketGeniumInetV10Server.
       (round_lot_size record < 256 ^ N.of_nat 4)%N /\
       (block_lot_size record < 256 ^ N.of_nat 4)%N /\
       (nominal_value record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (underlying_order_book_id record < 256 ^ N.of_nat 4)%N /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
       (expiration_date record < 256 ^ N.of_nat 4)%N /\
@@ -277,7 +277,7 @@ Module AixMarketGeniumInetV10Server.
       encode_uint 4 (round_lot_size record) ++
       encode_uint 4 (block_lot_size record) ++
       encode_uint 8 (nominal_value record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 4 (underlying_order_book_id record) ++
       encode_uint 4 (strike_price record) ++
       encode_uint 4 (expiration_date record) ++
@@ -325,7 +325,7 @@ Module AixMarketGeniumInetV10Server.
                                                       match decode_uint 8 bytes with
                                                       | None => None
                                                       | Some (nominal_value_value, bytes) =>
-                                                          match decode_uint 1 bytes with
+                                                          match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (reserved_1_value, bytes) =>
                                                               match decode_uint 4 bytes with
@@ -394,7 +394,7 @@ Module AixMarketGeniumInetV10Server.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.

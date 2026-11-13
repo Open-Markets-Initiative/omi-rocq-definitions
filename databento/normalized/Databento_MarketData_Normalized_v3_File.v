@@ -277,7 +277,7 @@ Module DatabentoMarketDataNormalizedV3File.
       is_trading : list byte;
       is_quoting : list byte;
       is_short_sell_restricted : list byte;
-      reserved_7 : N;
+      reserved_7 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -289,7 +289,7 @@ Module DatabentoMarketDataNormalizedV3File.
       Datatypes.length (is_trading record) = 1 /\
       Datatypes.length (is_quoting record) = 1 /\
       Datatypes.length (is_short_sell_restricted record) = 1 /\
-      (reserved_7 record < 256 ^ N.of_nat 7)%N.
+      Datatypes.length (reserved_7 record) = 7.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (ts_recv record) ++
@@ -299,7 +299,7 @@ Module DatabentoMarketDataNormalizedV3File.
       encode_bytes 1 (is_trading record) ++
       encode_bytes 1 (is_quoting record) ++
       encode_bytes 1 (is_short_sell_restricted record) ++
-      encode_uint 7 (reserved_7 record).
+      encode_bytes 7 (reserved_7 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -323,7 +323,7 @@ Module DatabentoMarketDataNormalizedV3File.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (is_short_sell_restricted_value, bytes) =>
-                                  match decode_uint 7 bytes with
+                                  match decode_bytes 7 bytes with
                                   | None => None
                                   | Some (reserved_7_value, bytes) =>
                                       Some ({| ts_recv := ts_recv_value; status_action := status_action_value; status_reason := status_reason_value; trading_event := trading_event_value; is_trading := is_trading_value; is_quoting := is_quoting_value; is_short_sell_restricted := is_short_sell_restricted_value; reserved_7 := reserved_7_value |}, bytes)
@@ -356,7 +356,7 @@ Module DatabentoMarketDataNormalizedV3File.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -984,7 +984,7 @@ Module DatabentoMarketDataNormalizedV3File.
       num_extensions : N;
       unpaired_side : list byte;
       significant_imbalance : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1009,7 +1009,7 @@ Module DatabentoMarketDataNormalizedV3File.
       (num_extensions record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (unpaired_side record) = 1 /\
       Datatypes.length (significant_imbalance record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (ts_recv record) ++
@@ -1032,7 +1032,7 @@ Module DatabentoMarketDataNormalizedV3File.
       encode_uint 1 (num_extensions record) ++
       encode_bytes 1 (unpaired_side record) ++
       encode_bytes 1 (significant_imbalance record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -1095,7 +1095,7 @@ Module DatabentoMarketDataNormalizedV3File.
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (significant_imbalance_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (reserved_1_value, bytes) =>
                                                                                           Some ({| ts_recv := ts_recv_value; ref_price := ref_price_value; auction_time := auction_time_value; cont_book_clr_price := cont_book_clr_price_value; auct_interest_clr_price := auct_interest_clr_price_value; ssr_filling_price := ssr_filling_price_value; ind_match_price := ind_match_price_value; upper_collar := upper_collar_value; lower_collar := lower_collar_value; paired_qty := paired_qty_value; total_imbalance_qty := total_imbalance_qty_value; market_imbalance_qty := market_imbalance_qty_value; unpaired_qty := unpaired_qty_value; auction_type := auction_type_value; side := side_value; auction_status := auction_status_value; freeze_status := freeze_status_value; num_extensions := num_extensions_value; unpaired_side := unpaired_side_value; significant_imbalance := significant_imbalance_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1154,7 +1154,7 @@ Module DatabentoMarketDataNormalizedV3File.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       destruct record. reflexivity.
     Qed.
 
@@ -1488,9 +1488,9 @@ Module DatabentoMarketDataNormalizedV3File.
       bid_sz : N;
       ask_sz : N;
       bid_pb : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       ask_pb : N;
-      second_reserved_2 : N;
+      second_reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1500,9 +1500,9 @@ Module DatabentoMarketDataNormalizedV3File.
       (bid_sz record < 256 ^ N.of_nat 4)%N /\
       (ask_sz record < 256 ^ N.of_nat 4)%N /\
       (bid_pb record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (ask_pb record < 256 ^ N.of_nat 2)%N /\
-      (second_reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (second_reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (bid_px record) ++
@@ -1510,9 +1510,9 @@ Module DatabentoMarketDataNormalizedV3File.
       encode_uint 4 (bid_sz record) ++
       encode_uint 4 (ask_sz record) ++
       encode_uint 2 (bid_pb record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 2 (ask_pb record) ++
-      encode_uint 2 (second_reserved_2 record).
+      encode_bytes 2 (second_reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -1530,13 +1530,13 @@ Module DatabentoMarketDataNormalizedV3File.
                       match decode_uint 2 bytes with
                       | None => None
                       | Some (bid_pb_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_bytes 2 bytes with
                           | None => None
                           | Some (reserved_2_value, bytes) =>
                               match decode_uint 2 bytes with
                               | None => None
                               | Some (ask_pb_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (second_reserved_2_value, bytes) =>
                                       Some ({| bid_px := bid_px_value; ask_px := ask_px_value; bid_sz := bid_sz_value; ask_sz := ask_sz_value; bid_pb := bid_pb_value; reserved_2 := reserved_2_value; ask_pb := ask_pb_value; second_reserved_2 := second_reserved_2_value |}, bytes)
@@ -1552,7 +1552,7 @@ Module DatabentoMarketDataNormalizedV3File.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1567,14 +1567,14 @@ Module DatabentoMarketDataNormalizedV3File.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ConsolidatedBidAskPair.
 

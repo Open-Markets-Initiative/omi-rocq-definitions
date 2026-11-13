@@ -921,7 +921,7 @@ Module ByxEquitiesMulticastDepthOfBookV24129.
       symbol_long : list byte;
       trading_status : list byte;
       reg_sho_action : list byte;
-      padding : N;
+      padding : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -930,14 +930,14 @@ Module ByxEquitiesMulticastDepthOfBookV24129.
       Datatypes.length (symbol_long record) = 8 /\
       Datatypes.length (trading_status record) = 1 /\
       Datatypes.length (reg_sho_action record) = 1 /\
-      (padding record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (padding record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 8 (symbol_long record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (reg_sho_action record) ++
-      encode_uint 2 (padding record).
+      encode_bytes 2 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -952,7 +952,7 @@ Module ByxEquitiesMulticastDepthOfBookV24129.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reg_sho_action_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_bytes 2 bytes with
                       | None => None
                       | Some (padding_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol_long := symbol_long_value; trading_status := trading_status_value; reg_sho_action := reg_sho_action_value; padding := padding_value |}, bytes)
@@ -979,7 +979,7 @@ Module ByxEquitiesMulticastDepthOfBookV24129.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

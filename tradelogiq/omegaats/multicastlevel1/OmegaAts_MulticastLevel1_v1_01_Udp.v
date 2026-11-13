@@ -144,7 +144,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** Tradelogiq's BBO will broadcast real-time updates every time Tradelogiq's top of book changes. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       stock_symbol : list byte;
       timestamp : N;
       best_bid_price : N;
@@ -155,7 +155,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (stock_symbol record) = 10 /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (best_bid_price record < 256 ^ N.of_nat 8)%N /\
@@ -164,7 +164,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       (best_ask_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 10 (stock_symbol record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 8 (best_bid_price record) ++
@@ -173,7 +173,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       encode_uint 4 (best_ask_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -206,7 +206,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -216,7 +216,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -334,7 +334,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** If trade is cancelled or busted during the day Trade Bust Message will be sent. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       stock_symbol : list byte;
       timestamp : N;
       trade_id : N;
@@ -342,19 +342,19 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (stock_symbol record) = 10 /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (trade_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 10 (stock_symbol record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (trade_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -375,7 +375,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -385,7 +385,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -401,7 +401,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** Trade amendments during the day will send this message. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       stock_symbol : list byte;
       timestamp : N;
       original_trade_id : N;
@@ -413,7 +413,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (stock_symbol record) = 10 /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (original_trade_id record < 256 ^ N.of_nat 4)%N /\
@@ -423,7 +423,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       (corrected_trade_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 10 (stock_symbol record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (original_trade_id record) ++
@@ -433,7 +433,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       encode_uint 4 (corrected_trade_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -470,7 +470,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 47.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -480,7 +480,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -501,26 +501,26 @@ Module OmegaAtsMulticastLevel1V101Udp.
     (** The system event message is used to signal a market or a data feed handler event. *)
     Record t := {
       event_code : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       timestamp : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (event_code record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (event_code record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (event_code_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (reserved_2_value, bytes) =>
               match decode_uint 8 bytes with
@@ -545,7 +545,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -678,7 +678,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       security_type : list byte;
       expiry_date : list byte;
       description : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -695,7 +695,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       Datatypes.length (security_type record) = 1 /\
       Datatypes.length (expiry_date record) = 8 /\
       Datatypes.length (description record) = 20 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market record) ++
@@ -710,7 +710,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       encode_bytes 1 (security_type record) ++
       encode_bytes 8 (expiry_date record) ++
       encode_bytes 20 (description record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -749,7 +749,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
                                                   match decode_bytes 20 bytes with
                                                   | None => None
                                                   | Some (description_value, bytes) =>
-                                                      match decode_uint 3 bytes with
+                                                      match decode_bytes 3 bytes with
                                                       | None => None
                                                       | Some (reserved_3_value, bytes) =>
                                                           Some ({| market := market_value; stock := stock_value; timestamp := timestamp_value; board_lot_size := board_lot_size_value; instrument_id := instrument_id_value; shortable := shortable_value; frequency := frequency_value; reserved_9 := reserved_9_value; currency := currency_value; security_type := security_type_value; expiry_date := expiry_date_value; description := description_value; reserved_3 := reserved_3_value |}, bytes)
@@ -792,7 +792,7 @@ Module OmegaAtsMulticastLevel1V101Udp.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 

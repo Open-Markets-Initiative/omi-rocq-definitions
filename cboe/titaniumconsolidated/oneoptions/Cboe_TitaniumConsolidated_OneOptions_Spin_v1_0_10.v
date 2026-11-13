@@ -42,13 +42,13 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (length_ record < 256 ^ N.of_nat 2)%N /\
-      (message_count record < 256 ^ N.of_nat 8)%N /\
+      (message_count record < 256 ^ N.of_nat 1)%N /\
       (unit_ record < 256 ^ N.of_nat 1)%N /\
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (length_ record) ++
-      encode_uint 8 (message_count record) ++
+      encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
       encode_uint 4 (sequence record).
 
@@ -56,7 +56,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       match decode_uint 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint 1 bytes with
           | None => None
           | Some (message_count_value, bytes) =>
               match decode_uint 1 bytes with
@@ -71,7 +71,7 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 15.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length. reflexivity.
@@ -649,19 +649,19 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
     (** The Trade Replay Response message is sent in response to a user's Trade Replay Request message indicating whether a spin will be sent. *)
     Record t := {
       sequence : N;
-      message_count : N;
+      trade_replay_message_count : N;
       trade_replay_response_status : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (sequence record < 256 ^ N.of_nat 4)%N /\
-      (message_count record < 256 ^ N.of_nat 8)%N /\
+      (trade_replay_message_count record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (trade_replay_response_status record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (sequence record) ++
-      encode_uint 8 (message_count record) ++
+      encode_uint 8 (trade_replay_message_count record) ++
       encode_bytes 1 (trade_replay_response_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -670,11 +670,11 @@ Module CboeTitaniumConsolidatedOneOptionsV1010.
       | Some (sequence_value, bytes) =>
           match decode_uint 8 bytes with
           | None => None
-          | Some (message_count_value, bytes) =>
+          | Some (trade_replay_message_count_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (trade_replay_response_status_value, bytes) =>
-                  Some ({| sequence := sequence_value; message_count := message_count_value; trade_replay_response_status := trade_replay_response_status_value |}, bytes)
+                  Some ({| sequence := sequence_value; trade_replay_message_count := trade_replay_message_count_value; trade_replay_response_status := trade_replay_response_status_value |}, bytes)
               end
           end
       end.

@@ -1108,25 +1108,25 @@ Module EdgxOptionsMulticastDepthOfBookV24129.
     Record t := {
       time_offset : N;
       symbol : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       trading_status : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 6 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (trading_status record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1135,13 +1135,13 @@ Module EdgxOptionsMulticastDepthOfBookV24129.
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 3 bytes with
+                      match decode_bytes 3 bytes with
                       | None => None
                       | Some (reserved_3_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol := symbol_value; reserved_2 := reserved_2_value; trading_status := trading_status_value; reserved_3 := reserved_3_value |}, bytes)
@@ -1166,9 +1166,9 @@ Module EdgxOptionsMulticastDepthOfBookV24129.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

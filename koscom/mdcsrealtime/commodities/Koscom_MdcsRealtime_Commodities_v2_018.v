@@ -91,7 +91,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_short : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -105,7 +105,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_short record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -117,7 +117,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (accumulated_trading_value_short record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -143,16 +143,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                               match decode_bytes 12 bytes with
                               | None => None
                               | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (accumulated_trading_value_short_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_short := accumulated_trading_value_short_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -164,7 +164,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 82.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -206,7 +206,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_short : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -220,7 +220,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_short record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -232,7 +232,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (accumulated_trading_value_short record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -258,16 +258,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                               match decode_bytes 12 bytes with
                               | None => None
                               | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (accumulated_trading_value_short_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_short := accumulated_trading_value_short_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -279,7 +279,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 82.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -321,7 +321,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       index : list byte;
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
-      currency_code : list byte;
+      currency_code_short : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -335,7 +335,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (index record) = 9 /\
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
-      Datatypes.length (currency_code record) = 6 /\
+      Datatypes.length (currency_code_short record) = 3 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -347,7 +347,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 9 (index record) ++
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
-      encode_bytes 6 (currency_code record) ++
+      encode_bytes 3 (currency_code_short record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -373,16 +373,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                               match decode_bytes 9 bytes with
                               | None => None
                               | Some (index_change_against_the_previous_day_value, bytes) =>
-                                  match decode_bytes 6 bytes with
+                                  match decode_bytes 3 bytes with
                                   | None => None
-                                  | Some (currency_code_value, bytes) =>
+                                  | Some (currency_code_short_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; business_date := business_date_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; currency_code := currency_code_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; business_date := business_date_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; currency_code_short := currency_code_short_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -394,7 +394,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -1756,12 +1756,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       processing_time_of_trading_system : list byte;
       trading_price : list byte;
       trading_volume : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       previous_price : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       final_ask_bid_type_code : list byte;
       lp_holding_quantity : list byte;
       end_keyword : N;
@@ -1777,12 +1777,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (processing_time_of_trading_system record) = 12 /\
       Datatypes.length (trading_price record) = 11 /\
       Datatypes.length (trading_volume record) = 10 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (previous_price record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (final_ask_bid_type_code record) = 1 /\
       Datatypes.length (lp_holding_quantity record) = 15 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
@@ -1796,12 +1796,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (processing_time_of_trading_system record) ++
       encode_bytes 11 (trading_price record) ++
       encode_bytes 10 (trading_volume record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 11 (previous_price record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (final_ask_bid_type_code record) ++
       encode_bytes 15 (lp_holding_quantity record) ++
       encode_uint 1 (end_keyword record).
@@ -1831,9 +1831,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (trading_volume_value, bytes) =>
-                                      match decode_bytes 9 bytes with
+                                      match decode_bytes 11 bytes with
                                       | None => None
-                                      | Some (opening_price_value, bytes) =>
+                                      | Some (opening_price_long_value, bytes) =>
                                           match decode_bytes 11 bytes with
                                           | None => None
                                           | Some (todays_high_value, bytes) =>
@@ -1848,7 +1848,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       | Some (accumulated_trading_volume_value, bytes) =>
                                                           match decode_bytes 22 bytes with
                                                           | None => None
-                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (final_ask_bid_type_code_value, bytes) =>
@@ -1858,7 +1858,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (end_keyword_value, bytes) =>
-                                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; final_ask_bid_type_code := final_ask_bid_type_code_value; lp_holding_quantity := lp_holding_quantity_value; end_keyword := end_keyword_value |}, bytes)
+                                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; final_ask_bid_type_code := final_ask_bid_type_code_value; lp_holding_quantity := lp_holding_quantity_value; end_keyword := end_keyword_value |}, bytes)
                                                                       end
                                                                   end
                                                               end
@@ -1877,7 +1877,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 156.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 158.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -1927,12 +1927,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       processing_time_of_trading_system : list byte;
       trading_price : list byte;
       trading_volume : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       previous_price : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       final_ask_bid_type_code : list byte;
       lp_holding_quantity : list byte;
       ask_level_1_price : list byte;
@@ -2010,12 +2010,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (processing_time_of_trading_system record) = 12 /\
       Datatypes.length (trading_price record) = 11 /\
       Datatypes.length (trading_volume record) = 10 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (previous_price record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (final_ask_bid_type_code record) = 1 /\
       Datatypes.length (lp_holding_quantity record) = 15 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
@@ -2091,12 +2091,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (processing_time_of_trading_system record) ++
       encode_bytes 11 (trading_price record) ++
       encode_bytes 10 (trading_volume record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 11 (previous_price record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (final_ask_bid_type_code record) ++
       encode_bytes 15 (lp_holding_quantity record) ++
       encode_bytes 11 (ask_level_1_price record) ++
@@ -2188,9 +2188,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (trading_volume_value, bytes) =>
-                                      match decode_bytes 9 bytes with
+                                      match decode_bytes 11 bytes with
                                       | None => None
-                                      | Some (opening_price_value, bytes) =>
+                                      | Some (opening_price_long_value, bytes) =>
                                           match decode_bytes 11 bytes with
                                           | None => None
                                           | Some (todays_high_value, bytes) =>
@@ -2205,7 +2205,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       | Some (accumulated_trading_volume_value, bytes) =>
                                                           match decode_bytes 22 bytes with
                                                           | None => None
-                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (final_ask_bid_type_code_value, bytes) =>
@@ -2401,7 +2401,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                                                                                                                                                                                                                                                                                               match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                                                               | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                  Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; final_ask_bid_type_code := final_ask_bid_type_code_value; lp_holding_quantity := lp_holding_quantity_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; lp_ask_level_1_volume := lp_ask_level_1_volume_value; lp_bid_level_1_volume := lp_bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; lp_ask_level_2_volume := lp_ask_level_2_volume_value; lp_bid_level_2_volume := lp_bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; lp_ask_level_3_volume := lp_ask_level_3_volume_value; lp_bid_level_3_volume := lp_bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; lp_ask_level_4_volume := lp_ask_level_4_volume_value; lp_bid_level_4_volume := lp_bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; lp_ask_level_5_volume := lp_ask_level_5_volume_value; lp_bid_level_5_volume := lp_bid_level_5_volume_value; ask_level_6_price := ask_level_6_price_value; bid_level_6_price := bid_level_6_price_value; ask_level_6_volume := ask_level_6_volume_value; bid_level_6_volume := bid_level_6_volume_value; lp_ask_level_6_volume := lp_ask_level_6_volume_value; lp_bid_level_6_volume := lp_bid_level_6_volume_value; ask_level_7_price := ask_level_7_price_value; bid_level_7_price := bid_level_7_price_value; ask_level_7_volume := ask_level_7_volume_value; bid_level_7_volume := bid_level_7_volume_value; lp_ask_level_7_volume := lp_ask_level_7_volume_value; lp_bid_level_7_volume := lp_bid_level_7_volume_value; ask_level_8_price := ask_level_8_price_value; bid_level_8_price := bid_level_8_price_value; ask_level_8_volume := ask_level_8_volume_value; bid_level_8_volume := bid_level_8_volume_value; lp_ask_level_8_volume := lp_ask_level_8_volume_value; lp_bid_level_8_volume := lp_bid_level_8_volume_value; ask_level_9_price := ask_level_9_price_value; bid_level_9_price := bid_level_9_price_value; ask_level_9_volume := ask_level_9_volume_value; bid_level_9_volume := bid_level_9_volume_value; lp_ask_level_9_volume := lp_ask_level_9_volume_value; lp_bid_level_9_volume := lp_bid_level_9_volume_value; ask_level_10_price := ask_level_10_price_value; bid_level_10_price := bid_level_10_price_value; ask_level_10_volume := ask_level_10_volume_value; bid_level_10_volume := bid_level_10_volume_value; lp_ask_level_10_volume := lp_ask_level_10_volume_value; lp_bid_level_10_volume := lp_bid_level_10_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                                  Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; final_ask_bid_type_code := final_ask_bid_type_code_value; lp_holding_quantity := lp_holding_quantity_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; lp_ask_level_1_volume := lp_ask_level_1_volume_value; lp_bid_level_1_volume := lp_bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; lp_ask_level_2_volume := lp_ask_level_2_volume_value; lp_bid_level_2_volume := lp_bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; lp_ask_level_3_volume := lp_ask_level_3_volume_value; lp_bid_level_3_volume := lp_bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; lp_ask_level_4_volume := lp_ask_level_4_volume_value; lp_bid_level_4_volume := lp_bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; lp_ask_level_5_volume := lp_ask_level_5_volume_value; lp_bid_level_5_volume := lp_bid_level_5_volume_value; ask_level_6_price := ask_level_6_price_value; bid_level_6_price := bid_level_6_price_value; ask_level_6_volume := ask_level_6_volume_value; bid_level_6_volume := bid_level_6_volume_value; lp_ask_level_6_volume := lp_ask_level_6_volume_value; lp_bid_level_6_volume := lp_bid_level_6_volume_value; ask_level_7_price := ask_level_7_price_value; bid_level_7_price := bid_level_7_price_value; ask_level_7_volume := ask_level_7_volume_value; bid_level_7_volume := bid_level_7_volume_value; lp_ask_level_7_volume := lp_ask_level_7_volume_value; lp_bid_level_7_volume := lp_bid_level_7_volume_value; ask_level_8_price := ask_level_8_price_value; bid_level_8_price := bid_level_8_price_value; ask_level_8_volume := ask_level_8_volume_value; bid_level_8_volume := bid_level_8_volume_value; lp_ask_level_8_volume := lp_ask_level_8_volume_value; lp_bid_level_8_volume := lp_bid_level_8_volume_value; ask_level_9_price := ask_level_9_price_value; bid_level_9_price := bid_level_9_price_value; ask_level_9_volume := ask_level_9_volume_value; bid_level_9_volume := bid_level_9_volume_value; lp_ask_level_9_volume := lp_ask_level_9_volume_value; lp_bid_level_9_volume := lp_bid_level_9_volume_value; ask_level_10_price := ask_level_10_price_value; bid_level_10_price := bid_level_10_price_value; ask_level_10_volume := ask_level_10_volume_value; bid_level_10_volume := bid_level_10_volume_value; lp_ask_level_10_volume := lp_ask_level_10_volume_value; lp_bid_level_10_volume := lp_bid_level_10_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                                                                                                                               end
                                                                                                                                                                                                                                                                                                                           end
                                                                                                                                                                                                                                                                                                                       end
@@ -2482,7 +2482,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 880.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 882.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -3226,11 +3226,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       isin_code : list byte;
       a_designated_number_for_an_issue : list byte;
       current_price : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       trading_halt : list byte;
       ask_level_1_price : list byte;
       bid_level_1_price : list byte;
@@ -3306,11 +3306,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (a_designated_number_for_an_issue record) = 6 /\
       Datatypes.length (current_price record) = 11 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (trading_halt record) = 1 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
       Datatypes.length (bid_level_1_price record) = 11 /\
@@ -3384,11 +3384,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (isin_code record) ++
       encode_bytes 6 (a_designated_number_for_an_issue record) ++
       encode_bytes 11 (current_price record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (trading_halt record) ++
       encode_bytes 11 (ask_level_1_price record) ++
       encode_bytes 11 (bid_level_1_price record) ++
@@ -3472,9 +3472,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                       match decode_bytes 11 bytes with
                       | None => None
                       | Some (current_price_value, bytes) =>
-                          match decode_bytes 9 bytes with
+                          match decode_bytes 11 bytes with
                           | None => None
-                          | Some (opening_price_value, bytes) =>
+                          | Some (opening_price_long_value, bytes) =>
                               match decode_bytes 11 bytes with
                               | None => None
                               | Some (todays_high_value, bytes) =>
@@ -3486,7 +3486,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                       | Some (accumulated_trading_volume_value, bytes) =>
                                           match decode_bytes 22 bytes with
                                           | None => None
-                                          | Some (accumulated_trading_value_value, bytes) =>
+                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (trading_halt_value, bytes) =>
@@ -3685,7 +3685,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                   | Some (end_keyword_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                      Some ({| board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; current_price := current_price_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; trading_halt := trading_halt_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; lp_ask_level_1_volume := lp_ask_level_1_volume_value; lp_bid_level_1_volume := lp_bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; lp_ask_level_2_volume := lp_ask_level_2_volume_value; lp_bid_level_2_volume := lp_bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; lp_ask_level_3_volume := lp_ask_level_3_volume_value; lp_bid_level_3_volume := lp_bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; lp_ask_level_4_volume := lp_ask_level_4_volume_value; lp_bid_level_4_volume := lp_bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; lp_ask_level_5_volume := lp_ask_level_5_volume_value; lp_bid_level_5_volume := lp_bid_level_5_volume_value; ask_level_6_price := ask_level_6_price_value; bid_level_6_price := bid_level_6_price_value; ask_level_6_volume := ask_level_6_volume_value; bid_level_6_volume := bid_level_6_volume_value; lp_ask_level_6_volume := lp_ask_level_6_volume_value; lp_bid_level_6_volume := lp_bid_level_6_volume_value; ask_level_7_price := ask_level_7_price_value; bid_level_7_price := bid_level_7_price_value; ask_level_7_volume := ask_level_7_volume_value; bid_level_7_volume := bid_level_7_volume_value; lp_ask_level_7_volume := lp_ask_level_7_volume_value; lp_bid_level_7_volume := lp_bid_level_7_volume_value; ask_level_8_price := ask_level_8_price_value; bid_level_8_price := bid_level_8_price_value; ask_level_8_volume := ask_level_8_volume_value; bid_level_8_volume := bid_level_8_volume_value; lp_ask_level_8_volume := lp_ask_level_8_volume_value; lp_bid_level_8_volume := lp_bid_level_8_volume_value; ask_level_9_price := ask_level_9_price_value; bid_level_9_price := bid_level_9_price_value; ask_level_9_volume := ask_level_9_volume_value; bid_level_9_volume := bid_level_9_volume_value; lp_ask_level_9_volume := lp_ask_level_9_volume_value; lp_bid_level_9_volume := lp_bid_level_9_volume_value; ask_level_10_price := ask_level_10_price_value; bid_level_10_price := bid_level_10_price_value; ask_level_10_volume := ask_level_10_volume_value; bid_level_10_volume := bid_level_10_volume_value; lp_ask_level_10_volume := lp_ask_level_10_volume_value; lp_bid_level_10_volume := lp_bid_level_10_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; estimated_trading_price := estimated_trading_price_value; estimated_trading_volume := estimated_trading_volume_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                      Some ({| board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; current_price := current_price_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; trading_halt := trading_halt_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; lp_ask_level_1_volume := lp_ask_level_1_volume_value; lp_bid_level_1_volume := lp_bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; lp_ask_level_2_volume := lp_ask_level_2_volume_value; lp_bid_level_2_volume := lp_bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; lp_ask_level_3_volume := lp_ask_level_3_volume_value; lp_bid_level_3_volume := lp_bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; lp_ask_level_4_volume := lp_ask_level_4_volume_value; lp_bid_level_4_volume := lp_bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; lp_ask_level_5_volume := lp_ask_level_5_volume_value; lp_bid_level_5_volume := lp_bid_level_5_volume_value; ask_level_6_price := ask_level_6_price_value; bid_level_6_price := bid_level_6_price_value; ask_level_6_volume := ask_level_6_volume_value; bid_level_6_volume := bid_level_6_volume_value; lp_ask_level_6_volume := lp_ask_level_6_volume_value; lp_bid_level_6_volume := lp_bid_level_6_volume_value; ask_level_7_price := ask_level_7_price_value; bid_level_7_price := bid_level_7_price_value; ask_level_7_volume := ask_level_7_volume_value; bid_level_7_volume := bid_level_7_volume_value; lp_ask_level_7_volume := lp_ask_level_7_volume_value; lp_bid_level_7_volume := lp_bid_level_7_volume_value; ask_level_8_price := ask_level_8_price_value; bid_level_8_price := bid_level_8_price_value; ask_level_8_volume := ask_level_8_volume_value; bid_level_8_volume := bid_level_8_volume_value; lp_ask_level_8_volume := lp_ask_level_8_volume_value; lp_bid_level_8_volume := lp_bid_level_8_volume_value; ask_level_9_price := ask_level_9_price_value; bid_level_9_price := bid_level_9_price_value; ask_level_9_volume := ask_level_9_volume_value; bid_level_9_volume := bid_level_9_volume_value; lp_ask_level_9_volume := lp_ask_level_9_volume_value; lp_bid_level_9_volume := lp_bid_level_9_volume_value; ask_level_10_price := ask_level_10_price_value; bid_level_10_price := bid_level_10_price_value; ask_level_10_volume := ask_level_10_volume_value; bid_level_10_volume := bid_level_10_volume_value; lp_ask_level_10_volume := lp_ask_level_10_volume_value; lp_bid_level_10_volume := lp_bid_level_10_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; estimated_trading_price := estimated_trading_price_value; estimated_trading_volume := estimated_trading_volume_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                                                                                               end
                                                                                                                                                                                                                                                                                                           end
@@ -3763,7 +3763,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 847.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 849.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -4246,12 +4246,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       processing_time_of_trading_system : list byte;
       trading_price : list byte;
       trading_volume : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       previous_price : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       final_ask_bid_type_code : list byte;
       end_keyword : N;
     }.
@@ -4266,12 +4266,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (processing_time_of_trading_system record) = 12 /\
       Datatypes.length (trading_price record) = 11 /\
       Datatypes.length (trading_volume record) = 10 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (previous_price record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (final_ask_bid_type_code record) = 1 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -4284,12 +4284,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (processing_time_of_trading_system record) ++
       encode_bytes 11 (trading_price record) ++
       encode_bytes 10 (trading_volume record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 11 (previous_price record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (final_ask_bid_type_code record) ++
       encode_uint 1 (end_keyword record).
 
@@ -4318,9 +4318,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (trading_volume_value, bytes) =>
-                                      match decode_bytes 9 bytes with
+                                      match decode_bytes 11 bytes with
                                       | None => None
-                                      | Some (opening_price_value, bytes) =>
+                                      | Some (opening_price_long_value, bytes) =>
                                           match decode_bytes 11 bytes with
                                           | None => None
                                           | Some (todays_high_value, bytes) =>
@@ -4335,14 +4335,14 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       | Some (accumulated_trading_volume_value, bytes) =>
                                                           match decode_bytes 22 bytes with
                                                           | None => None
-                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (final_ask_bid_type_code_value, bytes) =>
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (end_keyword_value, bytes) =>
-                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; final_ask_bid_type_code := final_ask_bid_type_code_value; end_keyword := end_keyword_value |}, bytes)
+                                                                      Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; final_ask_bid_type_code := final_ask_bid_type_code_value; end_keyword := end_keyword_value |}, bytes)
                                                                   end
                                                               end
                                                           end
@@ -4360,7 +4360,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 141.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 143.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -4409,12 +4409,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       processing_time_of_trading_system : list byte;
       trading_price : list byte;
       trading_volume : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       previous_price : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       final_ask_bid_type_code : list byte;
       ask_level_1_price : list byte;
       bid_level_1_price : list byte;
@@ -4451,12 +4451,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (processing_time_of_trading_system record) = 12 /\
       Datatypes.length (trading_price record) = 11 /\
       Datatypes.length (trading_volume record) = 10 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (previous_price record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (final_ask_bid_type_code record) = 1 /\
       Datatypes.length (ask_level_1_price record) = 11 /\
       Datatypes.length (bid_level_1_price record) = 11 /\
@@ -4491,12 +4491,12 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (processing_time_of_trading_system record) ++
       encode_bytes 11 (trading_price record) ++
       encode_bytes 10 (trading_volume record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 11 (previous_price record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 1 (final_ask_bid_type_code record) ++
       encode_bytes 11 (ask_level_1_price record) ++
       encode_bytes 11 (bid_level_1_price record) ++
@@ -4547,9 +4547,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (trading_volume_value, bytes) =>
-                                      match decode_bytes 9 bytes with
+                                      match decode_bytes 11 bytes with
                                       | None => None
-                                      | Some (opening_price_value, bytes) =>
+                                      | Some (opening_price_long_value, bytes) =>
                                           match decode_bytes 11 bytes with
                                           | None => None
                                           | Some (todays_high_value, bytes) =>
@@ -4564,7 +4564,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       | Some (accumulated_trading_volume_value, bytes) =>
                                                           match decode_bytes 22 bytes with
                                                           | None => None
-                                                          | Some (accumulated_trading_value_value, bytes) =>
+                                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (final_ask_bid_type_code_value, bytes) =>
@@ -4637,7 +4637,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                                                                                                                           match decode_uint 1 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (end_keyword_value, bytes) =>
-                                                                                                                                                              Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; final_ask_bid_type_code := final_ask_bid_type_code_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                              Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; processing_time_of_trading_system := processing_time_of_trading_system_value; trading_price := trading_price_value; trading_volume := trading_volume_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; previous_price := previous_price_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; final_ask_bid_type_code := final_ask_bid_type_code_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                           end
                                                                                                                                                       end
                                                                                                                                                   end
@@ -4677,7 +4677,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 395.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 397.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -5060,11 +5060,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       isin_code : list byte;
       a_designated_number_for_an_issue : list byte;
       current_price : list byte;
-      opening_price : list byte;
+      opening_price_long : list byte;
       todays_high : list byte;
       todays_low : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       negotiated_block_trade_trading_volume : list byte;
       negotiated_block_trade_trading_value : list byte;
       trading_halt : list byte;
@@ -5102,11 +5102,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (a_designated_number_for_an_issue record) = 6 /\
       Datatypes.length (current_price record) = 11 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_long record) = 11 /\
       Datatypes.length (todays_high record) = 11 /\
       Datatypes.length (todays_low record) = 11 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       Datatypes.length (negotiated_block_trade_trading_volume record) = 12 /\
       Datatypes.length (negotiated_block_trade_trading_value record) = 22 /\
       Datatypes.length (trading_halt record) = 1 /\
@@ -5142,11 +5142,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 12 (isin_code record) ++
       encode_bytes 6 (a_designated_number_for_an_issue record) ++
       encode_bytes 11 (current_price record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 11 (opening_price_long record) ++
       encode_bytes 11 (todays_high record) ++
       encode_bytes 11 (todays_low record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_bytes 12 (negotiated_block_trade_trading_volume record) ++
       encode_bytes 22 (negotiated_block_trade_trading_value record) ++
       encode_bytes 1 (trading_halt record) ++
@@ -5192,9 +5192,9 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                       match decode_bytes 11 bytes with
                       | None => None
                       | Some (current_price_value, bytes) =>
-                          match decode_bytes 9 bytes with
+                          match decode_bytes 11 bytes with
                           | None => None
-                          | Some (opening_price_value, bytes) =>
+                          | Some (opening_price_long_value, bytes) =>
                               match decode_bytes 11 bytes with
                               | None => None
                               | Some (todays_high_value, bytes) =>
@@ -5206,7 +5206,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                       | Some (accumulated_trading_volume_value, bytes) =>
                                           match decode_bytes 22 bytes with
                                           | None => None
-                                          | Some (accumulated_trading_value_value, bytes) =>
+                                          | Some (accumulated_trading_value_long_value, bytes) =>
                                               match decode_bytes 12 bytes with
                                               | None => None
                                               | Some (negotiated_block_trade_trading_volume_value, bytes) =>
@@ -5291,7 +5291,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                                                                                                                           match decode_uint 1 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (end_keyword_value, bytes) =>
-                                                                                                                                                              Some ({| board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; current_price := current_price_value; opening_price := opening_price_value; todays_high := todays_high_value; todays_low := todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; negotiated_block_trade_trading_volume := negotiated_block_trade_trading_volume_value; negotiated_block_trade_trading_value := negotiated_block_trade_trading_value_value; trading_halt := trading_halt_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; estimated_trading_price := estimated_trading_price_value; estimated_trading_volume := estimated_trading_volume_value; end_keyword := end_keyword_value |}, bytes)
+                                                                                                                                                              Some ({| board_id := board_id_value; session_id := session_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; current_price := current_price_value; opening_price_long := opening_price_long_value; todays_high := todays_high_value; todays_low := todays_low_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; negotiated_block_trade_trading_volume := negotiated_block_trade_trading_volume_value; negotiated_block_trade_trading_value := negotiated_block_trade_trading_value_value; trading_halt := trading_halt_value; ask_level_1_price := ask_level_1_price_value; bid_level_1_price := bid_level_1_price_value; ask_level_1_volume := ask_level_1_volume_value; bid_level_1_volume := bid_level_1_volume_value; ask_level_2_price := ask_level_2_price_value; bid_level_2_price := bid_level_2_price_value; ask_level_2_volume := ask_level_2_volume_value; bid_level_2_volume := bid_level_2_volume_value; ask_level_3_price := ask_level_3_price_value; bid_level_3_price := bid_level_3_price_value; ask_level_3_volume := ask_level_3_volume_value; bid_level_3_volume := bid_level_3_volume_value; ask_level_4_price := ask_level_4_price_value; bid_level_4_price := bid_level_4_price_value; ask_level_4_volume := ask_level_4_volume_value; bid_level_4_volume := bid_level_4_volume_value; ask_level_5_price := ask_level_5_price_value; bid_level_5_price := bid_level_5_price_value; ask_level_5_volume := ask_level_5_volume_value; bid_level_5_volume := bid_level_5_volume_value; total_ask_volume := total_ask_volume_value; total_bid_volume := total_bid_volume_value; estimated_trading_price := estimated_trading_price_value; estimated_trading_volume := estimated_trading_volume_value; end_keyword := end_keyword_value |}, bytes)
                                                                                                                                                           end
                                                                                                                                                       end
                                                                                                                                                   end
@@ -5331,7 +5331,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 411.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 413.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -5400,7 +5400,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       trading_price : list byte;
       trading_volume : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      accumulated_trading_value_long : list byte;
       end_keyword : N;
     }.
 
@@ -5412,7 +5412,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (trading_price record) = 11 /\
       Datatypes.length (trading_volume record) = 10 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (accumulated_trading_value_long record) = 22 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
@@ -5422,7 +5422,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 11 (trading_price record) ++
       encode_bytes 10 (trading_volume record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 22 (accumulated_trading_value_long record) ++
       encode_uint 1 (end_keyword record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -5446,11 +5446,11 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                           | Some (accumulated_trading_volume_value, bytes) =>
                               match decode_bytes 22 bytes with
                               | None => None
-                              | Some (accumulated_trading_value_value, bytes) =>
+                              | Some (accumulated_trading_value_long_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (end_keyword_value, bytes) =>
-                                      Some ({| board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; trading_price := trading_price_value; trading_volume := trading_volume_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; end_keyword := end_keyword_value |}, bytes)
+                                      Some ({| board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; trading_price := trading_price_value; trading_volume := trading_volume_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value_long := accumulated_trading_value_long_value; end_keyword := end_keyword_value |}, bytes)
                                   end
                               end
                           end
@@ -6229,16 +6229,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       job_code_symbol : list byte;
       trading_date : list byte;
       trading_time : list byte;
-      opening_price : list byte;
+      opening_price_short : list byte;
       high_price : list byte;
       low_price : list byte;
-      closing_price : list byte;
+      closing_price_short : list byte;
       change_from_previous_day_sign : list byte;
       change_from_previous_day : list byte;
       fluctuating_rate : list byte;
       bid_quote : list byte;
       ask_quote : list byte;
-      currency_code : list byte;
+      currency_code_long : list byte;
       conversion_basic_exchange_rate : list byte;
       end_keyword : N;
     }.
@@ -6249,16 +6249,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (job_code_symbol record) = 16 /\
       Datatypes.length (trading_date record) = 8 /\
       Datatypes.length (trading_time record) = 6 /\
-      Datatypes.length (opening_price record) = 9 /\
+      Datatypes.length (opening_price_short record) = 9 /\
       Datatypes.length (high_price record) = 9 /\
       Datatypes.length (low_price record) = 9 /\
-      Datatypes.length (closing_price record) = 11 /\
+      Datatypes.length (closing_price_short record) = 9 /\
       Datatypes.length (change_from_previous_day_sign record) = 1 /\
       Datatypes.length (change_from_previous_day record) = 9 /\
       Datatypes.length (fluctuating_rate record) = 9 /\
       Datatypes.length (bid_quote record) = 9 /\
       Datatypes.length (ask_quote record) = 9 /\
-      Datatypes.length (currency_code record) = 6 /\
+      Datatypes.length (currency_code_long record) = 6 /\
       Datatypes.length (conversion_basic_exchange_rate record) = 9 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -6267,16 +6267,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 16 (job_code_symbol record) ++
       encode_bytes 8 (trading_date record) ++
       encode_bytes 6 (trading_time record) ++
-      encode_bytes 9 (opening_price record) ++
+      encode_bytes 9 (opening_price_short record) ++
       encode_bytes 9 (high_price record) ++
       encode_bytes 9 (low_price record) ++
-      encode_bytes 11 (closing_price record) ++
+      encode_bytes 9 (closing_price_short record) ++
       encode_bytes 1 (change_from_previous_day_sign record) ++
       encode_bytes 9 (change_from_previous_day record) ++
       encode_bytes 9 (fluctuating_rate record) ++
       encode_bytes 9 (bid_quote record) ++
       encode_bytes 9 (ask_quote record) ++
-      encode_bytes 6 (currency_code record) ++
+      encode_bytes 6 (currency_code_long record) ++
       encode_bytes 9 (conversion_basic_exchange_rate record) ++
       encode_uint 1 (end_keyword record).
 
@@ -6295,16 +6295,16 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                   | Some (trading_time_value, bytes) =>
                       match decode_bytes 9 bytes with
                       | None => None
-                      | Some (opening_price_value, bytes) =>
+                      | Some (opening_price_short_value, bytes) =>
                           match decode_bytes 9 bytes with
                           | None => None
                           | Some (high_price_value, bytes) =>
                               match decode_bytes 9 bytes with
                               | None => None
                               | Some (low_price_value, bytes) =>
-                                  match decode_bytes 11 bytes with
+                                  match decode_bytes 9 bytes with
                                   | None => None
-                                  | Some (closing_price_value, bytes) =>
+                                  | Some (closing_price_short_value, bytes) =>
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (change_from_previous_day_sign_value, bytes) =>
@@ -6322,14 +6322,14 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       | Some (ask_quote_value, bytes) =>
                                                           match decode_bytes 6 bytes with
                                                           | None => None
-                                                          | Some (currency_code_value, bytes) =>
+                                                          | Some (currency_code_long_value, bytes) =>
                                                               match decode_bytes 9 bytes with
                                                               | None => None
                                                               | Some (conversion_basic_exchange_rate_value, bytes) =>
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (end_keyword_value, bytes) =>
-                                                                      Some ({| data_type := data_type_value; job_code_symbol := job_code_symbol_value; trading_date := trading_date_value; trading_time := trading_time_value; opening_price := opening_price_value; high_price := high_price_value; low_price := low_price_value; closing_price := closing_price_value; change_from_previous_day_sign := change_from_previous_day_sign_value; change_from_previous_day := change_from_previous_day_value; fluctuating_rate := fluctuating_rate_value; bid_quote := bid_quote_value; ask_quote := ask_quote_value; currency_code := currency_code_value; conversion_basic_exchange_rate := conversion_basic_exchange_rate_value; end_keyword := end_keyword_value |}, bytes)
+                                                                      Some ({| data_type := data_type_value; job_code_symbol := job_code_symbol_value; trading_date := trading_date_value; trading_time := trading_time_value; opening_price_short := opening_price_short_value; high_price := high_price_value; low_price := low_price_value; closing_price_short := closing_price_short_value; change_from_previous_day_sign := change_from_previous_day_sign_value; change_from_previous_day := change_from_previous_day_value; fluctuating_rate := fluctuating_rate_value; bid_quote := bid_quote_value; ask_quote := ask_quote_value; currency_code_long := currency_code_long_value; conversion_basic_exchange_rate := conversion_basic_exchange_rate_value; end_keyword := end_keyword_value |}, bytes)
                                                                   end
                                                               end
                                                           end
@@ -6347,7 +6347,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 122.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 120.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -6515,7 +6515,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       board_id : list byte;
       isin_code : list byte;
       a_designated_number_for_an_issue : list byte;
-      closing_price : list byte;
+      closing_price_long : list byte;
       closing_price_type_code : list byte;
       filler_11 : list byte;
       second_filler_11 : list byte;
@@ -6532,7 +6532,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (board_id record) = 2 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (a_designated_number_for_an_issue record) = 6 /\
-      Datatypes.length (closing_price record) = 11 /\
+      Datatypes.length (closing_price_long record) = 11 /\
       Datatypes.length (closing_price_type_code record) = 1 /\
       Datatypes.length (filler_11 record) = 11 /\
       Datatypes.length (second_filler_11 record) = 11 /\
@@ -6547,7 +6547,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 2 (board_id record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 6 (a_designated_number_for_an_issue record) ++
-      encode_bytes 11 (closing_price record) ++
+      encode_bytes 11 (closing_price_long record) ++
       encode_bytes 1 (closing_price_type_code record) ++
       encode_bytes 11 (filler_11 record) ++
       encode_bytes 11 (second_filler_11 record) ++
@@ -6572,7 +6572,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                   | Some (a_designated_number_for_an_issue_value, bytes) =>
                       match decode_bytes 11 bytes with
                       | None => None
-                      | Some (closing_price_value, bytes) =>
+                      | Some (closing_price_long_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (closing_price_type_code_value, bytes) =>
@@ -6597,7 +6597,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (end_keyword_value, bytes) =>
-                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; closing_price := closing_price_value; closing_price_type_code := closing_price_type_code_value; filler_11 := filler_11_value; second_filler_11 := second_filler_11_value; closing_price_weighted_stock_price_average := closing_price_weighted_stock_price_average_value; closing_price_base_price_of_buy_in := closing_price_base_price_of_buy_in_value; closing_price_upper_limit_of_buy_in := closing_price_upper_limit_of_buy_in_value; closing_price_lower_limit_of_buy_in := closing_price_lower_limit_of_buy_in_value; end_keyword := end_keyword_value |}, bytes)
+                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; closing_price_long := closing_price_long_value; closing_price_type_code := closing_price_type_code_value; filler_11 := filler_11_value; second_filler_11 := second_filler_11_value; closing_price_weighted_stock_price_average := closing_price_weighted_stock_price_average_value; closing_price_base_price_of_buy_in := closing_price_base_price_of_buy_in_value; closing_price_upper_limit_of_buy_in := closing_price_upper_limit_of_buy_in_value; closing_price_lower_limit_of_buy_in := closing_price_lower_limit_of_buy_in_value; end_keyword := end_keyword_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -6940,7 +6940,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       board_id : list byte;
       isin_code : list byte;
       a_designated_number_for_an_issue : list byte;
-      closing_price : list byte;
+      closing_price_long : list byte;
       closing_price_type_code : list byte;
       filler_11 : list byte;
       second_filler_11 : list byte;
@@ -6957,7 +6957,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       Datatypes.length (board_id record) = 2 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (a_designated_number_for_an_issue record) = 6 /\
-      Datatypes.length (closing_price record) = 11 /\
+      Datatypes.length (closing_price_long record) = 11 /\
       Datatypes.length (closing_price_type_code record) = 1 /\
       Datatypes.length (filler_11 record) = 11 /\
       Datatypes.length (second_filler_11 record) = 11 /\
@@ -6972,7 +6972,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
       encode_bytes 2 (board_id record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 6 (a_designated_number_for_an_issue record) ++
-      encode_bytes 11 (closing_price record) ++
+      encode_bytes 11 (closing_price_long record) ++
       encode_bytes 1 (closing_price_type_code record) ++
       encode_bytes 11 (filler_11 record) ++
       encode_bytes 11 (second_filler_11 record) ++
@@ -6997,7 +6997,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                   | Some (a_designated_number_for_an_issue_value, bytes) =>
                       match decode_bytes 11 bytes with
                       | None => None
-                      | Some (closing_price_value, bytes) =>
+                      | Some (closing_price_long_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (closing_price_type_code_value, bytes) =>
@@ -7022,7 +7022,7 @@ Module KoscomMdcsRealtimeCommoditiesV2018.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (end_keyword_value, bytes) =>
-                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; closing_price := closing_price_value; closing_price_type_code := closing_price_type_code_value; filler_11 := filler_11_value; second_filler_11 := second_filler_11_value; closing_price_weighted_stock_price_average := closing_price_weighted_stock_price_average_value; closing_price_base_price_of_buy_in := closing_price_base_price_of_buy_in_value; closing_price_upper_limit_of_buy_in := closing_price_upper_limit_of_buy_in_value; closing_price_lower_limit_of_buy_in := closing_price_lower_limit_of_buy_in_value; end_keyword := end_keyword_value |}, bytes)
+                                                          Some ({| message_sequence_number := message_sequence_number_value; board_id := board_id_value; isin_code := isin_code_value; a_designated_number_for_an_issue := a_designated_number_for_an_issue_value; closing_price_long := closing_price_long_value; closing_price_type_code := closing_price_type_code_value; filler_11 := filler_11_value; second_filler_11 := second_filler_11_value; closing_price_weighted_stock_price_average := closing_price_weighted_stock_price_average_value; closing_price_base_price_of_buy_in := closing_price_base_price_of_buy_in_value; closing_price_upper_limit_of_buy_in := closing_price_upper_limit_of_buy_in_value; closing_price_lower_limit_of_buy_in := closing_price_lower_limit_of_buy_in_value; end_keyword := end_keyword_value |}, bytes)
                                                       end
                                                   end
                                               end

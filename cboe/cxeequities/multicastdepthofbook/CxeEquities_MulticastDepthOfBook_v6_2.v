@@ -1663,7 +1663,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       buy_shares : N;
       sell_shares : N;
       indicative_price : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1675,7 +1675,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       (buy_shares record < 256 ^ N.of_nat 4)%N /\
       (sell_shares record < 256 ^ N.of_nat 4)%N /\
       (indicative_price record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -1685,7 +1685,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       encode_uint 4 (buy_shares record) ++
       encode_uint 4 (sell_shares record) ++
       encode_uint 8 (indicative_price record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1709,7 +1709,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
                               match decode_uint 8 bytes with
                               | None => None
                               | Some (indicative_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (reserved_8_value, bytes) =>
                                       Some ({| time_offset := time_offset_value; symbol_short := symbol_short_value; auction_type := auction_type_value; reference_price := reference_price_value; buy_shares := buy_shares_value; sell_shares := sell_shares_value; indicative_price := indicative_price_value; reserved_8 := reserved_8_value |}, bytes)
@@ -1742,7 +1742,7 @@ Module CxeEquitiesMulticastDepthOfBookV62.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

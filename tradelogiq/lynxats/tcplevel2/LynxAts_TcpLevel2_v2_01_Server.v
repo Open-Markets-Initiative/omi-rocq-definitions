@@ -178,26 +178,26 @@ Module LynxAtsTcpLevel2V201Server.
     (** The system event message type is used to signal a market or data feed handler event. *)
     Record t := {
       event_code : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       timestamp : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (event_code record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (event_code record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (event_code_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (reserved_2_value, bytes) =>
               match decode_uint 8 bytes with
@@ -222,7 +222,7 @@ Module LynxAtsTcpLevel2V201Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -355,7 +355,7 @@ Module LynxAtsTcpLevel2V201Server.
       security_type : list byte;
       expiry_date : list byte;
       description : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -372,7 +372,7 @@ Module LynxAtsTcpLevel2V201Server.
       Datatypes.length (security_type record) = 1 /\
       Datatypes.length (expiry_date record) = 8 /\
       Datatypes.length (description record) = 20 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market record) ++
@@ -387,7 +387,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_bytes 1 (security_type record) ++
       encode_bytes 8 (expiry_date record) ++
       encode_bytes 20 (description record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -426,7 +426,7 @@ Module LynxAtsTcpLevel2V201Server.
                                                   match decode_bytes 20 bytes with
                                                   | None => None
                                                   | Some (description_value, bytes) =>
-                                                      match decode_uint 3 bytes with
+                                                      match decode_bytes 3 bytes with
                                                       | None => None
                                                       | Some (reserved_3_value, bytes) =>
                                                           Some ({| market := market_value; stock := stock_value; timestamp := timestamp_value; board_lot_size := board_lot_size_value; instrument_id := instrument_id_value; shortable := shortable_value; frequency := frequency_value; reserved_9 := reserved_9_value; currency := currency_value; security_type := security_type_value; expiry_date := expiry_date_value; description := description_value; reserved_3 := reserved_3_value |}, bytes)
@@ -469,7 +469,7 @@ Module LynxAtsTcpLevel2V201Server.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -556,7 +556,7 @@ Module LynxAtsTcpLevel2V201Server.
       shares : N;
       price : N;
       exec_broker_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -568,7 +568,7 @@ Module LynxAtsTcpLevel2V201Server.
       (shares record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 4)%N /\
       (exec_broker_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (buy_sell_indicator record) ++
@@ -578,7 +578,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 4 (shares record) ++
       encode_uint 4 (price record) ++
       encode_uint 2 (exec_broker_id record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -602,7 +602,7 @@ Module LynxAtsTcpLevel2V201Server.
                               match decode_uint 2 bytes with
                               | None => None
                               | Some (exec_broker_id_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (reserved_2_value, bytes) =>
                                       Some ({| buy_sell_indicator := buy_sell_indicator_value; instrument_id := instrument_id_value; timestamp := timestamp_value; order_reference_number := order_reference_number_value; shares := shares_value; price := price_value; exec_broker_id := exec_broker_id_value; reserved_2 := reserved_2_value |}, bytes)
@@ -635,7 +635,7 @@ Module LynxAtsTcpLevel2V201Server.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -655,7 +655,7 @@ Module LynxAtsTcpLevel2V201Server.
       executed_shares : N;
       match_number : N;
       contra_broker_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -667,7 +667,7 @@ Module LynxAtsTcpLevel2V201Server.
       (executed_shares record < 256 ^ N.of_nat 4)%N /\
       (match_number record < 256 ^ N.of_nat 4)%N /\
       (contra_broker_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (marker record) ++
@@ -677,7 +677,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 4 (executed_shares record) ++
       encode_uint 4 (match_number record) ++
       encode_uint 2 (contra_broker_id record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -701,7 +701,7 @@ Module LynxAtsTcpLevel2V201Server.
                               match decode_uint 2 bytes with
                               | None => None
                               | Some (contra_broker_id_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (reserved_2_value, bytes) =>
                                       Some ({| marker := marker_value; instrument_id := instrument_id_value; timestamp := timestamp_value; order_reference_number := order_reference_number_value; executed_shares := executed_shares_value; match_number := match_number_value; contra_broker_id := contra_broker_id_value; reserved_2 := reserved_2_value |}, bytes)
@@ -734,7 +734,7 @@ Module LynxAtsTcpLevel2V201Server.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -755,7 +755,7 @@ Module LynxAtsTcpLevel2V201Server.
       execution_price : N;
       match_number : N;
       contra_broker_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -768,7 +768,7 @@ Module LynxAtsTcpLevel2V201Server.
       (execution_price record < 256 ^ N.of_nat 4)%N /\
       (match_number record < 256 ^ N.of_nat 4)%N /\
       (contra_broker_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (marker record) ++
@@ -779,7 +779,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 4 (execution_price record) ++
       encode_uint 4 (match_number record) ++
       encode_uint 2 (contra_broker_id record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -806,7 +806,7 @@ Module LynxAtsTcpLevel2V201Server.
                                   match decode_uint 2 bytes with
                                   | None => None
                                   | Some (contra_broker_id_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_bytes 2 bytes with
                                       | None => None
                                       | Some (reserved_2_value, bytes) =>
                                           Some ({| marker := marker_value; instrument_id := instrument_id_value; timestamp := timestamp_value; order_reference_number := order_reference_number_value; executed_shares := executed_shares_value; execution_price := execution_price_value; match_number := match_number_value; contra_broker_id := contra_broker_id_value; reserved_2 := reserved_2_value |}, bytes)
@@ -841,7 +841,7 @@ Module LynxAtsTcpLevel2V201Server.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -854,7 +854,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** This message is sent whenever an order on the book is being cancelled. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       instrument_id : N;
       timestamp : N;
       order_reference_number : N;
@@ -862,19 +862,19 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (order_reference_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (instrument_id record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (order_reference_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_uint 2 bytes with
@@ -895,7 +895,7 @@ Module LynxAtsTcpLevel2V201Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 15.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -905,7 +905,7 @@ Module LynxAtsTcpLevel2V201Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -913,7 +913,7 @@ Module LynxAtsTcpLevel2V201Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End OrderDeleteMessage.
 
@@ -921,7 +921,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** This message is sent whenever an order on the book has been cancelled and replaced. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       instrument_id : N;
       timestamp : N;
       original_order_reference_number : N;
@@ -932,7 +932,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (original_order_reference_number record < 256 ^ N.of_nat 4)%N /\
@@ -941,7 +941,7 @@ Module LynxAtsTcpLevel2V201Server.
       (price record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (instrument_id record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (original_order_reference_number record) ++
@@ -950,7 +950,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 4 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_uint 2 bytes with
@@ -983,7 +983,7 @@ Module LynxAtsTcpLevel2V201Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -993,7 +993,7 @@ Module LynxAtsTcpLevel2V201Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1004,7 +1004,7 @@ Module LynxAtsTcpLevel2V201Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End OrderReplaceMessage.
 
@@ -1012,7 +1012,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** This message is sent whenever an order on the book is modified as a result of a partial cancellation. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       instrument_id : N;
       timestamp : N;
       order_reference_number : N;
@@ -1021,21 +1021,21 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (order_reference_number record < 256 ^ N.of_nat 4)%N /\
       (cancelled_shares record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (instrument_id record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (order_reference_number record) ++
       encode_uint 4 (cancelled_shares record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_uint 2 bytes with
@@ -1060,7 +1060,7 @@ Module LynxAtsTcpLevel2V201Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1070,7 +1070,7 @@ Module LynxAtsTcpLevel2V201Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1079,7 +1079,7 @@ Module LynxAtsTcpLevel2V201Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End OrderCancelMessage.
 
@@ -1204,7 +1204,7 @@ Module LynxAtsTcpLevel2V201Server.
       sell_broker_id : N;
       bypass : list byte;
       settlement_type : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1219,7 +1219,7 @@ Module LynxAtsTcpLevel2V201Server.
       (sell_broker_id record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (bypass record) = 1 /\
       Datatypes.length (settlement_type record) = 1 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (cross_type record) ++
@@ -1232,7 +1232,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 2 (sell_broker_id record) ++
       encode_bytes 1 (bypass record) ++
       encode_bytes 1 (settlement_type record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -1265,7 +1265,7 @@ Module LynxAtsTcpLevel2V201Server.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (settlement_type_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (reserved_2_value, bytes) =>
                                                   Some ({| cross_type := cross_type_value; instrument_id := instrument_id_value; timestamp := timestamp_value; shares := shares_value; price := price_value; match_number := match_number_value; buy_broker_id := buy_broker_id_value; sell_broker_id := sell_broker_id_value; bypass := bypass_value; settlement_type := settlement_type_value; reserved_2 := reserved_2_value |}, bytes)
@@ -1304,7 +1304,7 @@ Module LynxAtsTcpLevel2V201Server.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -1317,7 +1317,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** The Trade Bust message is sent whenever an execution on Omega ATS or Lynx ATS is cancelled. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       instrument_id : N;
       timestamp : N;
       match_number : N;
@@ -1325,19 +1325,19 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (match_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (instrument_id record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (match_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_uint 2 bytes with
@@ -1358,7 +1358,7 @@ Module LynxAtsTcpLevel2V201Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 15.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1368,7 +1368,7 @@ Module LynxAtsTcpLevel2V201Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1376,7 +1376,7 @@ Module LynxAtsTcpLevel2V201Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End TradeBustMessage.
 
@@ -1384,7 +1384,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** The Trade Amend/Correction message is sent whenever an execution on Omega ATS or Lynx ATS is amended. *)
     Record t := {
-      reserved_1 : N;
+      reserved_1 : list byte;
       instrument_id : N;
       timestamp : N;
       original_trade_id : N;
@@ -1396,7 +1396,7 @@ Module LynxAtsTcpLevel2V201Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (original_trade_id record < 256 ^ N.of_nat 4)%N /\
@@ -1406,7 +1406,7 @@ Module LynxAtsTcpLevel2V201Server.
       (corrected_trade_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (instrument_id record) ++
       encode_uint 8 (timestamp record) ++
       encode_uint 4 (original_trade_id record) ++
@@ -1416,7 +1416,7 @@ Module LynxAtsTcpLevel2V201Server.
       encode_uint 4 (corrected_trade_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_1_value, bytes) =>
           match decode_uint 2 bytes with
@@ -1453,7 +1453,7 @@ Module LynxAtsTcpLevel2V201Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1463,7 +1463,7 @@ Module LynxAtsTcpLevel2V201Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1475,7 +1475,7 @@ Module LynxAtsTcpLevel2V201Server.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End TradeAmendMessage.
 

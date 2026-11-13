@@ -180,7 +180,7 @@ Module QseCashMarketDataV26.
       source_time : N;
       system_id : N;
       source_time_micro_secs : N;
-      filler_binary_int_2 : N;
+      filler_binary_int_2 : list byte;
       start_date_halting : list byte;
       start_time_halting : list byte;
       prog_opening_time : list byte;
@@ -191,7 +191,7 @@ Module QseCashMarketDataV26.
       action_affecting_state : list byte;
       instrument_state_tcs : list byte;
       period_side : list byte;
-      filler_binary_int_1 : N;
+      filler_binary_int_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -201,7 +201,7 @@ Module QseCashMarketDataV26.
       (source_time record < 256 ^ N.of_nat 4)%N /\
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
-      (filler_binary_int_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_binary_int_2 record) = 2 /\
       Datatypes.length (start_date_halting record) = 8 /\
       Datatypes.length (start_time_halting record) = 6 /\
       Datatypes.length (prog_opening_time record) = 6 /\
@@ -212,7 +212,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (action_affecting_state record) = 1 /\
       Datatypes.length (instrument_state_tcs record) = 1 /\
       Datatypes.length (period_side record) = 1 /\
-      (filler_binary_int_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (filler_binary_int_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -220,7 +220,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (source_time record) ++
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
-      encode_uint 2 (filler_binary_int_2 record) ++
+      encode_bytes 2 (filler_binary_int_2 record) ++
       encode_bytes 8 (start_date_halting record) ++
       encode_bytes 6 (start_time_halting record) ++
       encode_bytes 6 (prog_opening_time record) ++
@@ -231,7 +231,7 @@ Module QseCashMarketDataV26.
       encode_bytes 1 (action_affecting_state record) ++
       encode_bytes 1 (instrument_state_tcs record) ++
       encode_bytes 1 (period_side record) ++
-      encode_uint 1 (filler_binary_int_1 record).
+      encode_bytes 1 (filler_binary_int_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -249,7 +249,7 @@ Module QseCashMarketDataV26.
                       match decode_uint 2 bytes with
                       | None => None
                       | Some (source_time_micro_secs_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_bytes 2 bytes with
                           | None => None
                           | Some (filler_binary_int_2_value, bytes) =>
                               match decode_bytes 8 bytes with
@@ -282,7 +282,7 @@ Module QseCashMarketDataV26.
                                                                   match decode_bytes 1 bytes with
                                                                   | None => None
                                                                   | Some (period_side_value, bytes) =>
-                                                                      match decode_uint 1 bytes with
+                                                                      match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (filler_binary_int_1_value, bytes) =>
                                                                           Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; filler_binary_int_2 := filler_binary_int_2_value; start_date_halting := start_date_halting_value; start_time_halting := start_time_halting_value; prog_opening_time := prog_opening_time_value; order_entry_rejection := order_entry_rejection_value; instrument_state := instrument_state_value; instrument_trading_status := instrument_trading_status_value; halt_reason := halt_reason_value; action_affecting_state := action_affecting_state_value; instrument_state_tcs := instrument_state_tcs_value; period_side := period_side_value; filler_binary_int_1 := filler_binary_int_1_value |}, bytes)
@@ -322,7 +322,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -333,7 +333,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -353,7 +353,7 @@ Module QseCashMarketDataV26.
       instrument_group_code : list byte;
       instrument_group_state : list byte;
       session_type : list byte;
-      filler_binary_int_1 : N;
+      filler_binary_int_1 : list byte;
       class_state : list byte;
     }.
 
@@ -366,7 +366,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (instrument_group_code record) = 3 /\
       Datatypes.length (instrument_group_state record) = 1 /\
       Datatypes.length (session_type record) = 1 /\
-      (filler_binary_int_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_binary_int_1 record) = 1 /\
       Datatypes.length (class_state record) = 4.
 
     Definition encode (record : t) : list byte :=
@@ -377,7 +377,7 @@ Module QseCashMarketDataV26.
       encode_bytes 3 (instrument_group_code record) ++
       encode_bytes 1 (instrument_group_state record) ++
       encode_bytes 1 (session_type record) ++
-      encode_uint 1 (filler_binary_int_1 record) ++
+      encode_bytes 1 (filler_binary_int_1 record) ++
       encode_bytes 4 (class_state record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -402,7 +402,7 @@ Module QseCashMarketDataV26.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (session_type_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (filler_binary_int_1_value, bytes) =>
                                       match decode_bytes 4 bytes with
@@ -439,7 +439,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -461,13 +461,13 @@ Module QseCashMarketDataV26.
       number_of_message : N;
       sequence_number : N;
       instrument_group_code : list byte;
-      filler_ascii_str_1 : N;
+      filler_ascii_str_1 : list byte;
       priority_indicator : list byte;
       type_of_message : list byte;
       address_type : list byte;
       title : list byte;
       text : list byte;
-      filler_ascii_str_2 : N;
+      filler_ascii_str_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -480,13 +480,13 @@ Module QseCashMarketDataV26.
       (number_of_message record < 256 ^ N.of_nat 2)%N /\
       (sequence_number record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (instrument_group_code record) = 3 /\
-      (filler_ascii_str_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_ascii_str_1 record) = 1 /\
       Datatypes.length (priority_indicator record) = 1 /\
       Datatypes.length (type_of_message record) = 1 /\
       Datatypes.length (address_type record) = 2 /\
       Datatypes.length (title record) = 80 /\
       Datatypes.length (text record) = 854 /\
-      (filler_ascii_str_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_ascii_str_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_seq_num record) ++
@@ -497,13 +497,13 @@ Module QseCashMarketDataV26.
       encode_uint 2 (number_of_message record) ++
       encode_uint 2 (sequence_number record) ++
       encode_bytes 3 (instrument_group_code record) ++
-      encode_uint 1 (filler_ascii_str_1 record) ++
+      encode_bytes 1 (filler_ascii_str_1 record) ++
       encode_bytes 1 (priority_indicator record) ++
       encode_bytes 1 (type_of_message record) ++
       encode_bytes 2 (address_type record) ++
       encode_bytes 80 (title record) ++
       encode_bytes 854 (text record) ++
-      encode_uint 2 (filler_ascii_str_2 record).
+      encode_bytes 2 (filler_ascii_str_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -530,7 +530,7 @@ Module QseCashMarketDataV26.
                                   match decode_bytes 3 bytes with
                                   | None => None
                                   | Some (instrument_group_code_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (filler_ascii_str_1_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -548,7 +548,7 @@ Module QseCashMarketDataV26.
                                                           match decode_bytes 854 bytes with
                                                           | None => None
                                                           | Some (text_value, bytes) =>
-                                                              match decode_uint 2 bytes with
+                                                              match decode_bytes 2 bytes with
                                                               | None => None
                                                               | Some (filler_ascii_str_2_value, bytes) =>
                                                                   Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; e_mail_msg_number := e_mail_msg_number_value; number_of_message := number_of_message_value; sequence_number := sequence_number_value; instrument_group_code := instrument_group_code_value; filler_ascii_str_1 := filler_ascii_str_1_value; priority_indicator := priority_indicator_value; type_of_message := type_of_message_value; address_type := address_type_value; title := title_value; text := text_value; filler_ascii_str_2 := filler_ascii_str_2_value |}, bytes)
@@ -589,13 +589,13 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
@@ -733,7 +733,7 @@ Module QseCashMarketDataV26.
       high_scale_code : N;
       low_scale_code : N;
       collar_type : list byte;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -748,7 +748,7 @@ Module QseCashMarketDataV26.
       (high_scale_code record < 256 ^ N.of_nat 1)%N /\
       (low_scale_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (collar_type record) = 1 /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -761,7 +761,7 @@ Module QseCashMarketDataV26.
       encode_uint 1 (high_scale_code record) ++
       encode_uint 1 (low_scale_code record) ++
       encode_bytes 1 (collar_type record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -794,7 +794,7 @@ Module QseCashMarketDataV26.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (collar_type_value, bytes) =>
-                                              match decode_uint 3 bytes with
+                                              match decode_bytes 3 bytes with
                                               | None => None
                                               | Some (filler_ascii_str_3_value, bytes) =>
                                                   Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; high_collar := high_collar_value; low_collar := low_collar_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; high_scale_code := high_scale_code_value; low_scale_code := low_scale_code_value; collar_type := collar_type_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -833,7 +833,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -862,7 +862,7 @@ Module QseCashMarketDataV26.
       time_opening_3 : list byte;
       time_closing_3 : list byte;
       eod_time : list byte;
-      filler_ascii_str_2 : N;
+      filler_ascii_str_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -883,7 +883,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (time_opening_3 record) = 6 /\
       Datatypes.length (time_closing_3 record) = 6 /\
       Datatypes.length (eod_time record) = 6 /\
-      (filler_ascii_str_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_ascii_str_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_seq_num record) ++
@@ -902,7 +902,7 @@ Module QseCashMarketDataV26.
       encode_bytes 6 (time_opening_3 record) ++
       encode_bytes 6 (time_closing_3 record) ++
       encode_bytes 6 (eod_time record) ++
-      encode_uint 2 (filler_ascii_str_2 record).
+      encode_bytes 2 (filler_ascii_str_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -953,7 +953,7 @@ Module QseCashMarketDataV26.
                                                                   match decode_bytes 6 bytes with
                                                                   | None => None
                                                                   | Some (eod_time_value, bytes) =>
-                                                                      match decode_uint 2 bytes with
+                                                                      match decode_bytes 2 bytes with
                                                                       | None => None
                                                                       | Some (filler_ascii_str_2_value, bytes) =>
                                                                           Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; instrument_group_code := instrument_group_code_value; session_type := session_type_value; time_pre_opening_1 := time_pre_opening_1_value; time_opening_1 := time_opening_1_value; time_closing_1 := time_closing_1_value; time_pre_opening_2 := time_pre_opening_2_value; time_opening_2 := time_opening_2_value; time_closing_2 := time_closing_2_value; time_pre_opening_3 := time_pre_opening_3_value; time_opening_3 := time_opening_3_value; time_closing_3 := time_closing_3_value; eod_time := eod_time_value; filler_ascii_str_2 := filler_ascii_str_2_value |}, bytes)
@@ -1004,7 +1004,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -1025,7 +1025,7 @@ Module QseCashMarketDataV26.
       qty_shares : N;
       amount_traded : N;
       price_scale_code : N;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1038,7 +1038,7 @@ Module QseCashMarketDataV26.
       (qty_shares record < 256 ^ N.of_nat 4)%N /\
       (amount_traded record < 256 ^ N.of_nat 4)%N /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_seq_num record) ++
@@ -1049,7 +1049,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (qty_shares record) ++
       encode_uint 4 (amount_traded record) ++
       encode_uint 1 (price_scale_code record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1076,7 +1076,7 @@ Module QseCashMarketDataV26.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (price_scale_code_value, bytes) =>
-                                      match decode_uint 3 bytes with
+                                      match decode_bytes 3 bytes with
                                       | None => None
                                       | Some (filler_ascii_str_3_value, bytes) =>
                                           Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; nb_trades := nb_trades_value; qty_shares := qty_shares_value; amount_traded := amount_traded_value; price_scale_code := price_scale_code_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -1093,7 +1093,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1111,12 +1111,12 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End GlobalMarketActivitySummaryMessage.
 
@@ -1125,23 +1125,23 @@ Module QseCashMarketDataV26.
     (** A Start Referential message marks the beginning of the broadcast of the reference data. *)
     Record t := {
       indicator : list byte;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (indicator record) = 1 /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (indicator record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (indicator_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (filler_ascii_str_3_value, bytes) =>
               Some ({| indicator := indicator_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -1151,7 +1151,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1162,7 +1162,7 @@ Module QseCashMarketDataV26.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1176,23 +1176,23 @@ Module QseCashMarketDataV26.
     (** An End Referential message marks the end of the broadcast of the reference data. *)
     Record t := {
       indicator : list byte;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (indicator record) = 1 /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (indicator record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (indicator_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (filler_ascii_str_3_value, bytes) =>
               Some ({| indicator := indicator_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -1202,7 +1202,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1213,7 +1213,7 @@ Module QseCashMarketDataV26.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1268,7 +1268,7 @@ Module QseCashMarketDataV26.
       industry_text : list byte;
       financial_market_code : list byte;
       us_indicators : list byte;
-      filler_ascii_str_2 : N;
+      filler_ascii_str_2 : list byte;
       prev_day_capital_traded : N;
       nom_mkt_price : N;
       lot_size : N;
@@ -1288,7 +1288,7 @@ Module QseCashMarketDataV26.
       fix_price_tick_scale_code : N;
       mnemo : list byte;
       trading_code : list byte;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
       strike_price : N;
       strike_currency : list byte;
       strike_scale_code : N;
@@ -1347,7 +1347,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (industry_text record) = 100 /\
       Datatypes.length (financial_market_code record) = 3 /\
       Datatypes.length (us_indicators record) = 7 /\
-      (filler_ascii_str_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_ascii_str_2 record) = 2 /\
       (prev_day_capital_traded record < 256 ^ N.of_nat 8)%N /\
       (nom_mkt_price record < 256 ^ N.of_nat 8)%N /\
       (lot_size record < 256 ^ N.of_nat 8)%N /\
@@ -1367,7 +1367,7 @@ Module QseCashMarketDataV26.
       (fix_price_tick_scale_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (mnemo record) = 5 /\
       Datatypes.length (trading_code record) = 12 /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N /\
+      Datatypes.length (filler_ascii_str_3 record) = 3 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (strike_currency record) = 3 /\
       (strike_scale_code record < 256 ^ N.of_nat 1)%N /\
@@ -1424,7 +1424,7 @@ Module QseCashMarketDataV26.
       encode_bytes 100 (industry_text record) ++
       encode_bytes 3 (financial_market_code record) ++
       encode_bytes 7 (us_indicators record) ++
-      encode_uint 2 (filler_ascii_str_2 record) ++
+      encode_bytes 2 (filler_ascii_str_2 record) ++
       encode_uint 8 (prev_day_capital_traded record) ++
       encode_uint 8 (nom_mkt_price record) ++
       encode_uint 8 (lot_size record) ++
@@ -1444,7 +1444,7 @@ Module QseCashMarketDataV26.
       encode_uint 1 (fix_price_tick_scale_code record) ++
       encode_bytes 5 (mnemo record) ++
       encode_bytes 12 (trading_code record) ++
-      encode_uint 3 (filler_ascii_str_3 record) ++
+      encode_bytes 3 (filler_ascii_str_3 record) ++
       encode_uint 4 (strike_price record) ++
       encode_bytes 3 (strike_currency record) ++
       encode_uint 1 (strike_scale_code record) ++
@@ -1585,7 +1585,7 @@ Module QseCashMarketDataV26.
                                                                                                                                                                           match decode_bytes 7 bytes with
                                                                                                                                                                           | None => None
                                                                                                                                                                           | Some (us_indicators_value, bytes) =>
-                                                                                                                                                                              match decode_uint 2 bytes with
+                                                                                                                                                                              match decode_bytes 2 bytes with
                                                                                                                                                                               | None => None
                                                                                                                                                                               | Some (filler_ascii_str_2_value, bytes) =>
                                                                                                                                                                                   match decode_uint 8 bytes with
@@ -1645,7 +1645,7 @@ Module QseCashMarketDataV26.
                                                                                                                                                                                                                                                           match decode_bytes 12 bytes with
                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                           | Some (trading_code_value, bytes) =>
-                                                                                                                                                                                                                                                              match decode_uint 3 bytes with
+                                                                                                                                                                                                                                                              match decode_bytes 3 bytes with
                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                               | Some (filler_ascii_str_3_value, bytes) =>
                                                                                                                                                                                                                                                                   match decode_uint 4 bytes with
@@ -1816,7 +1816,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_39.
       rewrite decode_encode_bytes by exact bound_40.
       rewrite decode_encode_bytes by exact bound_41.
-      rewrite decode_encode_uint by exact bound_42.
+      rewrite decode_encode_bytes by exact bound_42.
       rewrite decode_encode_uint by exact bound_43.
       rewrite decode_encode_uint by exact bound_44.
       rewrite decode_encode_uint by exact bound_45.
@@ -1836,7 +1836,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_59.
       rewrite decode_encode_bytes by exact bound_60.
       rewrite decode_encode_bytes by exact bound_61.
-      rewrite decode_encode_uint by exact bound_62.
+      rewrite decode_encode_bytes by exact bound_62.
       rewrite decode_encode_uint by exact bound_63.
       rewrite decode_encode_bytes by exact bound_64.
       rewrite decode_encode_uint by exact bound_65.
@@ -2022,7 +2022,7 @@ Module QseCashMarketDataV26.
       original_trade_id_number : N;
       system_id : N;
       source_time_micro_secs : N;
-      filler_binary_int_2 : N;
+      filler_binary_int_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2033,7 +2033,7 @@ Module QseCashMarketDataV26.
       (original_trade_id_number record < 256 ^ N.of_nat 4)%N /\
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
-      (filler_binary_int_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_binary_int_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -2042,7 +2042,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (original_trade_id_number record) ++
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
-      encode_uint 2 (filler_binary_int_2 record).
+      encode_bytes 2 (filler_binary_int_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -2063,7 +2063,7 @@ Module QseCashMarketDataV26.
                           match decode_uint 2 bytes with
                           | None => None
                           | Some (source_time_micro_secs_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (filler_binary_int_2_value, bytes) =>
                                   Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; original_trade_id_number := original_trade_id_number_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; filler_binary_int_2 := filler_binary_int_2_value |}, bytes)
@@ -2078,7 +2078,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2094,12 +2094,12 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End TradeCancellationMessage.
 
@@ -2120,7 +2120,7 @@ Module QseCashMarketDataV26.
       variation_last_price : N;
       system_id : N;
       source_time_micro_secs : N;
-      filler_binary_int_2 : N;
+      filler_binary_int_2 : list byte;
       small_trade_indicator : list byte;
       trad_cond_2 : list byte;
       trad_cond_3 : list byte;
@@ -2146,7 +2146,7 @@ Module QseCashMarketDataV26.
       (variation_last_price record < 256 ^ N.of_nat 4)%N /\
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
-      (filler_binary_int_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_binary_int_2 record) = 2 /\
       Datatypes.length (small_trade_indicator record) = 1 /\
       Datatypes.length (trad_cond_2 record) = 1 /\
       Datatypes.length (trad_cond_3 record) = 1 /\
@@ -2170,7 +2170,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (variation_last_price record) ++
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
-      encode_uint 2 (filler_binary_int_2 record) ++
+      encode_bytes 2 (filler_binary_int_2 record) ++
       encode_bytes 1 (small_trade_indicator record) ++
       encode_bytes 1 (trad_cond_2 record) ++
       encode_bytes 1 (trad_cond_3 record) ++
@@ -2220,7 +2220,7 @@ Module QseCashMarketDataV26.
                                                       match decode_uint 2 bytes with
                                                       | None => None
                                                       | Some (source_time_micro_secs_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_bytes 2 bytes with
                                                           | None => None
                                                           | Some (filler_binary_int_2_value, bytes) =>
                                                               match decode_bytes 1 bytes with
@@ -2297,7 +2297,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
@@ -2328,7 +2328,7 @@ Module QseCashMarketDataV26.
       system_id : N;
       source_time_micro_secs : N;
       type_of_price : N;
-      filler_binary_int_2 : N;
+      filler_binary_int_2 : list byte;
       price_scale_code : N;
       variation_scale_code : N;
     }.
@@ -2345,7 +2345,7 @@ Module QseCashMarketDataV26.
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       (type_of_price record < 256 ^ N.of_nat 2)%N /\
-      (filler_binary_int_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_binary_int_2 record) = 2 /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
       (variation_scale_code record < 256 ^ N.of_nat 1)%N.
 
@@ -2360,7 +2360,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
       encode_uint 2 (type_of_price record) ++
-      encode_uint 2 (filler_binary_int_2 record) ++
+      encode_bytes 2 (filler_binary_int_2 record) ++
       encode_uint 1 (price_scale_code record) ++
       encode_uint 1 (variation_scale_code record).
 
@@ -2395,7 +2395,7 @@ Module QseCashMarketDataV26.
                                           match decode_uint 2 bytes with
                                           | None => None
                                           | Some (type_of_price_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (filler_binary_int_2_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -2422,7 +2422,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2442,14 +2442,14 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End PriceUpdateMessage.
 
@@ -2632,7 +2632,7 @@ Module QseCashMarketDataV26.
       amount_traded : N;
       system_id : N;
       price_scale_code : N;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2649,7 +2649,7 @@ Module QseCashMarketDataV26.
       (amount_traded record < 256 ^ N.of_nat 4)%N /\
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -2664,7 +2664,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (amount_traded record) ++
       encode_uint 4 (system_id record) ++
       encode_uint 1 (price_scale_code record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -2703,7 +2703,7 @@ Module QseCashMarketDataV26.
                                                   match decode_uint 1 bytes with
                                                   | None => None
                                                   | Some (price_scale_code_value, bytes) =>
-                                                      match decode_uint 3 bytes with
+                                                      match decode_bytes 3 bytes with
                                                       | None => None
                                                       | Some (filler_ascii_str_3_value, bytes) =>
                                                           Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; sending_indicator := sending_indicator_value; closing_price_rule := closing_price_rule_value; closing_price := closing_price_value; adjusted_closing_price := adjusted_closing_price_value; nb_trades := nb_trades_value; qty_shares := qty_shares_value; amount_traded := amount_traded_value; system_id := system_id_value; price_scale_code := price_scale_code_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -2724,7 +2724,7 @@ Module QseCashMarketDataV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2746,12 +2746,12 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End VwapClosingPriceMessage.
 
@@ -2776,7 +2776,7 @@ Module QseCashMarketDataV26.
       quote_condition : list byte;
       quote_number : N;
       price_scale_code : N;
-      filler_ascii_str_1 : N;
+      filler_ascii_str_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2798,7 +2798,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (quote_condition record) = 1 /\
       (quote_number record < 256 ^ N.of_nat 1)%N /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (filler_ascii_str_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (filler_ascii_str_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -2818,7 +2818,7 @@ Module QseCashMarketDataV26.
       encode_bytes 1 (quote_condition record) ++
       encode_uint 1 (quote_number record) ++
       encode_uint 1 (price_scale_code record) ++
-      encode_uint 1 (filler_ascii_str_1 record).
+      encode_bytes 1 (filler_ascii_str_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -2872,7 +2872,7 @@ Module QseCashMarketDataV26.
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (price_scale_code_value, bytes) =>
-                                                                          match decode_uint 1 bytes with
+                                                                          match decode_bytes 1 bytes with
                                                                           | None => None
                                                                           | Some (filler_ascii_str_1_value, bytes) =>
                                                                               Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; quote_link_id := quote_link_id_value; ask_price := ask_price_value; ask_size := ask_size_value; bid_price := bid_price_value; bid_size := bid_size_value; system_id := system_id_value; number_ask_orders := number_ask_orders_value; number_bid_orders := number_bid_orders_value; source_time_micro_secs := source_time_micro_secs_value; type_of_ask_price := type_of_ask_price_value; type_of_bid_price := type_of_bid_price_value; quote_condition := quote_condition_value; quote_number := quote_number_value; price_scale_code := price_scale_code_value; filler_ascii_str_1 := filler_ascii_str_1_value |}, bytes)
@@ -2925,7 +2925,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -2958,7 +2958,7 @@ Module QseCashMarketDataV26.
       order_priority_time : N;
       order_priority_micro_secs : N;
       order_origin : list byte;
-      filler_binary_int_1 : N;
+      filler_binary_int_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2983,7 +2983,7 @@ Module QseCashMarketDataV26.
       (order_priority_time record < 256 ^ N.of_nat 4)%N /\
       (order_priority_micro_secs record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (order_origin record) = 1 /\
-      (filler_binary_int_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (filler_binary_int_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -3006,7 +3006,7 @@ Module QseCashMarketDataV26.
       encode_uint 4 (order_priority_time record) ++
       encode_uint 2 (order_priority_micro_secs record) ++
       encode_bytes 1 (order_origin record) ++
-      encode_uint 1 (filler_binary_int_1 record).
+      encode_bytes 1 (filler_binary_int_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -3069,7 +3069,7 @@ Module QseCashMarketDataV26.
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (order_origin_value, bytes) =>
-                                                                                      match decode_uint 1 bytes with
+                                                                                      match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (filler_binary_int_1_value, bytes) =>
                                                                                           Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; price := price_value; aggregated_volume := aggregated_volume_value; volume := volume_value; link_id := link_id_value; order_id := order_id_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; number_orders := number_orders_value; side := side_value; order_type := order_type_value; action_type := action_type_value; price_scale_code := price_scale_code_value; order_date := order_date_value; order_priority_date := order_priority_date_value; order_priority_time := order_priority_time_value; order_priority_micro_secs := order_priority_micro_secs_value; order_origin := order_origin_value; filler_binary_int_1 := filler_binary_int_1_value |}, bytes)
@@ -3128,7 +3128,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       destruct record. reflexivity.
     Qed.
 
@@ -3233,7 +3233,7 @@ Module QseCashMarketDataV26.
       percentage_scale_code : N;
       variation_scale_code : N;
       rebroadcast_indicator : list byte;
-      filler_ascii_str_2 : N;
+      filler_ascii_str_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -3255,7 +3255,7 @@ Module QseCashMarketDataV26.
       (percentage_scale_code record < 256 ^ N.of_nat 1)%N /\
       (variation_scale_code record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (rebroadcast_indicator record) = 1 /\
-      (filler_ascii_str_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_ascii_str_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -3275,7 +3275,7 @@ Module QseCashMarketDataV26.
       encode_uint 1 (percentage_scale_code record) ++
       encode_uint 1 (variation_scale_code record) ++
       encode_bytes 1 (rebroadcast_indicator record) ++
-      encode_uint 2 (filler_ascii_str_2 record).
+      encode_bytes 2 (filler_ascii_str_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -3329,7 +3329,7 @@ Module QseCashMarketDataV26.
                                                                       match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (rebroadcast_indicator_value, bytes) =>
-                                                                          match decode_uint 2 bytes with
+                                                                          match decode_bytes 2 bytes with
                                                                           | None => None
                                                                           | Some (filler_ascii_str_2_value, bytes) =>
                                                                               Some ({| symbol_index := symbol_index_value; source_time := source_time_value; index_level := index_level_value; forerunner_level := forerunner_level_value; session_high := session_high_value; session_low := session_low_value; percentage_of_capitalization := percentage_of_capitalization_value; variation_from_previous_days_price := variation_from_previous_days_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; num_of_securities_quoted := num_of_securities_quoted_value; index_level_code := index_level_code_value; type_of_level := type_of_level_value; level_scale_code := level_scale_code_value; percentage_scale_code := percentage_scale_code_value; variation_scale_code := variation_scale_code_value; rebroadcast_indicator := rebroadcast_indicator_value; filler_ascii_str_2 := filler_ascii_str_2_value |}, bytes)
@@ -3382,7 +3382,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -3419,7 +3419,7 @@ Module QseCashMarketDataV26.
       type_of_level : list byte;
       level_scale_code : N;
       variation_scale_code : N;
-      filler_ascii_str_3 : N;
+      filler_ascii_str_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -3448,7 +3448,7 @@ Module QseCashMarketDataV26.
       Datatypes.length (type_of_level record) = 1 /\
       (level_scale_code record < 256 ^ N.of_nat 1)%N /\
       (variation_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (filler_ascii_str_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_ascii_str_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -3475,7 +3475,7 @@ Module QseCashMarketDataV26.
       encode_bytes 1 (type_of_level record) ++
       encode_uint 1 (level_scale_code record) ++
       encode_uint 1 (variation_scale_code record) ++
-      encode_uint 3 (filler_ascii_str_3 record).
+      encode_bytes 3 (filler_ascii_str_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -3550,7 +3550,7 @@ Module QseCashMarketDataV26.
                                                                                                   match decode_uint 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (variation_scale_code_value, bytes) =>
-                                                                                                      match decode_uint 3 bytes with
+                                                                                                      match decode_bytes 3 bytes with
                                                                                                       | None => None
                                                                                                       | Some (filler_ascii_str_3_value, bytes) =>
                                                                                                           Some ({| symbol_index := symbol_index_value; source_time := source_time_value; preliminary_opening_level := preliminary_opening_level_value; preliminary_opening_time := preliminary_opening_time_value; first_level := first_level_value; first_time := first_time_value; opening_reference_level := opening_reference_level_value; opening_reference_time := opening_reference_time_value; closing_reference_level := closing_reference_level_value; closing_reference_time := closing_reference_time_value; percent_variation_prev_clos := percent_variation_prev_clos_value; high_level := high_level_value; high_time := high_time_value; low_level := low_level_value; low_time := low_time_value; clearing_level := clearing_level_value; clearing_time := clearing_time_value; liquidation_level := liquidation_level_value; liquidation_time := liquidation_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; type_of_level := type_of_level_value; level_scale_code := level_scale_code_value; variation_scale_code := variation_scale_code_value; filler_ascii_str_3 := filler_ascii_str_3_value |}, bytes)
@@ -3617,7 +3617,7 @@ Module QseCashMarketDataV26.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
       rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_24.
       destruct record. reflexivity.
     Qed.
 

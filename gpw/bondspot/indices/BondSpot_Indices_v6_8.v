@@ -511,7 +511,7 @@ Module BondSpotIndicesV68.
       marker_low : list byte;
       marker_closing_prev_session : list byte;
       marker_closing_prev_year : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -544,7 +544,7 @@ Module BondSpotIndicesV68.
       Datatypes.length (marker_low record) = 1 /\
       Datatypes.length (marker_closing_prev_session record) = 1 /\
       Datatypes.length (marker_closing_prev_year record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -575,7 +575,7 @@ Module BondSpotIndicesV68.
       encode_bytes 1 (marker_low record) ++
       encode_bytes 1 (marker_closing_prev_session record) ++
       encode_bytes 1 (marker_closing_prev_year record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -662,7 +662,7 @@ Module BondSpotIndicesV68.
                                                                                                                   match decode_bytes 1 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (marker_closing_prev_year_value, bytes) =>
-                                                                                                                      match decode_uint 1 bytes with
+                                                                                                                      match decode_bytes 1 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (reserved_1_value, bytes) =>
                                                                                                                           Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; system_id := system_id_value; closing_index_value := closing_index_value_value; ind_opening_portfolio := ind_opening_portfolio_value; opening_index_value := opening_index_value_value; session_high := session_high_value; session_low := session_low_value; pct_chg_high_index_val_prev_session := pct_chg_high_index_val_prev_session_value; pct_chg_low_index_val_prev_session := pct_chg_low_index_val_prev_session_value; pct_change_index_val_prev_session := pct_change_index_val_prev_session_value; pct_change_index_val_prev_year := pct_change_index_val_prev_year_value; capitalisation_portfolio := capitalisation_portfolio_value; index_adjustment_coefficient := index_adjustment_coefficient_value; source_time_micro_secs := source_time_micro_secs_value; level_scale_code := level_scale_code_value; capitalisation_scale_code := capitalisation_scale_code_value; index_adjustment_scale_code := index_adjustment_scale_code_value; time_closing := time_closing_value; time_opening := time_opening_value; time_full_opening := time_full_opening_value; time_high := time_high_value; time_low := time_low_value; marker_high := marker_high_value; marker_low := marker_low_value; marker_closing_prev_session := marker_closing_prev_session_value; marker_closing_prev_year := marker_closing_prev_year_value; reserved_1 := reserved_1_value |}, bytes)
@@ -737,7 +737,7 @@ Module BondSpotIndicesV68.
       rewrite decode_encode_bytes by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
-      rewrite decode_encode_uint by exact bound_28.
+      rewrite decode_encode_bytes by exact bound_28.
       destruct record. reflexivity.
     Qed.
 

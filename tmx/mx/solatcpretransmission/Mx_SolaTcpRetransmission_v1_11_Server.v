@@ -19002,21 +19002,21 @@ Module MxSolaTcpRetransmissionV111Server.
 
     (** End of Sales message *)
     Record t := {
-      reserved : N;
+      reserved : list byte;
       time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved record) = 1 /\
       Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved record) ++
+      encode_bytes 1 (reserved record) ++
       encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -19029,7 +19029,7 @@ Module MxSolaTcpRetransmissionV111Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -19039,7 +19039,7 @@ Module MxSolaTcpRetransmissionV111Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.

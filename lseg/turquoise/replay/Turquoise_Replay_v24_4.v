@@ -1123,15 +1123,15 @@ Module TurquoiseReplayV244.
       venue_of_execution : list byte;
       publication_date_and_time : list byte;
       pt_ref_price_waiver_flag : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       market_closing_price_flag : list byte;
       pt_algo_trade : list byte;
       pt_cancellation_flag : list byte;
       pt_amendment_flag : list byte;
-      reserved_1 : N;
-      reserved_3 : N;
+      reserved_1 : list byte;
+      reserved_3 : list byte;
       reserved_20 : list byte;
-      second_reserved_4 : N;
+      second_reserved_4 : list byte;
       trade_qualifier : list byte;
       market_mechanism : list byte;
       trading_mode : list byte;
@@ -1169,15 +1169,15 @@ Module TurquoiseReplayV244.
       Datatypes.length (venue_of_execution record) = 4 /\
       Datatypes.length (publication_date_and_time record) = 27 /\
       Datatypes.length (pt_ref_price_waiver_flag record) = 4 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (market_closing_price_flag record) = 4 /\
       Datatypes.length (pt_algo_trade record) = 4 /\
       Datatypes.length (pt_cancellation_flag record) = 4 /\
       Datatypes.length (pt_amendment_flag record) = 4 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (reserved_3 record) = 3 /\
       Datatypes.length (reserved_20 record) = 20 /\
-      (second_reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (second_reserved_4 record) = 4 /\
       Datatypes.length (trade_qualifier record) = 1 /\
       Datatypes.length (market_mechanism record) = 1 /\
       Datatypes.length (trading_mode record) = 1 /\
@@ -1213,15 +1213,15 @@ Module TurquoiseReplayV244.
       encode_bytes 4 (venue_of_execution record) ++
       encode_bytes 27 (publication_date_and_time record) ++
       encode_bytes 4 (pt_ref_price_waiver_flag record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 4 (market_closing_price_flag record) ++
       encode_bytes 4 (pt_algo_trade record) ++
       encode_bytes 4 (pt_cancellation_flag record) ++
       encode_bytes 4 (pt_amendment_flag record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 3 (reserved_3 record) ++
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 3 (reserved_3 record) ++
       encode_bytes 20 (reserved_20 record) ++
-      encode_uint 4 (second_reserved_4 record) ++
+      encode_bytes 4 (second_reserved_4 record) ++
       encode_bytes 1 (trade_qualifier record) ++
       encode_bytes 1 (market_mechanism record) ++
       encode_bytes 1 (trading_mode record) ++
@@ -1293,7 +1293,7 @@ Module TurquoiseReplayV244.
                                                                           match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (pt_ref_price_waiver_flag_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_bytes 4 bytes with
                                                                               | None => None
                                                                               | Some (reserved_4_value, bytes) =>
                                                                                   match decode_bytes 4 bytes with
@@ -1308,16 +1308,16 @@ Module TurquoiseReplayV244.
                                                                                               match decode_bytes 4 bytes with
                                                                                               | None => None
                                                                                               | Some (pt_amendment_flag_value, bytes) =>
-                                                                                                  match decode_uint 1 bytes with
+                                                                                                  match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (reserved_1_value, bytes) =>
-                                                                                                      match decode_uint 3 bytes with
+                                                                                                      match decode_bytes 3 bytes with
                                                                                                       | None => None
                                                                                                       | Some (reserved_3_value, bytes) =>
                                                                                                           match decode_bytes 20 bytes with
                                                                                                           | None => None
                                                                                                           | Some (reserved_20_value, bytes) =>
-                                                                                                              match decode_uint 4 bytes with
+                                                                                                              match decode_bytes 4 bytes with
                                                                                                               | None => None
                                                                                                               | Some (second_reserved_4_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -1440,15 +1440,15 @@ Module TurquoiseReplayV244.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_23.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
@@ -1493,16 +1493,16 @@ Module TurquoiseReplayV244.
       notional_currency : list byte;
       venue_of_execution : list byte;
       publication_date_and_time : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       nt_pre_trade_waiver_flag : list byte;
       pt_algo_trade : list byte;
-      second_reserved_4 : N;
+      second_reserved_4 : list byte;
       pt_cancellation_flag : list byte;
       pt_amendment_flag : list byte;
-      reserved_1 : N;
-      reserved_3 : N;
+      reserved_1 : list byte;
+      reserved_3 : list byte;
       reserved_20 : list byte;
-      third_reserved_4 : N;
+      third_reserved_4 : list byte;
       market_mechanism : list byte;
       trading_mode : list byte;
       transaction_category : list byte;
@@ -1538,16 +1538,16 @@ Module TurquoiseReplayV244.
       Datatypes.length (notional_currency record) = 3 /\
       Datatypes.length (venue_of_execution record) = 4 /\
       Datatypes.length (publication_date_and_time record) = 27 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (nt_pre_trade_waiver_flag record) = 4 /\
       Datatypes.length (pt_algo_trade record) = 4 /\
-      (second_reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (second_reserved_4 record) = 4 /\
       Datatypes.length (pt_cancellation_flag record) = 4 /\
       Datatypes.length (pt_amendment_flag record) = 4 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
+      Datatypes.length (reserved_3 record) = 3 /\
       Datatypes.length (reserved_20 record) = 20 /\
-      (third_reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (third_reserved_4 record) = 4 /\
       Datatypes.length (market_mechanism record) = 1 /\
       Datatypes.length (trading_mode record) = 1 /\
       Datatypes.length (transaction_category record) = 1 /\
@@ -1581,16 +1581,16 @@ Module TurquoiseReplayV244.
       encode_bytes 3 (notional_currency record) ++
       encode_bytes 4 (venue_of_execution record) ++
       encode_bytes 27 (publication_date_and_time record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 4 (nt_pre_trade_waiver_flag record) ++
       encode_bytes 4 (pt_algo_trade record) ++
-      encode_uint 4 (second_reserved_4 record) ++
+      encode_bytes 4 (second_reserved_4 record) ++
       encode_bytes 4 (pt_cancellation_flag record) ++
       encode_bytes 4 (pt_amendment_flag record) ++
-      encode_uint 1 (reserved_1 record) ++
-      encode_uint 3 (reserved_3 record) ++
+      encode_bytes 1 (reserved_1 record) ++
+      encode_bytes 3 (reserved_3 record) ++
       encode_bytes 20 (reserved_20 record) ++
-      encode_uint 4 (third_reserved_4 record) ++
+      encode_bytes 4 (third_reserved_4 record) ++
       encode_bytes 1 (market_mechanism record) ++
       encode_bytes 1 (trading_mode record) ++
       encode_bytes 1 (transaction_category record) ++
@@ -1658,7 +1658,7 @@ Module TurquoiseReplayV244.
                                                                       match decode_bytes 27 bytes with
                                                                       | None => None
                                                                       | Some (publication_date_and_time_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_bytes 4 bytes with
                                                                           | None => None
                                                                           | Some (reserved_4_value, bytes) =>
                                                                               match decode_bytes 4 bytes with
@@ -1667,7 +1667,7 @@ Module TurquoiseReplayV244.
                                                                                   match decode_bytes 4 bytes with
                                                                                   | None => None
                                                                                   | Some (pt_algo_trade_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_bytes 4 bytes with
                                                                                       | None => None
                                                                                       | Some (second_reserved_4_value, bytes) =>
                                                                                           match decode_bytes 4 bytes with
@@ -1676,16 +1676,16 @@ Module TurquoiseReplayV244.
                                                                                               match decode_bytes 4 bytes with
                                                                                               | None => None
                                                                                               | Some (pt_amendment_flag_value, bytes) =>
-                                                                                                  match decode_uint 1 bytes with
+                                                                                                  match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (reserved_1_value, bytes) =>
-                                                                                                      match decode_uint 3 bytes with
+                                                                                                      match decode_bytes 3 bytes with
                                                                                                       | None => None
                                                                                                       | Some (reserved_3_value, bytes) =>
                                                                                                           match decode_bytes 20 bytes with
                                                                                                           | None => None
                                                                                                           | Some (reserved_20_value, bytes) =>
-                                                                                                              match decode_uint 4 bytes with
+                                                                                                              match decode_bytes 4 bytes with
                                                                                                               | None => None
                                                                                                               | Some (third_reserved_4_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -1803,16 +1803,16 @@ Module TurquoiseReplayV244.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_bytes by exact bound_23.
+      rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.

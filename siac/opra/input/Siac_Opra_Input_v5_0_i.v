@@ -307,7 +307,7 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       security_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       expiration_block : ExpirationBlock.t;
       strike_price_denominator_code : list byte;
       strike_price : N;
@@ -315,7 +315,7 @@ Module SiacOpraInputV50I.
       premium_price_denominator_code : list byte;
       premium_price : N;
       trade_identifier : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -323,7 +323,7 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       ExpirationBlock.bounded (expiration_block record) /\
       Datatypes.length (strike_price_denominator_code record) = 1 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
@@ -331,13 +331,13 @@ Module SiacOpraInputV50I.
       Datatypes.length (premium_price_denominator_code record) = 1 /\
       (premium_price record < 256 ^ N.of_nat 4)%N /\
       (trade_identifier record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       ExpirationBlock.encode (expiration_block record) ++
       encode_bytes 1 (strike_price_denominator_code record) ++
       encode_uint 4 (strike_price record) ++
@@ -345,7 +345,7 @@ Module SiacOpraInputV50I.
       encode_bytes 1 (premium_price_denominator_code record) ++
       encode_uint 4 (premium_price record) ++
       encode_uint 4 (trade_identifier record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -357,7 +357,7 @@ Module SiacOpraInputV50I.
               match decode_bytes 5 bytes with
               | None => None
               | Some (security_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match ExpirationBlock.decode bytes with
@@ -381,7 +381,7 @@ Module SiacOpraInputV50I.
                                               match decode_uint 4 bytes with
                                               | None => None
                                               | Some (trade_identifier_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (reserved_4_value, bytes) =>
                                                       Some ({| session_indicator := session_indicator_value; participant_reference_number := participant_reference_number_value; security_symbol := security_symbol_value; reserved_1 := reserved_1_value; expiration_block := expiration_block_value; strike_price_denominator_code := strike_price_denominator_code_value; strike_price := strike_price_value; volume := volume_value; premium_price_denominator_code := premium_price_denominator_code_value; premium_price := premium_price_value; trade_identifier := trade_identifier_value; reserved_4 := reserved_4_value |}, bytes)
@@ -414,7 +414,7 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite ExpirationBlock.decode_encode by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -422,7 +422,7 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -438,7 +438,7 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       security_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       expiration_block : ExpirationBlock.t;
       strike_price_denominator_code : list byte;
       strike_price : N;
@@ -461,7 +461,7 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       ExpirationBlock.bounded (expiration_block record) /\
       Datatypes.length (strike_price_denominator_code record) = 1 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
@@ -482,7 +482,7 @@ Module SiacOpraInputV50I.
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       ExpirationBlock.encode (expiration_block record) ++
       encode_bytes 1 (strike_price_denominator_code record) ++
       encode_uint 4 (strike_price record) ++
@@ -509,7 +509,7 @@ Module SiacOpraInputV50I.
               match decode_bytes 5 bytes with
               | None => None
               | Some (security_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match ExpirationBlock.decode bytes with
@@ -594,7 +594,7 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite ExpirationBlock.decode_encode by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -625,7 +625,7 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       security_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       expiration_block : ExpirationBlock.t;
       strike_price_denominator_code : list byte;
       strike_price : N;
@@ -641,7 +641,7 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       ExpirationBlock.bounded (expiration_block record) /\
       Datatypes.length (strike_price_denominator_code record) = 1 /\
       (strike_price record < 256 ^ N.of_nat 4)%N /\
@@ -655,7 +655,7 @@ Module SiacOpraInputV50I.
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       ExpirationBlock.encode (expiration_block record) ++
       encode_bytes 1 (strike_price_denominator_code record) ++
       encode_uint 4 (strike_price record) ++
@@ -675,7 +675,7 @@ Module SiacOpraInputV50I.
               match decode_bytes 5 bytes with
               | None => None
               | Some (security_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match ExpirationBlock.decode bytes with
@@ -732,7 +732,7 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite ExpirationBlock.decode_encode by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -913,22 +913,22 @@ Module SiacOpraInputV50I.
     Record t := {
       session_indicator : N;
       participant_reference_number : N;
-      reserved_4 : N;
-      second_reserved_4 : N;
+      reserved_4 : list byte;
+      second_reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
-      (second_reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4 /\
+      Datatypes.length (second_reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
-      encode_uint 4 (reserved_4 record) ++
-      encode_uint 4 (second_reserved_4 record).
+      encode_bytes 4 (reserved_4 record) ++
+      encode_bytes 4 (second_reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -937,10 +937,10 @@ Module SiacOpraInputV50I.
           match decode_uint 4 bytes with
           | None => None
           | Some (participant_reference_number_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_bytes 4 bytes with
               | None => None
               | Some (reserved_4_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_bytes 4 bytes with
                   | None => None
                   | Some (second_reserved_4_value, bytes) =>
                       Some ({| session_indicator := session_indicator_value; participant_reference_number := participant_reference_number_value; reserved_4 := reserved_4_value; second_reserved_4 := second_reserved_4_value |}, bytes)
@@ -952,7 +952,7 @@ Module SiacOpraInputV50I.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -964,13 +964,13 @@ Module SiacOpraInputV50I.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End BlockSequenceNumberStatusInquiryRequestMessage.
 
@@ -981,7 +981,7 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       block_sequence_number : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -989,13 +989,13 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       (block_sequence_number record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_uint 4 (block_sequence_number record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1007,7 +1007,7 @@ Module SiacOpraInputV50I.
               match decode_uint 4 bytes with
               | None => None
               | Some (block_sequence_number_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_bytes 4 bytes with
                   | None => None
                   | Some (reserved_4_value, bytes) =>
                       Some ({| session_indicator := session_indicator_value; participant_reference_number := participant_reference_number_value; block_sequence_number := block_sequence_number_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1019,7 +1019,7 @@ Module SiacOpraInputV50I.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1032,12 +1032,12 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End BlockSequenceNumberStatusResponseMessage.
 
@@ -1047,19 +1047,19 @@ Module SiacOpraInputV50I.
     Record t := {
       session_indicator : N;
       participant_reference_number : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1068,7 +1068,7 @@ Module SiacOpraInputV50I.
           match decode_uint 4 bytes with
           | None => None
           | Some (participant_reference_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_bytes 8 bytes with
               | None => None
               | Some (reserved_8_value, bytes) =>
                   Some ({| session_indicator := session_indicator_value; participant_reference_number := participant_reference_number_value; reserved_8 := reserved_8_value |}, bytes)
@@ -1079,7 +1079,7 @@ Module SiacOpraInputV50I.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1091,12 +1091,12 @@ Module SiacOpraInputV50I.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End MessageCountStatusInquiryRequestMessage.
 
@@ -1166,10 +1166,10 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       security_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       index_value_denominator_code : list byte;
       index_value : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1177,19 +1177,19 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (index_value_denominator_code record) = 1 /\
       (index_value record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (index_value_denominator_code record) ++
       encode_uint 4 (index_value record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1201,7 +1201,7 @@ Module SiacOpraInputV50I.
               match decode_bytes 5 bytes with
               | None => None
               | Some (security_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1210,7 +1210,7 @@ Module SiacOpraInputV50I.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (index_value_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
                                   Some ({| session_indicator := session_indicator_value; participant_reference_number := participant_reference_number_value; security_symbol := security_symbol_value; reserved_1 := reserved_1_value; index_value_denominator_code := index_value_denominator_code_value; index_value := index_value_value; reserved_4 := reserved_4_value |}, bytes)
@@ -1238,10 +1238,10 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -1257,7 +1257,7 @@ Module SiacOpraInputV50I.
       session_indicator : N;
       participant_reference_number : N;
       security_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       index_value_denominator_code : list byte;
       bid_index_value : N;
       offer_index_value : N;
@@ -1268,7 +1268,7 @@ Module SiacOpraInputV50I.
       (session_indicator record < 256 ^ N.of_nat 1)%N /\
       (participant_reference_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_symbol record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (index_value_denominator_code record) = 1 /\
       (bid_index_value record < 256 ^ N.of_nat 4)%N /\
       (offer_index_value record < 256 ^ N.of_nat 4)%N.
@@ -1277,7 +1277,7 @@ Module SiacOpraInputV50I.
       encode_uint 1 (session_indicator record) ++
       encode_uint 4 (participant_reference_number record) ++
       encode_bytes 5 (security_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (index_value_denominator_code record) ++
       encode_uint 4 (bid_index_value record) ++
       encode_uint 4 (offer_index_value record).
@@ -1292,7 +1292,7 @@ Module SiacOpraInputV50I.
               match decode_bytes 5 bytes with
               | None => None
               | Some (security_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1329,7 +1329,7 @@ Module SiacOpraInputV50I.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.

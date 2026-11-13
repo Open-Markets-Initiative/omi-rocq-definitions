@@ -464,16 +464,16 @@ Module LsegMillenniumLevel2ReplayV119.
     Record t := {
       nanosecond : N;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       symbol_status : list byte;
       isin : list byte;
       sedol : list byte;
       segment : list byte;
       underlying : list byte;
       currency : list byte;
-      reserved_byte : N;
-      reserved_4 : N;
+      reserved_byte : list byte;
+      reserved_4 : list byte;
       previous_close_price : N;
     }.
 
@@ -481,31 +481,31 @@ Module LsegMillenniumLevel2ReplayV119.
     Definition bounded (record : t) : Prop :=
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       Datatypes.length (symbol_status record) = 1 /\
       Datatypes.length (isin record) = 12 /\
       Datatypes.length (sedol record) = 12 /\
       Datatypes.length (segment record) = 6 /\
       Datatypes.length (underlying record) = 6 /\
       Datatypes.length (currency record) = 3 /\
-      (reserved_byte record < 256 ^ N.of_nat 1)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_byte record) = 1 /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (previous_close_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_bytes 1 (symbol_status record) ++
       encode_bytes 12 (isin record) ++
       encode_bytes 12 (sedol record) ++
       encode_bytes 6 (segment record) ++
       encode_bytes 6 (underlying record) ++
       encode_bytes 3 (currency record) ++
-      encode_uint 1 (reserved_byte record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 1 (reserved_byte record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 8 (previous_close_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -515,10 +515,10 @@ Module LsegMillenniumLevel2ReplayV119.
           match decode_uint 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_a_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_b_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -539,10 +539,10 @@ Module LsegMillenniumLevel2ReplayV119.
                                           match decode_bytes 3 bytes with
                                           | None => None
                                           | Some (currency_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (reserved_byte_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (reserved_4_value, bytes) =>
                                                       match decode_uint 8 bytes with
@@ -578,16 +578,16 @@ Module LsegMillenniumLevel2ReplayV119.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
@@ -761,11 +761,11 @@ Module LsegMillenniumLevel2ReplayV119.
     Record t := {
       nanosecond : N;
       paired_quantity : N;
-      reserved_4 : N;
-      reserved_1 : N;
+      reserved_4 : list byte;
+      reserved_1 : list byte;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       price : N;
       auction_type : list byte;
     }.
@@ -774,22 +774,22 @@ Module LsegMillenniumLevel2ReplayV119.
     Definition bounded (record : t) : Prop :=
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (paired_quantity record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (auction_type record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (paired_quantity record) ++
-      encode_uint 4 (reserved_4 record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 4 (reserved_4 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (auction_type record).
 
@@ -800,19 +800,19 @@ Module LsegMillenniumLevel2ReplayV119.
           match decode_uint 4 bytes with
           | None => None
           | Some (paired_quantity_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_bytes 4 bytes with
               | None => None
               | Some (reserved_4_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (instrument_id_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_a_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_b_value, bytes) =>
                                   match decode_uint 8 bytes with
@@ -847,11 +847,11 @@ Module LsegMillenniumLevel2ReplayV119.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.

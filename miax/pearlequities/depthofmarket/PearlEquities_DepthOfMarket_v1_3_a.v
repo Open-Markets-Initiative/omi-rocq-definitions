@@ -145,7 +145,7 @@ Module PearlEquitiesDepthOfMarketV13A.
       nanoseconds : N;
       symbol_id : N;
       ticker_symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       test_security_indicator : list byte;
       spare : N;
       lot_size : N;
@@ -159,7 +159,7 @@ Module PearlEquitiesDepthOfMarketV13A.
       (nanoseconds record < 256 ^ N.of_nat 4)%N /\
       (symbol_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ticker_symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (test_security_indicator record) = 1 /\
       (spare record < 256 ^ N.of_nat 1)%N /\
       (lot_size record < 256 ^ N.of_nat 2)%N /\
@@ -171,7 +171,7 @@ Module PearlEquitiesDepthOfMarketV13A.
       encode_uint 4 (nanoseconds record) ++
       encode_uint 4 (symbol_id record) ++
       encode_bytes 11 (ticker_symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (test_security_indicator record) ++
       encode_uint 1 (spare record) ++
       encode_uint 2 (lot_size record) ++
@@ -189,7 +189,7 @@ Module PearlEquitiesDepthOfMarketV13A.
               match decode_bytes 11 bytes with
               | None => None
               | Some (ticker_symbol_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -238,7 +238,7 @@ Module PearlEquitiesDepthOfMarketV13A.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.

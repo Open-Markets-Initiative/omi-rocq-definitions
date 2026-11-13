@@ -340,7 +340,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
     Record t := {
       symbol_index : N;
       symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
       system_id : N;
       exchange_code : list byte;
@@ -361,7 +361,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
     Definition bounded (record : t) : Prop :=
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exchange_code record) = 1 /\
@@ -380,7 +380,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
@@ -403,7 +403,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
           match decode_bytes 11 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -482,7 +482,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -582,7 +582,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       symbol_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       price_1 : N;
       price_2 : N;
       ssr_triggering_exchange_id : list byte;
@@ -601,7 +601,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (price_1 record < 256 ^ N.of_nat 4)%N /\
       (price_2 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ssr_triggering_exchange_id record) = 1 /\
@@ -618,7 +618,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (price_1 record) ++
       encode_uint 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
@@ -647,7 +647,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
                                   match decode_uint 4 bytes with
@@ -710,7 +710,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1169,7 +1169,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       num_extensions : N;
       unpaired_qty : N;
       unpaired_side : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1196,7 +1196,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       (num_extensions record < 256 ^ N.of_nat 1)%N /\
       (unpaired_qty record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (unpaired_side record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1221,7 +1221,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       encode_uint 1 (num_extensions record) ++
       encode_uint 4 (unpaired_qty record) ++
       encode_bytes 1 (unpaired_side record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1290,7 +1290,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
                                                                                           match decode_bytes 1 bytes with
                                                                                           | None => None
                                                                                           | Some (unpaired_side_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (reserved_1_value, bytes) =>
                                                                                                   Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; symbol_seq_num := symbol_seq_num_value; reference_price := reference_price_value; paired_qty := paired_qty_value; total_imbalance_qty := total_imbalance_qty_value; market_imbalance_qty := market_imbalance_qty_value; auction_time := auction_time_value; auction_type := auction_type_value; imbalance_side := imbalance_side_value; continuous_book_clearing_price := continuous_book_clearing_price_value; auction_interest_clearing_price := auction_interest_clearing_price_value; ssr_filing_price := ssr_filing_price_value; indicative_match_price := indicative_match_price_value; upper_collar := upper_collar_value; lower_collar := lower_collar_value; auction_status := auction_status_value; freeze_status := freeze_status_value; num_extensions := num_extensions_value; unpaired_qty := unpaired_qty_value; unpaired_side := unpaired_side_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1353,7 +1353,7 @@ Module ArcaEquitiesImbalancesFeedV22O.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       destruct record. reflexivity.
     Qed.
 

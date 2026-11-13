@@ -172,7 +172,7 @@ Module IceFuturesMdfV1151.
       last_trade_date_time : N;
       settle_price_date_time : N;
       last_message_sequence_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       open_interest_date : list byte;
       is_settle_price_official : list byte;
       settlement_price : N;
@@ -201,7 +201,7 @@ Module IceFuturesMdfV1151.
       (last_trade_date_time record < 256 ^ N.of_nat 8)%N /\
       (settle_price_date_time record < 256 ^ N.of_nat 8)%N /\
       (last_message_sequence_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (open_interest_date record) = 10 /\
       Datatypes.length (is_settle_price_official record) = 1 /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
@@ -228,7 +228,7 @@ Module IceFuturesMdfV1151.
       encode_uint 8 (last_trade_date_time record) ++
       encode_uint 8 (settle_price_date_time record) ++
       encode_uint 4 (last_message_sequence_id record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 10 (open_interest_date record) ++
       encode_bytes 1 (is_settle_price_official record) ++
       encode_uint 8 (settlement_price record) ++
@@ -293,7 +293,7 @@ Module IceFuturesMdfV1151.
                                                                               match decode_uint 4 bytes with
                                                                               | None => None
                                                                               | Some (last_message_sequence_id_value, bytes) =>
-                                                                                  match decode_uint 2 bytes with
+                                                                                  match decode_bytes 2 bytes with
                                                                                   | None => None
                                                                                   | Some (reserved_2_value, bytes) =>
                                                                                       match decode_bytes 10 bytes with
@@ -370,7 +370,7 @@ Module IceFuturesMdfV1151.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.

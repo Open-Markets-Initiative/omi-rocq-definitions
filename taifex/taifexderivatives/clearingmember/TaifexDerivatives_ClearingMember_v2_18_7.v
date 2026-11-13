@@ -400,7 +400,7 @@ Module TaifexDerivativesClearingMemberV2187.
       wide_status_code : N;
       part_id : N;
       end_out_bound_num : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -409,14 +409,14 @@ Module TaifexDerivativesClearingMemberV2187.
       (wide_status_code record < 256 ^ N.of_nat 2)%N /\
       (part_id record < 256 ^ N.of_nat 1)%N /\
       (end_out_bound_num record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       SubHdr.encode (sub_hdr record) ++
       encode_uint 2 (wide_status_code record) ++
       encode_uint 1 (part_id record) ++
       encode_uint 4 (end_out_bound_num record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match SubHdr.decode bytes with
@@ -431,7 +431,7 @@ Module TaifexDerivativesClearingMemberV2187.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (end_out_bound_num_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_bytes 8 bytes with
                       | None => None
                       | Some (reserved_8_value, bytes) =>
                           Some ({| sub_hdr := sub_hdr_value; wide_status_code := wide_status_code_value; part_id := part_id_value; end_out_bound_num := end_out_bound_num_value; reserved_8 := reserved_8_value |}, bytes)
@@ -444,7 +444,7 @@ Module TaifexDerivativesClearingMemberV2187.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 21.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !SubHdr.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !SubHdr.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -458,12 +458,12 @@ Module TaifexDerivativesClearingMemberV2187.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply SubHdr.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubHdr.eq_dec]. Defined.
 
   End FinalSequentialNumberNotificationForGroupMessage.
 

@@ -655,7 +655,7 @@ Module C2OptionsComplexV2161.
       quantity_long : N;
       complex_instrument_id : list byte;
       signed_price_long : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -666,7 +666,7 @@ Module C2OptionsComplexV2161.
       (quantity_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (complex_instrument_id record) = 6 /\
       (signed_price_long record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -675,7 +675,7 @@ Module C2OptionsComplexV2161.
       encode_uint 4 (quantity_long record) ++
       encode_bytes 6 (complex_instrument_id record) ++
       encode_uint 8 (signed_price_long record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -696,7 +696,7 @@ Module C2OptionsComplexV2161.
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_1_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_long := quantity_long_value; complex_instrument_id := complex_instrument_id_value; signed_price_long := signed_price_long_value; reserved_1 := reserved_1_value |}, bytes)
@@ -727,7 +727,7 @@ Module C2OptionsComplexV2161.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -746,7 +746,7 @@ Module C2OptionsComplexV2161.
       quantity_short : N;
       complex_instrument_id : list byte;
       signed_price_short : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -757,7 +757,7 @@ Module C2OptionsComplexV2161.
       (quantity_short record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (complex_instrument_id record) = 6 /\
       (signed_price_short record < 256 ^ N.of_nat 2)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
@@ -766,7 +766,7 @@ Module C2OptionsComplexV2161.
       encode_uint 2 (quantity_short record) ++
       encode_bytes 6 (complex_instrument_id record) ++
       encode_uint 2 (signed_price_short record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -787,7 +787,7 @@ Module C2OptionsComplexV2161.
                           match decode_uint 2 bytes with
                           | None => None
                           | Some (signed_price_short_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_1_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_short := quantity_short_value; complex_instrument_id := complex_instrument_id_value; signed_price_short := signed_price_short_value; reserved_1 := reserved_1_value |}, bytes)
@@ -818,7 +818,7 @@ Module C2OptionsComplexV2161.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -833,31 +833,31 @@ Module C2OptionsComplexV2161.
     Record t := {
       time_offset : N;
       complex_symbol_id : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       trading_status : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       gth_trading_status : list byte;
-      second_reserved_1 : N;
+      second_reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (complex_symbol_id record) = 6 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (trading_status record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (gth_trading_status record) = 1 /\
-      (second_reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 6 (complex_symbol_id record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (gth_trading_status record) ++
-      encode_uint 1 (second_reserved_1 record).
+      encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -866,19 +866,19 @@ Module C2OptionsComplexV2161.
           match decode_bytes 6 bytes with
           | None => None
           | Some (complex_symbol_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (gth_trading_status_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (second_reserved_1_value, bytes) =>
                                   Some ({| time_offset := time_offset_value; complex_symbol_id := complex_symbol_id_value; reserved_2 := reserved_2_value; trading_status := trading_status_value; reserved_1 := reserved_1_value; gth_trading_status := gth_trading_status_value; second_reserved_1 := second_reserved_1_value |}, bytes)
@@ -905,11 +905,11 @@ Module C2OptionsComplexV2161.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 

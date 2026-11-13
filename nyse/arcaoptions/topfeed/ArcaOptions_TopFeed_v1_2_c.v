@@ -280,26 +280,26 @@ Module ArcaOptionsTopFeedV12C.
     (** This message is sent at the start of every second during periods of active data publication *)
     Record t := {
       id : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       source_time : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (source_time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (id record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (source_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
       | Some (id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_bytes 4 bytes with
           | None => None
           | Some (reserved_4_value, bytes) =>
               match decode_uint 4 bytes with
@@ -313,7 +313,7 @@ Module ArcaOptionsTopFeedV12C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -324,13 +324,13 @@ Module ArcaOptionsTopFeedV12C.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End TimeReferenceMessage.
 
@@ -340,7 +340,7 @@ Module ArcaOptionsTopFeedV12C.
     Record t := {
       symbol_index : N;
       symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
       system_id : N;
       exchange_code : list byte;
@@ -351,14 +351,14 @@ Module ArcaOptionsTopFeedV12C.
       prev_close_volume : N;
       price_resolution : N;
       round_lot : list byte;
-      reserved_6 : N;
+      reserved_6 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exchange_code record) = 1 /\
@@ -369,12 +369,12 @@ Module ArcaOptionsTopFeedV12C.
       (prev_close_volume record < 256 ^ N.of_nat 4)%N /\
       (price_resolution record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (round_lot record) = 1 /\
-      (reserved_6 record < 256 ^ N.of_nat 6)%N.
+      Datatypes.length (reserved_6 record) = 6.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
@@ -385,7 +385,7 @@ Module ArcaOptionsTopFeedV12C.
       encode_uint 4 (prev_close_volume record) ++
       encode_uint 1 (price_resolution record) ++
       encode_bytes 1 (round_lot record) ++
-      encode_uint 6 (reserved_6 record).
+      encode_bytes 6 (reserved_6 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -394,7 +394,7 @@ Module ArcaOptionsTopFeedV12C.
           match decode_bytes 11 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -427,7 +427,7 @@ Module ArcaOptionsTopFeedV12C.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (round_lot_value, bytes) =>
-                                                          match decode_uint 6 bytes with
+                                                          match decode_bytes 6 bytes with
                                                           | None => None
                                                           | Some (reserved_6_value, bytes) =>
                                                               Some ({| symbol_index := symbol_index_value; symbol := symbol_value; reserved_1 := reserved_1_value; market_id := market_id_value; system_id := system_id_value; exchange_code := exchange_code_value; price_scale_code := price_scale_code_value; security_type := security_type_value; lot_size := lot_size_value; prev_close_price := prev_close_price_value; prev_close_volume := prev_close_volume_value; price_resolution := price_resolution_value; round_lot := round_lot_value; reserved_6 := reserved_6_value |}, bytes)
@@ -461,7 +461,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -472,7 +472,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       destruct record. reflexivity.
     Qed.
 
@@ -974,7 +974,7 @@ Module ArcaOptionsTopFeedV12C.
       symbol_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       price_1 : N;
       price_2 : N;
       ssr_triggering_exchange_id : list byte;
@@ -993,7 +993,7 @@ Module ArcaOptionsTopFeedV12C.
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (price_1 record < 256 ^ N.of_nat 4)%N /\
       (price_2 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ssr_triggering_exchange_id record) = 1 /\
@@ -1010,7 +1010,7 @@ Module ArcaOptionsTopFeedV12C.
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (price_1 record) ++
       encode_uint 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
@@ -1039,7 +1039,7 @@ Module ArcaOptionsTopFeedV12C.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
                                   match decode_uint 4 bytes with
@@ -1102,7 +1102,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1136,7 +1136,7 @@ Module ArcaOptionsTopFeedV12C.
       put_or_call : N;
       strike_price : list byte;
       closing_only_indicator : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1154,7 +1154,7 @@ Module ArcaOptionsTopFeedV12C.
       (put_or_call record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (strike_price record) = 10 /\
       Datatypes.length (closing_only_indicator record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (series_index record) ++
@@ -1170,7 +1170,7 @@ Module ArcaOptionsTopFeedV12C.
       encode_uint 1 (put_or_call record) ++
       encode_bytes 10 (strike_price record) ++
       encode_bytes 1 (closing_only_indicator record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1212,7 +1212,7 @@ Module ArcaOptionsTopFeedV12C.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (closing_only_indicator_value, bytes) =>
-                                                          match decode_uint 1 bytes with
+                                                          match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (reserved_1_value, bytes) =>
                                                               Some ({| series_index := series_index_value; series_type := series_type_value; market_id := market_id_value; system_id := system_id_value; option_symbol_root := option_symbol_root_value; underlying_symbol := underlying_symbol_value; underlying_index := underlying_index_value; price_scale_code := price_scale_code_value; contract_multiplier := contract_multiplier_value; maturity_date := maturity_date_value; put_or_call := put_or_call_value; strike_price := strike_price_value; closing_only_indicator := closing_only_indicator_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1257,7 +1257,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       destruct record. reflexivity.
     Qed.
 
@@ -1369,7 +1369,7 @@ Module ArcaOptionsTopFeedV12C.
       bid_price : N;
       bid_volume : N;
       quote_condition : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       ask_customer_volume : N;
       bid_customer_volume : N;
     }.
@@ -1384,7 +1384,7 @@ Module ArcaOptionsTopFeedV12C.
       (bid_price record < 256 ^ N.of_nat 4)%N /\
       (bid_volume record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (quote_condition record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (ask_customer_volume record < 256 ^ N.of_nat 4)%N /\
       (bid_customer_volume record < 256 ^ N.of_nat 4)%N.
 
@@ -1397,7 +1397,7 @@ Module ArcaOptionsTopFeedV12C.
       encode_uint 4 (bid_price record) ++
       encode_uint 4 (bid_volume record) ++
       encode_bytes 1 (quote_condition record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 4 (ask_customer_volume record) ++
       encode_uint 4 (bid_customer_volume record).
 
@@ -1426,7 +1426,7 @@ Module ArcaOptionsTopFeedV12C.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (quote_condition_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_1_value, bytes) =>
                                           match decode_uint 4 bytes with
@@ -1469,7 +1469,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       destruct record. reflexivity.
@@ -1486,7 +1486,7 @@ Module ArcaOptionsTopFeedV12C.
     Record t := {
       series : list byte;
       opening : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       offical : list byte;
     }.
 
@@ -1494,13 +1494,13 @@ Module ArcaOptionsTopFeedV12C.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (series record) = 1 /\
       Datatypes.length (opening record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (offical record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (series record) ++
       encode_bytes 1 (opening record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (offical record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1510,7 +1510,7 @@ Module ArcaOptionsTopFeedV12C.
           match decode_bytes 1 bytes with
           | None => None
           | Some (opening_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1525,7 +1525,7 @@ Module ArcaOptionsTopFeedV12C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1537,7 +1537,7 @@ Module ArcaOptionsTopFeedV12C.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -1726,23 +1726,23 @@ Module ArcaOptionsTopFeedV12C.
     (** Correction Condition *)
     Record t := {
       transaction : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (transaction record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (transaction record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (transaction_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (reserved_3_value, bytes) =>
               Some ({| transaction := transaction_value; reserved_3 := reserved_3_value |}, bytes)
@@ -1752,7 +1752,7 @@ Module ArcaOptionsTopFeedV12C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1763,7 +1763,7 @@ Module ArcaOptionsTopFeedV12C.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1887,16 +1887,16 @@ Module ArcaOptionsTopFeedV12C.
       source_time_ns : N;
       series_index : N;
       series_seq_num : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       paired_qty : N;
       total_imbalance_qty : N;
       market_imbalance_qty : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       auction_type : list byte;
       imbalance_side : list byte;
       continuous_book_clearing_price : N;
       auction_interest_clearing_price : N;
-      second_reserved_4 : N;
+      second_reserved_4 : list byte;
       indicative_match_price : N;
       upper_collar : N;
       lower_collar : N;
@@ -1909,16 +1909,16 @@ Module ArcaOptionsTopFeedV12C.
       (source_time_ns record < 256 ^ N.of_nat 4)%N /\
       (series_index record < 256 ^ N.of_nat 4)%N /\
       (series_seq_num record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (paired_qty record < 256 ^ N.of_nat 4)%N /\
       (total_imbalance_qty record < 256 ^ N.of_nat 4)%N /\
       (market_imbalance_qty record < 256 ^ N.of_nat 4)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (imbalance_side record) = 1 /\
       (continuous_book_clearing_price record < 256 ^ N.of_nat 4)%N /\
       (auction_interest_clearing_price record < 256 ^ N.of_nat 4)%N /\
-      (second_reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (second_reserved_4 record) = 4 /\
       (indicative_match_price record < 256 ^ N.of_nat 4)%N /\
       (upper_collar record < 256 ^ N.of_nat 4)%N /\
       (lower_collar record < 256 ^ N.of_nat 4)%N /\
@@ -1929,16 +1929,16 @@ Module ArcaOptionsTopFeedV12C.
       encode_uint 4 (source_time_ns record) ++
       encode_uint 4 (series_index record) ++
       encode_uint 4 (series_seq_num record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (paired_qty record) ++
       encode_uint 4 (total_imbalance_qty record) ++
       encode_uint 4 (market_imbalance_qty record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (imbalance_side record) ++
       encode_uint 4 (continuous_book_clearing_price record) ++
       encode_uint 4 (auction_interest_clearing_price record) ++
-      encode_uint 4 (second_reserved_4 record) ++
+      encode_bytes 4 (second_reserved_4 record) ++
       encode_uint 4 (indicative_match_price record) ++
       encode_uint 4 (upper_collar record) ++
       encode_uint 4 (lower_collar record) ++
@@ -1957,7 +1957,7 @@ Module ArcaOptionsTopFeedV12C.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_bytes 4 bytes with
                       | None => None
                       | Some (reserved_4_value, bytes) =>
                           match decode_uint 4 bytes with
@@ -1969,7 +1969,7 @@ Module ArcaOptionsTopFeedV12C.
                                   match decode_uint 4 bytes with
                                   | None => None
                                   | Some (market_imbalance_qty_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_bytes 2 bytes with
                                       | None => None
                                       | Some (reserved_2_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -1984,7 +1984,7 @@ Module ArcaOptionsTopFeedV12C.
                                                       match decode_uint 4 bytes with
                                                       | None => None
                                                       | Some (auction_interest_clearing_price_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_bytes 4 bytes with
                                                           | None => None
                                                           | Some (second_reserved_4_value, bytes) =>
                                                               match decode_uint 4 bytes with
@@ -2036,16 +2036,16 @@ Module ArcaOptionsTopFeedV12C.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.

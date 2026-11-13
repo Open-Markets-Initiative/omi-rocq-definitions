@@ -184,7 +184,7 @@ Module MiaxOptionsAisV25Tcp.
       liquidity_acceptance_increment_indicator : list byte;
       opening_underlying_market_code : list byte;
       priority_quote_width : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -205,7 +205,7 @@ Module MiaxOptionsAisV25Tcp.
       Datatypes.length (liquidity_acceptance_increment_indicator record) = 1 /\
       Datatypes.length (opening_underlying_market_code record) = 1 /\
       (priority_quote_width record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -224,7 +224,7 @@ Module MiaxOptionsAisV25Tcp.
       encode_bytes 1 (liquidity_acceptance_increment_indicator record) ++
       encode_bytes 1 (opening_underlying_market_code record) ++
       encode_uint 4 (priority_quote_width record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -275,7 +275,7 @@ Module MiaxOptionsAisV25Tcp.
                                                                   match decode_uint 4 bytes with
                                                                   | None => None
                                                                   | Some (priority_quote_width_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_bytes 8 bytes with
                                                                       | None => None
                                                                       | Some (reserved_8_value, bytes) =>
                                                                           Some ({| nanoseconds := nanoseconds_value; product_id := product_id_value; underlying_symbol := underlying_symbol_value; security_symbol := security_symbol_value; expiration_date := expiration_date_value; strike_price := strike_price_value; call_or_put := call_or_put_value; opening_time := opening_time_value; closing_time := closing_time_value; restricted_option := restricted_option_value; long_term_option := long_term_option_value; active_on_miax := active_on_miax_value; miax_bbo_posting_increment_indicator := miax_bbo_posting_increment_indicator_value; liquidity_acceptance_increment_indicator := liquidity_acceptance_increment_indicator_value; opening_underlying_market_code := opening_underlying_market_code_value; priority_quote_width := priority_quote_width_value; reserved_8 := reserved_8_value |}, bytes)
@@ -326,7 +326,7 @@ Module MiaxOptionsAisV25Tcp.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -417,7 +417,7 @@ Module MiaxOptionsAisV25Tcp.
       quantity_3 : N;
       quantity_4 : N;
       attributable_id : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -433,7 +433,7 @@ Module MiaxOptionsAisV25Tcp.
       (quantity_3 record < 256 ^ N.of_nat 4)%N /\
       (quantity_4 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (attributable_id record) = 4 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -447,7 +447,7 @@ Module MiaxOptionsAisV25Tcp.
       encode_uint 4 (quantity_3 record) ++
       encode_uint 4 (quantity_4 record) ++
       encode_bytes 4 (attributable_id record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -483,7 +483,7 @@ Module MiaxOptionsAisV25Tcp.
                                               match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (attributable_id_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_bytes 8 bytes with
                                                   | None => None
                                                   | Some (reserved_8_value, bytes) =>
                                                       Some ({| nanoseconds := nanoseconds_value; product_id := product_id_value; event_type := event_type_value; event_id := event_id_value; price_short := price_short_value; imbalance_side := imbalance_side_value; quantity_1 := quantity_1_value; quantity_2 := quantity_2_value; quantity_3 := quantity_3_value; quantity_4 := quantity_4_value; attributable_id := attributable_id_value; reserved_8 := reserved_8_value |}, bytes)
@@ -524,7 +524,7 @@ Module MiaxOptionsAisV25Tcp.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -546,7 +546,7 @@ Module MiaxOptionsAisV25Tcp.
       matched_quantity : N;
       imbalance_quantity_signed : N;
       attributable_id : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -560,7 +560,7 @@ Module MiaxOptionsAisV25Tcp.
       (matched_quantity record < 256 ^ N.of_nat 4)%N /\
       (imbalance_quantity_signed record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (attributable_id record) = 4 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -572,7 +572,7 @@ Module MiaxOptionsAisV25Tcp.
       encode_uint 4 (matched_quantity record) ++
       encode_uint 4 (imbalance_quantity_signed record) ++
       encode_bytes 4 (attributable_id record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -602,7 +602,7 @@ Module MiaxOptionsAisV25Tcp.
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (attributable_id_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_bytes 8 bytes with
                                           | None => None
                                           | Some (reserved_8_value, bytes) =>
                                               Some ({| nanoseconds := nanoseconds_value; strategy_id := strategy_id_value; event_type := event_type_value; event_id := event_id_value; side := side_value; price_long := price_long_value; matched_quantity := matched_quantity_value; imbalance_quantity_signed := imbalance_quantity_signed_value; attributable_id := attributable_id_value; reserved_8 := reserved_8_value |}, bytes)
@@ -639,7 +639,7 @@ Module MiaxOptionsAisV25Tcp.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -761,7 +761,7 @@ Module MiaxOptionsAisV25Tcp.
       opening_condition : list byte;
       mbb : N;
       mbo : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -792,7 +792,7 @@ Module MiaxOptionsAisV25Tcp.
       Datatypes.length (opening_condition record) = 1 /\
       (mbb record < 256 ^ N.of_nat 4)%N /\
       (mbo record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -821,7 +821,7 @@ Module MiaxOptionsAisV25Tcp.
       encode_bytes 1 (opening_condition record) ++
       encode_uint 4 (mbb record) ++
       encode_uint 4 (mbo record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -902,7 +902,7 @@ Module MiaxOptionsAisV25Tcp.
                                                                                                           match decode_uint 4 bytes with
                                                                                                           | None => None
                                                                                                           | Some (mbo_value, bytes) =>
-                                                                                                              match decode_uint 8 bytes with
+                                                                                                              match decode_bytes 8 bytes with
                                                                                                               | None => None
                                                                                                               | Some (reserved_8_value, bytes) =>
                                                                                                                   Some ({| nanoseconds := nanoseconds_value; product_id := product_id_value; underlying_symbol := underlying_symbol_value; security_symbol := security_symbol_value; expiration_date := expiration_date_value; strike_price := strike_price_value; call_or_put := call_or_put_value; option_state := option_state_value; prior_day_reference_price := prior_day_reference_price_value; settlement_reference_price := settlement_reference_price_value; settlement_reference_price_type := settlement_reference_price_type_value; sao_buy_quantity_1 := sao_buy_quantity_1_value; sao_sell_quantity_1 := sao_sell_quantity_1_value; sao_buy_quantity_2 := sao_buy_quantity_2_value; sao_sell_quantity_2 := sao_sell_quantity_2_value; non_sao_buy_quantity := non_sao_buy_quantity_value; non_sao_sell_quantity := non_sao_sell_quantity_value; total_buy_quantity := total_buy_quantity_value; total_sell_quantity := total_sell_quantity_value; imbalance_side := imbalance_side_value; imbalance_quantity_unsigned := imbalance_quantity_unsigned_value; must_fill_quantity := must_fill_quantity_value; matched_quantity := matched_quantity_value; opening_condition := opening_condition_value; mbb := mbb_value; mbo := mbo_value; reserved_8 := reserved_8_value |}, bytes)
@@ -973,7 +973,7 @@ Module MiaxOptionsAisV25Tcp.
       rewrite decode_encode_bytes by exact bound_23.
       rewrite decode_encode_uint by exact bound_24.
       rewrite decode_encode_uint by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_bytes by exact bound_26.
       destruct record. reflexivity.
     Qed.
 

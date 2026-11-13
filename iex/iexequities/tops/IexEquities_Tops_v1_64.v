@@ -36,7 +36,7 @@ Module IexEquitiesTopsV164.
     (** IexTp packet header *)
     Record t := {
       version : N;
-      reserved : N;
+      reserved : list byte;
       message_protocol_id : N;
       channel_id : N;
       session_id : N;
@@ -50,7 +50,7 @@ Module IexEquitiesTopsV164.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (version record < 256 ^ N.of_nat 1)%N /\
-      (reserved record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved record) = 1 /\
       (message_protocol_id record < 256 ^ N.of_nat 2)%N /\
       (channel_id record < 256 ^ N.of_nat 4)%N /\
       (session_id record < 256 ^ N.of_nat 4)%N /\
@@ -62,7 +62,7 @@ Module IexEquitiesTopsV164.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (version record) ++
-      encode_uint 1 (reserved record) ++
+      encode_bytes 1 (reserved record) ++
       encode_uint 2 (message_protocol_id record) ++
       encode_uint 4 (channel_id record) ++
       encode_uint 4 (session_id record) ++
@@ -76,7 +76,7 @@ Module IexEquitiesTopsV164.
       match decode_uint 1 bytes with
       | None => None
       | Some (version_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_bytes 1 bytes with
           | None => None
           | Some (reserved_value, bytes) =>
               match decode_uint 2 bytes with
@@ -118,7 +118,7 @@ Module IexEquitiesTopsV164.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -129,7 +129,7 @@ Module IexEquitiesTopsV164.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
@@ -142,7 +142,7 @@ Module IexEquitiesTopsV164.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End IextpHeader.
 

@@ -880,8 +880,8 @@ Module JseItacMarketDataV407.
       nanosecond : N;
       quantity : N;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       price : N;
       trade_id : N;
       auction_type : list byte;
@@ -898,8 +898,8 @@ Module JseItacMarketDataV407.
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (quantity record < 256 ^ N.of_nat 4)%N /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (trade_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (auction_type record) = 1 /\
@@ -914,8 +914,8 @@ Module JseItacMarketDataV407.
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (quantity record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_uint 8 (price record) ++
       encode_uint 8 (trade_id record) ++
       encode_bytes 1 (auction_type record) ++
@@ -936,10 +936,10 @@ Module JseItacMarketDataV407.
               match decode_uint 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_a_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_b_value, bytes) =>
                           match decode_uint 8 bytes with
@@ -1001,8 +1001,8 @@ Module JseItacMarketDataV407.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -1027,8 +1027,8 @@ Module JseItacMarketDataV407.
       nanosecond : N;
       executed_quantity : N;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       price : N;
       trade_id : N;
       off_book_trade_type : list byte;
@@ -1045,8 +1045,8 @@ Module JseItacMarketDataV407.
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (executed_quantity record < 256 ^ N.of_nat 4)%N /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (trade_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (off_book_trade_type record) = 4 /\
@@ -1061,8 +1061,8 @@ Module JseItacMarketDataV407.
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (executed_quantity record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_uint 8 (price record) ++
       encode_uint 8 (trade_id record) ++
       encode_bytes 4 (off_book_trade_type record) ++
@@ -1083,10 +1083,10 @@ Module JseItacMarketDataV407.
               match decode_uint 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_a_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_b_value, bytes) =>
                           match decode_uint 8 bytes with
@@ -1148,8 +1148,8 @@ Module JseItacMarketDataV407.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -1173,11 +1173,11 @@ Module JseItacMarketDataV407.
     Record t := {
       nanosecond : N;
       paired_quantity : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       imbalance_direction : list byte;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       price : N;
       auction_type : list byte;
     }.
@@ -1186,22 +1186,22 @@ Module JseItacMarketDataV407.
     Definition bounded (record : t) : Prop :=
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (paired_quantity record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (imbalance_direction record) = 1 /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (auction_type record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (paired_quantity record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (imbalance_direction record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (auction_type record).
 
@@ -1212,7 +1212,7 @@ Module JseItacMarketDataV407.
           match decode_uint 4 bytes with
           | None => None
           | Some (paired_quantity_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_bytes 4 bytes with
               | None => None
               | Some (reserved_4_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1221,10 +1221,10 @@ Module JseItacMarketDataV407.
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (instrument_id_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_a_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_b_value, bytes) =>
                                   match decode_uint 8 bytes with
@@ -1259,11 +1259,11 @@ Module JseItacMarketDataV407.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -1280,8 +1280,8 @@ Module JseItacMarketDataV407.
     Record t := {
       nanosecond : N;
       instrument_id : N;
-      reserved_a : N;
-      reserved_b : N;
+      reserved_a : list byte;
+      reserved_b : list byte;
       statistic_type : list byte;
       price : N;
       open_close_indicator : list byte;
@@ -1292,8 +1292,8 @@ Module JseItacMarketDataV407.
     Definition bounded (record : t) : Prop :=
       (nanosecond record < 256 ^ N.of_nat 4)%N /\
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_a record < 256 ^ N.of_nat 1)%N /\
-      (reserved_b record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_a record) = 1 /\
+      Datatypes.length (reserved_b record) = 1 /\
       Datatypes.length (statistic_type record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (open_close_indicator record) = 1 /\
@@ -1302,8 +1302,8 @@ Module JseItacMarketDataV407.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanosecond record) ++
       encode_uint 4 (instrument_id record) ++
-      encode_uint 1 (reserved_a record) ++
-      encode_uint 1 (reserved_b record) ++
+      encode_bytes 1 (reserved_a record) ++
+      encode_bytes 1 (reserved_b record) ++
       encode_bytes 1 (statistic_type record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (open_close_indicator record) ++
@@ -1316,10 +1316,10 @@ Module JseItacMarketDataV407.
           match decode_uint 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_a_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_b_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1359,8 +1359,8 @@ Module JseItacMarketDataV407.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -1385,7 +1385,7 @@ Module JseItacMarketDataV407.
       volume : N;
       turnover : N;
       number_of_trades : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       sub_book : N;
       notional_exposure : N;
       notional_delta_exposure : N;
@@ -1409,7 +1409,7 @@ Module JseItacMarketDataV407.
       (volume record < 256 ^ N.of_nat 4)%N /\
       (turnover record < 256 ^ N.of_nat 8)%N /\
       (number_of_trades record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (sub_book record < 256 ^ N.of_nat 1)%N /\
       (notional_exposure record < 256 ^ N.of_nat 8)%N /\
       (notional_delta_exposure record < 256 ^ N.of_nat 8)%N /\
@@ -1431,7 +1431,7 @@ Module JseItacMarketDataV407.
       encode_uint 4 (volume record) ++
       encode_uint 8 (turnover record) ++
       encode_uint 4 (number_of_trades record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 1 (sub_book record) ++
       encode_uint 8 (notional_exposure record) ++
       encode_uint 8 (notional_delta_exposure record) ++
@@ -1469,7 +1469,7 @@ Module JseItacMarketDataV407.
                                   match decode_uint 4 bytes with
                                   | None => None
                                   | Some (number_of_trades_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_bytes 8 bytes with
                                       | None => None
                                       | Some (reserved_8_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -1530,7 +1530,7 @@ Module JseItacMarketDataV407.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 137.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1548,7 +1548,7 @@ Module JseItacMarketDataV407.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
@@ -1564,7 +1564,7 @@ Module JseItacMarketDataV407.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ExtendedStatisticsMessage.
 

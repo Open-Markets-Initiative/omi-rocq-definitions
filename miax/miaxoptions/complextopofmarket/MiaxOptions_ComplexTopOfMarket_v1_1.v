@@ -158,7 +158,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       liquidity_acceptance_increment_indicator : list byte;
       opening_underlying_market_code : list byte;
       priority_quote_width : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -179,7 +179,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       Datatypes.length (liquidity_acceptance_increment_indicator record) = 1 /\
       Datatypes.length (opening_underlying_market_code record) = 1 /\
       (priority_quote_width record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
@@ -198,7 +198,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       encode_bytes 1 (liquidity_acceptance_increment_indicator record) ++
       encode_bytes 1 (opening_underlying_market_code record) ++
       encode_uint 4 (priority_quote_width record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -249,7 +249,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
                                                                   match decode_uint 4 bytes with
                                                                   | None => None
                                                                   | Some (priority_quote_width_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_bytes 8 bytes with
                                                                       | None => None
                                                                       | Some (reserved_8_value, bytes) =>
                                                                           Some ({| nanoseconds := nanoseconds_value; product_id := product_id_value; underlying_symbol := underlying_symbol_value; security_symbol := security_symbol_value; expiration_date := expiration_date_value; strike_price := strike_price_value; call_or_put := call_or_put_value; opening_time := opening_time_value; closing_time := closing_time_value; restricted_option := restricted_option_value; long_term_option := long_term_option_value; active_on_miax := active_on_miax_value; miax_bbo_posting_increment_indicator := miax_bbo_posting_increment_indicator_value; liquidity_acceptance_increment_indicator := liquidity_acceptance_increment_indicator_value; opening_underlying_market_code := opening_underlying_market_code_value; priority_quote_width := priority_quote_width_value; reserved_8 := reserved_8_value |}, bytes)
@@ -300,7 +300,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -459,7 +459,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       strategy_id : N;
       compact_price : N;
       compact_size : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       top_of_market_quote_condition : list byte;
     }.
 
@@ -469,7 +469,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       (strategy_id record < 256 ^ N.of_nat 4)%N /\
       (compact_price record < 256 ^ N.of_nat 2)%N /\
       (compact_size record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (top_of_market_quote_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -477,7 +477,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       encode_uint 4 (strategy_id record) ++
       encode_uint 2 (compact_price record) ++
       encode_uint 2 (compact_size record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (top_of_market_quote_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -493,7 +493,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (compact_size_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_bytes 2 bytes with
                       | None => None
                       | Some (reserved_2_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -524,7 +524,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -542,7 +542,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       strategy_id : N;
       wide_price : N;
       wide_size : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       top_of_market_quote_condition : list byte;
     }.
 
@@ -552,7 +552,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       (strategy_id record < 256 ^ N.of_nat 4)%N /\
       (wide_price record < 256 ^ N.of_nat 8)%N /\
       (wide_size record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (top_of_market_quote_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -560,7 +560,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       encode_uint 4 (strategy_id record) ++
       encode_uint 8 (wide_price record) ++
       encode_uint 4 (wide_size record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (top_of_market_quote_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -576,7 +576,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (wide_size_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_bytes 4 bytes with
                       | None => None
                       | Some (reserved_4_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -607,7 +607,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -625,7 +625,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       strategy_id : N;
       wide_price : N;
       wide_size : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       top_of_market_quote_condition : list byte;
     }.
 
@@ -635,7 +635,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       (strategy_id record < 256 ^ N.of_nat 4)%N /\
       (wide_price record < 256 ^ N.of_nat 8)%N /\
       (wide_size record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (top_of_market_quote_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
@@ -643,7 +643,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       encode_uint 4 (strategy_id record) ++
       encode_uint 8 (wide_price record) ++
       encode_uint 4 (wide_size record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (top_of_market_quote_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -659,7 +659,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (wide_size_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_bytes 4 bytes with
                       | None => None
                       | Some (reserved_4_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -690,7 +690,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -706,7 +706,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Record t := {
       compact_bid_price : N;
       compact_bid_size : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       bid_condition : list byte;
     }.
 
@@ -714,13 +714,13 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Definition bounded (record : t) : Prop :=
       (compact_bid_price record < 256 ^ N.of_nat 2)%N /\
       (compact_bid_size record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (bid_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (compact_bid_price record) ++
       encode_uint 2 (compact_bid_size record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (bid_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -730,7 +730,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
           match decode_uint 2 bytes with
           | None => None
           | Some (compact_bid_size_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -757,7 +757,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -773,7 +773,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Record t := {
       compact_offer_price : N;
       compact_offer_size : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       offer_condition : list byte;
     }.
 
@@ -781,13 +781,13 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Definition bounded (record : t) : Prop :=
       (compact_offer_price record < 256 ^ N.of_nat 2)%N /\
       (compact_offer_size record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (offer_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (compact_offer_price record) ++
       encode_uint 2 (compact_offer_size record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (offer_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -797,7 +797,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
           match decode_uint 2 bytes with
           | None => None
           | Some (compact_offer_size_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -824,7 +824,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -907,7 +907,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Record t := {
       wide_bid_price : N;
       wide_bid_size : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       bid_condition : list byte;
     }.
 
@@ -915,13 +915,13 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Definition bounded (record : t) : Prop :=
       (wide_bid_price record < 256 ^ N.of_nat 8)%N /\
       (wide_bid_size record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (bid_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (wide_bid_price record) ++
       encode_uint 4 (wide_bid_size record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (bid_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -931,7 +931,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
           match decode_uint 4 bytes with
           | None => None
           | Some (wide_bid_size_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_bytes 4 bytes with
               | None => None
               | Some (reserved_4_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -958,7 +958,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -974,7 +974,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Record t := {
       wide_offer_price : N;
       wide_offer_size : N;
-      reserved_4 : N;
+      reserved_4 : list byte;
       offer_condition : list byte;
     }.
 
@@ -982,13 +982,13 @@ Module MiaxOptionsComplexTopOfMarketV11.
     Definition bounded (record : t) : Prop :=
       (wide_offer_price record < 256 ^ N.of_nat 8)%N /\
       (wide_offer_size record < 256 ^ N.of_nat 4)%N /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (offer_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (wide_offer_price record) ++
       encode_uint 4 (wide_offer_size record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (offer_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -998,7 +998,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
           match decode_uint 4 bytes with
           | None => None
           | Some (wide_offer_size_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_bytes 4 bytes with
               | None => None
               | Some (reserved_4_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1025,7 +1025,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.

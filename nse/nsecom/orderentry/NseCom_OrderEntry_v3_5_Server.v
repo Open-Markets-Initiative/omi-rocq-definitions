@@ -350,7 +350,7 @@ Module NseComOrderEntryV35Server.
       firm_name : list byte;
       trader_number : N;
       trader_name : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -362,7 +362,7 @@ Module NseComOrderEntryV35Server.
       Datatypes.length (firm_name record) = 25 /\
       (trader_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trader_name record) = 26 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (message_type record) ++
@@ -372,7 +372,7 @@ Module NseComOrderEntryV35Server.
       encode_bytes 25 (firm_name record) ++
       encode_uint 4 (trader_number record) ++
       encode_bytes 26 (trader_name record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -396,7 +396,7 @@ Module NseComOrderEntryV35Server.
                               match decode_bytes 26 bytes with
                               | None => None
                               | Some (trader_name_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (reserved_1_value, bytes) =>
                                       Some ({| message_type := message_type_value; report_date := report_date_value; user_type := user_type_value; broker_id := broker_id_value; firm_name := firm_name_value; trader_number := trader_number_value; trader_name := trader_name_value; reserved_1 := reserved_1_value |}, bytes)
@@ -429,7 +429,7 @@ Module NseComOrderEntryV35Server.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -449,7 +449,7 @@ Module NseComOrderEntryV35Server.
       firm_name : list byte;
       trader_number : N;
       trader_name : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -461,7 +461,7 @@ Module NseComOrderEntryV35Server.
       Datatypes.length (firm_name record) = 25 /\
       (trader_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trader_name record) = 26 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (message_type record) ++
@@ -471,7 +471,7 @@ Module NseComOrderEntryV35Server.
       encode_bytes 25 (firm_name record) ++
       encode_uint 4 (trader_number record) ++
       encode_bytes 26 (trader_name record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -495,7 +495,7 @@ Module NseComOrderEntryV35Server.
                               match decode_bytes 26 bytes with
                               | None => None
                               | Some (trader_name_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (reserved_1_value, bytes) =>
                                       Some ({| message_type := message_type_value; report_date := report_date_value; user_type := user_type_value; broker_id := broker_id_value; firm_name := firm_name_value; trader_number := trader_number_value; trader_name := trader_name_value; reserved_1 := reserved_1_value |}, bytes)
@@ -528,7 +528,7 @@ Module NseComOrderEntryV35Server.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -548,7 +548,7 @@ Module NseComOrderEntryV35Server.
       firm_name : list byte;
       trader_number : N;
       trader_name : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -560,7 +560,7 @@ Module NseComOrderEntryV35Server.
       Datatypes.length (firm_name record) = 25 /\
       (trader_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trader_name record) = 26 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (message_type record) ++
@@ -570,7 +570,7 @@ Module NseComOrderEntryV35Server.
       encode_bytes 25 (firm_name record) ++
       encode_uint 4 (trader_number record) ++
       encode_bytes 26 (trader_name record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -594,7 +594,7 @@ Module NseComOrderEntryV35Server.
                               match decode_bytes 26 bytes with
                               | None => None
                               | Some (trader_name_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (reserved_1_value, bytes) =>
                                       Some ({| message_type := message_type_value; report_date := report_date_value; user_type := user_type_value; broker_id := broker_id_value; firm_name := firm_name_value; trader_number := trader_number_value; trader_name := trader_name_value; reserved_1 := reserved_1_value |}, bytes)
@@ -627,7 +627,7 @@ Module NseComOrderEntryV35Server.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -740,7 +740,7 @@ Module NseComOrderEntryV35Server.
       sell_account_number : list byte;
       buy_participant : list byte;
       sell_participant : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       buy_giveup_flag : list byte;
       sell_giveup_flag : list byte;
       buy_pan : list byte;
@@ -767,7 +767,7 @@ Module NseComOrderEntryV35Server.
       Datatypes.length (sell_account_number record) = 10 /\
       Datatypes.length (buy_participant record) = 12 /\
       Datatypes.length (sell_participant record) = 12 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (buy_giveup_flag record) = 1 /\
       Datatypes.length (sell_giveup_flag record) = 1 /\
       Datatypes.length (buy_pan record) = 10 /\
@@ -792,7 +792,7 @@ Module NseComOrderEntryV35Server.
       encode_bytes 10 (sell_account_number record) ++
       encode_bytes 12 (buy_participant record) ++
       encode_bytes 12 (sell_participant record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (buy_giveup_flag record) ++
       encode_bytes 1 (sell_giveup_flag record) ++
       encode_bytes 10 (buy_pan record) ++
@@ -851,7 +851,7 @@ Module NseComOrderEntryV35Server.
                                                                       match decode_bytes 12 bytes with
                                                                       | None => None
                                                                       | Some (sell_participant_value, bytes) =>
-                                                                          match decode_uint 2 bytes with
+                                                                          match decode_bytes 2 bytes with
                                                                           | None => None
                                                                           | Some (reserved_2_value, bytes) =>
                                                                               match decode_bytes 1 bytes with
@@ -924,7 +924,7 @@ Module NseComOrderEntryV35Server.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
@@ -959,7 +959,7 @@ Module NseComOrderEntryV35Server.
       sell_account_number : list byte;
       buy_participant : list byte;
       sell_participant : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       buy_giveup_flag : list byte;
       sell_giveup_flag : list byte;
       buy_pan : list byte;
@@ -986,7 +986,7 @@ Module NseComOrderEntryV35Server.
       Datatypes.length (sell_account_number record) = 10 /\
       Datatypes.length (buy_participant record) = 12 /\
       Datatypes.length (sell_participant record) = 12 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (buy_giveup_flag record) = 1 /\
       Datatypes.length (sell_giveup_flag record) = 1 /\
       Datatypes.length (buy_pan record) = 10 /\
@@ -1011,7 +1011,7 @@ Module NseComOrderEntryV35Server.
       encode_bytes 10 (sell_account_number record) ++
       encode_bytes 12 (buy_participant record) ++
       encode_bytes 12 (sell_participant record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (buy_giveup_flag record) ++
       encode_bytes 1 (sell_giveup_flag record) ++
       encode_bytes 10 (buy_pan record) ++
@@ -1070,7 +1070,7 @@ Module NseComOrderEntryV35Server.
                                                                       match decode_bytes 12 bytes with
                                                                       | None => None
                                                                       | Some (sell_participant_value, bytes) =>
-                                                                          match decode_uint 2 bytes with
+                                                                          match decode_bytes 2 bytes with
                                                                           | None => None
                                                                           | Some (reserved_2_value, bytes) =>
                                                                               match decode_bytes 1 bytes with
@@ -1143,7 +1143,7 @@ Module NseComOrderEntryV35Server.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
@@ -1517,19 +1517,19 @@ Module NseComOrderEntryV35Server.
     Record t := {
       user_id : N;
       col_user_bit : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (col_user_bit record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
       encode_bytes 1 (col_user_bit record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1538,7 +1538,7 @@ Module NseComOrderEntryV35Server.
           match decode_bytes 1 bytes with
           | None => None
           | Some (col_user_bit_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   Some ({| user_id := user_id_value; col_user_bit := col_user_bit_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1561,7 +1561,7 @@ Module NseComOrderEntryV35Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1574,18 +1574,18 @@ Module NseComOrderEntryV35Server.
 
     (** 7307 UPDATE_LDB_HEADER 42 I, carried in the UPDATE_LDB_HEADER structure *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -1594,7 +1594,7 @@ Module NseComOrderEntryV35Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1602,12 +1602,12 @@ Module NseComOrderEntryV35Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocaldbHeaderMessage.
 
@@ -1615,18 +1615,18 @@ Module NseComOrderEntryV35Server.
 
     (** 7308 UPDATE_LDB_HEADER 42 I, carried in the UPDATE_LOCAL_DB_TRAILER structure *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -1635,7 +1635,7 @@ Module NseComOrderEntryV35Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1643,12 +1643,12 @@ Module NseComOrderEntryV35Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocaldbTrailerMessage.
 

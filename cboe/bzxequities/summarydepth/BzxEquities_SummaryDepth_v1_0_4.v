@@ -468,7 +468,7 @@ Module BzxEquitiesSummaryDepthV104.
       reserved_1 : list byte;
       execution_id : N;
       cboe_cumulative_executed_volume : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       trade_break_flags : N;
     }.
 
@@ -479,7 +479,7 @@ Module BzxEquitiesSummaryDepthV104.
       Datatypes.length (reserved_1 record) = 1 /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
       (cboe_cumulative_executed_volume record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       (trade_break_flags record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
@@ -488,7 +488,7 @@ Module BzxEquitiesSummaryDepthV104.
       encode_bytes 1 (reserved_1 record) ++
       encode_uint 8 (execution_id record) ++
       encode_uint 8 (cboe_cumulative_executed_volume record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_uint 1 (trade_break_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -507,7 +507,7 @@ Module BzxEquitiesSummaryDepthV104.
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (cboe_cumulative_executed_volume_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_bytes 8 bytes with
                           | None => None
                           | Some (reserved_8_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -540,7 +540,7 @@ Module BzxEquitiesSummaryDepthV104.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
     Qed.

@@ -229,7 +229,7 @@ Module NyseEquitiesOpenBookV21B.
       source_id : list byte;
       status : list byte;
       reject_reason : list byte;
-      filler_2 : N;
+      filler_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -238,14 +238,14 @@ Module NyseEquitiesOpenBookV21B.
       Datatypes.length (source_id record) = 20 /\
       Datatypes.length (status record) = 1 /\
       Datatypes.length (reject_reason record) = 1 /\
-      (filler_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_seq_num record) ++
       encode_bytes 20 (source_id record) ++
       encode_bytes 1 (status record) ++
       encode_bytes 1 (reject_reason record) ++
-      encode_uint 2 (filler_2 record).
+      encode_bytes 2 (filler_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -260,7 +260,7 @@ Module NyseEquitiesOpenBookV21B.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reject_reason_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_bytes 2 bytes with
                       | None => None
                       | Some (filler_2_value, bytes) =>
                           Some ({| source_seq_num := source_seq_num_value; source_id := source_id_value; status := status_value; reject_reason := reject_reason_value; filler_2 := filler_2_value |}, bytes)
@@ -287,7 +287,7 @@ Module NyseEquitiesOpenBookV21B.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

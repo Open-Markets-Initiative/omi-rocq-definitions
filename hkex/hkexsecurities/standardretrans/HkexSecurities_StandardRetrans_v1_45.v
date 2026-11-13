@@ -37,7 +37,7 @@ Module HkexSecuritiesStandardRetransV145.
     Record t := {
       pkt_size : N;
       msg_count : N;
-      filler : N;
+      filler : list byte;
       seq_num : N;
       send_time : N;
     }.
@@ -46,14 +46,14 @@ Module HkexSecuritiesStandardRetransV145.
     Definition bounded (record : t) : Prop :=
       (pkt_size record < 256 ^ N.of_nat 2)%N /\
       (msg_count record < 256 ^ N.of_nat 1)%N /\
-      (filler record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler record) = 1 /\
       (seq_num record < 256 ^ N.of_nat 4)%N /\
       (send_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (pkt_size record) ++
       encode_uint 1 (msg_count record) ++
-      encode_uint 1 (filler record) ++
+      encode_bytes 1 (filler record) ++
       encode_uint 4 (seq_num record) ++
       encode_uint 8 (send_time record).
 
@@ -64,7 +64,7 @@ Module HkexSecuritiesStandardRetransV145.
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_count_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (filler_value, bytes) =>
                   match decode_uint 4 bytes with
@@ -83,7 +83,7 @@ Module HkexSecuritiesStandardRetransV145.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -95,14 +95,14 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End PacketHeader.
 
@@ -414,25 +414,25 @@ Module HkexSecuritiesStandardRetransV145.
     Record t := {
       security_code : N;
       order_imbalance_direction : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       order_imbalance_quantity : N;
-      filler_2 : N;
+      filler_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_code record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (order_imbalance_direction record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       (order_imbalance_quantity record < 256 ^ N.of_nat 8)%N /\
-      (filler_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (filler_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (security_code record) ++
       encode_bytes 1 (order_imbalance_direction record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_uint 8 (order_imbalance_quantity record) ++
-      encode_uint 2 (filler_2 record).
+      encode_bytes 2 (filler_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -441,13 +441,13 @@ Module HkexSecuritiesStandardRetransV145.
           match decode_bytes 1 bytes with
           | None => None
           | Some (order_imbalance_direction_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (filler_1_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (order_imbalance_quantity_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_bytes 2 bytes with
                       | None => None
                       | Some (filler_2_value, bytes) =>
                           Some ({| security_code := security_code_value; order_imbalance_direction := order_imbalance_direction_value; filler_1 := filler_1_value; order_imbalance_quantity := order_imbalance_quantity_value; filler_2 := filler_2_value |}, bytes)
@@ -472,9 +472,9 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -708,38 +708,38 @@ Module HkexSecuritiesStandardRetransV145.
     (** The Currency Rate message provides the foreign exchange conversion rates between various foreign currencies and the Hong Kong dollar. *)
     Record t := {
       currency_code : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       currency_factor : N;
-      filler_2 : N;
+      filler_2 : list byte;
       currency_rate : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (currency_code record) = 3 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       (currency_factor record < 256 ^ N.of_nat 2)%N /\
-      (filler_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_2 record) = 2 /\
       (currency_rate record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 3 (currency_code record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_uint 2 (currency_factor record) ++
-      encode_uint 2 (filler_2 record) ++
+      encode_bytes 2 (filler_2 record) ++
       encode_uint 4 (currency_rate record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 3 bytes with
       | None => None
       | Some (currency_code_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_bytes 1 bytes with
           | None => None
           | Some (filler_1_value, bytes) =>
               match decode_uint 2 bytes with
               | None => None
               | Some (currency_factor_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_bytes 2 bytes with
                   | None => None
                   | Some (filler_2_value, bytes) =>
                       match decode_uint 4 bytes with
@@ -766,9 +766,9 @@ Module HkexSecuritiesStandardRetransV145.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -932,23 +932,23 @@ Module HkexSecuritiesStandardRetransV145.
     (** Response to a Logon request indicating session status. *)
     Record t := {
       session_status : N;
-      filler_3 : N;
+      filler_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (session_status record < 256 ^ N.of_nat 1)%N /\
-      (filler_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (session_status record) ++
-      encode_uint 3 (filler_3 record).
+      encode_bytes 3 (filler_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (session_status_value, bytes) =>
-          match decode_uint 3 bytes with
+          match decode_bytes 3 bytes with
           | None => None
           | Some (filler_3_value, bytes) =>
               Some ({| session_status := session_status_value; filler_3 := filler_3_value |}, bytes)
@@ -958,7 +958,7 @@ Module HkexSecuritiesStandardRetransV145.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -969,12 +969,12 @@ Module HkexSecuritiesStandardRetransV145.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End LogonResponseMessage.
 
@@ -983,7 +983,7 @@ Module HkexSecuritiesStandardRetransV145.
     (** Client-initiated request to retransmit a range of messages from a specific multicast channel. *)
     Record t := {
       channel_id : N;
-      filler_2 : N;
+      filler_2 : list byte;
       begin_seq_num : N;
       end_seq_num : N;
     }.
@@ -991,13 +991,13 @@ Module HkexSecuritiesStandardRetransV145.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (channel_id record < 256 ^ N.of_nat 2)%N /\
-      (filler_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_2 record) = 2 /\
       (begin_seq_num record < 256 ^ N.of_nat 4)%N /\
       (end_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (channel_id record) ++
-      encode_uint 2 (filler_2 record) ++
+      encode_bytes 2 (filler_2 record) ++
       encode_uint 4 (begin_seq_num record) ++
       encode_uint 4 (end_seq_num record).
 
@@ -1005,7 +1005,7 @@ Module HkexSecuritiesStandardRetransV145.
       match decode_uint 2 bytes with
       | None => None
       | Some (channel_id_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_bytes 2 bytes with
           | None => None
           | Some (filler_2_value, bytes) =>
               match decode_uint 4 bytes with
@@ -1023,7 +1023,7 @@ Module HkexSecuritiesStandardRetransV145.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1034,14 +1034,14 @@ Module HkexSecuritiesStandardRetransV145.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End RetransmissionRequestMessage.
 
@@ -1051,7 +1051,7 @@ Module HkexSecuritiesStandardRetransV145.
     Record t := {
       channel_id : N;
       retrans_status : N;
-      filler_1 : N;
+      filler_1 : list byte;
       begin_seq_num : N;
       end_seq_num : N;
     }.
@@ -1060,14 +1060,14 @@ Module HkexSecuritiesStandardRetransV145.
     Definition bounded (record : t) : Prop :=
       (channel_id record < 256 ^ N.of_nat 2)%N /\
       (retrans_status record < 256 ^ N.of_nat 1)%N /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       (begin_seq_num record < 256 ^ N.of_nat 4)%N /\
       (end_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (channel_id record) ++
       encode_uint 1 (retrans_status record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_uint 4 (begin_seq_num record) ++
       encode_uint 4 (end_seq_num record).
 
@@ -1078,7 +1078,7 @@ Module HkexSecuritiesStandardRetransV145.
           match decode_uint 1 bytes with
           | None => None
           | Some (retrans_status_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (filler_1_value, bytes) =>
                   match decode_uint 4 bytes with
@@ -1097,7 +1097,7 @@ Module HkexSecuritiesStandardRetransV145.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1109,14 +1109,14 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End RetransmissionResponseMessage.
 
@@ -1233,7 +1233,7 @@ Module HkexSecuritiesStandardRetransV145.
     Record t := {
       market_code : list byte;
       currency_code : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       turnover : N;
     }.
 
@@ -1241,13 +1241,13 @@ Module HkexSecuritiesStandardRetransV145.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (market_code record) = 4 /\
       Datatypes.length (currency_code record) = 3 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       (turnover record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (market_code record) ++
       encode_bytes 3 (currency_code record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_uint 8 (turnover record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1257,7 +1257,7 @@ Module HkexSecuritiesStandardRetransV145.
           match decode_bytes 3 bytes with
           | None => None
           | Some (currency_code_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (filler_1_value, bytes) =>
                   match decode_uint 8 bytes with
@@ -1284,7 +1284,7 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -1350,11 +1350,11 @@ Module HkexSecuritiesStandardRetransV145.
     (** The Trading Session Status provides information on the status of a market segment. It is sent whenever there is change of trading session. This message may be sent on a separate multicast channel from order and trade data and therefore may not be synchronized. *)
     Record t := {
       market_code : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       trading_session_sub_id : N;
       trading_ses_status : N;
       trading_ses_control_flag : list byte;
-      filler_4 : N;
+      filler_4 : list byte;
       start_date_time : N;
       end_date_time : N;
     }.
@@ -1362,21 +1362,21 @@ Module HkexSecuritiesStandardRetransV145.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (market_code record) = 4 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       (trading_session_sub_id record < 256 ^ N.of_nat 1)%N /\
       (trading_ses_status record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (trading_ses_control_flag record) = 1 /\
-      (filler_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (filler_4 record) = 4 /\
       (start_date_time record < 256 ^ N.of_nat 8)%N /\
       (end_date_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (market_code record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_uint 1 (trading_session_sub_id record) ++
       encode_uint 1 (trading_ses_status record) ++
       encode_bytes 1 (trading_ses_control_flag record) ++
-      encode_uint 4 (filler_4 record) ++
+      encode_bytes 4 (filler_4 record) ++
       encode_uint 8 (start_date_time record) ++
       encode_uint 8 (end_date_time record).
 
@@ -1384,7 +1384,7 @@ Module HkexSecuritiesStandardRetransV145.
       match decode_bytes 4 bytes with
       | None => None
       | Some (market_code_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_bytes 1 bytes with
           | None => None
           | Some (filler_1_value, bytes) =>
               match decode_uint 1 bytes with
@@ -1396,7 +1396,7 @@ Module HkexSecuritiesStandardRetransV145.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (trading_ses_control_flag_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_bytes 4 bytes with
                           | None => None
                           | Some (filler_4_value, bytes) =>
                               match decode_uint 8 bytes with
@@ -1429,11 +1429,11 @@ Module HkexSecuritiesStandardRetransV145.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
@@ -1450,19 +1450,19 @@ Module HkexSecuritiesStandardRetransV145.
     Record t := {
       security_code : N;
       suspension_indicator : N;
-      filler_3 : N;
+      filler_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (security_code record < 256 ^ N.of_nat 4)%N /\
       (suspension_indicator record < 256 ^ N.of_nat 1)%N /\
-      (filler_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (filler_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (security_code record) ++
       encode_uint 1 (suspension_indicator record) ++
-      encode_uint 3 (filler_3 record).
+      encode_bytes 3 (filler_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1471,7 +1471,7 @@ Module HkexSecuritiesStandardRetransV145.
           match decode_uint 1 bytes with
           | None => None
           | Some (suspension_indicator_value, bytes) =>
-              match decode_uint 3 bytes with
+              match decode_bytes 3 bytes with
               | None => None
               | Some (filler_3_value, bytes) =>
                   Some ({| security_code := security_code_value; suspension_indicator := suspension_indicator_value; filler_3 := filler_3_value |}, bytes)
@@ -1482,7 +1482,7 @@ Module HkexSecuritiesStandardRetransV145.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1494,12 +1494,12 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End SecurityStatusMessage.
 
@@ -1514,7 +1514,7 @@ Module HkexSecuritiesStandardRetransV145.
       trade_time : N;
       trd_type : N;
       trd_cancel_flag : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1526,7 +1526,7 @@ Module HkexSecuritiesStandardRetransV145.
       (trade_time record < 256 ^ N.of_nat 8)%N /\
       (trd_type record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (trd_cancel_flag record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (filler_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (security_code record) ++
@@ -1536,7 +1536,7 @@ Module HkexSecuritiesStandardRetransV145.
       encode_uint 8 (trade_time record) ++
       encode_uint 2 (trd_type record) ++
       encode_bytes 1 (trd_cancel_flag record) ++
-      encode_uint 1 (filler_1 record).
+      encode_bytes 1 (filler_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1560,7 +1560,7 @@ Module HkexSecuritiesStandardRetransV145.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (trd_cancel_flag_value, bytes) =>
-                                  match decode_uint 1 bytes with
+                                  match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (filler_1_value, bytes) =>
                                       Some ({| security_code := security_code_value; ticker_id := ticker_id_value; price := price_value; aggregate_quantity := aggregate_quantity_value; trade_time := trade_time_value; trd_type := trd_type_value; trd_cancel_flag := trd_cancel_flag_value; filler_1 := filler_1_value |}, bytes)
@@ -1593,7 +1593,7 @@ Module HkexSecuritiesStandardRetransV145.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

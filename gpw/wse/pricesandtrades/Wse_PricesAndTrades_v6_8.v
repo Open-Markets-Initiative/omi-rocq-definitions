@@ -204,7 +204,7 @@ Module WsePricesAndTradesV68.
       quantity : list byte;
       notional_amount : list byte;
       notional_currency : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       transaction_id_code : list byte;
       mmt_market_mechanism : list byte;
       mmt_trading_mode : list byte;
@@ -247,7 +247,7 @@ Module WsePricesAndTradesV68.
       Datatypes.length (quantity record) = 20 /\
       Datatypes.length (notional_amount record) = 20 /\
       Datatypes.length (notional_currency record) = 3 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (transaction_id_code record) = 52 /\
       Datatypes.length (mmt_market_mechanism record) = 1 /\
       Datatypes.length (mmt_trading_mode record) = 1 /\
@@ -288,7 +288,7 @@ Module WsePricesAndTradesV68.
       encode_bytes 20 (quantity record) ++
       encode_bytes 20 (notional_amount record) ++
       encode_bytes 3 (notional_currency record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 52 (transaction_id_code record) ++
       encode_bytes 1 (mmt_market_mechanism record) ++
       encode_bytes 1 (mmt_trading_mode record) ++
@@ -387,7 +387,7 @@ Module WsePricesAndTradesV68.
                                                                                                                       match decode_bytes 3 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (notional_currency_value, bytes) =>
-                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (reserved_1_value, bytes) =>
                                                                                                                               match decode_bytes 52 bytes with
@@ -500,7 +500,7 @@ Module WsePricesAndTradesV68.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
+      rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
@@ -532,7 +532,7 @@ Module WsePricesAndTradesV68.
       system_id : N;
       source_time_micro_secs : N;
       type_of_price : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       price_scale_code : N;
       variation_scale_code : N;
     }.
@@ -549,7 +549,7 @@ Module WsePricesAndTradesV68.
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       (type_of_price record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (price_scale_code record < 256 ^ N.of_nat 1)%N /\
       (variation_scale_code record < 256 ^ N.of_nat 1)%N.
 
@@ -564,7 +564,7 @@ Module WsePricesAndTradesV68.
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
       encode_uint 2 (type_of_price record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 1 (price_scale_code record) ++
       encode_uint 1 (variation_scale_code record).
 
@@ -599,7 +599,7 @@ Module WsePricesAndTradesV68.
                                           match decode_uint 2 bytes with
                                           | None => None
                                           | Some (type_of_price_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (reserved_2_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -626,7 +626,7 @@ Module WsePricesAndTradesV68.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -646,14 +646,14 @@ Module WsePricesAndTradesV68.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End PriceUpdateMessage.
 
@@ -676,7 +676,7 @@ Module WsePricesAndTradesV68.
       notional_currency : list byte;
       tcs_trade_id : list byte;
       price_notation : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       transaction_to_be_cleared : list byte;
       mmt_benchmark_indicator : list byte;
       mmt_contribution_to_price : list byte;
@@ -695,7 +695,7 @@ Module WsePricesAndTradesV68.
       mmt_duplicative_indicator : list byte;
       mmt_publication_mode : list byte;
       mmt_algorithmic_indicator : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -715,7 +715,7 @@ Module WsePricesAndTradesV68.
       Datatypes.length (notional_currency record) = 3 /\
       Datatypes.length (tcs_trade_id record) = 16 /\
       Datatypes.length (price_notation record) = 4 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (transaction_to_be_cleared record) = 4 /\
       Datatypes.length (mmt_benchmark_indicator record) = 4 /\
       Datatypes.length (mmt_contribution_to_price record) = 4 /\
@@ -734,7 +734,7 @@ Module WsePricesAndTradesV68.
       Datatypes.length (mmt_duplicative_indicator record) = 4 /\
       Datatypes.length (mmt_publication_mode record) = 4 /\
       Datatypes.length (mmt_algorithmic_indicator record) = 4 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -752,7 +752,7 @@ Module WsePricesAndTradesV68.
       encode_bytes 3 (notional_currency record) ++
       encode_bytes 16 (tcs_trade_id record) ++
       encode_bytes 4 (price_notation record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (transaction_to_be_cleared record) ++
       encode_bytes 4 (mmt_benchmark_indicator record) ++
       encode_bytes 4 (mmt_contribution_to_price record) ++
@@ -771,7 +771,7 @@ Module WsePricesAndTradesV68.
       encode_bytes 4 (mmt_duplicative_indicator record) ++
       encode_bytes 4 (mmt_publication_mode record) ++
       encode_bytes 4 (mmt_algorithmic_indicator record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -819,7 +819,7 @@ Module WsePricesAndTradesV68.
                                                               match decode_bytes 4 bytes with
                                                               | None => None
                                                               | Some (price_notation_value, bytes) =>
-                                                                  match decode_uint 1 bytes with
+                                                                  match decode_bytes 1 bytes with
                                                                   | None => None
                                                                   | Some (reserved_1_value, bytes) =>
                                                                       match decode_bytes 4 bytes with
@@ -876,7 +876,7 @@ Module WsePricesAndTradesV68.
                                                                                                                                           match decode_bytes 4 bytes with
                                                                                                                                           | None => None
                                                                                                                                           | Some (mmt_algorithmic_indicator_value, bytes) =>
-                                                                                                                                              match decode_uint 2 bytes with
+                                                                                                                                              match decode_bytes 2 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (reserved_2_value, bytes) =>
                                                                                                                                                   Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; venue_of_execution := venue_of_execution_value; instrument_id_code_type := instrument_id_code_type_value; price_multiplier := price_multiplier_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; trading_date_time := trading_date_time_value; price_currency := price_currency_value; instrument_id_code := instrument_id_code_value; publication_date_time := publication_date_time_value; notional_currency := notional_currency_value; tcs_trade_id := tcs_trade_id_value; price_notation := price_notation_value; reserved_1 := reserved_1_value; transaction_to_be_cleared := transaction_to_be_cleared_value; mmt_benchmark_indicator := mmt_benchmark_indicator_value; mmt_contribution_to_price := mmt_contribution_to_price_value; multiplier_scale_code := multiplier_scale_code_value; price_ascii_ch_20 := price_ascii_ch_20_value; quantity := quantity_value; notional_amount := notional_amount_value; transaction_id_code := transaction_id_code_value; mmt_market_mechanism := mmt_market_mechanism_value; mmt_trading_mode := mmt_trading_mode_value; mmt_special_dividend_indicator := mmt_special_dividend_indicator_value; mmt_negotiation_indicator := mmt_negotiation_indicator_value; mmt_agency_cross_indicator := mmt_agency_cross_indicator_value; mmt_transaction_category := mmt_transaction_category_value; mmt_modification_indicator := mmt_modification_indicator_value; mmt_duplicative_indicator := mmt_duplicative_indicator_value; mmt_publication_mode := mmt_publication_mode_value; mmt_algorithmic_indicator := mmt_algorithmic_indicator_value; reserved_2 := reserved_2_value |}, bytes)
@@ -944,7 +944,7 @@ Module WsePricesAndTradesV68.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
@@ -963,7 +963,7 @@ Module WsePricesAndTradesV68.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
-      rewrite decode_encode_uint by exact bound_34.
+      rewrite decode_encode_bytes by exact bound_34.
       destruct record. reflexivity.
     Qed.
 
@@ -1152,7 +1152,7 @@ Module WsePricesAndTradesV68.
       system_id : N;
       source_time_micro_secs : N;
       scale_code : N;
-      reserved_5 : N;
+      reserved_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1170,7 +1170,7 @@ Module WsePricesAndTradesV68.
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       (scale_code record < 256 ^ N.of_nat 1)%N /\
-      (reserved_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (reserved_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -1186,7 +1186,7 @@ Module WsePricesAndTradesV68.
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
       encode_uint 1 (scale_code record) ++
-      encode_uint 5 (reserved_5 record).
+      encode_bytes 5 (reserved_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1228,7 +1228,7 @@ Module WsePricesAndTradesV68.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (scale_code_value, bytes) =>
-                                                          match decode_uint 5 bytes with
+                                                          match decode_bytes 5 bytes with
                                                           | None => None
                                                           | Some (reserved_5_value, bytes) =>
                                                               Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; sending_indicator := sending_indicator_value; closing_price_rule := closing_price_rule_value; closing_price := closing_price_value; adjusted_closing_price := adjusted_closing_price_value; nb_trades := nb_trades_value; amount_traded := amount_traded_value; qty_shares := qty_shares_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; scale_code := scale_code_value; reserved_5 := reserved_5_value |}, bytes)
@@ -1250,7 +1250,7 @@ Module WsePricesAndTradesV68.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1273,12 +1273,12 @@ Module WsePricesAndTradesV68.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_bytes by exact bound_13.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End VwapClosingPriceMessage.
 

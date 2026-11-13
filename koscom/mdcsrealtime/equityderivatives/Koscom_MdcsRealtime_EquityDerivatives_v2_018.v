@@ -91,7 +91,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      index_accumulated_trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -105,7 +105,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (index_accumulated_trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -117,7 +117,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (index_accumulated_trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -143,16 +143,16 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
                               match decode_bytes 12 bytes with
                               | None => None
                               | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (index_accumulated_trading_value_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; index_accumulated_trading_value := index_accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -164,7 +164,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 82.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -206,7 +206,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       index_change_sign_against_the_previous_day : list byte;
       index_change_against_the_previous_day : list byte;
       accumulated_trading_volume : list byte;
-      accumulated_trading_value : list byte;
+      index_accumulated_trading_value : list byte;
       filler_4 : list byte;
       end_keyword : N;
     }.
@@ -220,7 +220,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       Datatypes.length (index_change_sign_against_the_previous_day record) = 1 /\
       Datatypes.length (index_change_against_the_previous_day record) = 9 /\
       Datatypes.length (accumulated_trading_volume record) = 12 /\
-      Datatypes.length (accumulated_trading_value record) = 22 /\
+      Datatypes.length (index_accumulated_trading_value record) = 12 /\
       Datatypes.length (filler_4 record) = 4 /\
       (end_keyword record < 256 ^ N.of_nat 1)%N.
 
@@ -232,7 +232,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       encode_bytes 1 (index_change_sign_against_the_previous_day record) ++
       encode_bytes 9 (index_change_against_the_previous_day record) ++
       encode_bytes 12 (accumulated_trading_volume record) ++
-      encode_bytes 22 (accumulated_trading_value record) ++
+      encode_bytes 12 (index_accumulated_trading_value record) ++
       encode_bytes 4 (filler_4 record) ++
       encode_uint 1 (end_keyword record).
 
@@ -258,16 +258,16 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
                               match decode_bytes 12 bytes with
                               | None => None
                               | Some (accumulated_trading_volume_value, bytes) =>
-                                  match decode_bytes 22 bytes with
+                                  match decode_bytes 12 bytes with
                                   | None => None
-                                  | Some (accumulated_trading_value_value, bytes) =>
+                                  | Some (index_accumulated_trading_value_value, bytes) =>
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (filler_4_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (end_keyword_value, bytes) =>
-                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; accumulated_trading_value := accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
+                                              Some ({| index_id := index_id_value; isin_code := isin_code_value; calculation_time := calculation_time_value; index := index_value; index_change_sign_against_the_previous_day := index_change_sign_against_the_previous_day_value; index_change_against_the_previous_day := index_change_against_the_previous_day_value; accumulated_trading_volume := accumulated_trading_volume_value; index_accumulated_trading_value := index_accumulated_trading_value_value; filler_4 := filler_4_value; end_keyword := end_keyword_value |}, bytes)
                                           end
                                       end
                                   end
@@ -279,7 +279,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 82.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -2603,6 +2603,8 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       message_sequence_number : list byte;
       isin_code : list byte;
       market_participant_number : list byte;
+      board_id : list byte;
+      market_making_liquidity_provider_type_code : list byte;
       lp_start_date : list byte;
       lp_end_date : list byte;
       minimum_order_volume : list byte;
@@ -2623,6 +2625,8 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       Datatypes.length (message_sequence_number record) = 8 /\
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (market_participant_number record) = 5 /\
+      Datatypes.length (board_id record) = 2 /\
+      Datatypes.length (market_making_liquidity_provider_type_code record) = 1 /\
       Datatypes.length (lp_start_date record) = 8 /\
       Datatypes.length (lp_end_date record) = 8 /\
       Datatypes.length (minimum_order_volume record) = 11 /\
@@ -2641,6 +2645,8 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       encode_bytes 8 (message_sequence_number record) ++
       encode_bytes 12 (isin_code record) ++
       encode_bytes 5 (market_participant_number record) ++
+      encode_bytes 2 (board_id record) ++
+      encode_bytes 1 (market_making_liquidity_provider_type_code record) ++
       encode_bytes 8 (lp_start_date record) ++
       encode_bytes 8 (lp_end_date record) ++
       encode_bytes 11 (minimum_order_volume record) ++
@@ -2665,46 +2671,54 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
               match decode_bytes 5 bytes with
               | None => None
               | Some (market_participant_number_value, bytes) =>
-                  match decode_bytes 8 bytes with
+                  match decode_bytes 2 bytes with
                   | None => None
-                  | Some (lp_start_date_value, bytes) =>
-                      match decode_bytes 8 bytes with
+                  | Some (board_id_value, bytes) =>
+                      match decode_bytes 1 bytes with
                       | None => None
-                      | Some (lp_end_date_value, bytes) =>
-                          match decode_bytes 11 bytes with
+                      | Some (market_making_liquidity_provider_type_code_value, bytes) =>
+                          match decode_bytes 8 bytes with
                           | None => None
-                          | Some (minimum_order_volume_value, bytes) =>
-                              match decode_bytes 11 bytes with
+                          | Some (lp_start_date_value, bytes) =>
+                              match decode_bytes 8 bytes with
                               | None => None
-                              | Some (maximum_volume_of_multiple_order_value, bytes) =>
-                                  match decode_bytes 1 bytes with
+                              | Some (lp_end_date_value, bytes) =>
+                                  match decode_bytes 11 bytes with
                                   | None => None
-                                  | Some (bid_ask_spread_unit_code_value, bytes) =>
-                                      match decode_bytes 22 bytes with
+                                  | Some (minimum_order_volume_value, bytes) =>
+                                      match decode_bytes 11 bytes with
                                       | None => None
-                                      | Some (upper_limit_of_bid_ask_spread_value, bytes) =>
-                                          match decode_bytes 11 bytes with
+                                      | Some (maximum_volume_of_multiple_order_value, bytes) =>
+                                          match decode_bytes 1 bytes with
                                           | None => None
-                                          | Some (spread_multiple_for_market_holidays_value, bytes) =>
-                                              match decode_bytes 6 bytes with
+                                          | Some (bid_ask_spread_unit_code_value, bytes) =>
+                                              match decode_bytes 22 bytes with
                                               | None => None
-                                              | Some (an_obligatory_time_interval_to_place_an_order_value, bytes) =>
-                                                  match decode_bytes 22 bytes with
+                                              | Some (upper_limit_of_bid_ask_spread_value, bytes) =>
+                                                  match decode_bytes 11 bytes with
                                                   | None => None
-                                                  | Some (minimum_ask_price_value, bytes) =>
-                                                      match decode_bytes 22 bytes with
+                                                  | Some (spread_multiple_for_market_holidays_value, bytes) =>
+                                                      match decode_bytes 6 bytes with
                                                       | None => None
-                                                      | Some (maximum_bid_price_value, bytes) =>
+                                                      | Some (an_obligatory_time_interval_to_place_an_order_value, bytes) =>
                                                           match decode_bytes 22 bytes with
                                                           | None => None
-                                                          | Some (minimum_order_price_value, bytes) =>
+                                                          | Some (minimum_ask_price_value, bytes) =>
                                                               match decode_bytes 22 bytes with
                                                               | None => None
-                                                              | Some (maximum_order_price_value, bytes) =>
-                                                                  match decode_uint 1 bytes with
+                                                              | Some (maximum_bid_price_value, bytes) =>
+                                                                  match decode_bytes 22 bytes with
                                                                   | None => None
-                                                                  | Some (end_keyword_value, bytes) =>
-                                                                      Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; market_participant_number := market_participant_number_value; lp_start_date := lp_start_date_value; lp_end_date := lp_end_date_value; minimum_order_volume := minimum_order_volume_value; maximum_volume_of_multiple_order := maximum_volume_of_multiple_order_value; bid_ask_spread_unit_code := bid_ask_spread_unit_code_value; upper_limit_of_bid_ask_spread := upper_limit_of_bid_ask_spread_value; spread_multiple_for_market_holidays := spread_multiple_for_market_holidays_value; an_obligatory_time_interval_to_place_an_order := an_obligatory_time_interval_to_place_an_order_value; minimum_ask_price := minimum_ask_price_value; maximum_bid_price := maximum_bid_price_value; minimum_order_price := minimum_order_price_value; maximum_order_price := maximum_order_price_value; end_keyword := end_keyword_value |}, bytes)
+                                                                  | Some (minimum_order_price_value, bytes) =>
+                                                                      match decode_bytes 22 bytes with
+                                                                      | None => None
+                                                                      | Some (maximum_order_price_value, bytes) =>
+                                                                          match decode_uint 1 bytes with
+                                                                          | None => None
+                                                                          | Some (end_keyword_value, bytes) =>
+                                                                              Some ({| message_sequence_number := message_sequence_number_value; isin_code := isin_code_value; market_participant_number := market_participant_number_value; board_id := board_id_value; market_making_liquidity_provider_type_code := market_making_liquidity_provider_type_code_value; lp_start_date := lp_start_date_value; lp_end_date := lp_end_date_value; minimum_order_volume := minimum_order_volume_value; maximum_volume_of_multiple_order := maximum_volume_of_multiple_order_value; bid_ask_spread_unit_code := bid_ask_spread_unit_code_value; upper_limit_of_bid_ask_spread := upper_limit_of_bid_ask_spread_value; spread_multiple_for_market_holidays := spread_multiple_for_market_holidays_value; an_obligatory_time_interval_to_place_an_order := an_obligatory_time_interval_to_place_an_order_value; minimum_ask_price := minimum_ask_price_value; maximum_bid_price := maximum_bid_price_value; minimum_order_price := minimum_order_price_value; maximum_order_price := maximum_order_price_value; end_keyword := end_keyword_value |}, bytes)
+                                                                          end
+                                                                      end
                                                                   end
                                                               end
                                                           end
@@ -2722,7 +2736,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 192.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 195.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
@@ -2732,7 +2746,7 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
@@ -2750,7 +2764,9 @@ Module KoscomMdcsRealtimeEquityDerivativesV2018.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_16.
+      rewrite decode_encode_uint by exact bound_17.
       destruct record. reflexivity.
     Qed.
 

@@ -245,7 +245,7 @@ Module MxSolaOrderEntryV121Firm.
       account_type : list byte;
       open_close : list byte;
       hedge_spec : list byte;
-      filler_5 : N;
+      filler_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -254,14 +254,14 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (account_type record) = 1 /\
       Datatypes.length (open_close record) = 1 /\
       Datatypes.length (hedge_spec record) = 1 /\
-      (filler_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (filler_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (clearing_instruction record) ++
       encode_bytes 1 (account_type record) ++
       encode_bytes 1 (open_close record) ++
       encode_bytes 1 (hedge_spec record) ++
-      encode_uint 5 (filler_5 record).
+      encode_bytes 5 (filler_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
@@ -276,7 +276,7 @@ Module MxSolaOrderEntryV121Firm.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (hedge_spec_value, bytes) =>
-                      match decode_uint 5 bytes with
+                      match decode_bytes 5 bytes with
                       | None => None
                       | Some (filler_5_value, bytes) =>
                           Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; filler_5 := filler_5_value |}, bytes)
@@ -289,7 +289,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -303,7 +303,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -362,7 +362,7 @@ Module MxSolaOrderEntryV121Firm.
       owner_data : OwnerData.t;
       maximum_number_trades : list byte;
       minimum_volume : list byte;
-      filler_2 : N;
+      filler_2 : list byte;
       calculation_time_interval : list byte;
       maximum_total_volume : list byte;
       maximum_total_value : list byte;
@@ -380,7 +380,7 @@ Module MxSolaOrderEntryV121Firm.
       OwnerData.bounded (owner_data record) /\
       Datatypes.length (maximum_number_trades record) = 2 /\
       Datatypes.length (minimum_volume record) = 8 /\
-      (filler_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (filler_2 record) = 2 /\
       Datatypes.length (calculation_time_interval record) = 8 /\
       Datatypes.length (maximum_total_volume record) = 8 /\
       Datatypes.length (maximum_total_value record) = 8 /\
@@ -396,7 +396,7 @@ Module MxSolaOrderEntryV121Firm.
       OwnerData.encode (owner_data record) ++
       encode_bytes 2 (maximum_number_trades record) ++
       encode_bytes 8 (minimum_volume record) ++
-      encode_uint 2 (filler_2 record) ++
+      encode_bytes 2 (filler_2 record) ++
       encode_bytes 8 (calculation_time_interval record) ++
       encode_bytes 8 (maximum_total_volume record) ++
       encode_bytes 8 (maximum_total_value record) ++
@@ -424,7 +424,7 @@ Module MxSolaOrderEntryV121Firm.
                           match decode_bytes 8 bytes with
                           | None => None
                           | Some (minimum_volume_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_bytes 2 bytes with
                               | None => None
                               | Some (filler_2_value, bytes) =>
                                   match decode_bytes 8 bytes with
@@ -467,7 +467,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 174.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -483,7 +483,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite OwnerData.decode_encode by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -810,7 +810,7 @@ Module MxSolaOrderEntryV121Firm.
       duration_type : list byte;
       gtd_date : list byte;
       executing_participant : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       clearing_data : ClearingData.t;
       owner_data : OwnerData.t;
       anti_wash_id : list byte;
@@ -834,7 +834,7 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (duration_type record) = 1 /\
       Datatypes.length (gtd_date record) = 8 /\
       Datatypes.length (executing_participant record) = 4 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       ClearingData.bounded (clearing_data record) /\
       OwnerData.bounded (owner_data record) /\
       Datatypes.length (anti_wash_id record) = 8 /\
@@ -856,7 +856,7 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 1 (duration_type record) ++
       encode_bytes 8 (gtd_date record) ++
       encode_bytes 4 (executing_participant record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       ClearingData.encode (clearing_data record) ++
       OwnerData.encode (owner_data record) ++
       encode_bytes 8 (anti_wash_id record) ++
@@ -906,7 +906,7 @@ Module MxSolaOrderEntryV121Firm.
                                                           match decode_bytes 4 bytes with
                                                           | None => None
                                                           | Some (executing_participant_value, bytes) =>
-                                                              match decode_uint 1 bytes with
+                                                              match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (filler_1_value, bytes) =>
                                                                   match ClearingData.decode bytes with
@@ -949,7 +949,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 181.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -973,7 +973,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_14.
       rewrite ClearingData.decode_encode by exact bound_15.
       rewrite OwnerData.decode_encode by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
@@ -1004,8 +1004,8 @@ Module MxSolaOrderEntryV121Firm.
       additional_quantity : list byte;
       duration_type : list byte;
       gtd_date : list byte;
-      filler_4 : N;
-      filler_1 : N;
+      filler_4 : list byte;
+      filler_1 : list byte;
       modified_order_id : list byte;
       clearing_data : ClearingData.t;
       owner_data : OwnerData.t;
@@ -1030,8 +1030,8 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (additional_quantity record) = 8 /\
       Datatypes.length (duration_type record) = 1 /\
       Datatypes.length (gtd_date record) = 8 /\
-      (filler_4 record < 256 ^ N.of_nat 4)%N /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_4 record) = 4 /\
+      Datatypes.length (filler_1 record) = 1 /\
       Datatypes.length (modified_order_id record) = 8 /\
       ClearingData.bounded (clearing_data record) /\
       OwnerData.bounded (owner_data record) /\
@@ -1054,8 +1054,8 @@ Module MxSolaOrderEntryV121Firm.
       encode_bytes 8 (additional_quantity record) ++
       encode_bytes 1 (duration_type record) ++
       encode_bytes 8 (gtd_date record) ++
-      encode_uint 4 (filler_4 record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 4 (filler_4 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_bytes 8 (modified_order_id record) ++
       ClearingData.encode (clearing_data record) ++
       OwnerData.encode (owner_data record) ++
@@ -1106,10 +1106,10 @@ Module MxSolaOrderEntryV121Firm.
                                                           match decode_bytes 8 bytes with
                                                           | None => None
                                                           | Some (gtd_date_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_bytes 4 bytes with
                                                               | None => None
                                                               | Some (filler_4_value, bytes) =>
-                                                                  match decode_uint 1 bytes with
+                                                                  match decode_bytes 1 bytes with
                                                                   | None => None
                                                                   | Some (filler_1_value, bytes) =>
                                                                       match decode_bytes 8 bytes with
@@ -1157,7 +1157,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 190.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !ClearingData.encode_length, !OwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1181,8 +1181,8 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_14.
+      rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite ClearingData.decode_encode by exact bound_17.
       rewrite OwnerData.decode_encode by exact bound_18.
@@ -1205,7 +1205,7 @@ Module MxSolaOrderEntryV121Firm.
       account_type : list byte;
       open_close : list byte;
       hedge_spec : list byte;
-      filler_5 : N;
+      filler_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1214,14 +1214,14 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (account_type record) = 1 /\
       Datatypes.length (open_close record) = 1 /\
       Datatypes.length (hedge_spec record) = 1 /\
-      (filler_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (filler_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (clearing_instruction record) ++
       encode_bytes 1 (account_type record) ++
       encode_bytes 1 (open_close record) ++
       encode_bytes 1 (hedge_spec record) ++
-      encode_uint 5 (filler_5 record).
+      encode_bytes 5 (filler_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
@@ -1236,7 +1236,7 @@ Module MxSolaOrderEntryV121Firm.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (hedge_spec_value, bytes) =>
-                      match decode_uint 5 bytes with
+                      match decode_bytes 5 bytes with
                       | None => None
                       | Some (filler_5_value, bytes) =>
                           Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; filler_5 := filler_5_value |}, bytes)
@@ -1249,7 +1249,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1263,7 +1263,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1280,7 +1280,7 @@ Module MxSolaOrderEntryV121Firm.
       account_type : list byte;
       open_close : list byte;
       hedge_spec : list byte;
-      filler_5 : N;
+      filler_5 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1289,14 +1289,14 @@ Module MxSolaOrderEntryV121Firm.
       Datatypes.length (account_type record) = 1 /\
       Datatypes.length (open_close record) = 1 /\
       Datatypes.length (hedge_spec record) = 1 /\
-      (filler_5 record < 256 ^ N.of_nat 5)%N.
+      Datatypes.length (filler_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (clearing_instruction record) ++
       encode_bytes 1 (account_type record) ++
       encode_bytes 1 (open_close record) ++
       encode_bytes 1 (hedge_spec record) ++
-      encode_uint 5 (filler_5 record).
+      encode_bytes 5 (filler_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
@@ -1311,7 +1311,7 @@ Module MxSolaOrderEntryV121Firm.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (hedge_spec_value, bytes) =>
-                      match decode_uint 5 bytes with
+                      match decode_bytes 5 bytes with
                       | None => None
                       | Some (filler_5_value, bytes) =>
                           Some ({| clearing_instruction := clearing_instruction_value; account_type := account_type_value; open_close := open_close_value; hedge_spec := hedge_spec_value; filler_5 := filler_5_value |}, bytes)
@@ -1324,7 +1324,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1338,7 +1338,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1435,7 +1435,7 @@ Module MxSolaOrderEntryV121Firm.
       incoming_messages_header : IncomingMessagesHeader.t;
       group : list byte;
       instrument : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       quantity : list byte;
       price : list byte;
       buying_clearing_data : BuyingClearingData.t;
@@ -1450,7 +1450,7 @@ Module MxSolaOrderEntryV121Firm.
       IncomingMessagesHeader.bounded (incoming_messages_header record) /\
       Datatypes.length (group record) = 2 /\
       Datatypes.length (instrument record) = 4 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       Datatypes.length (quantity record) = 8 /\
       Datatypes.length (price record) = 10 /\
       BuyingClearingData.bounded (buying_clearing_data record) /\
@@ -1463,7 +1463,7 @@ Module MxSolaOrderEntryV121Firm.
       IncomingMessagesHeader.encode (incoming_messages_header record) ++
       encode_bytes 2 (group record) ++
       encode_bytes 4 (instrument record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_bytes 8 (quantity record) ++
       encode_bytes 10 (price record) ++
       BuyingClearingData.encode (buying_clearing_data record) ++
@@ -1482,7 +1482,7 @@ Module MxSolaOrderEntryV121Firm.
               match decode_bytes 4 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
-                  match decode_uint 1 bytes with
+                  match decode_bytes 1 bytes with
                   | None => None
                   | Some (filler_1_value, bytes) =>
                       match decode_bytes 8 bytes with
@@ -1522,7 +1522,7 @@ Module MxSolaOrderEntryV121Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 207.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !encode_uint_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length. reflexivity.
+      rewrite !length_app, !IncomingMessagesHeader.encode_length, !encode_bytes_length, !BuyingClearingData.encode_length, !SellingClearingData.encode_length, !BuyingOwnerData.encode_length, !SellingOwnerData.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1535,7 +1535,7 @@ Module MxSolaOrderEntryV121Firm.
       rewrite IncomingMessagesHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite BuyingClearingData.decode_encode by exact bound_6.

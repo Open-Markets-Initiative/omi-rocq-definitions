@@ -220,7 +220,7 @@ Module BoxOptionsSolaMulticastV21.
     Record t := {
       root_symbol : list byte;
       expiry_month_code : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       strike_price : list byte;
       strike_price_fraction_indicator : list byte;
       expiry_year : list byte;
@@ -231,7 +231,7 @@ Module BoxOptionsSolaMulticastV21.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (root_symbol record) = 6 /\
       Datatypes.length (expiry_month_code record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       Datatypes.length (strike_price record) = 7 /\
       Datatypes.length (strike_price_fraction_indicator record) = 1 /\
       Datatypes.length (expiry_year record) = 2 /\
@@ -240,7 +240,7 @@ Module BoxOptionsSolaMulticastV21.
     Definition encode (record : t) : list byte :=
       encode_bytes 6 (root_symbol record) ++
       encode_bytes 1 (expiry_month_code record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_bytes 7 (strike_price record) ++
       encode_bytes 1 (strike_price_fraction_indicator record) ++
       encode_bytes 2 (expiry_year record) ++
@@ -253,7 +253,7 @@ Module BoxOptionsSolaMulticastV21.
           match decode_bytes 1 bytes with
           | None => None
           | Some (expiry_month_code_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (filler_1_value, bytes) =>
                   match decode_bytes 7 bytes with
@@ -280,7 +280,7 @@ Module BoxOptionsSolaMulticastV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -292,7 +292,7 @@ Module BoxOptionsSolaMulticastV21.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -855,21 +855,21 @@ Module BoxOptionsSolaMulticastV21.
 
     (** This message is sent when there is no more trading activity to be transmitted *)
     Record t := {
-      reserved : N;
+      reserved : list byte;
       time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved record) = 1 /\
       Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reserved record) ++
+      encode_bytes 1 (reserved record) ++
       encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
+      match decode_bytes 1 bytes with
       | None => None
       | Some (reserved_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -882,7 +882,7 @@ Module BoxOptionsSolaMulticastV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -892,7 +892,7 @@ Module BoxOptionsSolaMulticastV21.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -918,7 +918,7 @@ Module BoxOptionsSolaMulticastV21.
       minimum_quantity_for_improvement_order : list byte;
       percentage_assured_to_initial_order : list byte;
       auction_type : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -935,7 +935,7 @@ Module BoxOptionsSolaMulticastV21.
       Datatypes.length (minimum_quantity_for_improvement_order record) = 8 /\
       Datatypes.length (percentage_assured_to_initial_order record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (filler_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (exchange_id record) ++
@@ -950,7 +950,7 @@ Module BoxOptionsSolaMulticastV21.
       encode_bytes 8 (minimum_quantity_for_improvement_order record) ++
       encode_bytes 8 (percentage_assured_to_initial_order record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 1 (filler_1 record).
+      encode_bytes 1 (filler_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -989,7 +989,7 @@ Module BoxOptionsSolaMulticastV21.
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (auction_type_value, bytes) =>
-                                                      match decode_uint 1 bytes with
+                                                      match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (filler_1_value, bytes) =>
                                                           Some ({| exchange_id := exchange_id_value; instrument_description := instrument_description_value; improvement_phase_sequential_number := improvement_phase_sequential_number_value; initial_order_price := initial_order_price_value; initial_order_price_fraction_indicator := initial_order_price_fraction_indicator_value; initial_order_quantity := initial_order_quantity_value; initial_order_side := initial_order_side_value; improvement_phase_expiry_time := improvement_phase_expiry_time_value; improvement_process_expiry_duration := improvement_process_expiry_duration_value; minimum_quantity_for_improvement_order := minimum_quantity_for_improvement_order_value; percentage_assured_to_initial_order := percentage_assured_to_initial_order_value; auction_type := auction_type_value; filler_1 := filler_1_value |}, bytes)
@@ -1010,7 +1010,7 @@ Module BoxOptionsSolaMulticastV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 73.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1032,7 +1032,7 @@ Module BoxOptionsSolaMulticastV21.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -1192,9 +1192,9 @@ Module BoxOptionsSolaMulticastV21.
       limit_fraction_indicator : list byte;
       order_quantity : list byte;
       order_sequence_number : list byte;
-      filler_6 : N;
+      filler_6 : list byte;
       type_of_clearing_account : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       end_of_the_exposition : list byte;
       auction_type : list byte;
       firm_id : list byte;
@@ -1211,9 +1211,9 @@ Module BoxOptionsSolaMulticastV21.
       Datatypes.length (limit_fraction_indicator record) = 1 /\
       Datatypes.length (order_quantity record) = 8 /\
       Datatypes.length (order_sequence_number record) = 6 /\
-      (filler_6 record < 256 ^ N.of_nat 6)%N /\
+      Datatypes.length (filler_6 record) = 6 /\
       Datatypes.length (type_of_clearing_account record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       Datatypes.length (end_of_the_exposition record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (firm_id record) = 4 /\
@@ -1228,9 +1228,9 @@ Module BoxOptionsSolaMulticastV21.
       encode_bytes 1 (limit_fraction_indicator record) ++
       encode_bytes 8 (order_quantity record) ++
       encode_bytes 6 (order_sequence_number record) ++
-      encode_uint 6 (filler_6 record) ++
+      encode_bytes 6 (filler_6 record) ++
       encode_bytes 1 (type_of_clearing_account record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_bytes 8 (end_of_the_exposition record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 4 (firm_id record) ++
@@ -1261,13 +1261,13 @@ Module BoxOptionsSolaMulticastV21.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (order_sequence_number_value, bytes) =>
-                                      match decode_uint 6 bytes with
+                                      match decode_bytes 6 bytes with
                                       | None => None
                                       | Some (filler_6_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (type_of_clearing_account_value, bytes) =>
-                                              match decode_uint 1 bytes with
+                                              match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (filler_1_value, bytes) =>
                                                   match decode_bytes 8 bytes with
@@ -1302,7 +1302,7 @@ Module BoxOptionsSolaMulticastV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !InstrumentDescription.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1320,9 +1320,9 @@ Module BoxOptionsSolaMulticastV21.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
@@ -1348,9 +1348,9 @@ Module BoxOptionsSolaMulticastV21.
       limit_fraction_indicator : list byte;
       order_quantity : list byte;
       order_sequence_number : list byte;
-      filler_6 : N;
+      filler_6 : list byte;
       type_of_clearing_account : list byte;
-      filler_1 : N;
+      filler_1 : list byte;
       end_of_the_exposition : list byte;
       auction_type : list byte;
       firm_id : list byte;
@@ -1368,9 +1368,9 @@ Module BoxOptionsSolaMulticastV21.
       Datatypes.length (limit_fraction_indicator record) = 1 /\
       Datatypes.length (order_quantity record) = 8 /\
       Datatypes.length (order_sequence_number record) = 6 /\
-      (filler_6 record < 256 ^ N.of_nat 6)%N /\
+      Datatypes.length (filler_6 record) = 6 /\
       Datatypes.length (type_of_clearing_account record) = 1 /\
-      (filler_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (filler_1 record) = 1 /\
       Datatypes.length (end_of_the_exposition record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (firm_id record) = 4 /\
@@ -1386,9 +1386,9 @@ Module BoxOptionsSolaMulticastV21.
       encode_bytes 1 (limit_fraction_indicator record) ++
       encode_bytes 8 (order_quantity record) ++
       encode_bytes 6 (order_sequence_number record) ++
-      encode_uint 6 (filler_6 record) ++
+      encode_bytes 6 (filler_6 record) ++
       encode_bytes 1 (type_of_clearing_account record) ++
-      encode_uint 1 (filler_1 record) ++
+      encode_bytes 1 (filler_1 record) ++
       encode_bytes 8 (end_of_the_exposition record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 4 (firm_id record) ++
@@ -1422,13 +1422,13 @@ Module BoxOptionsSolaMulticastV21.
                                       match decode_bytes 6 bytes with
                                       | None => None
                                       | Some (order_sequence_number_value, bytes) =>
-                                          match decode_uint 6 bytes with
+                                          match decode_bytes 6 bytes with
                                           | None => None
                                           | Some (filler_6_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (type_of_clearing_account_value, bytes) =>
-                                                  match decode_uint 1 bytes with
+                                                  match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (filler_1_value, bytes) =>
                                                       match decode_bytes 8 bytes with
@@ -1464,7 +1464,7 @@ Module BoxOptionsSolaMulticastV21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 80.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1483,9 +1483,9 @@ Module BoxOptionsSolaMulticastV21.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.

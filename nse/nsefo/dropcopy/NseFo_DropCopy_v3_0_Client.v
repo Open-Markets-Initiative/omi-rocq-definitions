@@ -98,7 +98,7 @@ Module NseFoDropCopyV30Client.
       partition_id : list byte;
       concurrent_login_id : N;
       func_indc : list byte;
-      reserve : N;
+      reserve : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -109,7 +109,7 @@ Module NseFoDropCopyV30Client.
       Datatypes.length (partition_id record) = 6 /\
       (concurrent_login_id record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (func_indc record) = 1 /\
-      (reserve record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserve record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (transaction_code record) ++
@@ -118,7 +118,7 @@ Module NseFoDropCopyV30Client.
       encode_bytes 6 (partition_id record) ++
       encode_uint 2 (concurrent_login_id record) ++
       encode_bytes 1 (func_indc record) ++
-      encode_uint 1 (reserve record).
+      encode_bytes 1 (reserve record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -139,7 +139,7 @@ Module NseFoDropCopyV30Client.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (func_indc_value, bytes) =>
-                              match decode_uint 1 bytes with
+                              match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserve_value, bytes) =>
                                   Some ({| transaction_code := transaction_code_value; trader_id := trader_id_value; request_sequence_number := request_sequence_number_value; partition_id := partition_id_value; concurrent_login_id := concurrent_login_id_value; func_indc := func_indc_value; reserve := reserve_value |}, bytes)
@@ -170,7 +170,7 @@ Module NseFoDropCopyV30Client.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 

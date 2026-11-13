@@ -151,18 +151,18 @@ Module NeoEquitiesMulticastTradesV1014.
 
     (** Instructs feed recipients to clear all orders for the Cboe Canada order book in the unit specified in the Sequenced Unit Header. Distributed in rare recovery events such as a data center fail-over. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -171,7 +171,7 @@ Module NeoEquitiesMulticastTradesV1014.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,12 +179,12 @@ Module NeoEquitiesMulticastTradesV1014.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UnitClearMessage.
 
@@ -489,18 +489,18 @@ Module NeoEquitiesMulticastTradesV1014.
 
     (** Sent for each unit when the unit shuts down. No additional sequenced messages will be delivered for this unit, but heartbeats from the unit may be received. *)
     Record t := {
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_bytes 4 bytes with
       | None => None
       | Some (reserved_4_value, bytes) =>
           Some ({| reserved_4 := reserved_4_value |}, bytes)
@@ -509,7 +509,7 @@ Module NeoEquitiesMulticastTradesV1014.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -517,12 +517,12 @@ Module NeoEquitiesMulticastTradesV1014.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End EndOfSessionMessage.
 

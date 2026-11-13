@@ -304,7 +304,7 @@ Module MiaxOptionsMpfV11Tcp.
       nanoseconds : N;
       synthetic_future_symbol : list byte;
       value : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -312,13 +312,13 @@ Module MiaxOptionsMpfV11Tcp.
       (nanoseconds record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (synthetic_future_symbol record) = 8 /\
       (value record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (nanoseconds record) ++
       encode_bytes 8 (synthetic_future_symbol record) ++
       encode_uint 4 (value record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -330,7 +330,7 @@ Module MiaxOptionsMpfV11Tcp.
               match decode_uint 4 bytes with
               | None => None
               | Some (value_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_bytes 8 bytes with
                   | None => None
                   | Some (reserved_8_value, bytes) =>
                       Some ({| nanoseconds := nanoseconds_value; synthetic_future_symbol := synthetic_future_symbol_value; value := value_value; reserved_8 := reserved_8_value |}, bytes)
@@ -355,7 +355,7 @@ Module MiaxOptionsMpfV11Tcp.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

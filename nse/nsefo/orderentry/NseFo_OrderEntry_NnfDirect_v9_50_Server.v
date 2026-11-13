@@ -556,18 +556,18 @@ Module NseFoOrderEntryV950Server.
 
     (** Opens the local database download *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -576,7 +576,7 @@ Module NseFoOrderEntryV950Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -584,12 +584,12 @@ Module NseFoOrderEntryV950Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocalDatabaseHeaderMessage.
 
@@ -597,18 +597,18 @@ Module NseFoOrderEntryV950Server.
 
     (** Closes the local database download *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -617,7 +617,7 @@ Module NseFoOrderEntryV950Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -625,12 +625,12 @@ Module NseFoOrderEntryV950Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocalDatabaseTrailerMessage.
 
@@ -830,7 +830,7 @@ Module NseFoOrderEntryV950Server.
     Record t := {
       trader_id : N;
       action_code : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       broad_cast_message_length : N;
       broad_cast_message : list byte;
     }.
@@ -839,14 +839,14 @@ Module NseFoOrderEntryV950Server.
     Definition bounded (record : t) : Prop :=
       (trader_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (action_code record) = 3 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (broad_cast_message_length record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (broad_cast_message record) = 239.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (trader_id record) ++
       encode_bytes 3 (action_code record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (broad_cast_message_length record) ++
       encode_bytes 239 (broad_cast_message record).
 
@@ -857,7 +857,7 @@ Module NseFoOrderEntryV950Server.
           match decode_bytes 3 bytes with
           | None => None
           | Some (action_code_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -888,7 +888,7 @@ Module NseFoOrderEntryV950Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -995,23 +995,23 @@ Module NseFoOrderEntryV950Server.
     (** Report Trailer Body *)
     Record t := {
       number_of_packets : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (number_of_packets record < 256 ^ N.of_nat 4)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (number_of_packets record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
       | Some (number_of_packets_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_bytes 1 bytes with
           | None => None
           | Some (reserved_1_value, bytes) =>
               Some ({| number_of_packets := number_of_packets_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1021,7 +1021,7 @@ Module NseFoOrderEntryV950Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1032,12 +1032,12 @@ Module NseFoOrderEntryV950Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ReportTrailerBody.
 
@@ -1562,19 +1562,19 @@ Module NseFoOrderEntryV950Server.
     Record t := {
       user_id : N;
       col_user_bit : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (col_user_bit record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
       encode_bytes 1 (col_user_bit record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1583,7 +1583,7 @@ Module NseFoOrderEntryV950Server.
           match decode_bytes 1 bytes with
           | None => None
           | Some (col_user_bit_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   Some ({| user_id := user_id_value; col_user_bit := col_user_bit_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1606,7 +1606,7 @@ Module NseFoOrderEntryV950Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1621,19 +1621,19 @@ Module NseFoOrderEntryV950Server.
     Record t := {
       user_id : N;
       trd_mod_cxl_bit : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trd_mod_cxl_bit record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
       encode_bytes 1 (trd_mod_cxl_bit record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1642,7 +1642,7 @@ Module NseFoOrderEntryV950Server.
           match decode_bytes 1 bytes with
           | None => None
           | Some (trd_mod_cxl_bit_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   Some ({| user_id := user_id_value; trd_mod_cxl_bit := trd_mod_cxl_bit_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1665,7 +1665,7 @@ Module NseFoOrderEntryV950Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

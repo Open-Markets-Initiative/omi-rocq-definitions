@@ -147,19 +147,19 @@ Module NseCmOrderEntryV66Server.
     Record t := {
       user_id : N;
       colo_user_bit : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (colo_user_bit record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
       encode_bytes 1 (colo_user_bit record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -168,7 +168,7 @@ Module NseCmOrderEntryV66Server.
           match decode_bytes 1 bytes with
           | None => None
           | Some (colo_user_bit_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   Some ({| user_id := user_id_value; colo_user_bit := colo_user_bit_value; reserved_1 := reserved_1_value |}, bytes)
@@ -191,7 +191,7 @@ Module NseCmOrderEntryV66Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -500,7 +500,7 @@ Module NseCmOrderEntryV66Server.
     Record t := {
       trader_id : N;
       action_code : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       msg_length : N;
       msg : list byte;
     }.
@@ -509,14 +509,14 @@ Module NseCmOrderEntryV66Server.
     Definition bounded (record : t) : Prop :=
       (trader_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (action_code record) = 3 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (msg_length record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (msg record) = 240.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (trader_id record) ++
       encode_bytes 3 (action_code record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (msg_length record) ++
       encode_bytes 240 (msg record).
 
@@ -527,7 +527,7 @@ Module NseCmOrderEntryV66Server.
           match decode_bytes 3 bytes with
           | None => None
           | Some (action_code_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -558,7 +558,7 @@ Module NseCmOrderEntryV66Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -787,18 +787,18 @@ Module NseCmOrderEntryV66Server.
 
     (** Sent as UPDATE_LOCALDB_HEADER *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -807,7 +807,7 @@ Module NseCmOrderEntryV66Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -815,12 +815,12 @@ Module NseCmOrderEntryV66Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocalDatabaseHeaderMessage.
 
@@ -828,18 +828,18 @@ Module NseCmOrderEntryV66Server.
 
     (** Sent as UPDATE_LOCALDB_TRAILER *)
     Record t := {
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
           Some ({| reserved_2 := reserved_2_value |}, bytes)
@@ -848,7 +848,7 @@ Module NseCmOrderEntryV66Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -856,12 +856,12 @@ Module NseCmOrderEntryV66Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_bytes by exact bound.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End UpdateLocalDatabaseTrailerMessage.
 
@@ -953,19 +953,19 @@ Module NseCmOrderEntryV66Server.
     Record t := {
       user_id : N;
       trd_mod_cxl_bit : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trd_mod_cxl_bit record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
       encode_bytes 1 (trd_mod_cxl_bit record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -974,7 +974,7 @@ Module NseCmOrderEntryV66Server.
           match decode_bytes 1 bytes with
           | None => None
           | Some (trd_mod_cxl_bit_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   Some ({| user_id := user_id_value; trd_mod_cxl_bit := trd_mod_cxl_bit_value; reserved_1 := reserved_1_value |}, bytes)
@@ -997,7 +997,7 @@ Module NseCmOrderEntryV66Server.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

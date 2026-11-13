@@ -1185,9 +1185,9 @@ Module C1OptionsMulticastDepthOfBookV24129.
     Record t := {
       time_offset : N;
       symbol : list byte;
-      reserved_2 : N;
+      reserved_2 : list byte;
       trading_status : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       gth_trading_status : list byte;
       padding : list byte;
     }.
@@ -1196,18 +1196,18 @@ Module C1OptionsMulticastDepthOfBookV24129.
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 6 /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (trading_status record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (gth_trading_status record) = 1 /\
       Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (gth_trading_status record) ++
       encode_bytes 1 (padding record).
 
@@ -1218,13 +1218,13 @@ Module C1OptionsMulticastDepthOfBookV24129.
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_bytes 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -1257,9 +1257,9 @@ Module C1OptionsMulticastDepthOfBookV24129.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.

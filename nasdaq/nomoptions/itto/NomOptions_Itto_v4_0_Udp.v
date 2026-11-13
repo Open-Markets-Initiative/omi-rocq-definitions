@@ -2009,7 +2009,7 @@ Module NomOptionsIttoV40Udp.
       imbalance_price : N;
       imbalance_volume : N;
       customer_firm_indicator : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2024,7 +2024,7 @@ Module NomOptionsIttoV40Udp.
       (imbalance_price record < 256 ^ N.of_nat 4)%N /\
       (imbalance_volume record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (customer_firm_indicator record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
@@ -2037,7 +2037,7 @@ Module NomOptionsIttoV40Udp.
       encode_uint 4 (imbalance_price record) ++
       encode_uint 4 (imbalance_volume record) ++
       encode_bytes 1 (customer_firm_indicator record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -2070,7 +2070,7 @@ Module NomOptionsIttoV40Udp.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (customer_firm_indicator_value, bytes) =>
-                                              match decode_uint 3 bytes with
+                                              match decode_bytes 3 bytes with
                                               | None => None
                                               | Some (reserved_3_value, bytes) =>
                                                   Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; auction_id := auction_id_value; auction_type := auction_type_value; paired_contracts := paired_contracts_value; imbalance_direction := imbalance_direction_value; option_id := option_id_value; imbalance_price := imbalance_price_value; imbalance_volume := imbalance_volume_value; customer_firm_indicator := customer_firm_indicator_value; reserved_3 := reserved_3_value |}, bytes)
@@ -2109,7 +2109,7 @@ Module NomOptionsIttoV40Udp.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 

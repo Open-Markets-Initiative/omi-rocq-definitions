@@ -6,7 +6,7 @@ From Omi Require Import Wire.
 
 Import ListNotations.
 
-(** * National Association of Securities Dealers Automated Quotations (Nasdaq) Nom Itto Top Order Market Data
+(** * National Association of Securities Dealers Automated Quotations (Nasdaq) Itch to Trade Options
 
     Generated from the binary model. Every record is a run of fields, and carries the two
     theorems the model's rules call for: an encoding is as wide as its fields say, and

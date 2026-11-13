@@ -720,7 +720,7 @@ Module MrxOptionsQuotingV90Client.
       debit_credit : list byte;
       contracts : N;
       price_protection : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -735,7 +735,7 @@ Module MrxOptionsQuotingV90Client.
       Datatypes.length (debit_credit record) = 1 /\
       (contracts record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (price_protection record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (badge record) ++
@@ -748,7 +748,7 @@ Module MrxOptionsQuotingV90Client.
       encode_bytes 1 (debit_credit record) ++
       encode_uint 4 (contracts record) ++
       encode_bytes 1 (price_protection record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
@@ -781,7 +781,7 @@ Module MrxOptionsQuotingV90Client.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (price_protection_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (reserved_4_value, bytes) =>
                                                   Some ({| badge := badge_value; message_id := message_id_value; instrument_id := instrument_id_value; msar_type := msar_type_value; auction_id := auction_id_value; price := price_value; side := side_value; debit_credit := debit_credit_value; contracts := contracts_value; price_protection := price_protection_value; reserved_4 := reserved_4_value |}, bytes)
@@ -820,7 +820,7 @@ Module MrxOptionsQuotingV90Client.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 

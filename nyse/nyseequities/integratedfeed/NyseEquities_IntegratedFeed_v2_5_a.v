@@ -340,7 +340,7 @@ Module NyseEquitiesIntegratedFeedV25A.
     Record t := {
       symbol_index : N;
       symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
       system_id : N;
       exchange_code : list byte;
@@ -353,14 +353,14 @@ Module NyseEquitiesIntegratedFeedV25A.
       round_lot : list byte;
       mpv : N;
       unit_of_trade : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exchange_code record) = 1 /\
@@ -373,12 +373,12 @@ Module NyseEquitiesIntegratedFeedV25A.
       Datatypes.length (round_lot record) = 1 /\
       (mpv record < 256 ^ N.of_nat 2)%N /\
       (unit_of_trade record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
@@ -391,7 +391,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_bytes 1 (round_lot record) ++
       encode_uint 2 (mpv record) ++
       encode_uint 2 (unit_of_trade record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -400,7 +400,7 @@ Module NyseEquitiesIntegratedFeedV25A.
           match decode_bytes 11 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -439,7 +439,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                                                               match decode_uint 2 bytes with
                                                               | None => None
                                                               | Some (unit_of_trade_value, bytes) =>
-                                                                  match decode_uint 2 bytes with
+                                                                  match decode_bytes 2 bytes with
                                                                   | None => None
                                                                   | Some (reserved_2_value, bytes) =>
                                                                       Some ({| symbol_index := symbol_index_value; symbol := symbol_value; reserved_1 := reserved_1_value; market_id := market_id_value; system_id := system_id_value; exchange_code := exchange_code_value; price_scale_code := price_scale_code_value; security_type := security_type_value; lot_size := lot_size_value; prev_close_price := prev_close_price_value; prev_close_volume := prev_close_volume_value; price_resolution := price_resolution_value; round_lot := round_lot_value; mpv := mpv_value; unit_of_trade := unit_of_trade_value; reserved_2 := reserved_2_value |}, bytes)
@@ -475,7 +475,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -488,7 +488,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -990,7 +990,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       symbol_seq_num : N;
       security_status : list byte;
       halt_condition : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       price_1 : N;
       price_2 : N;
       ssr_triggering_exchange_id : list byte;
@@ -1009,7 +1009,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       (price_1 record < 256 ^ N.of_nat 4)%N /\
       (price_2 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ssr_triggering_exchange_id record) = 1 /\
@@ -1026,7 +1026,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_uint 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_uint 4 (price_1 record) ++
       encode_uint 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
@@ -1055,7 +1055,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (halt_condition_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
                                   match decode_uint 4 bytes with
@@ -1118,7 +1118,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1147,7 +1147,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       volume : N;
       side : list byte;
       firm_id : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1160,7 +1160,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       (volume record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (side record) = 1 /\
       Datatypes.length (firm_id record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time_ns record) ++
@@ -1171,7 +1171,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_uint 4 (volume record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 5 (firm_id record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1198,7 +1198,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                                   match decode_bytes 5 bytes with
                                   | None => None
                                   | Some (firm_id_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_1_value, bytes) =>
                                           Some ({| source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; symbol_seq_num := symbol_seq_num_value; order_id := order_id_value; price := price_value; volume := volume_value; side := side_value; firm_id := firm_id_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1233,7 +1233,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1254,7 +1254,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       volume : N;
       position_change : N;
       side : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1267,7 +1267,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       (volume record < 256 ^ N.of_nat 4)%N /\
       (position_change record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (side record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time_ns record) ++
@@ -1278,7 +1278,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_uint 4 (volume record) ++
       encode_uint 1 (position_change record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1305,7 +1305,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (side_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_1_value, bytes) =>
                                           Some ({| source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; symbol_seq_num := symbol_seq_num_value; order_id := order_id_value; price := price_value; volume := volume_value; position_change := position_change_value; side := side_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1340,7 +1340,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1357,7 +1357,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       symbol_index : N;
       symbol_seq_num : N;
       order_id : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1366,14 +1366,14 @@ Module NyseEquitiesIntegratedFeedV25A.
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       (symbol_seq_num record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time_ns record) ++
       encode_uint 4 (symbol_index record) ++
       encode_uint 4 (symbol_seq_num record) ++
       encode_uint 8 (order_id record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1388,7 +1388,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
                           Some ({| source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; symbol_seq_num := symbol_seq_num_value; order_id := order_id_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1401,7 +1401,7 @@ Module NyseEquitiesIntegratedFeedV25A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 21.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1415,12 +1415,12 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End DeleteOrderMessage.
 
@@ -1436,7 +1436,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       price : N;
       volume : N;
       printable_flag : N;
-      reserved_1 : N;
+      reserved_1 : list byte;
       trade_cond_1 : list byte;
       trade_cond_2 : list byte;
       trade_cond_3 : list byte;
@@ -1453,7 +1453,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       (price record < 256 ^ N.of_nat 4)%N /\
       (volume record < 256 ^ N.of_nat 4)%N /\
       (printable_flag record < 256 ^ N.of_nat 1)%N /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (trade_cond_1 record) = 1 /\
       Datatypes.length (trade_cond_2 record) = 1 /\
       Datatypes.length (trade_cond_3 record) = 1 /\
@@ -1468,7 +1468,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_uint 4 (price record) ++
       encode_uint 4 (volume record) ++
       encode_uint 1 (printable_flag record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (trade_cond_2 record) ++
       encode_bytes 1 (trade_cond_3 record) ++
@@ -1499,7 +1499,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (printable_flag_value, bytes) =>
-                                      match decode_uint 1 bytes with
+                                      match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_1_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -1550,7 +1550,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -1902,7 +1902,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       volume : N;
       side : list byte;
       firm_id : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1916,7 +1916,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       (volume record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (side record) = 1 /\
       Datatypes.length (firm_id record) = 5 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (source_time record) ++
@@ -1928,7 +1928,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       encode_uint 4 (volume record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 5 (firm_id record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1958,7 +1958,7 @@ Module NyseEquitiesIntegratedFeedV25A.
                                       match decode_bytes 5 bytes with
                                       | None => None
                                       | Some (firm_id_value, bytes) =>
-                                          match decode_uint 1 bytes with
+                                          match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (reserved_1_value, bytes) =>
                                               Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; symbol_seq_num := symbol_seq_num_value; order_id := order_id_value; price := price_value; volume := volume_value; side := side_value; firm_id := firm_id_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1995,7 +1995,7 @@ Module NyseEquitiesIntegratedFeedV25A.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 

@@ -38,7 +38,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       message_length : N;
       firm_message_type : N;
       matching_unit : N;
-      reserved_field : N;
+      reserved_field : list byte;
       sequence_number : N;
     }.
 
@@ -48,7 +48,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       (message_length record < 256 ^ N.of_nat 2)%N /\
       (firm_message_type record < 256 ^ N.of_nat 2)%N /\
       (matching_unit record < 256 ^ N.of_nat 1)%N /\
-      (reserved_field record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_field record) = 1 /\
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
@@ -56,7 +56,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_uint 2 (message_length record) ++
       encode_uint 2 (firm_message_type record) ++
       encode_uint 1 (matching_unit record) ++
-      encode_uint 1 (reserved_field record) ++
+      encode_bytes 1 (reserved_field record) ++
       encode_uint 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -72,7 +72,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (matching_unit_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
                           match decode_uint 4 bytes with
@@ -89,7 +89,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -103,13 +103,13 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End FirmMessageHeader.
 
@@ -1457,7 +1457,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       sell_lei_order_origin : N;
       sell_lei_routing_arrangement_indicator : list byte;
       anonymous : list byte;
-      reserved : N;
+      reserved : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1499,7 +1499,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       (sell_lei_order_origin record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (sell_lei_routing_arrangement_indicator record) = 1 /\
       Datatypes.length (anonymous record) = 1 /\
-      (reserved record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (broker_id record) ++
@@ -1539,7 +1539,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_uint 1 (sell_lei_order_origin record) ++
       encode_bytes 1 (sell_lei_routing_arrangement_indicator record) ++
       encode_bytes 1 (anonymous record) ++
-      encode_uint 4 (reserved record).
+      encode_bytes 4 (reserved record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -1653,7 +1653,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                                                       | None => None
                                                                                                                                                       | Some (anonymous_value, bytes) =>
-                                                                                                                                                          match decode_uint 4 bytes with
+                                                                                                                                                          match decode_bytes 4 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (reserved_value, bytes) =>
                                                                                                                                                               Some ({| broker_id := broker_id_value; cross_cl_ord_id := cross_cl_ord_id_value; cross_type := cross_type_value; price := price_value; order_qty := order_qty_value; symbol := symbol_value; settlement_type := settlement_type_value; fut_settl_date := fut_settl_date_value; umir_user_id := umir_user_id_value; basket_trade := basket_trade_value; program_trade := program_trade_value; non_resident := non_resident_value; bypass := bypass_value; ncib := ncib_value; cross_side := cross_side_value; short_marking_exempt := short_marking_exempt_value; buy_umir_account_type := buy_umir_account_type_value; buy_account := buy_account_value; buy_umir_regulation_id := buy_umir_regulation_id_value; buy_jitney := buy_jitney_value; buy_lei_customer_account := buy_lei_customer_account_value; buy_lei_algorithm_id := buy_lei_algorithm_id_value; buy_customer_lei := buy_customer_lei_value; buy_broker_lei := buy_broker_lei_value; buy_lei_order_origin := buy_lei_order_origin_value; buy_lei_routing_arrangement_indicator := buy_lei_routing_arrangement_indicator_value; sell_umir_account_type := sell_umir_account_type_value; sell_account := sell_account_value; sell_umir_regulation_id := sell_umir_regulation_id_value; sell_jitney := sell_jitney_value; sell_lei_customer_account := sell_lei_customer_account_value; sell_lei_algorithm_id := sell_lei_algorithm_id_value; sell_customer_lei := sell_customer_lei_value; sell_broker_lei := sell_broker_lei_value; sell_lei_order_origin := sell_lei_order_origin_value; sell_lei_routing_arrangement_indicator := sell_lei_routing_arrangement_indicator_value; anonymous := anonymous_value; reserved := reserved_value |}, bytes)
@@ -1746,7 +1746,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_uint by exact bound_34.
       rewrite decode_encode_bytes by exact bound_35.
       rewrite decode_encode_bytes by exact bound_36.
-      rewrite decode_encode_uint by exact bound_37.
+      rewrite decode_encode_bytes by exact bound_37.
       destruct record. reflexivity.
     Qed.
 

@@ -85,23 +85,23 @@ Module EurexT7EdciV141Client.
 
     Record t := {
       msg_seq_num : N;
-      pad4 : N;
+      pad4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (msg_seq_num record < 256 ^ N.of_nat 4)%N /\
-      (pad4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (pad4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (msg_seq_num record) ++
-      encode_uint 4 (pad4 record).
+      encode_bytes 4 (pad4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_bytes 4 bytes with
           | None => None
           | Some (pad4_value, bytes) =>
               Some ({| msg_seq_num := msg_seq_num_value; pad4 := pad4_value |}, bytes)
@@ -111,7 +111,7 @@ Module EurexT7EdciV141Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -122,12 +122,12 @@ Module EurexT7EdciV141Client.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End RequestHeaderComp.
 

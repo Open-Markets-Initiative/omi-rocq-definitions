@@ -313,7 +313,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       price_short : N;
       volume_short : N;
       scope : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -327,7 +327,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       (price_short record < 256 ^ N.of_nat 2)%N /\
       (volume_short record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (scope record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
@@ -339,7 +339,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       encode_uint 2 (price_short record) ++
       encode_uint 2 (volume_short record) ++
       encode_bytes 1 (scope record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -369,7 +369,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (scope_value, bytes) =>
-                                          match decode_uint 3 bytes with
+                                          match decode_bytes 3 bytes with
                                           | None => None
                                           | Some (reserved_3_value, bytes) =>
                                               Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; strategy_id := strategy_id_value; order_reference_number := order_reference_number_value; depth_side := depth_side_value; order_capacity := order_capacity_value; price_short := price_short_value; volume_short := volume_short_value; scope := scope_value; reserved_3 := reserved_3_value |}, bytes)
@@ -406,7 +406,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -428,7 +428,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       price_long : N;
       volume_long : N;
       scope : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -442,7 +442,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       (price_long record < 256 ^ N.of_nat 4)%N /\
       (volume_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (scope record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N.
+      Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
@@ -454,7 +454,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       encode_uint 4 (price_long record) ++
       encode_uint 4 (volume_long record) ++
       encode_bytes 1 (scope record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -484,7 +484,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (scope_value, bytes) =>
-                                          match decode_uint 3 bytes with
+                                          match decode_bytes 3 bytes with
                                           | None => None
                                           | Some (reserved_3_value, bytes) =>
                                               Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; strategy_id := strategy_id_value; order_reference_number := order_reference_number_value; depth_side := depth_side_value; order_capacity := order_capacity_value; price_long := price_long_value; volume_long := volume_long_value; scope := scope_value; reserved_3 := reserved_3_value |}, bytes)
@@ -521,7 +521,7 @@ Module MrxOptionsSpreadDepthOfMarketV21Server.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 

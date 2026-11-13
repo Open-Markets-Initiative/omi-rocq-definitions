@@ -38,7 +38,7 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
       message_length : N;
       exchange_message_type : N;
       matching_unit : N;
-      reserved_field : N;
+      reserved_field : list byte;
       sequence_number : N;
     }.
 
@@ -48,7 +48,7 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
       (message_length record < 256 ^ N.of_nat 2)%N /\
       (exchange_message_type record < 256 ^ N.of_nat 2)%N /\
       (matching_unit record < 256 ^ N.of_nat 1)%N /\
-      (reserved_field record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_field record) = 1 /\
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
@@ -56,7 +56,7 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
       encode_uint 2 (message_length record) ++
       encode_uint 2 (exchange_message_type record) ++
       encode_uint 1 (matching_unit record) ++
-      encode_uint 1 (reserved_field record) ++
+      encode_bytes 1 (reserved_field record) ++
       encode_uint 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -72,7 +72,7 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (matching_unit_value, bytes) =>
-                      match decode_uint 1 bytes with
+                      match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
                           match decode_uint 4 bytes with
@@ -89,7 +89,7 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -103,13 +103,13 @@ Module ByxEquitiesBinaryOrderEntryV1014Exchange.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End ExchangeMessageHeader.
 

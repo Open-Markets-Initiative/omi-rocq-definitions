@@ -174,7 +174,7 @@ Module MemxEquitiesMemoirDepthFeedV11.
       symbol : list byte;
       symbol_sfx : list byte;
       round_lot : N;
-      reserved : N;
+      reserved : list byte;
       is_test_symbol : N;
       mpv : N;
     }.
@@ -186,7 +186,7 @@ Module MemxEquitiesMemoirDepthFeedV11.
       Datatypes.length (symbol record) = 6 /\
       Datatypes.length (symbol_sfx record) = 6 /\
       (round_lot record < 256 ^ N.of_nat 4)%N /\
-      (reserved record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved record) = 1 /\
       (is_test_symbol record < 256 ^ N.of_nat 1)%N /\
       (mpv record < 256 ^ N.of_nat 8)%N.
 
@@ -196,7 +196,7 @@ Module MemxEquitiesMemoirDepthFeedV11.
       encode_bytes 6 (symbol record) ++
       encode_bytes 6 (symbol_sfx record) ++
       encode_uint 4 (round_lot record) ++
-      encode_uint 1 (reserved record) ++
+      encode_bytes 1 (reserved record) ++
       encode_uint 1 (is_test_symbol record) ++
       encode_uint 8 (mpv record).
 
@@ -216,7 +216,7 @@ Module MemxEquitiesMemoirDepthFeedV11.
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (round_lot_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -253,7 +253,7 @@ Module MemxEquitiesMemoirDepthFeedV11.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.

@@ -345,7 +345,7 @@ Module PhlxOptionsQuotingV90Server.
       side : list byte;
       contracts : N;
       price_protection : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -359,7 +359,7 @@ Module PhlxOptionsQuotingV90Server.
       Datatypes.length (side record) = 1 /\
       (contracts record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (price_protection record) = 1 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (badge record) ++
@@ -371,7 +371,7 @@ Module PhlxOptionsQuotingV90Server.
       encode_bytes 1 (side record) ++
       encode_uint 4 (contracts record) ++
       encode_bytes 1 (price_protection record) ++
-      encode_uint 4 (reserved_4 record).
+      encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
@@ -401,7 +401,7 @@ Module PhlxOptionsQuotingV90Server.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (price_protection_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_bytes 4 bytes with
                                           | None => None
                                           | Some (reserved_4_value, bytes) =>
                                               Some ({| badge := badge_value; message_id := message_id_value; instrument_id := instrument_id_value; msar_type := msar_type_value; auction_id := auction_id_value; price := price_value; side := side_value; contracts := contracts_value; price_protection := price_protection_value; reserved_4 := reserved_4_value |}, bytes)
@@ -438,7 +438,7 @@ Module PhlxOptionsQuotingV90Server.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -2536,7 +2536,7 @@ Module PhlxOptionsQuotingV90Server.
       badge : list byte;
       message_id : N;
       status_code : list byte;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2544,13 +2544,13 @@ Module PhlxOptionsQuotingV90Server.
       Datatypes.length (badge record) = 4 /\
       (message_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (status_code record) = 1 /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (badge record) ++
       encode_uint 8 (message_id record) ++
       encode_bytes 1 (status_code record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
@@ -2562,7 +2562,7 @@ Module PhlxOptionsQuotingV90Server.
               match decode_bytes 1 bytes with
               | None => None
               | Some (status_code_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_bytes 8 bytes with
                   | None => None
                   | Some (reserved_8_value, bytes) =>
                       Some ({| badge := badge_value; message_id := message_id_value; status_code := status_code_value; reserved_8 := reserved_8_value |}, bytes)
@@ -2587,7 +2587,7 @@ Module PhlxOptionsQuotingV90Server.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -2887,7 +2887,7 @@ Module PhlxOptionsQuotingV90Server.
       underlying_symbol : list byte;
       reentry_scope : list byte;
       message_id : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2898,7 +2898,7 @@ Module PhlxOptionsQuotingV90Server.
       Datatypes.length (underlying_symbol record) = 13 /\
       Datatypes.length (reentry_scope record) = 1 /\
       (message_id record < 256 ^ N.of_nat 8)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N.
+      Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (seconds record) ++
@@ -2907,7 +2907,7 @@ Module PhlxOptionsQuotingV90Server.
       encode_bytes 13 (underlying_symbol record) ++
       encode_bytes 1 (reentry_scope record) ++
       encode_uint 8 (message_id record) ++
-      encode_uint 8 (reserved_8 record).
+      encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -2928,7 +2928,7 @@ Module PhlxOptionsQuotingV90Server.
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (message_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_bytes 8 bytes with
                               | None => None
                               | Some (reserved_8_value, bytes) =>
                                   Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value; badge := badge_value; underlying_symbol := underlying_symbol_value; reentry_scope := reentry_scope_value; message_id := message_id_value; reserved_8 := reserved_8_value |}, bytes)
@@ -2959,7 +2959,7 @@ Module PhlxOptionsQuotingV90Server.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
 

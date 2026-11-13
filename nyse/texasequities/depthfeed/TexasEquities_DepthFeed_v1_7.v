@@ -281,7 +281,7 @@ Module TexasEquitiesDepthFeedV17.
     Record t := {
       symbol_index : N;
       symbol : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
       system_id : N;
       exchange_code : list byte;
@@ -294,14 +294,14 @@ Module TexasEquitiesDepthFeedV17.
       round_lot : list byte;
       mpv : N;
       unit_of_trade : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol record) = 11 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
       (system_id record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (exchange_code record) = 1 /\
@@ -314,12 +314,12 @@ Module TexasEquitiesDepthFeedV17.
       Datatypes.length (round_lot record) = 1 /\
       (mpv record < 256 ^ N.of_nat 2)%N /\
       (unit_of_trade record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
@@ -332,7 +332,7 @@ Module TexasEquitiesDepthFeedV17.
       encode_bytes 1 (round_lot record) ++
       encode_uint 2 (mpv record) ++
       encode_uint 2 (unit_of_trade record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -341,7 +341,7 @@ Module TexasEquitiesDepthFeedV17.
           match decode_bytes 11 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 1 bytes with
+              match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
                   match decode_uint 2 bytes with
@@ -380,7 +380,7 @@ Module TexasEquitiesDepthFeedV17.
                                                               match decode_uint 2 bytes with
                                                               | None => None
                                                               | Some (unit_of_trade_value, bytes) =>
-                                                                  match decode_uint 2 bytes with
+                                                                  match decode_bytes 2 bytes with
                                                                   | None => None
                                                                   | Some (reserved_2_value, bytes) =>
                                                                       Some ({| symbol_index := symbol_index_value; symbol := symbol_value; reserved_1 := reserved_1_value; market_id := market_id_value; system_id := system_id_value; exchange_code := exchange_code_value; price_scale_code := price_scale_code_value; security_type := security_type_value; lot_size := lot_size_value; prev_close_price := prev_close_price_value; prev_close_volume := prev_close_volume_value; price_resolution := price_resolution_value; round_lot := round_lot_value; mpv := mpv_value; unit_of_trade := unit_of_trade_value; reserved_2 := reserved_2_value |}, bytes)
@@ -416,7 +416,7 @@ Module TexasEquitiesDepthFeedV17.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -429,7 +429,7 @@ Module TexasEquitiesDepthFeedV17.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -524,7 +524,7 @@ Module TexasEquitiesDepthFeedV17.
       security_status : list byte;
       halt_condition : list byte;
       market_id : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
       price_1 : N;
       price_2 : N;
       ssr_triggering_exchange_id : list byte;
@@ -544,7 +544,7 @@ Module TexasEquitiesDepthFeedV17.
       Datatypes.length (security_status record) = 1 /\
       Datatypes.length (halt_condition record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N /\
+      Datatypes.length (reserved_2 record) = 2 /\
       (price_1 record < 256 ^ N.of_nat 4)%N /\
       (price_2 record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ssr_triggering_exchange_id record) = 1 /\
@@ -562,7 +562,7 @@ Module TexasEquitiesDepthFeedV17.
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
       encode_uint 2 (market_id record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_bytes 2 (reserved_2 record) ++
       encode_uint 4 (price_1 record) ++
       encode_uint 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
@@ -594,7 +594,7 @@ Module TexasEquitiesDepthFeedV17.
                               match decode_uint 2 bytes with
                               | None => None
                               | Some (market_id_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (reserved_2_value, bytes) =>
                                       match decode_uint 4 bytes with
@@ -659,7 +659,7 @@ Module TexasEquitiesDepthFeedV17.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
@@ -702,7 +702,7 @@ Module TexasEquitiesDepthFeedV17.
       num_extensions : N;
       unpaired_qty : N;
       unpaired_side : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
       market_id : N;
     }.
 
@@ -730,7 +730,7 @@ Module TexasEquitiesDepthFeedV17.
       (num_extensions record < 256 ^ N.of_nat 1)%N /\
       (unpaired_qty record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (unpaired_side record) = 1 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_1 record) = 1 /\
       (market_id record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
@@ -756,7 +756,7 @@ Module TexasEquitiesDepthFeedV17.
       encode_uint 1 (num_extensions record) ++
       encode_uint 4 (unpaired_qty record) ++
       encode_bytes 1 (unpaired_side record) ++
-      encode_uint 1 (reserved_1 record) ++
+      encode_bytes 1 (reserved_1 record) ++
       encode_uint 2 (market_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -826,7 +826,7 @@ Module TexasEquitiesDepthFeedV17.
                                                                                           match decode_bytes 1 bytes with
                                                                                           | None => None
                                                                                           | Some (unpaired_side_value, bytes) =>
-                                                                                              match decode_uint 1 bytes with
+                                                                                              match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (reserved_1_value, bytes) =>
                                                                                                   match decode_uint 2 bytes with
@@ -893,7 +893,7 @@ Module TexasEquitiesDepthFeedV17.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_uint by exact bound_23.
       destruct record. reflexivity.
     Qed.

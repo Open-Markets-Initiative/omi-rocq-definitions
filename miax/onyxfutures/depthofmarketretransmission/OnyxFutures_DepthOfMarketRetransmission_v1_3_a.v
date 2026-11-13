@@ -95,7 +95,7 @@ Module OnyxFuturesDepthOfMarketRetransmissionV13A.
       instrument_id_source : list byte;
       instrument_type : list byte;
       instrument_listing_status : list byte;
-      reserved_3 : N;
+      reserved_3 : list byte;
       currency : list byte;
       settlement_currency : list byte;
       match_algorithm : list byte;
@@ -139,7 +139,7 @@ Module OnyxFuturesDepthOfMarketRetransmissionV13A.
       Datatypes.length (instrument_id_source record) = 1 /\
       Datatypes.length (instrument_type record) = 1 /\
       Datatypes.length (instrument_listing_status record) = 1 /\
-      (reserved_3 record < 256 ^ N.of_nat 3)%N /\
+      Datatypes.length (reserved_3 record) = 3 /\
       Datatypes.length (currency record) = 1 /\
       Datatypes.length (settlement_currency record) = 1 /\
       Datatypes.length (match_algorithm record) = 1 /\
@@ -181,7 +181,7 @@ Module OnyxFuturesDepthOfMarketRetransmissionV13A.
       encode_bytes 1 (instrument_id_source record) ++
       encode_bytes 1 (instrument_type record) ++
       encode_bytes 1 (instrument_listing_status record) ++
-      encode_uint 3 (reserved_3 record) ++
+      encode_bytes 3 (reserved_3 record) ++
       encode_bytes 1 (currency record) ++
       encode_bytes 1 (settlement_currency record) ++
       encode_bytes 1 (match_algorithm record) ++
@@ -241,7 +241,7 @@ Module OnyxFuturesDepthOfMarketRetransmissionV13A.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (instrument_listing_status_value, bytes) =>
-                                          match decode_uint 3 bytes with
+                                          match decode_bytes 3 bytes with
                                           | None => None
                                           | Some (reserved_3_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -398,7 +398,7 @@ Module OnyxFuturesDepthOfMarketRetransmissionV13A.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.

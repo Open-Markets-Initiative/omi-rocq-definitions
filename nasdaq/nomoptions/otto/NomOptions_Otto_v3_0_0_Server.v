@@ -1399,7 +1399,7 @@ Module NomOptionsOttoV300Server.
       contra_position_effect_mask : N;
       contra_stock_leg_short_sale : list byte;
       contra_stock_leg_mpid : list byte;
-      reserved_1 : N;
+      reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1441,7 +1441,7 @@ Module NomOptionsOttoV300Server.
       (contra_position_effect_mask record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (contra_stock_leg_short_sale record) = 1 /\
       Datatypes.length (contra_stock_leg_mpid record) = 4 /\
-      (reserved_1 record < 256 ^ N.of_nat 1)%N.
+      Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (timestamp record) ++
@@ -1481,7 +1481,7 @@ Module NomOptionsOttoV300Server.
       encode_uint 2 (contra_position_effect_mask record) ++
       encode_bytes 1 (contra_stock_leg_short_sale record) ++
       encode_bytes 4 (contra_stock_leg_mpid record) ++
-      encode_uint 1 (reserved_1 record).
+      encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 8 bytes with
@@ -1595,7 +1595,7 @@ Module NomOptionsOttoV300Server.
                                                                                                                                                       match decode_bytes 4 bytes with
                                                                                                                                                       | None => None
                                                                                                                                                       | Some (contra_stock_leg_mpid_value, bytes) =>
-                                                                                                                                                          match decode_uint 1 bytes with
+                                                                                                                                                          match decode_bytes 1 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (reserved_1_value, bytes) =>
                                                                                                                                                               Some ({| timestamp := timestamp_value; firm_id := firm_id_value; instrument_id := instrument_id_value; cross_type := cross_type_value; auction_type := auction_type_value; auction_id := auction_id_value; auction_alloc_pct := auction_alloc_pct_value; side := side_value; iso := iso_value; price_protection := price_protection_value; effective_time := effective_time_value; disclosure_mask := disclosure_mask_value; primary_order_id := primary_order_id_value; primary_cl_ord_id := primary_cl_ord_id_value; primary_cmta := primary_cmta_value; primary_clearing_account := primary_clearing_account_value; primary_occ_account := primary_occ_account_value; primary_cust_acct := primary_cust_acct_value; primary_price := primary_price_value; primary_quantity := primary_quantity_value; primary_capacity := primary_capacity_value; primary_position_effect_mask := primary_position_effect_mask_value; primary_stock_leg_short_sale := primary_stock_leg_short_sale_value; primary_stock_leg_mpid := primary_stock_leg_mpid_value; contra_order_id := contra_order_id_value; contra_cl_ord_id := contra_cl_ord_id_value; contra_cmta := contra_cmta_value; contra_clearing_account := contra_clearing_account_value; contra_occ_account := contra_occ_account_value; contra_cust_acct := contra_cust_acct_value; contra_order_type := contra_order_type_value; contra_price := contra_price_value; contra_quantity := contra_quantity_value; contra_capacity := contra_capacity_value; contra_position_effect_mask := contra_position_effect_mask_value; contra_stock_leg_short_sale := contra_stock_leg_short_sale_value; contra_stock_leg_mpid := contra_stock_leg_mpid_value; reserved_1 := reserved_1_value |}, bytes)
@@ -1688,7 +1688,7 @@ Module NomOptionsOttoV300Server.
       rewrite decode_encode_uint by exact bound_34.
       rewrite decode_encode_bytes by exact bound_35.
       rewrite decode_encode_bytes by exact bound_36.
-      rewrite decode_encode_uint by exact bound_37.
+      rewrite decode_encode_bytes by exact bound_37.
       destruct record. reflexivity.
     Qed.
 

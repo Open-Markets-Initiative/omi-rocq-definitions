@@ -201,9 +201,9 @@ Module NseCdDropCopyV17Client.
     (** Logs the user on to the drop copy feed *)
     Record t := {
       user_id : N;
-      reserved_8 : N;
+      reserved_8 : list byte;
       password : list byte;
-      reserved_4 : N;
+      reserved_4 : list byte;
       reserved_38 : list byte;
       broker_id : list byte;
       reserved_119 : list byte;
@@ -215,9 +215,9 @@ Module NseCdDropCopyV17Client.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (user_id record < 256 ^ N.of_nat 4)%N /\
-      (reserved_8 record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (reserved_8 record) = 8 /\
       Datatypes.length (password record) = 12 /\
-      (reserved_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (reserved_4 record) = 4 /\
       Datatypes.length (reserved_38 record) = 38 /\
       Datatypes.length (broker_id record) = 5 /\
       Datatypes.length (reserved_119 record) = 119 /\
@@ -227,9 +227,9 @@ Module NseCdDropCopyV17Client.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (user_id record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_bytes 8 (reserved_8 record) ++
       encode_bytes 12 (password record) ++
-      encode_uint 4 (reserved_4 record) ++
+      encode_bytes 4 (reserved_4 record) ++
       encode_bytes 38 (reserved_38 record) ++
       encode_bytes 5 (broker_id record) ++
       encode_bytes 119 (reserved_119 record) ++
@@ -241,13 +241,13 @@ Module NseCdDropCopyV17Client.
       match decode_uint 4 bytes with
       | None => None
       | Some (user_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_bytes 8 bytes with
           | None => None
           | Some (reserved_8_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (password_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_bytes 4 bytes with
                   | None => None
                   | Some (reserved_4_value, bytes) =>
                       match decode_bytes 38 bytes with
@@ -294,9 +294,9 @@ Module NseCdDropCopyV17Client.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.

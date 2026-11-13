@@ -186,7 +186,7 @@ Module WseBondsV68.
       source_time_micro_secs : N;
       currency : list byte;
       interest_scale_code : N;
-      reserved_2 : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -201,7 +201,7 @@ Module WseBondsV68.
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (currency record) = 3 /\
       (interest_scale_code record < 256 ^ N.of_nat 1)%N /\
-      (reserved_2 record < 256 ^ N.of_nat 2)%N.
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (symbol_index record) ++
@@ -214,7 +214,7 @@ Module WseBondsV68.
       encode_uint 2 (source_time_micro_secs record) ++
       encode_bytes 3 (currency record) ++
       encode_uint 1 (interest_scale_code record) ++
-      encode_uint 2 (reserved_2 record).
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -247,7 +247,7 @@ Module WseBondsV68.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (interest_scale_code_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (reserved_2_value, bytes) =>
                                                   Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; system_id := system_id_value; date := date_value; settlement_date := settlement_date_value; interest := interest_value; source_time_micro_secs := source_time_micro_secs_value; currency := currency_value; interest_scale_code := interest_scale_code_value; reserved_2 := reserved_2_value |}, bytes)
@@ -286,7 +286,7 @@ Module WseBondsV68.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
