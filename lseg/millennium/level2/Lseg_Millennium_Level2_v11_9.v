@@ -47,13 +47,13 @@ Module LsegMillenniumLevel2V119.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -62,7 +62,7 @@ Module LsegMillenniumLevel2V119.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_data_group_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_number_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; market_data_group := market_data_group_value; sequence_number := sequence_number_value |}, bytes)
@@ -74,7 +74,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -84,10 +84,10 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -159,10 +159,10 @@ Module LsegMillenniumLevel2V119.
       (seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record).
+      encode_uint_le 4 (seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
           Some ({| seconds := seconds_value |}, bytes)
@@ -171,7 +171,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,7 +179,7 @@ Module LsegMillenniumLevel2V119.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -202,11 +202,11 @@ Module LsegMillenniumLevel2V119.
       Datatypes.length (event_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 1 (event_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -219,7 +219,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -229,7 +229,7 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -275,8 +275,8 @@ Module LsegMillenniumLevel2V119.
       (previous_close_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 1 (reserved_a record) ++
       encode_bytes 1 (reserved_b record) ++
       encode_bytes 1 (symbol_status record) ++
@@ -287,13 +287,13 @@ Module LsegMillenniumLevel2V119.
       encode_bytes 3 (currency record) ++
       encode_bytes 1 (reserved_byte record) ++
       encode_bytes 4 (reserved_4 record) ++
-      encode_uint 8 (previous_close_price record).
+      encode_uint_le 8 (previous_close_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -326,7 +326,7 @@ Module LsegMillenniumLevel2V119.
                                                   match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (reserved_4_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (previous_close_price_value, bytes) =>
                                                           Some ({| nanosecond := nanosecond_value; instrument_id := instrument_id_value; reserved_a := reserved_a_value; reserved_b := reserved_b_value; symbol_status := symbol_status_value; isin := isin_value; sedol := sedol_value; segment := segment_value; underlying := underlying_value; currency := currency_value; reserved_byte := reserved_byte_value; reserved_4 := reserved_4_value; previous_close_price := previous_close_price_value |}, bytes)
@@ -347,7 +347,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 63.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -357,8 +357,8 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -369,7 +369,7 @@ Module LsegMillenniumLevel2V119.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -396,22 +396,22 @@ Module LsegMillenniumLevel2V119.
       (trade_match_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 8 (trade_match_id record).
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 8 (trade_match_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trade_match_id_value, bytes) =>
                       Some ({| nanosecond := nanosecond_value; order_id := order_id_value; executed_quantity := executed_quantity_value; trade_match_id := trade_match_id_value |}, bytes)
@@ -423,7 +423,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -433,10 +433,10 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -469,34 +469,34 @@ Module LsegMillenniumLevel2V119.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 4 (display_quantity record) ++
-      encode_uint 8 (trade_match_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 4 (display_quantity record) ++
+      encode_uint_le 8 (trade_match_id record) ++
       encode_bytes 1 (printable record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (display_quantity_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_match_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (printable_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   Some ({| nanosecond := nanosecond_value; order_id := order_id_value; executed_quantity := executed_quantity_value; display_quantity := display_quantity_value; trade_match_id := trade_match_id_value; printable := printable_value; price := price_value |}, bytes)
@@ -511,7 +511,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 37.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -521,13 +521,13 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -564,21 +564,21 @@ Module LsegMillenniumLevel2V119.
       Datatypes.length (auction_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (paired_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (paired_quantity record) ++
       encode_bytes 4 (reserved_4 record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 1 (reserved_a record) ++
       encode_bytes 1 (reserved_b record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (auction_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (paired_quantity_value, bytes) =>
               match decode_bytes 4 bytes with
@@ -587,7 +587,7 @@ Module LsegMillenniumLevel2V119.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (instrument_id_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -596,7 +596,7 @@ Module LsegMillenniumLevel2V119.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (reserved_b_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -616,7 +616,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -626,14 +626,14 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -665,30 +665,30 @@ Module LsegMillenniumLevel2V119.
       (sell_limit_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (buy_limit_price record) ++
-      encode_uint 4 (buy_limit_size record) ++
-      encode_uint 8 (sell_limit_price record) ++
-      encode_uint 4 (sell_limit_size record).
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (buy_limit_price record) ++
+      encode_uint_le 4 (buy_limit_size record) ++
+      encode_uint_le 8 (sell_limit_price record) ++
+      encode_uint_le 4 (sell_limit_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (buy_limit_price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (buy_limit_size_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (sell_limit_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sell_limit_size_value, bytes) =>
                               Some ({| nanosecond := nanosecond_value; instrument_id := instrument_id_value; buy_limit_price := buy_limit_price_value; buy_limit_size := buy_limit_size_value; sell_limit_price := sell_limit_price_value; sell_limit_size := sell_limit_size_value |}, bytes)
@@ -702,7 +702,7 @@ Module LsegMillenniumLevel2V119.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -712,12 +712,12 @@ Module LsegMillenniumLevel2V119.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

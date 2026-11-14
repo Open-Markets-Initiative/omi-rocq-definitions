@@ -49,13 +49,13 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -76,7 +76,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -172,7 +172,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       encode_bytes 4 (username record) ++
       encode_bytes 2 (filler record) ++
       encode_bytes 10 (password record) ++
-      encode_uint 4 (next_sequence record).
+      encode_uint_le 4 (next_sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
@@ -187,7 +187,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
                   match decode_bytes 10 bytes with
                   | None => None
                   | Some (password_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (next_sequence_value, bytes) =>
                           Some ({| session_sub_id := session_sub_id_value; username := username_value; filler := filler_value; password := password_value; next_sequence := next_sequence_value |}, bytes)
@@ -200,7 +200,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -214,7 +214,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -276,10 +276,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -288,7 +288,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -296,7 +296,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -321,12 +321,12 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (market_center record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (market_center record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -343,7 +343,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -353,7 +353,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
@@ -380,12 +380,12 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (market_center record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (market_center record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -402,7 +402,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -412,7 +412,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
@@ -451,39 +451,39 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (reserved_1 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
-      encode_uint 8 (cboe_cumulative_executed_volume record) ++
-      encode_uint 8 (consolidated_best_bid_price record) ++
-      encode_uint 8 (consolidated_best_bid_quantity record) ++
-      encode_uint 8 (consolidated_best_ask_price record) ++
-      encode_uint 8 (consolidated_best_ask_quantity record) ++
-      encode_uint 8 (national_cumulative_volume record) ++
+      encode_uint_le 8 (cboe_cumulative_executed_volume record) ++
+      encode_uint_le 8 (consolidated_best_bid_price record) ++
+      encode_uint_le 8 (consolidated_best_bid_quantity record) ++
+      encode_uint_le 8 (consolidated_best_ask_price record) ++
+      encode_uint_le 8 (consolidated_best_ask_quantity record) ++
+      encode_uint_le 8 (national_cumulative_volume record) ++
       encode_uint 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
           | Some (symbol_long_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cboe_cumulative_executed_volume_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (consolidated_best_bid_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (consolidated_best_bid_quantity_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (consolidated_best_ask_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (consolidated_best_ask_quantity_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (national_cumulative_volume_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -503,7 +503,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -513,14 +513,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -550,14 +550,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (consolidated_quote_quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 8 (consolidated_best_quote_price record) ++
-      encode_uint 8 (consolidated_quote_quantity record).
+      encode_uint_le 8 (consolidated_best_quote_price record) ++
+      encode_uint_le 8 (consolidated_quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -566,10 +566,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (consolidated_best_quote_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (consolidated_quote_quantity_value, bytes) =>
                           Some ({| last_update_timestamp := last_update_timestamp_value; symbol_short := symbol_short_value; side_indicator := side_indicator_value; consolidated_best_quote_price := consolidated_best_quote_price_value; consolidated_quote_quantity := consolidated_quote_quantity_value |}, bytes)
@@ -582,7 +582,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 33.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -592,11 +592,11 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -625,14 +625,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (consolidated_quote_quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 8 (consolidated_best_quote_price record) ++
-      encode_uint 8 (consolidated_quote_quantity record).
+      encode_uint_le 8 (consolidated_best_quote_price record) ++
+      encode_uint_le 8 (consolidated_quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -641,10 +641,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (consolidated_best_quote_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (consolidated_quote_quantity_value, bytes) =>
                           Some ({| last_update_timestamp := last_update_timestamp_value; symbol_long := symbol_long_value; side_indicator := side_indicator_value; consolidated_best_quote_price := consolidated_best_quote_price_value; consolidated_quote_quantity := consolidated_quote_quantity_value |}, bytes)
@@ -657,7 +657,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -667,11 +667,11 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -698,13 +698,13 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (session_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (market_status record) ++
       encode_bytes 1 (session_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -725,7 +725,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -735,7 +735,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -767,8 +767,8 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 4 (price_short record) ++
-      encode_uint 4 (quantity_short record).
+      encode_uint_le 4 (price_short record) ++
+      encode_uint_le 4 (quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -777,10 +777,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
           match decode_bytes 1 bytes with
           | None => None
           | Some (side_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (price_short_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_short_value, bytes) =>
                       Some ({| market_center := market_center_value; side := side_value; price_short := price_short_value; quantity_short := quantity_short_value |}, bytes)
@@ -792,7 +792,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -804,8 +804,8 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -834,8 +834,8 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 8 (quantity_long record).
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 8 (quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -844,10 +844,10 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
           match decode_bytes 1 bytes with
           | None => None
           | Some (side_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_long_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (quantity_long_value, bytes) =>
                       Some ({| market_center := market_center_value; side := side_value; price_long := price_long_value; quantity_long := quantity_long_value |}, bytes)
@@ -859,7 +859,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -871,8 +871,8 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -899,13 +899,13 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (retail_price_improvement record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (retail_price_improvement record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -926,7 +926,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -936,7 +936,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -976,18 +976,18 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (reserved_1 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (market_center record) ++
-      encode_uint 8 (market_center_execution_id record) ++
-      encode_uint 8 (last_price record) ++
-      encode_uint 8 (last_quantity record) ++
-      encode_uint 8 (cboe_cumulative_executed_volume record) ++
-      encode_uint 8 (national_cumulative_volume record) ++
+      encode_uint_le 8 (market_center_execution_id record) ++
+      encode_uint_le 8 (last_price record) ++
+      encode_uint_le 8 (last_quantity record) ++
+      encode_uint_le 8 (cboe_cumulative_executed_volume record) ++
+      encode_uint_le 8 (national_cumulative_volume record) ++
       encode_uint 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -996,19 +996,19 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_center_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (market_center_execution_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (last_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (last_quantity_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (cboe_cumulative_executed_volume_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (national_cumulative_volume_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -1028,7 +1028,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1038,14 +1038,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -1079,16 +1079,16 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (reserved_1 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (market_center record) ++
-      encode_uint 8 (market_center_execution_id record) ++
-      encode_uint 8 (cboe_cumulative_executed_volume record) ++
-      encode_uint 8 (national_cumulative_volume record) ++
+      encode_uint_le 8 (market_center_execution_id record) ++
+      encode_uint_le 8 (cboe_cumulative_executed_volume record) ++
+      encode_uint_le 8 (national_cumulative_volume record) ++
       encode_uint 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -1097,13 +1097,13 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_center_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (market_center_execution_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (cboe_cumulative_executed_volume_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (national_cumulative_volume_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -1121,7 +1121,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1131,12 +1131,12 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -1166,14 +1166,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (reg_sho_action record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (reg_sho_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -1198,7 +1198,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1208,7 +1208,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1241,14 +1241,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       Datatypes.length (reg_sho_action record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (reg_sho_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -1273,7 +1273,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1283,7 +1283,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1316,14 +1316,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (price_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (open_close_indicator record) ++
-      encode_uint 8 (price_long record).
+      encode_uint_le 8 (price_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -1335,7 +1335,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (open_close_indicator_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_long_value, bytes) =>
                           Some ({| timestamp := timestamp_value; symbol_short := symbol_short_value; market_center := market_center_value; open_close_indicator := open_close_indicator_value; price_long := price_long_value |}, bytes)
@@ -1348,7 +1348,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1358,11 +1358,11 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1391,14 +1391,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (price_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (market_center record) ++
       encode_bytes 1 (open_close_indicator record) ++
-      encode_uint 8 (price_long record).
+      encode_uint_le 8 (price_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -1410,7 +1410,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (open_close_indicator_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_long_value, bytes) =>
                           Some ({| timestamp := timestamp_value; symbol_long := symbol_long_value; market_center := market_center_value; open_close_indicator := open_close_indicator_value; price_long := price_long_value |}, bytes)
@@ -1423,7 +1423,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1433,11 +1433,11 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1472,17 +1472,17 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (national_cumulative_volume record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol_short record) ++
       encode_bytes 1 (data_source record) ++
-      encode_uint 8 (opening_price record) ++
-      encode_uint 8 (closing_price record) ++
-      encode_uint 8 (high_price record) ++
-      encode_uint 8 (low_price record) ++
-      encode_uint 8 (national_cumulative_volume record).
+      encode_uint_le 8 (opening_price record) ++
+      encode_uint_le 8 (closing_price record) ++
+      encode_uint_le 8 (high_price record) ++
+      encode_uint_le 8 (low_price record) ++
+      encode_uint_le 8 (national_cumulative_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -1491,19 +1491,19 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (data_source_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (opening_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (closing_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (high_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (low_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (national_cumulative_volume_value, bytes) =>
                                       Some ({| timestamp := timestamp_value; symbol_short := symbol_short_value; data_source := data_source_value; opening_price := opening_price_value; closing_price := closing_price_value; high_price := high_price_value; low_price := low_price_value; national_cumulative_volume := national_cumulative_volume_value |}, bytes)
@@ -1519,7 +1519,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 57.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1529,14 +1529,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -1571,17 +1571,17 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       (national_cumulative_volume record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 14 (symbol_long record) ++
       encode_bytes 1 (data_source record) ++
-      encode_uint 8 (opening_price record) ++
-      encode_uint 8 (closing_price record) ++
-      encode_uint 8 (high_price record) ++
-      encode_uint 8 (low_price record) ++
-      encode_uint 8 (national_cumulative_volume record).
+      encode_uint_le 8 (opening_price record) ++
+      encode_uint_le 8 (closing_price record) ++
+      encode_uint_le 8 (high_price record) ++
+      encode_uint_le 8 (low_price record) ++
+      encode_uint_le 8 (national_cumulative_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 14 bytes with
@@ -1590,19 +1590,19 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
               match decode_bytes 1 bytes with
               | None => None
               | Some (data_source_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (opening_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (closing_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (high_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (low_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (national_cumulative_volume_value, bytes) =>
                                       Some ({| timestamp := timestamp_value; symbol_long := symbol_long_value; data_source := data_source_value; opening_price := opening_price_value; closing_price := closing_price_value; high_price := high_price_value; low_price := low_price_value; national_cumulative_volume := national_cumulative_volume_value |}, bytes)
@@ -1618,7 +1618,7 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 63.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1628,14 +1628,14 @@ Module CboeTitaniumConsolidatedTcpOneEquitiesV1413.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

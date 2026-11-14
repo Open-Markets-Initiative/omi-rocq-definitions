@@ -43,14 +43,14 @@ Module WseReplayBboV17620ReplayRequest.
       (replay_message_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (replay_message_length record) ++
-      encode_uint 2 (replay_message_type record).
+      encode_uint_le 2 (replay_message_length record) ++
+      encode_uint_le 2 (replay_message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (replay_message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (replay_message_type_value, bytes) =>
               Some ({| replay_message_length := replay_message_length_value; replay_message_type := replay_message_type_value |}, bytes)
@@ -60,7 +60,7 @@ Module WseReplayBboV17620ReplayRequest.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -70,8 +70,8 @@ Module WseReplayBboV17620ReplayRequest.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -96,15 +96,15 @@ Module WseReplayBboV17620ReplayRequest.
       (stream_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_uint 1 (stream_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_num_value, bytes) =>
               match decode_uint 1 bytes with
@@ -118,7 +118,7 @@ Module WseReplayBboV17620ReplayRequest.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -128,8 +128,8 @@ Module WseReplayBboV17620ReplayRequest.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.

@@ -102,10 +102,10 @@ Module CoinbaseDerivativesSessionV12.
       (heartbeat_interval_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (heartbeat_interval_seconds record).
+      encode_uint_le 4 (heartbeat_interval_seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (heartbeat_interval_seconds_value, bytes) =>
           Some ({| heartbeat_interval_seconds := heartbeat_interval_seconds_value |}, bytes)
@@ -114,7 +114,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -122,7 +122,7 @@ Module CoinbaseDerivativesSessionV12.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -225,10 +225,10 @@ Module CoinbaseDerivativesSessionV12.
       (correlation_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record).
+      encode_uint_le 8 (correlation_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
           Some ({| correlation_id := correlation_id_value |}, bytes)
@@ -237,7 +237,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -245,7 +245,7 @@ Module CoinbaseDerivativesSessionV12.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -266,10 +266,10 @@ Module CoinbaseDerivativesSessionV12.
       (correlation_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record).
+      encode_uint_le 8 (correlation_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
           Some ({| correlation_id := correlation_id_value |}, bytes)
@@ -278,7 +278,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -286,7 +286,7 @@ Module CoinbaseDerivativesSessionV12.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -309,14 +309,14 @@ Module CoinbaseDerivativesSessionV12.
       (to_sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (from_sequence_number record) ++
-      encode_uint 4 (to_sequence_number record).
+      encode_uint_le 4 (from_sequence_number record) ++
+      encode_uint_le 4 (to_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (from_sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (to_sequence_number_value, bytes) =>
               Some ({| from_sequence_number := from_sequence_number_value; to_sequence_number := to_sequence_number_value |}, bytes)
@@ -326,7 +326,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -336,8 +336,8 @@ Module CoinbaseDerivativesSessionV12.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -360,14 +360,14 @@ Module CoinbaseDerivativesSessionV12.
       (gap_fill_padding record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_sequence_number record) ++
-      encode_uint 4 (gap_fill_padding record).
+      encode_uint_le 4 (new_sequence_number record) ++
+      encode_uint_le 4 (gap_fill_padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (gap_fill_padding_value, bytes) =>
               Some ({| new_sequence_number := new_sequence_number_value; gap_fill_padding := gap_fill_padding_value |}, bytes)
@@ -377,7 +377,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -387,8 +387,8 @@ Module CoinbaseDerivativesSessionV12.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -413,15 +413,15 @@ Module CoinbaseDerivativesSessionV12.
       Datatypes.length (details record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (ref_sequence_number record) ++
-      encode_uint 4 (reason_reject_reason record) ++
+      encode_uint_le 4 (ref_sequence_number record) ++
+      encode_uint_le 4 (reason_reject_reason record) ++
       encode_bytes 64 (details record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (ref_sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (reason_reject_reason_value, bytes) =>
               match decode_bytes 64 bytes with
@@ -435,7 +435,7 @@ Module CoinbaseDerivativesSessionV12.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -445,8 +445,8 @@ Module CoinbaseDerivativesSessionV12.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.

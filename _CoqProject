@@ -283,6 +283,7 @@ cboe/c1options/complextop/C1Options_ComplexTop_Pitch_v1_1_54.v
 cboe/c1options/complextop/C1Options_ComplexTop_Spin_v1_1_54.v
 cboe/c1options/flex/C1Options_Flex_Pitch_v1_1_30.v
 cboe/c1options/flex/C1Options_Flex_Spin_v1_1_30.v
+cboe/c1options/index/C1Options_Index_v1_3_3.v
 cboe/c1options/marketdatafeed/C1Options_MarketDataFeed_v1_4_2.v
 cboe/c1options/marketlevel2/C1Options_MarketLevel2_v1_0_4.v
 cboe/c1options/multicastdepthofbook/C1Options_MulticastDepthOfBook_Pitch_v2_41_66.v

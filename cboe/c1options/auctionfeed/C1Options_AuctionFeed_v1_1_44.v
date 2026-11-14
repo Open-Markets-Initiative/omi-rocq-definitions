@@ -47,13 +47,13 @@ Module C1OptionsAuctionFeedV1144.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -62,7 +62,7 @@ Module C1OptionsAuctionFeedV1144.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -74,7 +74,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -84,10 +84,10 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -164,22 +164,22 @@ Module C1OptionsAuctionFeedV1144.
       (trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (midnight_reference record) ++
-      encode_uint 4 (time record) ++
-      encode_uint 4 (time_offset record) ++
-      encode_uint 4 (trade_date record).
+      encode_uint_le 4 (midnight_reference record) ++
+      encode_uint_le 4 (time record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 4 (trade_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (midnight_reference_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (time_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (time_offset_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (trade_date_value, bytes) =>
                       Some ({| midnight_reference := midnight_reference_value; time := time_value; time_offset := time_offset_value; trade_date := trade_date_value |}, bytes)
@@ -191,7 +191,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -201,10 +201,10 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -227,14 +227,14 @@ Module C1OptionsAuctionFeedV1144.
       (epoch_time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time record) ++
-      encode_uint 4 (epoch_time record).
+      encode_uint_le 4 (time record) ++
+      encode_uint_le 4 (epoch_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (epoch_time_value, bytes) =>
               Some ({| time := time_value; epoch_time := epoch_time_value |}, bytes)
@@ -244,7 +244,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -254,8 +254,8 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -276,10 +276,10 @@ Module C1OptionsAuctionFeedV1144.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -288,7 +288,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -296,7 +296,7 @@ Module C1OptionsAuctionFeedV1144.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -337,26 +337,26 @@ Module C1OptionsAuctionFeedV1144.
       Datatypes.length (client_id record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 8 (auction_id record) ++
+      encode_uint_le 8 (auction_id record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (contracts record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (contracts record) ++
       encode_bytes 1 (customer_indicator record) ++
       encode_bytes 4 (participant_id record) ++
-      encode_uint 4 (auction_end_offset record) ++
+      encode_uint_le 4 (auction_end_offset record) ++
       encode_bytes 4 (client_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (auction_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -365,10 +365,10 @@ Module C1OptionsAuctionFeedV1144.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (contracts_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -377,7 +377,7 @@ Module C1OptionsAuctionFeedV1144.
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (participant_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (auction_end_offset_value, bytes) =>
                                               match decode_bytes 4 bytes with
@@ -399,7 +399,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -409,16 +409,16 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
@@ -442,14 +442,14 @@ Module C1OptionsAuctionFeedV1144.
       (auction_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (auction_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (auction_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (auction_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; auction_id := auction_id_value |}, bytes)
@@ -459,7 +459,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -469,8 +469,8 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -499,26 +499,26 @@ Module C1OptionsAuctionFeedV1144.
       (contracts record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (auction_id record) ++
-      encode_uint 8 (execution_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (contracts record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (auction_id record) ++
+      encode_uint_le 8 (execution_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (contracts record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (auction_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (execution_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (contracts_value, bytes) =>
                           Some ({| time_offset := time_offset_value; auction_id := auction_id_value; execution_id := execution_id_value; price := price_value; contracts := contracts_value |}, bytes)
@@ -531,7 +531,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -541,11 +541,11 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -586,20 +586,20 @@ Module C1OptionsAuctionFeedV1144.
       (composite_market_offer_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (expanded_symbol record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (reference_price record) ++
-      encode_uint 4 (buy_contracts record) ++
-      encode_uint 4 (sell_contracts record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 8 (auction_only_price record) ++
+      encode_uint_le 8 (reference_price record) ++
+      encode_uint_le 4 (buy_contracts record) ++
+      encode_uint_le 4 (sell_contracts record) ++
+      encode_uint_le 8 (indicative_price record) ++
+      encode_uint_le 8 (auction_only_price record) ++
       encode_bytes 1 (opening_condition record) ++
-      encode_uint 8 (composite_market_bid_price record) ++
-      encode_uint 8 (composite_market_offer_price record).
+      encode_uint_le 8 (composite_market_bid_price record) ++
+      encode_uint_le 8 (composite_market_offer_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -608,28 +608,28 @@ Module C1OptionsAuctionFeedV1144.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (reference_price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (buy_contracts_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sell_contracts_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (indicative_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (auction_only_price_value, bytes) =>
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (opening_condition_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (composite_market_bid_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (composite_market_offer_price_value, bytes) =>
                                                   Some ({| time_offset := time_offset_value; expanded_symbol := expanded_symbol_value; auction_type := auction_type_value; reference_price := reference_price_value; buy_contracts := buy_contracts_value; sell_contracts := sell_contracts_value; indicative_price := indicative_price_value; auction_only_price := auction_only_price_value; opening_condition := opening_condition_value; composite_market_bid_price := composite_market_bid_price_value; composite_market_offer_price := composite_market_offer_price_value |}, bytes)
@@ -648,7 +648,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -658,17 +658,17 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -697,14 +697,14 @@ Module C1OptionsAuctionFeedV1144.
       (quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (expanded_symbol record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -713,10 +713,10 @@ Module C1OptionsAuctionFeedV1144.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
                           Some ({| time_offset := time_offset_value; expanded_symbol := expanded_symbol_value; auction_type := auction_type_value; price := price_value; quantity := quantity_value |}, bytes)
@@ -729,7 +729,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -739,11 +739,11 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -770,13 +770,13 @@ Module C1OptionsAuctionFeedV1144.
       (multiplier record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (underlying record) ++
       encode_bytes 1 (width_type record) ++
-      encode_uint 4 (multiplier record).
+      encode_uint_le 4 (multiplier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -785,7 +785,7 @@ Module C1OptionsAuctionFeedV1144.
               match decode_bytes 1 bytes with
               | None => None
               | Some (width_type_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (multiplier_value, bytes) =>
                       Some ({| time_offset := time_offset_value; underlying := underlying_value; width_type := width_type_value; multiplier := multiplier_value |}, bytes)
@@ -797,7 +797,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -807,10 +807,10 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -898,10 +898,10 @@ Module C1OptionsAuctionFeedV1144.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -910,7 +910,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -918,7 +918,7 @@ Module C1OptionsAuctionFeedV1144.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -945,22 +945,22 @@ Module C1OptionsAuctionFeedV1144.
       (upper_strike_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 20 (soq_identifier record) ++
-      encode_uint 8 (lower_strike_price record) ++
-      encode_uint 8 (upper_strike_price record).
+      encode_uint_le 8 (lower_strike_price record) ++
+      encode_uint_le 8 (upper_strike_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (soq_identifier_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (lower_strike_price_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (upper_strike_price_value, bytes) =>
                       Some ({| time_offset := time_offset_value; soq_identifier := soq_identifier_value; lower_strike_price := lower_strike_price_value; upper_strike_price := upper_strike_price_value |}, bytes)
@@ -972,7 +972,7 @@ Module C1OptionsAuctionFeedV1144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -982,10 +982,10 @@ Module C1OptionsAuctionFeedV1144.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

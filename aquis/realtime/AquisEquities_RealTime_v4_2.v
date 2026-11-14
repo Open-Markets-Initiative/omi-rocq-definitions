@@ -89,7 +89,7 @@ Module AquisEquitiesRealTimeV42.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (msg_type record) ++
       encode_uint 1 (msg_length record) ++
-      encode_uint 4 (seq_no record).
+      encode_uint_le 4 (seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -98,7 +98,7 @@ Module AquisEquitiesRealTimeV42.
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_length_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (seq_no_value, bytes) =>
                   Some ({| msg_type := msg_type_value; msg_length := msg_length_value; seq_no := seq_no_value |}, bytes)
@@ -109,7 +109,7 @@ Module AquisEquitiesRealTimeV42.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -121,7 +121,7 @@ Module AquisEquitiesRealTimeV42.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -150,8 +150,8 @@ Module AquisEquitiesRealTimeV42.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (tick_table_id record) ++
       encode_bytes 10 (name record) ++
-      encode_uint 8 (threshold record) ++
-      encode_uint 8 (tick_size record).
+      encode_uint_le 8 (threshold record) ++
+      encode_uint_le 8 (tick_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -160,10 +160,10 @@ Module AquisEquitiesRealTimeV42.
           match decode_bytes 10 bytes with
           | None => None
           | Some (name_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (threshold_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (tick_size_value, bytes) =>
                       Some ({| tick_table_id := tick_table_id_value; name := name_value; threshold := threshold_value; tick_size := tick_size_value |}, bytes)
@@ -175,7 +175,7 @@ Module AquisEquitiesRealTimeV42.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,8 +187,8 @@ Module AquisEquitiesRealTimeV42.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -211,11 +211,11 @@ Module AquisEquitiesRealTimeV42.
       (lot_size_decimal record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (lot_size record) ++
+      encode_uint_le 8 (lot_size record) ++
       encode_uint 1 (lot_size_decimal record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (lot_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -228,7 +228,7 @@ Module AquisEquitiesRealTimeV42.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -238,7 +238,7 @@ Module AquisEquitiesRealTimeV42.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -268,26 +268,26 @@ Module AquisEquitiesRealTimeV42.
       (pub_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (security_id record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 4 (match_vol record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (pub_timestamp record).
+      encode_uint_le 2 (security_id record) ++
+      encode_uint_le 8 (indicative_price record) ++
+      encode_uint_le 4 (match_vol record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (pub_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (indicative_price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (match_vol_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (timestamp_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (pub_timestamp_value, bytes) =>
                           Some ({| security_id := security_id_value; indicative_price := indicative_price_value; match_vol := match_vol_value; timestamp := timestamp_value; pub_timestamp := pub_timestamp_value |}, bytes)
@@ -300,7 +300,7 @@ Module AquisEquitiesRealTimeV42.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -310,11 +310,11 @@ Module AquisEquitiesRealTimeV42.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -343,26 +343,26 @@ Module AquisEquitiesRealTimeV42.
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (security_id record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 4 (closing_buy_qty record) ++
-      encode_uint 4 (closing_sell_qty record) ++
-      encode_uint 8 (timestamp record).
+      encode_uint_le 2 (security_id record) ++
+      encode_uint_le 8 (indicative_price record) ++
+      encode_uint_le 4 (closing_buy_qty record) ++
+      encode_uint_le 4 (closing_sell_qty record) ++
+      encode_uint_le 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (indicative_price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (closing_buy_qty_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (closing_sell_qty_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (timestamp_value, bytes) =>
                           Some ({| security_id := security_id_value; indicative_price := indicative_price_value; closing_buy_qty := closing_buy_qty_value; closing_sell_qty := closing_sell_qty_value; timestamp := timestamp_value |}, bytes)
@@ -375,7 +375,7 @@ Module AquisEquitiesRealTimeV42.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -385,11 +385,11 @@ Module AquisEquitiesRealTimeV42.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 

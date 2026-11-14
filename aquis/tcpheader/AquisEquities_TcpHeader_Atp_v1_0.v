@@ -45,18 +45,18 @@ Module AquisEquitiesTcpHeaderV10.
       (msg_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_length record) ++
+      encode_uint_le 2 (msg_length record) ++
       encode_uint 1 (msg_type record) ++
-      encode_uint 4 (msg_seq_no record).
+      encode_uint_le 4 (msg_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_length_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_seq_no_value, bytes) =>
                   Some ({| msg_length := msg_length_value; msg_type := msg_type_value; msg_seq_no := msg_seq_no_value |}, bytes)
@@ -67,7 +67,7 @@ Module AquisEquitiesTcpHeaderV10.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -77,9 +77,9 @@ Module AquisEquitiesTcpHeaderV10.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

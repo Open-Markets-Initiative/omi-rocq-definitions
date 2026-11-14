@@ -47,14 +47,14 @@ Module EbsILink3V87Client.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -64,7 +64,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -74,8 +74,8 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -102,22 +102,22 @@ Module EbsILink3V87Client.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -129,7 +129,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,10 +139,10 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -169,16 +169,16 @@ Module EbsILink3V87Client.
       (keep_alive_interval_lapsed record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 4 (next_seq_no record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 4 (next_seq_no record) ++
       encode_uint 1 (fault_tolerance_indicator record) ++
       encode_uint 1 (keep_alive_interval_lapsed record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (next_seq_no_value, bytes) =>
               match decode_uint 1 bytes with
@@ -196,7 +196,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -206,8 +206,8 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -239,22 +239,22 @@ Module EbsILink3V87Client.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 2 (error_codes record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 2 (error_codes record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 48 bytes with
       | None => None
       | Some (reason_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (error_codes_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -270,7 +270,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -281,9 +281,9 @@ Module EbsILink3V87Client.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -313,26 +313,26 @@ Module EbsILink3V87Client.
       (msg_count_16 record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (last_uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (from_seq_no record) ++
-      encode_uint 2 (msg_count_16 record).
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (last_uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (from_seq_no record) ++
+      encode_uint_le 2 (msg_count_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (last_uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (from_seq_no_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (msg_count_16_value, bytes) =>
                           Some ({| uuid := uuid_value; last_uuid := last_uuid_value; request_timestamp := request_timestamp_value; from_seq_no := from_seq_no_value; msg_count_16 := msg_count_16_value |}, bytes)
@@ -345,7 +345,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -355,11 +355,11 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -402,30 +402,30 @@ Module EbsILink3V87Client.
       (liquidity_flag record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id_optional record) ++
-      encode_uint 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (order_id_optional record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
       encode_uint 1 (manual_order_indicator record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       encode_bytes 20 (sender_id record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_request_id record) ++
-      encode_uint 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (order_request_id record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
       encode_bytes 5 (location record) ++
-      encode_uint 4 (security_id record) ++
+      encode_uint_le 4 (security_id record) ++
       encode_uint 1 (side record) ++
       encode_uint 1 (liquidity_flag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_optional_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (party_details_list_req_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (manual_order_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match decode_bytes 20 bytes with
@@ -434,16 +434,16 @@ Module EbsILink3V87Client.
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (cl_ord_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (order_request_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (sending_time_epoch_value, bytes) =>
                                       match decode_bytes 5 bytes with
                                       | None => None
                                       | Some (location_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (security_id_value, bytes) =>
                                               match decode_uint 1 bytes with
@@ -469,7 +469,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -479,16 +479,16 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       destruct record. reflexivity.
@@ -513,11 +513,11 @@ Module EbsILink3V87Client.
       (num_in_group record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -530,7 +530,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -540,7 +540,7 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -586,37 +586,37 @@ Module EbsILink3V87Client.
       (market_segment_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (mass_status_req_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (mass_status_req_id record) ++
       encode_uint 1 (manual_order_indicator record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       encode_bytes 20 (sender_id record) ++
-      encode_uint 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
       encode_bytes 6 (security_group record) ++
       encode_bytes 5 (location record) ++
-      encode_uint 4 (security_id_optional record) ++
+      encode_uint_le 4 (security_id_optional record) ++
       encode_uint 1 (mass_status_req_type record) ++
       encode_uint 1 (ord_status_req_type record) ++
       encode_uint 1 (mass_status_tif record) ++
       encode_uint 1 (market_segment_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (party_details_list_req_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (mass_status_req_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (manual_order_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match decode_bytes 20 bytes with
                       | None => None
                       | Some (sender_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (sending_time_epoch_value, bytes) =>
                               match decode_bytes 6 bytes with
@@ -625,7 +625,7 @@ Module EbsILink3V87Client.
                                   match decode_bytes 5 bytes with
                                   | None => None
                                   | Some (location_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (security_id_optional_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -658,7 +658,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 68.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -668,15 +668,15 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
@@ -715,35 +715,35 @@ Module EbsILink3V87Client.
       Datatypes.length (location record) = 5.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (ord_status_req_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (ord_status_req_id record) ++
       encode_uint 1 (manual_order_indicator record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       encode_bytes 20 (sender_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
       encode_bytes 5 (location record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (party_details_list_req_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (ord_status_req_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (manual_order_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match decode_bytes 20 bytes with
                       | None => None
                       | Some (sender_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (sending_time_epoch_value, bytes) =>
                                   match decode_bytes 5 bytes with
@@ -762,7 +762,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -772,13 +772,13 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -828,48 +828,48 @@ Module EbsILink3V87Client.
       (manual_order_indicator record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_uint 1 (exec_ack_status record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (sec_exec_id record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (security_id record) ++
-      encode_uint 4 (last_qty record) ++
+      encode_uint_le 8 (sec_exec_id record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (security_id record) ++
+      encode_uint_le 4 (last_qty record) ++
       encode_bytes 1 (dk_reason record) ++
       encode_uint 1 (side record) ++
       encode_bytes 20 (sender_id record) ++
-      encode_uint 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
       encode_bytes 5 (location record) ++
       encode_uint 1 (manual_order_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (party_details_list_req_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (exec_ack_status_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match decode_bytes 20 bytes with
                       | None => None
                       | Some (cl_ord_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (sec_exec_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (last_px_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (security_id_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (last_qty_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -881,7 +881,7 @@ Module EbsILink3V87Client.
                                                   match decode_bytes 20 bytes with
                                                   | None => None
                                                   | Some (sender_id_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (sending_time_epoch_value, bytes) =>
                                                           match decode_bytes 5 bytes with
@@ -910,7 +910,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -920,19 +920,19 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       destruct record. reflexivity.
@@ -957,11 +957,11 @@ Module EbsILink3V87Client.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -974,7 +974,7 @@ Module EbsILink3V87Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -984,7 +984,7 @@ Module EbsILink3V87Client.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.

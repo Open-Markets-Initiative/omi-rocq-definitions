@@ -47,16 +47,16 @@ Module OnyxFuturesHeaderOnlyV10.
       (session_number record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sequence_number record) ++
-      encode_uint 2 (packet_length record) ++
+      encode_uint_le 8 (sequence_number record) ++
+      encode_uint_le 2 (packet_length record) ++
       encode_uint 1 (packet_type record) ++
       encode_uint 1 (session_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (packet_length_value, bytes) =>
               match decode_uint 1 bytes with
@@ -74,7 +74,7 @@ Module OnyxFuturesHeaderOnlyV10.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -84,8 +84,8 @@ Module OnyxFuturesHeaderOnlyV10.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.

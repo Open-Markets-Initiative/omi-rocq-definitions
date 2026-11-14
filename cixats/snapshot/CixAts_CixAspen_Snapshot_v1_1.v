@@ -44,11 +44,11 @@ Module CixAtsCixAspenSnapshotV11.
       Datatypes.length (packet_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_bytes 1 (packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_bytes 1 bytes with
@@ -61,7 +61,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -71,7 +71,7 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -273,14 +273,14 @@ Module CixAtsCixAspenSnapshotV11.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (event record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -294,7 +294,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -305,7 +305,7 @@ Module CixAtsCixAspenSnapshotV11.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -335,17 +335,17 @@ Module CixAtsCixAspenSnapshotV11.
       (board_lot_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (symbol_id record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (listing_market record) ++
-      encode_uint 4 (board_lot_size record).
+      encode_uint_le 4 (board_lot_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -354,7 +354,7 @@ Module CixAtsCixAspenSnapshotV11.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (listing_market_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (board_lot_size_value, bytes) =>
                           Some ({| timestamp := timestamp_value; symbol_id := symbol_id_value; symbol := symbol_value; listing_market := listing_market_value; board_lot_size := board_lot_size_value |}, bytes)
@@ -367,7 +367,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -377,11 +377,11 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -412,18 +412,18 @@ Module CixAtsCixAspenSnapshotV11.
       Datatypes.length (info record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (symbol_id record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (state record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (info record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -449,7 +449,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -459,8 +459,8 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -501,36 +501,36 @@ Module CixAtsCixAspenSnapshotV11.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (quantity record) ++
+      encode_uint_le 8 (quantity record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 3 (broker record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
                           match decode_bytes 11 bytes with
                           | None => None
                           | Some (symbol_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   match decode_bytes 3 bytes with
@@ -553,7 +553,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -563,13 +563,13 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -596,18 +596,18 @@ Module CixAtsCixAspenSnapshotV11.
       (quantity_canceled record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (quantity_canceled record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (quantity_canceled record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_canceled_value, bytes) =>
                   Some ({| timestamp := timestamp_value; order_id := order_id_value; quantity_canceled := quantity_canceled_value |}, bytes)
@@ -618,7 +618,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -628,9 +628,9 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -653,14 +653,14 @@ Module CixAtsCixAspenSnapshotV11.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| timestamp := timestamp_value; order_id := order_id_value |}, bytes)
@@ -670,7 +670,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -680,8 +680,8 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -716,32 +716,32 @@ Module CixAtsCixAspenSnapshotV11.
       Datatypes.length (contra_broker record) = 3.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (quantity record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (quantity record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 3 (broker record) ++
       encode_bytes 3 (contra_broker record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (execution_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 3 bytes with
@@ -763,7 +763,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 47.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -773,12 +773,12 @@ Module CixAtsCixAspenSnapshotV11.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -801,10 +801,10 @@ Module CixAtsCixAspenSnapshotV11.
       (sequence record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sequence record).
+      encode_uint_le 8 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -813,7 +813,7 @@ Module CixAtsCixAspenSnapshotV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -821,7 +821,7 @@ Module CixAtsCixAspenSnapshotV11.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

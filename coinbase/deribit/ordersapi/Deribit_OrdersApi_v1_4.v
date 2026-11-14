@@ -54,7 +54,7 @@ Module DeribitOrdersApiV14.
       encode_bytes 16 (client_id record) ++
       encode_bytes 48 (secret record) ++
       encode_uint 1 (reset_seq_num record) ++
-      encode_uint 2 (schema_version record).
+      encode_uint_le 2 (schema_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -66,7 +66,7 @@ Module DeribitOrdersApiV14.
               match decode_uint 1 bytes with
               | None => None
               | Some (reset_seq_num_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (schema_version_value, bytes) =>
                       Some ({| client_id := client_id_value; secret := secret_value; reset_seq_num := reset_seq_num_value; schema_version := schema_version_value |}, bytes)
@@ -78,7 +78,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -91,7 +91,7 @@ Module DeribitOrdersApiV14.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -114,14 +114,14 @@ Module DeribitOrdersApiV14.
       (schema_version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (heartbeat_interval_seconds record) ++
-      encode_uint 2 (schema_version record).
+      encode_uint_le 4 (heartbeat_interval_seconds record) ++
+      encode_uint_le 2 (schema_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (heartbeat_interval_seconds_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (schema_version_value, bytes) =>
               Some ({| heartbeat_interval_seconds := heartbeat_interval_seconds_value; schema_version := schema_version_value |}, bytes)
@@ -131,7 +131,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -141,8 +141,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -163,10 +163,10 @@ Module DeribitOrdersApiV14.
       (correlation_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record).
+      encode_uint_le 8 (correlation_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
           Some ({| correlation_id := correlation_id_value |}, bytes)
@@ -175,7 +175,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -183,7 +183,7 @@ Module DeribitOrdersApiV14.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -204,10 +204,10 @@ Module DeribitOrdersApiV14.
       (correlation_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record).
+      encode_uint_le 8 (correlation_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
           Some ({| correlation_id := correlation_id_value |}, bytes)
@@ -216,7 +216,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -224,7 +224,7 @@ Module DeribitOrdersApiV14.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -247,14 +247,14 @@ Module DeribitOrdersApiV14.
       (to_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (from_sequence_number record) ++
-      encode_uint 8 (to_sequence_number record).
+      encode_uint_le 8 (from_sequence_number record) ++
+      encode_uint_le 8 (to_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (from_sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (to_sequence_number_value, bytes) =>
               Some ({| from_sequence_number := from_sequence_number_value; to_sequence_number := to_sequence_number_value |}, bytes)
@@ -264,7 +264,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -274,8 +274,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -296,10 +296,10 @@ Module DeribitOrdersApiV14.
       (new_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (new_sequence_number record).
+      encode_uint_le 8 (new_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (new_sequence_number_value, bytes) =>
           Some ({| new_sequence_number := new_sequence_number_value |}, bytes)
@@ -308,7 +308,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -316,7 +316,7 @@ Module DeribitOrdersApiV14.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -339,11 +339,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -356,7 +356,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -366,7 +366,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -390,11 +390,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -407,7 +407,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -417,7 +417,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -443,18 +443,18 @@ Module DeribitOrdersApiV14.
       (instrument_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (client_order_id record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (instrument_id record).
+      encode_uint_le 8 (client_order_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (client_order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
                   Some ({| client_order_id := client_order_id_value; correlation_id := correlation_id_value; instrument_id := instrument_id_value |}, bytes)
@@ -465,7 +465,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -475,9 +475,9 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -502,18 +502,18 @@ Module DeribitOrdersApiV14.
       (instrument_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (instrument_id record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
                   Some ({| order_id := order_id_value; correlation_id := correlation_id_value; instrument_id := instrument_id_value |}, bytes)
@@ -524,7 +524,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -534,9 +534,9 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -559,14 +559,14 @@ Module DeribitOrdersApiV14.
       (num_in_group record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (num_in_group record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (num_in_group_value, bytes) =>
               Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
@@ -576,7 +576,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -586,8 +586,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -610,11 +610,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -627,7 +627,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -637,7 +637,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -661,11 +661,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -678,7 +678,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -688,7 +688,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -718,20 +718,20 @@ Module DeribitOrdersApiV14.
       (side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (currency_pair_id record) ++
-      encode_uint 8 (instrument_id_optional record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (currency_pair_id record) ++
+      encode_uint_le 8 (instrument_id_optional record) ++
       encode_uint 1 (product_type record) ++
       encode_uint 1 (side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (currency_pair_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_id_optional_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -750,7 +750,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -760,9 +760,9 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
@@ -789,15 +789,15 @@ Module DeribitOrdersApiV14.
       (side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (mmp_group_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (mmp_group_id record) ++
       encode_uint 1 (side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (mmp_group_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -811,7 +811,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -821,8 +821,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -846,14 +846,14 @@ Module DeribitOrdersApiV14.
       (mmp_group_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (mmp_group_id record).
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (mmp_group_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (mmp_group_id_value, bytes) =>
               Some ({| correlation_id := correlation_id_value; mmp_group_id := mmp_group_id_value |}, bytes)
@@ -863,7 +863,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -873,8 +873,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -897,14 +897,14 @@ Module DeribitOrdersApiV14.
       (currency_pair_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (currency_pair_id record).
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (currency_pair_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (correlation_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (currency_pair_id_value, bytes) =>
               Some ({| correlation_id := correlation_id_value; currency_pair_id := currency_pair_id_value |}, bytes)
@@ -914,7 +914,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -924,8 +924,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -948,11 +948,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -965,7 +965,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -975,7 +975,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -999,11 +999,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1016,7 +1016,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1026,7 +1026,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1050,11 +1050,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1067,7 +1067,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1077,7 +1077,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1111,34 +1111,34 @@ Module DeribitOrdersApiV14.
       (receive_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (client_order_id record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (receive_time record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (receive_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (correlation_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (instrument_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (receive_time_value, bytes) =>
                                   Some ({| timestamp := timestamp_value; exec_id := exec_id_value; client_order_id := client_order_id_value; correlation_id := correlation_id_value; order_id := order_id_value; instrument_id := instrument_id_value; receive_time := receive_time_value |}, bytes)
@@ -1153,7 +1153,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1163,13 +1163,13 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -1192,11 +1192,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1209,7 +1209,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1219,7 +1219,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1243,11 +1243,11 @@ Module DeribitOrdersApiV14.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1260,7 +1260,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1270,7 +1270,7 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1300,26 +1300,26 @@ Module DeribitOrdersApiV14.
       (total_order_count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (receive_time record) ++
-      encode_uint 4 (total_order_count record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (receive_time record) ++
+      encode_uint_le 4 (total_order_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (correlation_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (receive_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (total_order_count_value, bytes) =>
                           Some ({| timestamp := timestamp_value; exec_id := exec_id_value; correlation_id := correlation_id_value; receive_time := receive_time_value; total_order_count := total_order_count_value |}, bytes)
@@ -1332,7 +1332,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1342,11 +1342,11 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1373,22 +1373,22 @@ Module DeribitOrdersApiV14.
       (frozen_until_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (mmp_group_id record) ++
-      encode_uint 8 (frozen_until_time record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (mmp_group_id record) ++
+      encode_uint_le 8 (frozen_until_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (mmp_group_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (frozen_until_time_value, bytes) =>
                       Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; mmp_group_id := mmp_group_id_value; frozen_until_time := frozen_until_time_value |}, bytes)
@@ -1400,7 +1400,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1410,10 +1410,10 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1438,15 +1438,15 @@ Module DeribitOrdersApiV14.
       (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (correlation_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (correlation_id record) ++
       encode_uint 1 (reason_mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -1460,7 +1460,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1470,8 +1470,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1499,22 +1499,22 @@ Module DeribitOrdersApiV14.
       (frozen_until_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (correlation_id record) ++
-      encode_uint 8 (currency_pair_id record) ++
-      encode_uint 8 (frozen_until_time record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (currency_pair_id record) ++
+      encode_uint_le 8 (frozen_until_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (currency_pair_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (frozen_until_time_value, bytes) =>
                       Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; currency_pair_id := currency_pair_id_value; frozen_until_time := frozen_until_time_value |}, bytes)
@@ -1526,7 +1526,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1536,10 +1536,10 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1564,15 +1564,15 @@ Module DeribitOrdersApiV14.
       (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (correlation_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (correlation_id record) ++
       encode_uint 1 (reason_mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -1586,7 +1586,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1596,8 +1596,8 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1633,35 +1633,35 @@ Module DeribitOrdersApiV14.
       (trigger record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (mmp_group_id record) ++
-      encode_uint 8 (frozen_until record) ++
-      encode_uint 8 (quantity_level record) ++
-      encode_uint 8 (vega_level record) ++
-      encode_uint 8 (delta_level record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (mmp_group_id record) ++
+      encode_uint_le 8 (frozen_until record) ++
+      encode_uint_le 8 (quantity_level record) ++
+      encode_uint_le 8 (vega_level record) ++
+      encode_uint_le 8 (delta_level record) ++
       encode_uint 1 (trigger record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (mmp_group_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (frozen_until_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (quantity_level_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (vega_level_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (delta_level_value, bytes) =>
                                   match decode_uint 1 bytes with
@@ -1680,7 +1680,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 57.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1690,13 +1690,13 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1732,35 +1732,35 @@ Module DeribitOrdersApiV14.
       (trigger record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (currency_pair_id record) ++
-      encode_uint 8 (frozen_until record) ++
-      encode_uint 8 (quantity_level record) ++
-      encode_uint 8 (vega_level record) ++
-      encode_uint 8 (delta_level record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (currency_pair_id record) ++
+      encode_uint_le 8 (frozen_until record) ++
+      encode_uint_le 8 (quantity_level record) ++
+      encode_uint_le 8 (vega_level record) ++
+      encode_uint_le 8 (delta_level record) ++
       encode_uint 1 (trigger record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (currency_pair_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (frozen_until_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (quantity_level_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (vega_level_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (delta_level_value, bytes) =>
                                   match decode_uint 1 bytes with
@@ -1779,7 +1779,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 57.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1789,13 +1789,13 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1823,22 +1823,22 @@ Module DeribitOrdersApiV14.
       (correlation_id_optional record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (mmp_group_id record) ++
-      encode_uint 8 (correlation_id_optional record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (mmp_group_id record) ++
+      encode_uint_le 8 (correlation_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (mmp_group_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (correlation_id_optional_value, bytes) =>
                       Some ({| timestamp := timestamp_value; exec_id := exec_id_value; mmp_group_id := mmp_group_id_value; correlation_id_optional := correlation_id_optional_value |}, bytes)
@@ -1850,7 +1850,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1860,10 +1860,10 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1890,22 +1890,22 @@ Module DeribitOrdersApiV14.
       (correlation_id_optional record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 8 (currency_pair_id record) ++
-      encode_uint 8 (correlation_id_optional record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (currency_pair_id record) ++
+      encode_uint_le 8 (correlation_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (currency_pair_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (correlation_id_optional_value, bytes) =>
                       Some ({| timestamp := timestamp_value; exec_id := exec_id_value; currency_pair_id := currency_pair_id_value; correlation_id_optional := correlation_id_optional_value |}, bytes)
@@ -1917,7 +1917,7 @@ Module DeribitOrdersApiV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1927,10 +1927,10 @@ Module DeribitOrdersApiV14.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

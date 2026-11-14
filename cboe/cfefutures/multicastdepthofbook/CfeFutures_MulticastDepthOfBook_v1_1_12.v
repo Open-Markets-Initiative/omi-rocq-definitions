@@ -49,13 +49,13 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -76,7 +76,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -166,22 +166,22 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (midnight_reference record) ++
-      encode_uint 4 (time_reference record) ++
-      encode_uint 4 (time_offset record) ++
-      encode_uint 4 (trade_date record).
+      encode_uint_le 4 (midnight_reference record) ++
+      encode_uint_le 4 (time_reference record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 4 (trade_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (midnight_reference_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (time_reference_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (time_offset_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (trade_date_value, bytes) =>
                       Some ({| midnight_reference := midnight_reference_value; time_reference := time_reference_value; time_offset := time_offset_value; trade_date := trade_date_value |}, bytes)
@@ -193,7 +193,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -203,10 +203,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -229,14 +229,14 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (epoch record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_reference record) ++
-      encode_uint 4 (epoch record).
+      encode_uint_le 4 (time_reference record) ++
+      encode_uint_le 4 (epoch record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_reference_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (epoch_value, bytes) =>
               Some ({| time_reference := time_reference_value; epoch := epoch_value |}, bytes)
@@ -246,7 +246,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -256,8 +256,8 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -278,10 +278,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -290,7 +290,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -298,7 +298,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -329,30 +329,30 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (long_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (long_quantity record) ++
+      encode_uint_le 4 (long_quantity record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 8 (long_price record).
+      encode_uint_le 8 (long_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (long_quantity_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (long_price_value, bytes) =>
                               Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; long_quantity := long_quantity_value; symbol := symbol_value; long_price := long_price_value |}, bytes)
@@ -366,7 +366,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -376,12 +376,12 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -412,30 +412,30 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (short_price record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (short_quantity record) ++
+      encode_uint_le 2 (short_quantity record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (short_price record).
+      encode_uint_le 2 (short_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (short_quantity_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (short_price_value, bytes) =>
                               Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; short_quantity := short_quantity_value; symbol := symbol_value; short_price := short_price_value |}, bytes)
@@ -449,7 +449,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -459,12 +459,12 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -493,23 +493,23 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (execution_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -525,7 +525,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -535,10 +535,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -564,18 +564,18 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (canceled_long_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (canceled_long_quantity record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (canceled_long_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (canceled_long_quantity_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_long_quantity := canceled_long_quantity_value |}, bytes)
@@ -586,7 +586,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -596,9 +596,9 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -623,18 +623,18 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (canceled_short_quantity record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (canceled_short_quantity record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (canceled_short_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (canceled_short_quantity_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_short_quantity := canceled_short_quantity_value |}, bytes)
@@ -645,7 +645,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -655,9 +655,9 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -684,22 +684,22 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (long_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (long_quantity record) ++
-      encode_uint 8 (long_price record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (long_quantity record) ++
+      encode_uint_le 8 (long_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (long_quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (long_price_value, bytes) =>
                       Some ({| time_offset := time_offset_value; order_id := order_id_value; long_quantity := long_quantity_value; long_price := long_price_value |}, bytes)
@@ -711,7 +711,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -721,10 +721,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -751,22 +751,22 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (short_price record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (short_quantity record) ++
-      encode_uint 2 (short_price record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (short_quantity record) ++
+      encode_uint_le 2 (short_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (short_quantity_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (short_price_value, bytes) =>
                       Some ({| time_offset := time_offset_value; order_id := order_id_value; short_quantity := short_quantity_value; short_price := short_price_value |}, bytes)
@@ -778,7 +778,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -788,10 +788,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -814,14 +814,14 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; order_id := order_id_value |}, bytes)
@@ -831,7 +831,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -841,8 +841,8 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -877,35 +877,35 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (long_quantity record) ++
+      encode_uint_le 4 (long_quantity record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 8 (long_price record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 8 (long_price record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (long_quantity_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (long_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -924,7 +924,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -934,13 +934,13 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -976,35 +976,35 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (short_quantity record) ++
+      encode_uint_le 2 (short_quantity record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (short_price record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 2 (short_price record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (short_quantity_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (short_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1023,7 +1023,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1033,13 +1033,13 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1061,10 +1061,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1073,7 +1073,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1081,7 +1081,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1102,10 +1102,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1114,7 +1114,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1122,7 +1122,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1145,14 +1145,14 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (execution_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (execution_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; execution_id := execution_id_value |}, bytes)
@@ -1162,7 +1162,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1172,8 +1172,8 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1202,23 +1202,23 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       Datatypes.length (issue record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 4 (trade_date record) ++
-      encode_uint 8 (settlement_price record) ++
+      encode_uint_le 4 (trade_date record) ++
+      encode_uint_le 8 (settlement_price record) ++
       encode_bytes 1 (issue record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (trade_date_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (settlement_price_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1234,7 +1234,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1244,10 +1244,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -1277,14 +1277,14 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -1309,7 +1309,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1319,7 +1319,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1344,10 +1344,10 @@ Module CfeFuturesMulticastDepthOfBookV1112.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1356,7 +1356,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1364,7 +1364,7 @@ Module CfeFuturesMulticastDepthOfBookV1112.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

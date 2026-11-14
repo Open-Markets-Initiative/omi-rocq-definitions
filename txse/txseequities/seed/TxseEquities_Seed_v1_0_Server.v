@@ -46,11 +46,11 @@ Module TxseEquitiesSeedV10Server.
       (packet_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_uint 1 (packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -63,7 +63,7 @@ Module TxseEquitiesSeedV10Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,7 +73,7 @@ Module TxseEquitiesSeedV10Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -105,21 +105,21 @@ Module TxseEquitiesSeedV10Server.
       (instance record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (session record) ++
-      encode_uint 8 (next_sequence_number record) ++
-      encode_uint 8 (highest_known_sequence_number record) ++
+      encode_uint_le 8 (session record) ++
+      encode_uint_le 8 (next_sequence_number record) ++
+      encode_uint_le 8 (highest_known_sequence_number record) ++
       encode_uint 1 (logon_response_code record) ++
       encode_uint 1 (number_stream_ids record) ++
-      encode_uint 4 (instance record).
+      encode_uint_le 4 (instance record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (session_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (next_sequence_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (highest_known_sequence_number_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -128,7 +128,7 @@ Module TxseEquitiesSeedV10Server.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (number_stream_ids_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (instance_value, bytes) =>
                               Some ({| session := session_value; next_sequence_number := next_sequence_number_value; highest_known_sequence_number := highest_known_sequence_number_value; logon_response_code := logon_response_code_value; number_stream_ids := number_stream_ids_value; instance := instance_value |}, bytes)
@@ -142,7 +142,7 @@ Module TxseEquitiesSeedV10Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -152,12 +152,12 @@ Module TxseEquitiesSeedV10Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -184,19 +184,19 @@ Module TxseEquitiesSeedV10Server.
       (cancel_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (orig_cl_ord_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
       encode_uint 1 (cancel_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (orig_cl_ord_id_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -211,7 +211,7 @@ Module TxseEquitiesSeedV10Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -221,9 +221,9 @@ Module TxseEquitiesSeedV10Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -249,15 +249,15 @@ Module TxseEquitiesSeedV10Server.
       (cancel_rejected_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (orig_cl_ord_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
       encode_uint 1 (cancel_rejected_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (orig_cl_ord_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -271,7 +271,7 @@ Module TxseEquitiesSeedV10Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -281,8 +281,8 @@ Module TxseEquitiesSeedV10Server.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -310,22 +310,22 @@ Module TxseEquitiesSeedV10Server.
       (canceled_count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (mass_cancel_request_id record) ++
-      encode_uint 8 (mass_cancel_id record) ++
-      encode_uint 4 (canceled_count record).
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (mass_cancel_request_id record) ++
+      encode_uint_le 8 (mass_cancel_id record) ++
+      encode_uint_le 4 (canceled_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (mass_cancel_request_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (mass_cancel_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (canceled_count_value, bytes) =>
                       Some ({| transact_time := transact_time_value; mass_cancel_request_id := mass_cancel_request_id_value; mass_cancel_id := mass_cancel_id_value; canceled_count := canceled_count_value |}, bytes)
@@ -337,7 +337,7 @@ Module TxseEquitiesSeedV10Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -347,10 +347,10 @@ Module TxseEquitiesSeedV10Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

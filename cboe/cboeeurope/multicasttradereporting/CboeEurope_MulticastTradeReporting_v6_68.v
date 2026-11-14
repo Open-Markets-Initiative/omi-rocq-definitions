@@ -48,13 +48,13 @@ Module CboeEuropeMulticastTradeReportingV668.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -63,7 +63,7 @@ Module CboeEuropeMulticastTradeReportingV668.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -75,7 +75,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,10 +85,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -159,10 +159,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       (time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time record).
+      encode_uint_le 4 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_value, bytes) =>
           Some ({| time := time_value |}, bytes)
@@ -171,7 +171,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,7 +179,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -200,10 +200,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -212,7 +212,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -220,7 +220,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -251,30 +251,30 @@ Module CboeEuropeMulticastTradeReportingV668.
       (price_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (quantity record) ++
+      encode_uint_le 4 (quantity record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint 8 (price_long record).
+      encode_uint_le 8 (price_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_short_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_long_value, bytes) =>
                               Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity := quantity_value; symbol_short := symbol_short_value; price_long := price_long_value |}, bytes)
@@ -288,7 +288,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -298,12 +298,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -334,30 +334,30 @@ Module CboeEuropeMulticastTradeReportingV668.
       (price_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (quantity_short record) ++
+      encode_uint_le 2 (quantity_short record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint 2 (price_short record).
+      encode_uint_le 2 (price_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (quantity_short_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_short_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (price_short_value, bytes) =>
                               Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_short := quantity_short_value; symbol_short := symbol_short_value; price_short := price_short_value |}, bytes)
@@ -371,7 +371,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -381,12 +381,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -482,23 +482,23 @@ Module CboeEuropeMulticastTradeReportingV668.
       ExecutionFlags.bounded (execution_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_shares record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_shares record) ++
+      encode_uint_le 8 (execution_id record) ++
       ExecutionFlags.encode (execution_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_shares_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (execution_id_value, bytes) =>
                       match ExecutionFlags.decode bytes with
@@ -514,7 +514,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !ExecutionFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !ExecutionFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -524,10 +524,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite ExecutionFlags.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -561,31 +561,31 @@ Module CboeEuropeMulticastTradeReportingV668.
       ExecutionFlags.bounded (execution_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_shares record) ++
-      encode_uint 4 (remaining_shares record) ++
-      encode_uint 8 (execution_id record) ++
-      encode_uint 8 (price_long record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_shares record) ++
+      encode_uint_le 4 (remaining_shares record) ++
+      encode_uint_le 8 (execution_id record) ++
+      encode_uint_le 8 (price_long record) ++
       ExecutionFlags.encode (execution_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_shares_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (remaining_shares_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (execution_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_long_value, bytes) =>
                               match ExecutionFlags.decode bytes with
@@ -603,7 +603,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !ExecutionFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !ExecutionFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -613,12 +613,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite ExecutionFlags.decode_encode by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -644,18 +644,18 @@ Module CboeEuropeMulticastTradeReportingV668.
       (canceled_shares_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (canceled_shares_long record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (canceled_shares_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (canceled_shares_long_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_shares_long := canceled_shares_long_value |}, bytes)
@@ -666,7 +666,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -676,9 +676,9 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -703,18 +703,18 @@ Module CboeEuropeMulticastTradeReportingV668.
       (canceled_shares_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (canceled_shares_short record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (canceled_shares_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (canceled_shares_short_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_shares_short := canceled_shares_short_value |}, bytes)
@@ -725,7 +725,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -735,9 +735,9 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -764,22 +764,22 @@ Module CboeEuropeMulticastTradeReportingV668.
       (price_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (shares_long record) ++
-      encode_uint 8 (price_long record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (shares_long record) ++
+      encode_uint_le 8 (price_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (shares_long_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_long_value, bytes) =>
                       Some ({| time_offset := time_offset_value; order_id := order_id_value; shares_long := shares_long_value; price_long := price_long_value |}, bytes)
@@ -791,7 +791,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -801,10 +801,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -831,22 +831,22 @@ Module CboeEuropeMulticastTradeReportingV668.
       (price_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (shares_short record) ++
-      encode_uint 2 (price_short record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (shares_short record) ++
+      encode_uint_le 2 (price_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (shares_short_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (price_short_value, bytes) =>
                       Some ({| time_offset := time_offset_value; order_id := order_id_value; shares_short := shares_short_value; price_short := price_short_value |}, bytes)
@@ -858,7 +858,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -868,10 +868,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -894,14 +894,14 @@ Module CboeEuropeMulticastTradeReportingV668.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; order_id := order_id_value |}, bytes)
@@ -911,7 +911,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -921,8 +921,8 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1032,35 +1032,35 @@ Module CboeEuropeMulticastTradeReportingV668.
       TradeFlags.bounded (trade_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (shares_long record) ++
+      encode_uint_le 4 (shares_long record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 8 (execution_id record) ++
       TradeFlags.encode (trade_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (shares_long_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_short_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_long_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match TradeFlags.decode bytes with
@@ -1079,7 +1079,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1089,13 +1089,13 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite TradeFlags.decode_encode by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1131,35 +1131,35 @@ Module CboeEuropeMulticastTradeReportingV668.
       TradeFlags.bounded (trade_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (contracts_short record) ++
+      encode_uint_le 2 (contracts_short record) ++
       encode_bytes 6 (symbol_alphanumeric_6 record) ++
-      encode_uint 2 (price_short record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 2 (price_short record) ++
+      encode_uint_le 8 (execution_id record) ++
       TradeFlags.encode (trade_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (contracts_short_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_alphanumeric_6_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (price_short_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match TradeFlags.decode bytes with
@@ -1178,7 +1178,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1188,13 +1188,13 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite TradeFlags.decode_encode by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1381,34 +1381,34 @@ Module CboeEuropeMulticastTradeReportingV668.
       ExtendedTradeFlags.bounded (extended_trade_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (shares_extended record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (shares_extended record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 8 (trade_id record) ++
-      encode_uint 8 (trade_timestamp record) ++
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 8 (trade_id record) ++
+      encode_uint_le 8 (trade_timestamp record) ++
       encode_bytes 4 (execution_venue record) ++
       encode_bytes 3 (currency record) ++
       encode_bytes 1 (cboe_trade_flags record) ++
       ExtendedTradeFlags.encode (extended_trade_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (shares_extended_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
               | Some (symbol_short_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_long_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (trade_timestamp_value, bytes) =>
                               match decode_bytes 4 bytes with
@@ -1438,7 +1438,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !ExtendedTradeFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !ExtendedTradeFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1448,12 +1448,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1496,34 +1496,34 @@ Module CboeEuropeMulticastTradeReportingV668.
       ExtendedTradeFlags.bounded (extended_trade_flags record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (shares_extended record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (shares_extended record) ++
       encode_bytes 12 (symbol_long record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 8 (trade_id record) ++
-      encode_uint 8 (trade_timestamp record) ++
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 8 (trade_id record) ++
+      encode_uint_le 8 (trade_timestamp record) ++
       encode_bytes 4 (execution_venue record) ++
       encode_bytes 3 (currency record) ++
       encode_bytes 1 (cboe_trade_flags record) ++
       ExtendedTradeFlags.encode (extended_trade_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (shares_extended_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_long_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_long_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (trade_timestamp_value, bytes) =>
                               match decode_bytes 4 bytes with
@@ -1553,7 +1553,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 70.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !ExtendedTradeFlags.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !ExtendedTradeFlags.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1563,12 +1563,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1593,10 +1593,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1605,7 +1605,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1613,7 +1613,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1634,10 +1634,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1646,7 +1646,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1654,7 +1654,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1675,10 +1675,10 @@ Module CboeEuropeMulticastTradeReportingV668.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1687,7 +1687,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1695,7 +1695,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1722,13 +1722,13 @@ Module CboeEuropeMulticastTradeReportingV668.
       Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol_short record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -1749,7 +1749,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1759,7 +1759,7 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1791,20 +1791,20 @@ Module CboeEuropeMulticastTradeReportingV668.
       Datatypes.length (price_determination record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint 8 (price_long record) ++
+      encode_uint_le 8 (price_long record) ++
       encode_bytes 1 (statistic_type record) ++
       encode_bytes 1 (price_determination record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_short_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_long_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1823,7 +1823,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1833,9 +1833,9 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -1872,17 +1872,17 @@ Module CboeEuropeMulticastTradeReportingV668.
       Datatypes.length (includes_primary record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol_short record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (reference_price record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 4 (indicative_shares record) ++
+      encode_uint_le 8 (reference_price record) ++
+      encode_uint_le 8 (indicative_price record) ++
+      encode_uint_le 4 (indicative_shares record) ++
       encode_bytes 1 (outside_tolerance record) ++
       encode_bytes 1 (includes_primary record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -1891,13 +1891,13 @@ Module CboeEuropeMulticastTradeReportingV668.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (reference_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (indicative_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (indicative_shares_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -1919,7 +1919,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 33.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1929,12 +1929,12 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -1965,14 +1965,14 @@ Module CboeEuropeMulticastTradeReportingV668.
       (shares_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol_short record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 4 (shares_long record).
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 4 (shares_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -1981,10 +1981,10 @@ Module CboeEuropeMulticastTradeReportingV668.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_long_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (shares_long_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol_short := symbol_short_value; auction_type := auction_type_value; price_long := price_long_value; shares_long := shares_long_value |}, bytes)
@@ -1997,7 +1997,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2007,11 +2007,11 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -2038,19 +2038,19 @@ Module CboeEuropeMulticastTradeReportingV668.
       Datatypes.length (index_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (index_timestamp record) ++
+      encode_uint_le 8 (index_timestamp record) ++
       encode_bytes 10 (index_ticker record) ++
-      encode_uint 8 (index_price record) ++
+      encode_uint_le 8 (index_price record) ++
       encode_bytes 1 (index_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (index_timestamp_value, bytes) =>
           match decode_bytes 10 bytes with
           | None => None
           | Some (index_ticker_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (index_price_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -2065,7 +2065,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2075,9 +2075,9 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -2103,18 +2103,18 @@ Module CboeEuropeMulticastTradeReportingV668.
       (index_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (index_timestamp record) ++
+      encode_uint_le 8 (index_timestamp record) ++
       encode_bytes 10 (index_ticker record) ++
-      encode_uint 8 (index_price record).
+      encode_uint_le 8 (index_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (index_timestamp_value, bytes) =>
           match decode_bytes 10 bytes with
           | None => None
           | Some (index_ticker_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (index_price_value, bytes) =>
                   Some ({| index_timestamp := index_timestamp_value; index_ticker := index_ticker_value; index_price := index_price_value |}, bytes)
@@ -2125,7 +2125,7 @@ Module CboeEuropeMulticastTradeReportingV668.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2135,9 +2135,9 @@ Module CboeEuropeMulticastTradeReportingV668.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

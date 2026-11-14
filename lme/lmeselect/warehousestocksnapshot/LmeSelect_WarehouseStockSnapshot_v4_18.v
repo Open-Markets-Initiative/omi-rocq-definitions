@@ -49,14 +49,14 @@ Module LmeSelectWarehouseStockSnapshotV418.
       (send_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (msg_count record) ++
       encode_bytes 1 (filler record) ++
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (send_time record).
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -65,10 +65,10 @@ Module LmeSelectWarehouseStockSnapshotV418.
               match decode_bytes 1 bytes with
               | None => None
               | Some (filler_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (send_time_value, bytes) =>
                           Some ({| pkt_size := pkt_size_value; msg_count := msg_count_value; filler := filler_value; seq_num := seq_num_value; send_time := send_time_value |}, bytes)
@@ -81,7 +81,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -91,11 +91,11 @@ Module LmeSelectWarehouseStockSnapshotV418.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -118,14 +118,14 @@ Module LmeSelectWarehouseStockSnapshotV418.
       (msg_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_size record) ++
-      encode_uint 2 (msg_type record).
+      encode_uint_le 2 (msg_size record) ++
+      encode_uint_le 2 (msg_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
               Some ({| msg_size := msg_size_value; msg_type := msg_type_value |}, bytes)
@@ -135,7 +135,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,8 +145,8 @@ Module LmeSelectWarehouseStockSnapshotV418.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -167,10 +167,10 @@ Module LmeSelectWarehouseStockSnapshotV418.
       (new_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record).
+      encode_uint_le 4 (new_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           Some ({| new_seq_no := new_seq_no_value |}, bytes)
@@ -179,7 +179,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,7 +187,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -208,10 +208,10 @@ Module LmeSelectWarehouseStockSnapshotV418.
       (last_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (last_seq_num record).
+      encode_uint_le 4 (last_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (last_seq_num_value, bytes) =>
           Some ({| last_seq_num := last_seq_num_value |}, bytes)
@@ -220,7 +220,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -228,7 +228,7 @@ Module LmeSelectWarehouseStockSnapshotV418.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

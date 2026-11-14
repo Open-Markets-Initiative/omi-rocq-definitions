@@ -47,19 +47,19 @@ Module TxseEquitiesFramingV10.
       (packet_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (session record) ++
-      encode_uint 8 (sequence record) ++
-      encode_uint 2 (message_count record) ++
+      encode_uint_le 8 (session record) ++
+      encode_uint_le 8 (sequence record) ++
+      encode_uint_le 2 (message_count record) ++
       encode_uint 1 (packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (session_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (sequence_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (message_count_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -74,7 +74,7 @@ Module TxseEquitiesFramingV10.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -84,9 +84,9 @@ Module TxseEquitiesFramingV10.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.

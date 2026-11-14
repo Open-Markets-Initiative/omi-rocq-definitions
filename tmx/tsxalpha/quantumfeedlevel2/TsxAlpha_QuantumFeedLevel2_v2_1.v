@@ -57,8 +57,8 @@ Module TsxAlphaQuantumFeedLevel2V21.
       encode_uint 1 (start_of_frame record) ++
       encode_bytes 1 (protocol_name record) ++
       encode_bytes 1 (protocol_version record) ++
-      encode_uint 2 (message_length record) ++
-      encode_uint 4 (session_id record) ++
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 4 (session_id record) ++
       encode_bytes 1 (ack_required_poss_dup record) ++
       encode_uint 1 (num_body record).
 
@@ -72,10 +72,10 @@ Module TsxAlphaQuantumFeedLevel2V21.
               match decode_bytes 1 bytes with
               | None => None
               | Some (protocol_version_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (message_length_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (session_id_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -96,7 +96,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -109,8 +109,8 @@ Module TsxAlphaQuantumFeedLevel2V21.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
@@ -135,11 +135,11 @@ Module TsxAlphaQuantumFeedLevel2V21.
       Datatypes.length (msg_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_length record) ++
+      encode_uint_le 2 (msg_length record) ++
       encode_bytes 1 (msg_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_length_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -152,7 +152,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -162,7 +162,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -194,9 +194,9 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (msg_version record) ++
       encode_bytes 1 (source_id record) ++
-      encode_uint 2 (stream_id record) ++
+      encode_uint_le 2 (stream_id record) ++
       encode_uint 1 (sequence_0 record) ++
-      encode_uint 4 (sequence_1 record).
+      encode_uint_le 4 (sequence_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -205,13 +205,13 @@ Module TsxAlphaQuantumFeedLevel2V21.
           match decode_bytes 1 bytes with
           | None => None
           | Some (source_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (stream_id_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (sequence_0_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (sequence_1_value, bytes) =>
                           Some ({| msg_version := msg_version_value; source_id := source_id_value; stream_id := stream_id_value; sequence_0 := sequence_0_value; sequence_1 := sequence_1_value |}, bytes)
@@ -224,7 +224,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -236,9 +236,9 @@ Module TsxAlphaQuantumFeedLevel2V21.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -285,11 +285,11 @@ Module TsxAlphaQuantumFeedLevel2V21.
       encode_bytes 1 (listing_market record) ++
       encode_bytes 1 (product_type record) ++
       encode_bytes 12 (cusip record) ++
-      encode_uint 2 (board_lot record) ++
+      encode_uint_le 2 (board_lot record) ++
       encode_bytes 1 (currency record) ++
-      encode_uint 8 (face_value record) ++
-      encode_uint 8 (last_sale record) ++
-      encode_uint 4 (min_po_qty record) ++
+      encode_uint_le 8 (face_value record) ++
+      encode_uint_le 8 (last_sale record) ++
+      encode_uint_le 4 (min_po_qty record) ++
       encode_bytes 2 (stock_state record) ++
       encode_bytes 1 (test_symbol record).
 
@@ -309,19 +309,19 @@ Module TsxAlphaQuantumFeedLevel2V21.
                       match decode_bytes 12 bytes with
                       | None => None
                       | Some (cusip_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (board_lot_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (currency_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (face_value_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_sale_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (min_po_qty_value, bytes) =>
                                               match decode_bytes 2 bytes with
@@ -347,7 +347,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 53.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -362,11 +362,11 @@ Module TsxAlphaQuantumFeedLevel2V21.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
@@ -401,33 +401,33 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 2 (broker_number record) ++
+      encode_uint_le 2 (broker_number record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 8 (priority_time_stamp record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 8 (priority_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (broker_number_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (order_side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (volume_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (priority_time_stamp_value, bytes) =>
                                   Some ({| symbol := symbol_value; broker_number := broker_number_value; order_side := order_side_value; order_id := order_id_value; price := price_value; volume := volume_value; priority_time_stamp := priority_time_stamp_value |}, bytes)
@@ -442,7 +442,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -453,12 +453,12 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -484,7 +484,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market_state record) ++
       encode_uint 1 (stock_group record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -493,7 +493,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
           match decode_uint 1 bytes with
           | None => None
           | Some (stock_group_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trading_system_time_stamp_value, bytes) =>
                   Some ({| market_state := market_state_value; stock_group := stock_group_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -504,7 +504,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -516,7 +516,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -551,37 +551,37 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 2 (broker_number record) ++
+      encode_uint_le 2 (broker_number record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 8 (priority_time_stamp record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 8 (priority_time_stamp record) ++
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (broker_number_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (order_side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (volume_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (priority_time_stamp_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (trading_system_time_stamp_value, bytes) =>
                                       Some ({| symbol := symbol_value; broker_number := broker_number_value; order_side := order_side_value; order_id := order_id_value; price := price_value; volume := volume_value; priority_time_stamp := priority_time_stamp_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -597,7 +597,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 51.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -608,13 +608,13 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -643,25 +643,25 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 2 (broker_number record) ++
+      encode_uint_le 2 (broker_number record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (broker_number_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (order_side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trading_system_time_stamp_value, bytes) =>
                           Some ({| symbol := symbol_value; broker_number := broker_number_value; order_side := order_side_value; order_id := order_id_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -674,7 +674,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -685,10 +685,10 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -723,37 +723,37 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 2 (broker_number record) ++
+      encode_uint_le 2 (broker_number record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 8 (priority_time_stamp record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 8 (priority_time_stamp record) ++
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (broker_number_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (order_side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (volume_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (priority_time_stamp_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (trading_system_time_stamp_value, bytes) =>
                                       Some ({| symbol := symbol_value; broker_number := broker_number_value; order_side := order_side_value; order_id := order_id_value; price := price_value; volume := volume_value; priority_time_stamp := priority_time_stamp_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -769,7 +769,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 51.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -780,13 +780,13 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -815,7 +815,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
       encode_bytes 12 (symbol record) ++
       encode_bytes 40 (comment record) ++
       encode_bytes 2 (stock_state record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
@@ -827,7 +827,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
               match decode_bytes 2 bytes with
               | None => None
               | Some (stock_state_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trading_system_time_stamp_value, bytes) =>
                       Some ({| symbol := symbol_value; comment := comment_value; stock_state := stock_state_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -839,7 +839,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -852,7 +852,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -901,56 +901,56 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 2 (buy_broker_number record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 4 (buy_display_volume record) ++
-      encode_uint 2 (sell_broker_number record) ++
-      encode_uint 8 (sell_order_id record) ++
-      encode_uint 4 (sell_display_volume record) ++
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 2 (buy_broker_number record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 4 (buy_display_volume record) ++
+      encode_uint_le 2 (sell_broker_number record) ++
+      encode_uint_le 8 (sell_order_id record) ++
+      encode_uint_le 4 (sell_display_volume record) ++
       encode_bytes 1 (bypass record) ++
-      encode_uint 4 (trade_time_stamp record) ++
+      encode_uint_le 4 (trade_time_stamp record) ++
       encode_bytes 1 (cross_type record) ++
       encode_bytes 1 (is_dark record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (buy_broker_number_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (buy_order_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (buy_display_volume_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (sell_broker_number_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (sell_order_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (sell_display_volume_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (bypass_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (trade_time_stamp_value, bytes) =>
                                                       match decode_bytes 1 bytes with
@@ -959,7 +959,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (is_dark_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (trading_system_time_stamp_value, bytes) =>
                                                                   Some ({| symbol := symbol_value; trade_number := trade_number_value; price := price_value; volume := volume_value; buy_broker_number := buy_broker_number_value; buy_order_id := buy_order_id_value; buy_display_volume := buy_display_volume_value; sell_broker_number := sell_broker_number_value; sell_order_id := sell_order_id_value; sell_display_volume := sell_display_volume_value; bypass := bypass_value; trade_time_stamp := trade_time_stamp_value; cross_type := cross_type_value; is_dark := is_dark_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -982,7 +982,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -993,20 +993,20 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
@@ -1055,65 +1055,65 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 2 (buy_broker_number record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 4 (buy_display_volume record) ++
-      encode_uint 2 (sell_broker_number record) ++
-      encode_uint 8 (sell_order_id record) ++
-      encode_uint 4 (sell_display_volume record) ++
-      encode_uint 4 (trade_time_stamp record) ++
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 2 (buy_broker_number record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 4 (buy_display_volume record) ++
+      encode_uint_le 2 (sell_broker_number record) ++
+      encode_uint_le 8 (sell_order_id record) ++
+      encode_uint_le 4 (sell_display_volume record) ++
+      encode_uint_le 4 (trade_time_stamp record) ++
       encode_bytes 1 (settlement_terms record) ++
-      encode_uint 4 (settlement_date record) ++
+      encode_uint_le 4 (settlement_date record) ++
       encode_bytes 1 (cross_type record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (buy_broker_number_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (buy_order_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (buy_display_volume_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (sell_broker_number_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (sell_order_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (sell_display_volume_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (trade_time_stamp_value, bytes) =>
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (settlement_terms_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (settlement_date_value, bytes) =>
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (cross_type_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (trading_system_time_stamp_value, bytes) =>
                                                                   Some ({| symbol := symbol_value; trade_number := trade_number_value; price := price_value; volume := volume_value; buy_broker_number := buy_broker_number_value; buy_order_id := buy_order_id_value; buy_display_volume := buy_display_volume_value; sell_broker_number := sell_broker_number_value; sell_order_id := sell_order_id_value; sell_display_volume := sell_display_volume_value; trade_time_stamp := trade_time_stamp_value; settlement_terms := settlement_terms_value; settlement_date := settlement_date_value; cross_type := cross_type_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -1136,7 +1136,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 74.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1147,20 +1147,20 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
@@ -1185,17 +1185,17 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trading_system_time_stamp_value, bytes) =>
                   Some ({| symbol := symbol_value; trade_number := trade_number_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -1206,7 +1206,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1217,8 +1217,8 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1243,17 +1243,17 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trading_system_time_stamp_value, bytes) =>
                   Some ({| symbol := symbol_value; trade_number := trade_number_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -1264,7 +1264,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1275,8 +1275,8 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1321,48 +1321,48 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 2 (buy_broker_number record) ++
-      encode_uint 2 (sell_broker_number record) ++
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 2 (buy_broker_number record) ++
+      encode_uint_le 2 (sell_broker_number record) ++
       encode_bytes 1 (initiated_by record) ++
-      encode_uint 4 (orig_trade_number record) ++
+      encode_uint_le 4 (orig_trade_number record) ++
       encode_bytes 1 (bypass record) ++
-      encode_uint 4 (trade_time_stamp record) ++
+      encode_uint_le 4 (trade_time_stamp record) ++
       encode_bytes 1 (cross_type record) ++
       encode_bytes 1 (is_dark record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (buy_broker_number_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (sell_broker_number_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (initiated_by_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (orig_trade_number_value, bytes) =>
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (bypass_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (trade_time_stamp_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -1371,7 +1371,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (is_dark_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (trading_system_time_stamp_value, bytes) =>
                                                           Some ({| symbol := symbol_value; trade_number := trade_number_value; price := price_value; volume := volume_value; buy_broker_number := buy_broker_number_value; sell_broker_number := sell_broker_number_value; initiated_by := initiated_by_value; orig_trade_number := orig_trade_number_value; bypass := bypass_value; trade_time_stamp := trade_time_stamp_value; cross_type := cross_type_value; is_dark := is_dark_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -1392,7 +1392,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1403,18 +1403,18 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -1459,57 +1459,57 @@ Module TsxAlphaQuantumFeedLevel2V21.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (trade_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 2 (buy_broker_number record) ++
-      encode_uint 2 (sell_broker_number record) ++
+      encode_uint_le 4 (trade_number record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 2 (buy_broker_number record) ++
+      encode_uint_le 2 (sell_broker_number record) ++
       encode_bytes 1 (initiated_by record) ++
-      encode_uint 4 (orig_trade_number record) ++
-      encode_uint 4 (trade_time_stamp record) ++
+      encode_uint_le 4 (orig_trade_number record) ++
+      encode_uint_le 4 (trade_time_stamp record) ++
       encode_bytes 1 (settlement_terms record) ++
-      encode_uint 4 (settlement_date record) ++
+      encode_uint_le 4 (settlement_date record) ++
       encode_bytes 1 (cross_type record) ++
-      encode_uint 8 (trading_system_time_stamp record).
+      encode_uint_le 8 (trading_system_time_stamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 12 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (trade_number_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (buy_broker_number_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (sell_broker_number_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (initiated_by_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (orig_trade_number_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (trade_time_stamp_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (settlement_terms_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (settlement_date_value, bytes) =>
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (cross_type_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (trading_system_time_stamp_value, bytes) =>
                                                           Some ({| symbol := symbol_value; trade_number := trade_number_value; price := price_value; volume := volume_value; buy_broker_number := buy_broker_number_value; sell_broker_number := sell_broker_number_value; initiated_by := initiated_by_value; orig_trade_number := orig_trade_number_value; trade_time_stamp := trade_time_stamp_value; settlement_terms := settlement_terms_value; settlement_date := settlement_date_value; cross_type := cross_type_value; trading_system_time_stamp := trading_system_time_stamp_value |}, bytes)
@@ -1530,7 +1530,7 @@ Module TsxAlphaQuantumFeedLevel2V21.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 55.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1541,18 +1541,18 @@ Module TsxAlphaQuantumFeedLevel2V21.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       destruct record. reflexivity.
     Qed.
 

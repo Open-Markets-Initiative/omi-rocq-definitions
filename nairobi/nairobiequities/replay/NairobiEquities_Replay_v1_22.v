@@ -49,13 +49,13 @@ Module NairobiEquitiesReplayV122.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module NairobiEquitiesReplayV122.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_data_group_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_number_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; market_data_group := market_data_group_value; sequence_number := sequence_number_value |}, bytes)
@@ -76,7 +76,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -112,11 +112,11 @@ Module NairobiEquitiesReplayV122.
       (message_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_uint 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -129,7 +129,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,7 +139,7 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -258,17 +258,17 @@ Module NairobiEquitiesReplayV122.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (first_message record) ++
-      encode_uint 2 (count record).
+      encode_uint_le 4 (first_message record) ++
+      encode_uint_le 2 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (market_data_group_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (first_message_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (count_value, bytes) =>
                   Some ({| market_data_group := market_data_group_value; first_message := first_message_value; count := count_value |}, bytes)
@@ -279,7 +279,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -290,8 +290,8 @@ Module NairobiEquitiesReplayV122.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -319,18 +319,18 @@ Module NairobiEquitiesReplayV122.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (first_message record) ++
-      encode_uint 2 (count record) ++
+      encode_uint_le 4 (first_message record) ++
+      encode_uint_le 2 (count record) ++
       encode_bytes 1 (replay_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
       | None => None
       | Some (market_data_group_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (first_message_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (count_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -345,7 +345,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -356,8 +356,8 @@ Module NairobiEquitiesReplayV122.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -379,10 +379,10 @@ Module NairobiEquitiesReplayV122.
       (seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record).
+      encode_uint_le 4 (seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
           Some ({| seconds := seconds_value |}, bytes)
@@ -391,7 +391,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -399,7 +399,7 @@ Module NairobiEquitiesReplayV122.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -422,11 +422,11 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (event_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 1 (event_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -439,7 +439,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -449,7 +449,7 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -473,14 +473,14 @@ Module NairobiEquitiesReplayV122.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| nanosecond := nanosecond_value; order_id := order_id_value |}, bytes)
@@ -490,7 +490,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -500,8 +500,8 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -528,13 +528,13 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (book_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 12 (symbol record) ++
       encode_uint 1 (sub_book record) ++
       encode_bytes 1 (book_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 12 bytes with
@@ -555,7 +555,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -565,7 +565,7 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -605,27 +605,27 @@ Module NairobiEquitiesReplayV122.
       (underlying_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 6 (buy_firm record) ++
       encode_bytes 6 (sell_firm record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record).
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trade_id_value, bytes) =>
                       match decode_bytes 6 bytes with
@@ -634,13 +634,13 @@ Module NairobiEquitiesReplayV122.
                           match decode_bytes 6 bytes with
                           | None => None
                           | Some (sell_firm_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (last_opt_px_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (volatility_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (underlying_reference_price_value, bytes) =>
                                           Some ({| nanosecond := nanosecond_value; order_id := order_id_value; executed_quantity := executed_quantity_value; trade_id := trade_id_value; buy_firm := buy_firm_value; sell_firm := sell_firm_value; last_opt_px := last_opt_px_value; volatility := volatility_value; underlying_reference_price := underlying_reference_price_value |}, bytes)
@@ -657,7 +657,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 60.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -667,15 +667,15 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -718,39 +718,39 @@ Module NairobiEquitiesReplayV122.
       (underlying_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 4 (display_quantity record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 4 (display_quantity record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 1 (printable record) ++
-      encode_uint 4 (price record) ++
+      encode_uint_le 4 (price record) ++
       encode_bytes 6 (buy_firm record) ++
       encode_bytes 6 (sell_firm record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record).
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (display_quantity_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (printable_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   match decode_bytes 6 bytes with
@@ -759,13 +759,13 @@ Module NairobiEquitiesReplayV122.
                                       match decode_bytes 6 bytes with
                                       | None => None
                                       | Some (sell_firm_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (last_opt_px_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (volatility_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (underlying_reference_price_value, bytes) =>
                                                       Some ({| nanosecond := nanosecond_value; order_id := order_id_value; executed_quantity := executed_quantity_value; display_quantity := display_quantity_value; trade_id := trade_id_value; printable := printable_value; price := price_value; buy_firm := buy_firm_value; sell_firm := sell_firm_value; last_opt_px := last_opt_px_value; volatility := volatility_value; underlying_reference_price := underlying_reference_price_value |}, bytes)
@@ -785,7 +785,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -795,18 +795,18 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -847,32 +847,32 @@ Module NairobiEquitiesReplayV122.
       (underlying_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (executed_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (executed_quantity record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_uint 1 (sub_book record) ++
       encode_bytes 6 (buy_firm record) ++
       encode_bytes 6 (sell_firm record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record).
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (executed_quantity_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -884,13 +884,13 @@ Module NairobiEquitiesReplayV122.
                                   match decode_bytes 6 bytes with
                                   | None => None
                                   | Some (sell_firm_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_opt_px_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (volatility_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (underlying_reference_price_value, bytes) =>
                                                   Some ({| nanosecond := nanosecond_value; executed_quantity := executed_quantity_value; symbol := symbol_value; price := price_value; trade_id := trade_id_value; sub_book := sub_book_value; buy_firm := buy_firm_value; sell_firm := sell_firm_value; last_opt_px := last_opt_px_value; volatility := volatility_value; underlying_reference_price := underlying_reference_price_value |}, bytes)
@@ -909,7 +909,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -919,17 +919,17 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -966,42 +966,42 @@ Module NairobiEquitiesReplayV122.
       (underlying_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (executed_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (executed_quantity record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record).
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (executed_quantity_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (auction_type_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (last_opt_px_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (volatility_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (underlying_reference_price_value, bytes) =>
                                           Some ({| nanosecond := nanosecond_value; executed_quantity := executed_quantity_value; symbol := symbol_value; price := price_value; trade_id := trade_id_value; auction_type := auction_type_value; last_opt_px := last_opt_px_value; volatility := volatility_value; underlying_reference_price := underlying_reference_price_value |}, bytes)
@@ -1018,7 +1018,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 57.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1028,15 +1028,15 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1077,32 +1077,32 @@ Module NairobiEquitiesReplayV122.
       (underlying_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (executed_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (executed_quantity record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 4 (off_book_trade_type record) ++
       encode_bytes 8 (trade_time record) ++
       encode_bytes 8 (trade_date record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record).
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (executed_quantity_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
                           match decode_bytes 4 bytes with
@@ -1114,13 +1114,13 @@ Module NairobiEquitiesReplayV122.
                                   match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (trade_date_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_opt_px_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (volatility_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (underlying_reference_price_value, bytes) =>
                                                   Some ({| nanosecond := nanosecond_value; executed_quantity := executed_quantity_value; symbol := symbol_value; price := price_value; trade_id := trade_id_value; off_book_trade_type := off_book_trade_type_value; trade_time := trade_time_value; trade_date := trade_date_value; last_opt_px := last_opt_px_value; volatility := volatility_value; underlying_reference_price := underlying_reference_price_value |}, bytes)
@@ -1139,7 +1139,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1149,17 +1149,17 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -1184,15 +1184,15 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (trade_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 1 (trade_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (trade_id_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -1206,7 +1206,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1216,8 +1216,8 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1253,29 +1253,29 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (sell_firm record) = 6.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 4 (quantity record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 4 (quantity record) ++
       encode_uint 1 (sub_book record) ++
       encode_bytes 6 (buy_firm record) ++
       encode_bytes 6 (sell_firm record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (trade_id_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -1300,7 +1300,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1310,11 +1310,11 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -1370,11 +1370,11 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (auction_trade_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (executed_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (executed_quantity record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 4 (off_book_trade_type record) ++
       encode_bytes 8 (trade_time record) ++
@@ -1383,25 +1383,25 @@ Module NairobiEquitiesReplayV122.
       encode_uint 1 (sub_book record) ++
       encode_bytes 6 (buy_firm record) ++
       encode_bytes 6 (sell_firm record) ++
-      encode_uint 8 (last_opt_px record) ++
-      encode_uint 8 (volatility record) ++
-      encode_uint 8 (underlying_reference_price record) ++
+      encode_uint_le 8 (last_opt_px record) ++
+      encode_uint_le 8 (volatility record) ++
+      encode_uint_le 8 (underlying_reference_price record) ++
       encode_bytes 1 (auction_trade_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (executed_quantity_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -1428,13 +1428,13 @@ Module NairobiEquitiesReplayV122.
                                                       match decode_bytes 6 bytes with
                                                       | None => None
                                                       | Some (sell_firm_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (last_opt_px_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (volatility_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (underlying_reference_price_value, bytes) =>
                                                                       match decode_bytes 1 bytes with
@@ -1462,7 +1462,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 92.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1472,11 +1472,11 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -1485,9 +1485,9 @@ Module NairobiEquitiesReplayV122.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
@@ -1521,22 +1521,22 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (auction_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
-      encode_uint 4 (paired_quantity record) ++
-      encode_uint 4 (imbalance_quantity record) ++
+      encode_uint_le 4 (nanosecond record) ++
+      encode_uint_le 4 (paired_quantity record) ++
+      encode_uint_le 4 (imbalance_quantity record) ++
       encode_bytes 1 (imbalance_direction record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
+      encode_uint_le 4 (price record) ++
       encode_bytes 1 (auction_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (paired_quantity_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (imbalance_quantity_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1545,7 +1545,7 @@ Module NairobiEquitiesReplayV122.
                       match decode_bytes 12 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -1563,7 +1563,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1573,12 +1573,12 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -1610,15 +1610,15 @@ Module NairobiEquitiesReplayV122.
       (sub_book record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 12 (symbol record) ++
       encode_bytes 1 (statistic_type record) ++
-      encode_uint 4 (price record) ++
+      encode_uint_le 4 (price record) ++
       encode_bytes 1 (open_close_indicator record) ++
       encode_uint 1 (sub_book record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 12 bytes with
@@ -1627,7 +1627,7 @@ Module NairobiEquitiesReplayV122.
               match decode_bytes 1 bytes with
               | None => None
               | Some (statistic_type_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1647,7 +1647,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1657,10 +1657,10 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
@@ -1711,45 +1711,45 @@ Module NairobiEquitiesReplayV122.
       (market_capitalization record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (high_price record) ++
-      encode_uint 4 (low_price record) ++
-      encode_uint 4 (vwap record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 8 (turnover record) ++
-      encode_uint 4 (trades record) ++
+      encode_uint_le 4 (high_price record) ++
+      encode_uint_le 4 (low_price record) ++
+      encode_uint_le 4 (vwap record) ++
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 8 (turnover record) ++
+      encode_uint_le 4 (trades record) ++
       encode_bytes 8 (reserved_8 record) ++
       encode_uint 1 (sub_book record) ++
-      encode_uint 8 (notional_exposure record) ++
-      encode_uint 8 (notional_delta_exposure record) ++
-      encode_uint 8 (daily_foreign_buy_value record) ++
-      encode_uint 8 (daily_foreign_sell_value record) ++
-      encode_uint 8 (market_capitalization record).
+      encode_uint_le 8 (notional_exposure record) ++
+      encode_uint_le 8 (notional_delta_exposure record) ++
+      encode_uint_le 8 (daily_foreign_buy_value record) ++
+      encode_uint_le 8 (daily_foreign_sell_value record) ++
+      encode_uint_le 8 (market_capitalization record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (high_price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (low_price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (vwap_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (volume_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (turnover_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (trades_value, bytes) =>
                                       match decode_bytes 8 bytes with
@@ -1758,19 +1758,19 @@ Module NairobiEquitiesReplayV122.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (sub_book_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (notional_exposure_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (notional_delta_exposure_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (daily_foreign_buy_value_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (daily_foreign_sell_value_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (market_capitalization_value, bytes) =>
                                                                   Some ({| nanosecond := nanosecond_value; symbol := symbol_value; high_price := high_price_value; low_price := low_price_value; vwap := vwap_value; volume := volume_value; turnover := turnover_value; trades := trades_value; reserved_8 := reserved_8_value; sub_book := sub_book_value; notional_exposure := notional_exposure_value; notional_delta_exposure := notional_delta_exposure_value; daily_foreign_buy_value := daily_foreign_buy_value_value; daily_foreign_sell_value := daily_foreign_sell_value_value; market_capitalization := market_capitalization_value |}, bytes)
@@ -1793,7 +1793,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1803,21 +1803,21 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
@@ -1854,18 +1854,18 @@ Module NairobiEquitiesReplayV122.
       (market_capitalization record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_uint 1 (statistics_type record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (volume record) ++
-      encode_uint 8 (turnover record) ++
-      encode_uint 4 (trades record) ++
-      encode_uint 8 (daily_foreign_buy_value record) ++
-      encode_uint 8 (daily_foreign_sell_value record) ++
-      encode_uint 8 (market_capitalization record).
+      encode_uint_le 4 (volume record) ++
+      encode_uint_le 8 (turnover record) ++
+      encode_uint_le 4 (trades record) ++
+      encode_uint_le 8 (daily_foreign_buy_value record) ++
+      encode_uint_le 8 (daily_foreign_sell_value record) ++
+      encode_uint_le 8 (market_capitalization record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1874,22 +1874,22 @@ Module NairobiEquitiesReplayV122.
               match decode_bytes 12 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (turnover_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trades_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (daily_foreign_buy_value_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (daily_foreign_sell_value_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (market_capitalization_value, bytes) =>
                                           Some ({| nanosecond := nanosecond_value; statistics_type := statistics_type_value; symbol := symbol_value; volume := volume_value; turnover := turnover_value; trades := trades_value; daily_foreign_buy_value := daily_foreign_buy_value_value; daily_foreign_sell_value := daily_foreign_sell_value_value; market_capitalization := market_capitalization_value |}, bytes)
@@ -1906,7 +1906,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 57.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1916,15 +1916,15 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1953,26 +1953,26 @@ Module NairobiEquitiesReplayV122.
       (perctg_diff_from_closing record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (index_value record) ++
+      encode_uint_le 4 (index_value record) ++
       encode_uint 1 (update_type record) ++
-      encode_uint 4 (perctg_diff_from_closing record).
+      encode_uint_le 4 (perctg_diff_from_closing record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (index_value_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (update_type_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (perctg_diff_from_closing_value, bytes) =>
                           Some ({| nanosecond := nanosecond_value; symbol := symbol_value; index_value := index_value_value; update_type := update_type_value; perctg_diff_from_closing := perctg_diff_from_closing_value |}, bytes)
@@ -1985,7 +1985,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1995,11 +1995,11 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -2032,28 +2032,28 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (date record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 12 (symbol record) ++
-      encode_uint 4 (price record) ++
+      encode_uint_le 4 (price record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 4 (quantity record) ++
+      encode_uint_le 4 (quantity record) ++
       encode_bytes 1 (aon_status record) ++
       encode_bytes 8 (date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (price_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -2074,7 +2074,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2084,11 +2084,11 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -2123,7 +2123,7 @@ Module NairobiEquitiesReplayV122.
       Datatypes.length (underlyings record) = 100.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanosecond record) ++
+      encode_uint_le 4 (nanosecond record) ++
       encode_bytes 8 (time record) ++
       encode_bytes 1 (urgency record) ++
       encode_bytes 100 (headline record) ++
@@ -2132,7 +2132,7 @@ Module NairobiEquitiesReplayV122.
       encode_bytes 100 (underlyings record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanosecond_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -2165,7 +2165,7 @@ Module NairobiEquitiesReplayV122.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1063.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2175,7 +2175,7 @@ Module NairobiEquitiesReplayV122.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.

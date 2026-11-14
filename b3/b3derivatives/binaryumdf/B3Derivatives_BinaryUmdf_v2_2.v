@@ -55,9 +55,9 @@ Module B3DerivativesBinaryUmdfV22.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (channel_id record) ++
       encode_uint 1 (packet_reserved record) ++
-      encode_uint 2 (sequence_version record) ++
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 8 (sending_time record).
+      encode_uint_le 2 (sequence_version record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 8 (sending_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -66,13 +66,13 @@ Module B3DerivativesBinaryUmdfV22.
           match decode_uint 1 bytes with
           | None => None
           | Some (packet_reserved_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (sequence_version_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_number_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (sending_time_value, bytes) =>
                           Some ({| channel_id := channel_id_value; packet_reserved := packet_reserved_value; sequence_version := sequence_version_value; sequence_number := sequence_number_value; sending_time := sending_time_value |}, bytes)
@@ -85,7 +85,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -97,9 +97,9 @@ Module B3DerivativesBinaryUmdfV22.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -122,14 +122,14 @@ Module B3DerivativesBinaryUmdfV22.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -139,7 +139,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -149,8 +149,8 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -177,22 +177,22 @@ Module B3DerivativesBinaryUmdfV22.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -204,7 +204,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -214,10 +214,10 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -238,10 +238,10 @@ Module B3DerivativesBinaryUmdfV22.
       (next_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (next_seq_no record).
+      encode_uint_le 4 (next_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (next_seq_no_value, bytes) =>
           Some ({| next_seq_no := next_seq_no_value |}, bytes)
@@ -250,7 +250,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -258,7 +258,7 @@ Module B3DerivativesBinaryUmdfV22.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -285,13 +285,13 @@ Module B3DerivativesBinaryUmdfV22.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -312,7 +312,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -322,7 +322,7 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -352,13 +352,13 @@ Module B3DerivativesBinaryUmdfV22.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -379,7 +379,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -389,7 +389,7 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -415,11 +415,11 @@ Module B3DerivativesBinaryUmdfV22.
       (num_in_group record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -432,7 +432,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -442,7 +442,7 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -480,42 +480,42 @@ Module B3DerivativesBinaryUmdfV22.
       (last_sequence_version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 4 (last_msg_seq_num_processed record) ++
-      encode_uint 4 (tot_num_reports record) ++
-      encode_uint 4 (tot_num_bids record) ++
-      encode_uint 4 (tot_num_offers record) ++
-      encode_uint 2 (tot_num_stats record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 4 (last_msg_seq_num_processed record) ++
+      encode_uint_le 4 (tot_num_reports record) ++
+      encode_uint_le 4 (tot_num_bids record) ++
+      encode_uint_le 4 (tot_num_offers record) ++
+      encode_uint_le 2 (tot_num_stats record) ++
       encode_bytes 2 (offset_26_padding_2 record) ++
-      encode_uint 4 (last_rpt_seq record) ++
-      encode_uint 2 (last_sequence_version record).
+      encode_uint_le 4 (last_rpt_seq record) ++
+      encode_uint_le 2 (last_sequence_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_msg_seq_num_processed_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (tot_num_reports_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (tot_num_bids_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (tot_num_offers_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (tot_num_stats_value, bytes) =>
                               match decode_bytes 2 bytes with
                               | None => None
                               | Some (offset_26_padding_2_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (last_rpt_seq_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (last_sequence_version_value, bytes) =>
                                           Some ({| security_id := security_id_value; last_msg_seq_num_processed := last_msg_seq_num_processed_value; tot_num_reports := tot_num_reports_value; tot_num_bids := tot_num_bids_value; tot_num_offers := tot_num_offers_value; tot_num_stats := tot_num_stats_value; offset_26_padding_2 := offset_26_padding_2_value; last_rpt_seq := last_rpt_seq_value; last_sequence_version := last_sequence_version_value |}, bytes)
@@ -532,7 +532,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -542,15 +542,15 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -591,20 +591,20 @@ Module B3DerivativesBinaryUmdfV22.
       (transact_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (security_id record) ++
       encode_bytes 2 (offset_8_padding_2 record) ++
       encode_uint 1 (aggressor_side record) ++
       encode_bytes 1 (offset_11_padding_1 record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 8 (fill_qty record) ++
-      encode_uint 8 (traded_hidden_qty record) ++
-      encode_uint 8 (cxl_qty record) ++
-      encode_uint 8 (aggressor_time record) ++
-      encode_uint 4 (rpt_seq record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 8 (fill_qty record) ++
+      encode_uint_le 8 (traded_hidden_qty record) ++
+      encode_uint_le 8 (cxl_qty record) ++
+      encode_uint_le 8 (aggressor_time record) ++
+      encode_uint_le 4 (rpt_seq record) ++
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
           match decode_bytes 2 bytes with
@@ -616,25 +616,25 @@ Module B3DerivativesBinaryUmdfV22.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (offset_11_padding_1_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (last_px_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (fill_qty_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (traded_hidden_qty_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (cxl_qty_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (aggressor_time_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (rpt_seq_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (transact_time_value, bytes) =>
                                                   Some ({| security_id := security_id_value; offset_8_padding_2 := offset_8_padding_2_value; aggressor_side := aggressor_side_value; offset_11_padding_1 := offset_11_padding_1_value; last_px := last_px_value; fill_qty := fill_qty_value; traded_hidden_qty := traded_hidden_qty_value; cxl_qty := cxl_qty_value; aggressor_time := aggressor_time_value; rpt_seq := rpt_seq_value; transact_time := transact_time_value |}, bytes)
@@ -653,7 +653,7 @@ Module B3DerivativesBinaryUmdfV22.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -663,17 +663,17 @@ Module B3DerivativesBinaryUmdfV22.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 

@@ -43,14 +43,14 @@ Module EurexT7EtiV1Server.
       (template_id record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (body_len record) ++
-      encode_uint 2 (template_id record).
+      encode_uint_le 4 (body_len record) ++
+      encode_uint_le 2 (template_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (body_len_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
               Some ({| body_len := body_len_value; template_id := template_id_value |}, bytes)
@@ -60,7 +60,7 @@ Module EurexT7EtiV1Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -70,8 +70,8 @@ Module EurexT7EtiV1Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

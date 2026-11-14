@@ -46,11 +46,11 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (sesm_packet_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (sesm_packet_length record) ++
+      encode_uint_le 2 (sesm_packet_length record) ++
       encode_bytes 1 (sesm_packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (sesm_packet_length_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -63,7 +63,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,7 +73,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -107,16 +107,16 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine record) ++
+      encode_uint_le 8 (matching_engine record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -125,10 +125,10 @@ Module OnyxFuturesExpressInterfaceV10C.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (instrument_id_binary_u_4_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -149,7 +149,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -159,11 +159,11 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -202,18 +202,18 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -225,13 +225,13 @@ Module OnyxFuturesExpressInterfaceV10C.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (original_client_order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (instrument_id_binary_u_4_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (leaves_qty_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -254,7 +254,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 80.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -264,13 +264,13 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -305,16 +305,16 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -326,10 +326,10 @@ Module OnyxFuturesExpressInterfaceV10C.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (original_client_order_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (instrument_id_binary_u_4_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -347,7 +347,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 66.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -357,12 +357,12 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -392,14 +392,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 1 (status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -424,7 +424,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -434,7 +434,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -469,7 +469,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (instrument_id_string_20 record) ++
@@ -477,7 +477,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -506,7 +506,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 70.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -516,7 +516,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -550,14 +550,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 8 (version record) ++
       encode_uint 1 (session_id record) ++
       encode_bytes 1 (system_status record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -582,7 +582,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -592,7 +592,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -641,22 +641,22 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 18 (operator_id record) ++
       encode_bytes 6 (operator_location record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (client_send_time record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (client_send_time record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (cancel_reason record) ++
-      encode_uint 8 (last_price record) ++
-      encode_uint 4 (last_size record) ++
+      encode_uint_le 8 (last_price record) ++
+      encode_uint_le 4 (last_size record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -671,25 +671,25 @@ Module OnyxFuturesExpressInterfaceV10C.
                       match decode_bytes 20 bytes with
                       | None => None
                       | Some (client_order_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (instrument_id_binary_u_4_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (order_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (client_send_time_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (leaves_qty_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (cancel_reason_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (last_price_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (last_size_value, bytes) =>
                                                       match decode_bytes 8 bytes with
@@ -713,7 +713,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 102.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -723,18 +723,18 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
@@ -764,20 +764,20 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_32 record) = 32.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (update_status record) ++
       encode_bytes 32 (reserved_32 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_binary_u_4_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -796,7 +796,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 53.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -806,9 +806,9 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -847,18 +847,18 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (client_send_time record) ++
+      encode_uint_le 8 (client_send_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 18 (operator_id record) ++
       encode_bytes 6 (operator_location record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (client_send_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -870,7 +870,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                   match decode_bytes 6 bytes with
                   | None => None
                   | Some (operator_location_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
                           match decode_bytes 20 bytes with
@@ -879,7 +879,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                               match decode_bytes 20 bytes with
                               | None => None
                               | Some (original_client_order_id_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (instrument_id_binary_u_4_value, bytes) =>
                                       match decode_bytes 10 bytes with
@@ -899,7 +899,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 99.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -909,14 +909,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -960,7 +960,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (reserved_9 record) = 9.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (client_send_time record) ++
+      encode_uint_le 8 (client_send_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 18 (operator_id record) ++
       encode_bytes 6 (operator_location record) ++
@@ -974,7 +974,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 9 (reserved_9 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (client_send_time_value, bytes) =>
           match decode_bytes 5 bytes with
@@ -1027,7 +1027,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 86.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1037,7 +1037,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1084,7 +1084,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 8 (computer_id record) ++
       encode_bytes 8 (application_protocol record) ++
       encode_uint 1 (requested_session record) ++
-      encode_uint 8 (requested_sequence_number record).
+      encode_uint_le 8 (requested_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 5 bytes with
@@ -1102,7 +1102,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (requested_session_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (requested_sequence_number_value, bytes) =>
                               Some ({| sesm_version := sesm_version_value; username := username_value; computer_id := computer_id_value; application_protocol := application_protocol_value; requested_session := requested_session_value; requested_sequence_number := requested_sequence_number_value |}, bytes)
@@ -1116,7 +1116,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1131,7 +1131,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -1158,7 +1158,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (login_status record) ++
       encode_uint 1 (session_id record) ++
-      encode_uint 8 (highest_sequence_number record).
+      encode_uint_le 8 (highest_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -1167,7 +1167,7 @@ Module OnyxFuturesExpressInterfaceV10C.
           match decode_uint 1 bytes with
           | None => None
           | Some (session_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (highest_sequence_number_value, bytes) =>
                   Some ({| login_status := login_status_value; session_id := session_id_value; highest_sequence_number := highest_sequence_number_value |}, bytes)
@@ -1178,7 +1178,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1190,7 +1190,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1213,14 +1213,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       (end_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (start_sequence_number record) ++
-      encode_uint 8 (end_sequence_number record).
+      encode_uint_le 8 (start_sequence_number record) ++
+      encode_uint_le 8 (end_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (start_sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (end_sequence_number_value, bytes) =>
               Some ({| start_sequence_number := start_sequence_number_value; end_sequence_number := end_sequence_number_value |}, bytes)
@@ -1230,7 +1230,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1240,8 +1240,8 @@ Module OnyxFuturesExpressInterfaceV10C.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

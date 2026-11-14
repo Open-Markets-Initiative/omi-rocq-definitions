@@ -51,22 +51,22 @@ Module EuronextOptiqMarketDataGatewayV525.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -78,7 +78,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -88,10 +88,10 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -114,14 +114,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       (session_trading_day record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
-      encode_uint 2 (session_trading_day record).
+      encode_uint_le 8 (md_seq_num record) ++
+      encode_uint_le 2 (session_trading_day record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (session_trading_day_value, bytes) =>
               Some ({| md_seq_num := md_seq_num_value; session_trading_day := session_trading_day_value |}, bytes)
@@ -131,7 +131,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -141,8 +141,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -165,14 +165,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       (session_trading_day record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
-      encode_uint 2 (session_trading_day record).
+      encode_uint_le 8 (md_seq_num record) ++
+      encode_uint_le 2 (session_trading_day record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (session_trading_day_value, bytes) =>
               Some ({| md_seq_num := md_seq_num_value; session_trading_day := session_trading_day_value |}, bytes)
@@ -182,7 +182,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -192,8 +192,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -216,14 +216,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       (event_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
-      encode_uint 8 (event_time record).
+      encode_uint_le 8 (md_seq_num record) ++
+      encode_uint_le 8 (event_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (event_time_value, bytes) =>
               Some ({| md_seq_num := md_seq_num_value; event_time := event_time_value |}, bytes)
@@ -233,7 +233,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -243,8 +243,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -275,15 +275,15 @@ Module EuronextOptiqMarketDataGatewayV525.
       (symbol_index_optional record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (technical_notification_type record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
-      encode_uint 8 (retransmission_start_time record) ++
-      encode_uint 8 (retransmission_end_time record) ++
-      encode_uint 4 (symbol_index_optional record).
+      encode_uint_le 8 (retransmission_start_time record) ++
+      encode_uint_le 8 (retransmission_end_time record) ++
+      encode_uint_le 4 (symbol_index_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
@@ -292,13 +292,13 @@ Module EuronextOptiqMarketDataGatewayV525.
               match decode_uint 1 bytes with
               | None => None
               | Some (rebroadcast_indicator_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (retransmission_start_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (retransmission_end_time_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (symbol_index_optional_value, bytes) =>
                               Some ({| md_seq_num_optional := md_seq_num_optional_value; technical_notification_type := technical_notification_type_value; rebroadcast_indicator := rebroadcast_indicator_value; retransmission_start_time := retransmission_start_time_value; retransmission_end_time := retransmission_end_time_value; symbol_index_optional := symbol_index_optional_value |}, bytes)
@@ -312,7 +312,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -322,12 +322,12 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -419,20 +419,20 @@ Module EuronextOptiqMarketDataGatewayV525.
       (index_price_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
+      encode_uint_le 8 (md_seq_num record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_time record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (index_level record) ++
-      encode_uint 8 (pctg_of_capitalization record) ++
-      encode_uint 8 (prct_varfrom_prev_close record) ++
-      encode_uint 2 (num_traded_instruments record) ++
+      encode_uint_le 8 (event_time record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (index_level record) ++
+      encode_uint_le 8 (pctg_of_capitalization record) ++
+      encode_uint_le 8 (prct_varfrom_prev_close record) ++
+      encode_uint_le 2 (num_traded_instruments record) ++
       encode_uint 1 (index_level_type record) ++
       encode_uint 1 (index_price_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -441,22 +441,22 @@ Module EuronextOptiqMarketDataGatewayV525.
               match decode_uint 1 bytes with
               | None => None
               | Some (emm_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (event_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_index_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (index_level_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (pctg_of_capitalization_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (prct_varfrom_prev_close_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (num_traded_instruments_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -481,7 +481,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -491,15 +491,15 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       destruct record. reflexivity.
@@ -556,27 +556,27 @@ Module EuronextOptiqMarketDataGatewayV525.
       (liquidation_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
+      encode_uint_le 8 (md_seq_num record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_time record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (opening_level record) ++
-      encode_uint 8 (opening_time record) ++
-      encode_uint 8 (confirmed_reference_level record) ++
-      encode_uint 8 (confirmed_reference_time record) ++
-      encode_uint 8 (closing_reference_level record) ++
-      encode_uint 8 (closing_reference_time record) ++
-      encode_uint 8 (prct_varfrom_prev_close record) ++
-      encode_uint 8 (high_level record) ++
-      encode_uint 8 (high_time record) ++
-      encode_uint 8 (low_level record) ++
-      encode_uint 8 (low_time record) ++
-      encode_uint 8 (liquidation_level record) ++
-      encode_uint 8 (liquidation_time record).
+      encode_uint_le 8 (event_time record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (opening_level record) ++
+      encode_uint_le 8 (opening_time record) ++
+      encode_uint_le 8 (confirmed_reference_level record) ++
+      encode_uint_le 8 (confirmed_reference_time record) ++
+      encode_uint_le 8 (closing_reference_level record) ++
+      encode_uint_le 8 (closing_reference_time record) ++
+      encode_uint_le 8 (prct_varfrom_prev_close record) ++
+      encode_uint_le 8 (high_level record) ++
+      encode_uint_le 8 (high_time record) ++
+      encode_uint_le 8 (low_level record) ++
+      encode_uint_le 8 (low_time record) ++
+      encode_uint_le 8 (liquidation_level record) ++
+      encode_uint_le 8 (liquidation_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -585,49 +585,49 @@ Module EuronextOptiqMarketDataGatewayV525.
               match decode_uint 1 bytes with
               | None => None
               | Some (emm_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (event_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_index_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (opening_level_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (opening_time_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (confirmed_reference_level_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (confirmed_reference_time_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (closing_reference_level_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (closing_reference_time_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (prct_varfrom_prev_close_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (high_level_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (high_time_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (low_level_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (low_time_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (liquidation_level_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (liquidation_time_value, bytes) =>
                                                                               Some ({| md_seq_num := md_seq_num_value; rebroadcast_indicator := rebroadcast_indicator_value; emm := emm_value; event_time := event_time_value; symbol_index := symbol_index_value; opening_level := opening_level_value; opening_time := opening_time_value; confirmed_reference_level := confirmed_reference_level_value; confirmed_reference_time := confirmed_reference_time_value; closing_reference_level := closing_reference_level_value; closing_reference_time := closing_reference_time_value; prct_varfrom_prev_close := prct_varfrom_prev_close_value; high_level := high_level_value; high_time := high_time_value; low_level := low_level_value; low_time := low_time_value; liquidation_level := liquidation_level_value; liquidation_time := liquidation_time_value |}, bytes)
@@ -653,7 +653,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 126.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -663,24 +663,24 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -723,21 +723,21 @@ Module EuronextOptiqMarketDataGatewayV525.
       Datatypes.length (apa_origin record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
       encode_bytes 4 (mifid_instrument_id_type record) ++
       encode_bytes 12 (mifid_instrument_id record) ++
       encode_bytes 4 (mic record) ++
       encode_bytes 3 (currency record) ++
       encode_bytes 20 (lei_code record) ++
-      encode_uint 8 (event_time record) ++
+      encode_uint_le 8 (event_time record) ++
       encode_uint 1 (quote_update_type record) ++
       encode_bytes 20 (mifid_price record) ++
       encode_bytes 20 (mifid_quantity record) ++
       encode_bytes 4 (apa_origin record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
@@ -758,7 +758,7 @@ Module EuronextOptiqMarketDataGatewayV525.
                               match decode_bytes 20 bytes with
                               | None => None
                               | Some (lei_code_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (event_time_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -790,7 +790,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 105.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -800,14 +800,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
@@ -870,7 +870,7 @@ Module EuronextOptiqMarketDataGatewayV525.
       Datatypes.length (settlement_method record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
       encode_bytes 4 (mifid_instrument_id_type record) ++
       encode_bytes 12 (mifid_instrument_id record) ++
@@ -878,13 +878,13 @@ Module EuronextOptiqMarketDataGatewayV525.
       encode_bytes 6 (cfi_optional record) ++
       encode_bytes 3 (notional_currency record) ++
       encode_bytes 3 (second_notional_currency record) ++
-      encode_uint 4 (price_multiplier record) ++
+      encode_uint_le 4 (price_multiplier record) ++
       encode_uint 1 (price_multiplier_decimals record) ++
       encode_bytes 12 (underlying_isin_code record) ++
       encode_bytes 25 (underlying_index_name record) ++
       encode_bytes 8 (underlying_index_term record) ++
       encode_uint 1 (option_type record) ++
-      encode_uint 8 (strike_price record) ++
+      encode_uint_le 8 (strike_price record) ++
       encode_uint 1 (strike_price_decimals record) ++
       encode_uint 1 (exer_style record) ++
       encode_bytes 8 (maturity_date_optional record) ++
@@ -892,7 +892,7 @@ Module EuronextOptiqMarketDataGatewayV525.
       encode_bytes 1 (settlement_method record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
@@ -916,7 +916,7 @@ Module EuronextOptiqMarketDataGatewayV525.
                                   match decode_bytes 3 bytes with
                                   | None => None
                                   | Some (second_notional_currency_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (price_multiplier_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -934,7 +934,7 @@ Module EuronextOptiqMarketDataGatewayV525.
                                                           match decode_uint 1 bytes with
                                                           | None => None
                                                           | Some (option_type_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (strike_price_value, bytes) =>
                                                                   match decode_uint 1 bytes with
@@ -977,7 +977,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 217.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -987,7 +987,7 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 bound_19]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -995,13 +995,13 @@ Module EuronextOptiqMarketDataGatewayV525.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
@@ -1109,10 +1109,10 @@ Module EuronextOptiqMarketDataGatewayV525.
       Datatypes.length (trade_unique_identifier record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num record) ++
+      encode_uint_le 8 (md_seq_num record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_time record) ++
+      encode_uint_le 8 (event_time record) ++
       encode_bytes 27 (trading_date_time record) ++
       encode_bytes 27 (publication_date_time record) ++
       encode_uint 1 (trade_type record) ++
@@ -1143,8 +1143,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       encode_bytes 1 (efficient_mmt_post_trade_deferral record) ++
       encode_bytes 1 (efficient_mmt_duplicative_indicator record) ++
       encode_bytes 30 (trade_reference record) ++
-      encode_uint 8 (original_report_timestamp record) ++
-      encode_uint 4 (price_multiplier record) ++
+      encode_uint_le 8 (original_report_timestamp record) ++
+      encode_uint_le 4 (price_multiplier record) ++
       encode_uint 1 (price_multiplier_decimals record) ++
       encode_bytes 11 (venue record) ++
       encode_bytes 4 (mifid_emission_allowance_type record) ++
@@ -1153,7 +1153,7 @@ Module EuronextOptiqMarketDataGatewayV525.
       encode_bytes 16 (trade_unique_identifier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1162,7 +1162,7 @@ Module EuronextOptiqMarketDataGatewayV525.
               match decode_uint 1 bytes with
               | None => None
               | Some (emm_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (event_time_value, bytes) =>
                       match decode_bytes 27 bytes with
@@ -1255,10 +1255,10 @@ Module EuronextOptiqMarketDataGatewayV525.
                                                                                                                                           match decode_bytes 30 bytes with
                                                                                                                                           | None => None
                                                                                                                                           | Some (trade_reference_value, bytes) =>
-                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (original_report_timestamp_value, bytes) =>
-                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (price_multiplier_value, bytes) =>
                                                                                                                                                       match decode_uint 1 bytes with
@@ -1326,7 +1326,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 405.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1336,10 +1336,10 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 [bound_40 bound_41]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -1370,8 +1370,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
-      rewrite decode_encode_uint by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_34.
+      rewrite decode_encode_uint_le by exact bound_35.
       rewrite decode_encode_uint by exact bound_36.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_bytes by exact bound_38.
@@ -1434,58 +1434,58 @@ Module EuronextOptiqMarketDataGatewayV525.
       Datatypes.length (trading_currency_optional record) = 3.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 52 (mifid_transaction_id record) ++
-      encode_uint 8 (event_time record) ++
-      encode_uint 8 (bid_offer_date_time record) ++
+      encode_uint_le 8 (event_time record) ++
+      encode_uint_le 8 (bid_offer_date_time record) ++
       encode_bytes 4 (mmt_modification_indicator record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (bid_price record) ++
-      encode_uint 8 (offer_price record) ++
-      encode_uint 8 (quantity record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (bid_price record) ++
+      encode_uint_le 8 (offer_price record) ++
+      encode_uint_le 8 (quantity record) ++
       encode_bytes 4 (mmt_agency_cross_trade_indicator record) ++
       encode_bytes 4 (mmt_benchmark_indicator record) ++
       encode_bytes 4 (mmt_special_dividend_indicator record) ++
       encode_bytes 1 (mmt_trading_mode record) ++
       encode_bytes 4 (mifid_price_notation record) ++
       encode_bytes 3 (quantity_notation record) ++
-      encode_uint 8 (notional_amount_traded record) ++
+      encode_uint_le 8 (notional_amount_traded record) ++
       encode_bytes 3 (trading_currency_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (rebroadcast_indicator_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
                   match decode_bytes 52 bytes with
                   | None => None
                   | Some (mifid_transaction_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (event_time_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (bid_offer_date_time_value, bytes) =>
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (mmt_modification_indicator_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (bid_price_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (offer_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (quantity_value, bytes) =>
                                                   match decode_bytes 4 bytes with
@@ -1506,7 +1506,7 @@ Module EuronextOptiqMarketDataGatewayV525.
                                                                       match decode_bytes 3 bytes with
                                                                       | None => None
                                                                       | Some (quantity_notation_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (notional_amount_traded_value, bytes) =>
                                                                               match decode_bytes 3 bytes with
@@ -1536,7 +1536,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 148.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1546,24 +1546,24 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 bound_18]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       destruct record. reflexivity.
     Qed.
@@ -1603,28 +1603,28 @@ Module EuronextOptiqMarketDataGatewayV525.
       (nav_offer_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (bid_offer_date_time record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (bid_offer_date_time record) ++
       encode_bytes 52 (mifid_transaction_id record) ++
       encode_bytes 4 (mmt_modification_indicator record) ++
-      encode_uint 8 (nav_price record) ++
-      encode_uint 8 (event_time_optional record) ++
-      encode_uint 8 (nav_bid_price record) ++
-      encode_uint 8 (nav_offer_price record).
+      encode_uint_le 8 (nav_price record) ++
+      encode_uint_le 8 (event_time_optional record) ++
+      encode_uint_le 8 (nav_bid_price record) ++
+      encode_uint_le 8 (nav_offer_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (rebroadcast_indicator_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (bid_offer_date_time_value, bytes) =>
                       match decode_bytes 52 bytes with
@@ -1633,16 +1633,16 @@ Module EuronextOptiqMarketDataGatewayV525.
                           match decode_bytes 4 bytes with
                           | None => None
                           | Some (mmt_modification_indicator_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (nav_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (event_time_optional_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (nav_bid_price_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (nav_offer_price_value, bytes) =>
                                               Some ({| md_seq_num_optional := md_seq_num_optional_value; rebroadcast_indicator := rebroadcast_indicator_value; symbol_index := symbol_index_value; bid_offer_date_time := bid_offer_date_time_value; mifid_transaction_id := mifid_transaction_id_value; mmt_modification_indicator := mmt_modification_indicator_value; nav_price := nav_price_value; event_time_optional := event_time_optional_value; nav_bid_price := nav_bid_price_value; nav_offer_price := nav_offer_price_value |}, bytes)
@@ -1660,7 +1660,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 109.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1670,16 +1670,16 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -1708,23 +1708,23 @@ Module EuronextOptiqMarketDataGatewayV525.
       Datatypes.length (security_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (md_seq_num_optional record) ++
+      encode_uint_le 8 (md_seq_num_optional record) ++
       encode_uint 1 (rebroadcast_indicator record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (event_time record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (event_time record) ++
       encode_bytes 1 (security_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (md_seq_num_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (rebroadcast_indicator_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (event_time_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1740,7 +1740,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1750,10 +1750,10 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -1777,14 +1777,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       (snapshot_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_md_seq_num record) ++
-      encode_uint 8 (snapshot_time record).
+      encode_uint_le 8 (last_md_seq_num record) ++
+      encode_uint_le 8 (snapshot_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_md_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (snapshot_time_value, bytes) =>
               Some ({| last_md_seq_num := last_md_seq_num_value; snapshot_time := snapshot_time_value |}, bytes)
@@ -1794,7 +1794,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1804,8 +1804,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1828,14 +1828,14 @@ Module EuronextOptiqMarketDataGatewayV525.
       (snapshot_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_md_seq_num record) ++
-      encode_uint 8 (snapshot_time record).
+      encode_uint_le 8 (last_md_seq_num record) ++
+      encode_uint_le 8 (snapshot_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_md_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (snapshot_time_value, bytes) =>
               Some ({| last_md_seq_num := last_md_seq_num_value; snapshot_time := snapshot_time_value |}, bytes)
@@ -1845,7 +1845,7 @@ Module EuronextOptiqMarketDataGatewayV525.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1855,8 +1855,8 @@ Module EuronextOptiqMarketDataGatewayV525.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

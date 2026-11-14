@@ -50,22 +50,22 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -77,7 +77,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -87,10 +87,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -166,18 +166,18 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (subsession_id record) ++
-      encode_uint 4 (sequence record) ++
-      encode_uint 8 (timestamp record).
+      encode_uint_le 8 (subsession_id record) ++
+      encode_uint_le 4 (sequence record) ++
+      encode_uint_le 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (subsession_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (timestamp_value, bytes) =>
                   Some ({| subsession_id := subsession_id_value; sequence := sequence_value; timestamp := timestamp_value |}, bytes)
@@ -188,7 +188,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -198,9 +198,9 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -225,18 +225,18 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (end_sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (subsession_id record) ++
-      encode_uint 4 (start_sequence record) ++
-      encode_uint 4 (end_sequence record).
+      encode_uint_le 8 (subsession_id record) ++
+      encode_uint_le 4 (start_sequence record) ++
+      encode_uint_le 4 (end_sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (subsession_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (start_sequence_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (end_sequence_value, bytes) =>
                   Some ({| subsession_id := subsession_id_value; start_sequence := start_sequence_value; end_sequence := end_sequence_value |}, bytes)
@@ -247,7 +247,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -257,9 +257,9 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -280,10 +280,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (subsession_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (subsession_id record).
+      encode_uint_le 8 (subsession_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (subsession_id_value, bytes) =>
           Some ({| subsession_id := subsession_id_value |}, bytes)
@@ -292,7 +292,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -300,7 +300,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -364,9 +364,9 @@ Module IexOptionsBinaryOrderEntryV103Client.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account_account_optional record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
       encode_bytes 4 (clearing_account_optional record) ++
       encode_uint 1 (customer_or_firm record) ++
       encode_uint 1 (open_close record) ++
@@ -377,26 +377,26 @@ Module IexOptionsBinaryOrderEntryV103Client.
       encode_uint 1 (exec_inst record) ++
       encode_uint 1 (ord_type record) ++
       encode_bytes 4 (target_party_id record) ++
-      encode_uint 4 (auction_id record) ++
-      encode_uint 4 (clearing_firm record) ++
+      encode_uint_le 4 (auction_id record) ++
+      encode_uint_le 4 (clearing_firm record) ++
       encode_bytes 16 (optional_data record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 3 (aiq record) ++
       encode_uint 1 (side record) ++
-      encode_uint 8 (price_price_8_optional record) ++
-      encode_uint 4 (order_qty_quantity_non_zero record).
+      encode_uint_le 8 (price_price_8_optional record) ++
+      encode_uint_le 4 (order_qty_quantity_non_zero record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
       | None => None
       | Some (account_account_optional_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
               | Some (market_participant_id_optional_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (cl_ord_id_value, bytes) =>
                       match decode_bytes 4 bytes with
@@ -429,10 +429,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
                                                           match decode_bytes 4 bytes with
                                                           | None => None
                                                           | Some (target_party_id_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (auction_id_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (clearing_firm_value, bytes) =>
                                                                       match decode_bytes 16 bytes with
@@ -447,10 +447,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (side_value, bytes) =>
-                                                                                      match decode_uint 8 bytes with
+                                                                                      match decode_uint_le 8 bytes with
                                                                                       | None => None
                                                                                       | Some (price_price_8_optional_value, bytes) =>
-                                                                                          match decode_uint 4 bytes with
+                                                                                          match decode_uint_le 4 bytes with
                                                                                           | None => None
                                                                                           | Some (order_qty_quantity_non_zero_value, bytes) =>
                                                                                               Some ({| account_account_optional := account_account_optional_value; instrument_id := instrument_id_value; market_participant_id_optional := market_participant_id_optional_value; cl_ord_id := cl_ord_id_value; clearing_account_optional := clearing_account_optional_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote_optional := attributed_quote_optional_value; time_in_force := time_in_force_value; cancel_instead_of_slide_optional := cancel_instead_of_slide_optional_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8_optional := price_price_8_optional_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value |}, bytes)
@@ -480,7 +480,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 92.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -491,9 +491,9 @@ Module IexOptionsBinaryOrderEntryV103Client.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -504,14 +504,14 @@ Module IexOptionsBinaryOrderEntryV103Client.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
       destruct record. reflexivity.
     Qed.
 
@@ -577,11 +577,11 @@ Module IexOptionsBinaryOrderEntryV103Client.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account_account_optional record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
       encode_bytes 4 (clearing_account_optional record) ++
-      encode_uint 8 (orig_cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
       encode_uint 1 (customer_or_firm_optional record) ++
       encode_uint 1 (open_close_optional record) ++
       encode_uint 1 (attributed_quote_optional record) ++
@@ -591,32 +591,32 @@ Module IexOptionsBinaryOrderEntryV103Client.
       encode_uint 1 (exec_inst record) ++
       encode_uint 1 (ord_type_optional record) ++
       encode_bytes 4 (target_party_id record) ++
-      encode_uint 4 (auction_id record) ++
-      encode_uint 4 (clearing_firm record) ++
+      encode_uint_le 4 (auction_id record) ++
+      encode_uint_le 4 (clearing_firm record) ++
       encode_bytes 16 (optional_data record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 3 (aiq record) ++
       encode_uint 1 (side_optional record) ++
-      encode_uint 8 (price_price_8_optional record) ++
-      encode_uint 4 (order_qty_quantity_non_zero record).
+      encode_uint_le 8 (price_price_8_optional record) ++
+      encode_uint_le 4 (order_qty_quantity_non_zero record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
       | None => None
       | Some (account_account_optional_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
               | Some (market_participant_id_optional_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (cl_ord_id_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (clearing_account_optional_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (orig_cl_ord_id_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -646,10 +646,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
                                                               match decode_bytes 4 bytes with
                                                               | None => None
                                                               | Some (target_party_id_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (auction_id_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (clearing_firm_value, bytes) =>
                                                                           match decode_bytes 16 bytes with
@@ -664,10 +664,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
                                                                                       match decode_uint 1 bytes with
                                                                                       | None => None
                                                                                       | Some (side_optional_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (price_price_8_optional_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (order_qty_quantity_non_zero_value, bytes) =>
                                                                                                   Some ({| account_account_optional := account_account_optional_value; instrument_id := instrument_id_value; market_participant_id_optional := market_participant_id_optional_value; cl_ord_id := cl_ord_id_value; clearing_account_optional := clearing_account_optional_value; orig_cl_ord_id := orig_cl_ord_id_value; customer_or_firm_optional := customer_or_firm_optional_value; open_close_optional := open_close_optional_value; attributed_quote_optional := attributed_quote_optional_value; time_in_force_optional := time_in_force_optional_value; cancel_instead_of_slide_optional := cancel_instead_of_slide_optional_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type_optional := ord_type_optional_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side_optional := side_optional_value; price_price_8_optional := price_price_8_optional_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value |}, bytes)
@@ -698,7 +698,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 100.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -709,11 +709,11 @@ Module IexOptionsBinaryOrderEntryV103Client.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
@@ -723,14 +723,14 @@ Module IexOptionsBinaryOrderEntryV103Client.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
       destruct record. reflexivity.
     Qed.
 
@@ -757,22 +757,22 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (orig_cl_ord_id record).
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match decode_bytes 4 bytes with
           | None => None
           | Some (market_participant_id_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (orig_cl_ord_id_value, bytes) =>
                       Some ({| instrument_id := instrument_id_value; market_participant_id_optional := market_participant_id_optional_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value |}, bytes)
@@ -784,7 +784,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -794,10 +794,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -881,25 +881,25 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (bulk_action record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (underlying_id_optional record) ++
+      encode_uint_le 4 (underlying_id_optional record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (send_time record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (send_time record) ++
       encode_uint 1 (ack_style_mass_cancel_ack_style record) ++
       encode_uint 1 (mpid_filter record) ++
       encode_uint 1 (bulk_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (underlying_id_optional_value, bytes) =>
           match decode_bytes 4 bytes with
           | None => None
           | Some (market_participant_id_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (send_time_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -923,7 +923,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -933,10 +933,10 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -1029,25 +1029,25 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (cust_capacity_weight record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (underlying_id_optional record) ++
+      encode_uint_le 4 (underlying_id_optional record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
       encode_uint 1 (risk_control_optional record) ++
       encode_uint 1 (risk_control_status record) ++
-      encode_uint 8 (time_limit record) ++
-      encode_uint 4 (percentage_limit record) ++
-      encode_uint 4 (count_limit record) ++
+      encode_uint_le 8 (time_limit record) ++
+      encode_uint_le 4 (percentage_limit record) ++
+      encode_uint_le 4 (count_limit record) ++
       encode_uint 1 (ioc_attribution record) ++
       encode_uint 1 (cust_capacity_weight record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (underlying_id_optional_value, bytes) =>
           match decode_bytes 4 bytes with
           | None => None
           | Some (market_participant_id_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1056,13 +1056,13 @@ Module IexOptionsBinaryOrderEntryV103Client.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (risk_control_status_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (time_limit_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (percentage_limit_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (count_limit_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -1086,7 +1086,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1096,14 +1096,14 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       destruct record. reflexivity.
@@ -1136,21 +1136,21 @@ Module IexOptionsBinaryOrderEntryV103Client.
       (custom_group_id_optional record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (underlying_id_optional record) ++
+      encode_uint_le 4 (underlying_id_optional record) ++
       encode_bytes 4 (market_participant_id_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
       encode_uint 1 (risk_control record) ++
       encode_uint 1 (risk_action record) ++
-      encode_uint 2 (custom_group_id_optional record).
+      encode_uint_le 2 (custom_group_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (underlying_id_optional_value, bytes) =>
           match decode_bytes 4 bytes with
           | None => None
           | Some (market_participant_id_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1159,7 +1159,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (risk_action_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (custom_group_id_optional_value, bytes) =>
                               Some ({| underlying_id_optional := underlying_id_optional_value; market_participant_id_optional := market_participant_id_optional_value; cl_ord_id := cl_ord_id_value; risk_control := risk_control_value; risk_action := risk_action_value; custom_group_id_optional := custom_group_id_optional_value |}, bytes)
@@ -1173,7 +1173,7 @@ Module IexOptionsBinaryOrderEntryV103Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1183,12 +1183,12 @@ Module IexOptionsBinaryOrderEntryV103Client.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

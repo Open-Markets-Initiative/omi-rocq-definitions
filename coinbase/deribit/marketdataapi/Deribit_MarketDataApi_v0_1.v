@@ -48,22 +48,22 @@ Module DeribitMarketDataApiV01.
       (day_of_month record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
-      encode_uint 2 (month record) ++
-      encode_uint 2 (week_of_month record) ++
-      encode_uint 2 (day_of_month record).
+      encode_uint_le 2 (year record) ++
+      encode_uint_le 2 (month record) ++
+      encode_uint_le 2 (week_of_month record) ++
+      encode_uint_le 2 (day_of_month record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (month_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (week_of_month_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (day_of_month_value, bytes) =>
                       Some ({| year := year_value; month := month_value; week_of_month := week_of_month_value; day_of_month := day_of_month_value |}, bytes)
@@ -75,7 +75,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,10 +85,10 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -111,11 +111,11 @@ Module DeribitMarketDataApiV01.
       (trading_status record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (instrument_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
       encode_uint 1 (trading_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -128,7 +128,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -138,7 +138,7 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -168,26 +168,26 @@ Module DeribitMarketDataApiV01.
       (mark_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (min_sell_price record) ++
-      encode_uint 8 (max_buy_price record) ++
-      encode_uint 8 (index_price record) ++
-      encode_uint 8 (mark_price record).
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (min_sell_price record) ++
+      encode_uint_le 8 (max_buy_price record) ++
+      encode_uint_le 8 (index_price record) ++
+      encode_uint_le 8 (mark_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (min_sell_price_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (max_buy_price_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (index_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (mark_price_value, bytes) =>
                           Some ({| instrument_id := instrument_id_value; min_sell_price := min_sell_price_value; max_buy_price := max_buy_price_value; index_price := index_price_value; mark_price := mark_price_value |}, bytes)
@@ -200,7 +200,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -210,11 +210,11 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -245,30 +245,30 @@ Module DeribitMarketDataApiV01.
       (settlement_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (current_funding record) ++
-      encode_uint 8 (funding_8h record) ++
-      encode_uint 8 (estimated_delivery_price record) ++
-      encode_uint 8 (delivery_price record) ++
-      encode_uint 8 (settlement_price record).
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (current_funding record) ++
+      encode_uint_le 8 (funding_8h record) ++
+      encode_uint_le 8 (estimated_delivery_price record) ++
+      encode_uint_le 8 (delivery_price record) ++
+      encode_uint_le 8 (settlement_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (current_funding_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (funding_8h_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (estimated_delivery_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (delivery_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (settlement_price_value, bytes) =>
                               Some ({| instrument_id := instrument_id_value; current_funding := current_funding_value; funding_8h := funding_8h_value; estimated_delivery_price := estimated_delivery_price_value; delivery_price := delivery_price_value; settlement_price := settlement_price_value |}, bytes)
@@ -282,7 +282,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -292,12 +292,12 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -324,22 +324,22 @@ Module DeribitMarketDataApiV01.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (quantity_mantissa record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (quantity_mantissa record) ++
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_mantissa_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
                       Some ({| order_id := order_id_value; instrument_id := instrument_id_value; quantity_mantissa := quantity_mantissa_value; price := price_value |}, bytes)
@@ -351,7 +351,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -361,10 +361,10 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -391,22 +391,22 @@ Module DeribitMarketDataApiV01.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (quantity_mantissa record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (quantity_mantissa record) ++
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_mantissa_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
                       Some ({| order_id := order_id_value; instrument_id := instrument_id_value; quantity_mantissa := quantity_mantissa_value; price := price_value |}, bytes)
@@ -418,7 +418,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -428,10 +428,10 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -456,18 +456,18 @@ Module DeribitMarketDataApiV01.
       (quantity_mantissa record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (quantity_mantissa record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (quantity_mantissa record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_mantissa_value, bytes) =>
                   Some ({| order_id := order_id_value; instrument_id := instrument_id_value; quantity_mantissa := quantity_mantissa_value |}, bytes)
@@ -478,7 +478,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -488,9 +488,9 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -515,18 +515,18 @@ Module DeribitMarketDataApiV01.
       (quantity_mantissa record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (quantity_mantissa record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (quantity_mantissa record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_mantissa_value, bytes) =>
                   Some ({| order_id := order_id_value; instrument_id := instrument_id_value; quantity_mantissa := quantity_mantissa_value |}, bytes)
@@ -537,7 +537,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -547,9 +547,9 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -572,14 +572,14 @@ Module DeribitMarketDataApiV01.
       (instrument_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               Some ({| order_id := order_id_value; instrument_id := instrument_id_value |}, bytes)
@@ -589,7 +589,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -599,8 +599,8 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -623,14 +623,14 @@ Module DeribitMarketDataApiV01.
       (instrument_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument_id record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (order_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               Some ({| order_id := order_id_value; instrument_id := instrument_id_value |}, bytes)
@@ -640,7 +640,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -650,8 +650,8 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -676,18 +676,18 @@ Module DeribitMarketDataApiV01.
       (incremental_seq_num record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (incremental_timestamp record) ++
-      encode_uint 8 (incremental_seq_num record).
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (incremental_timestamp record) ++
+      encode_uint_le 8 (incremental_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (incremental_timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (incremental_seq_num_value, bytes) =>
                   Some ({| instrument_id := instrument_id_value; incremental_timestamp := incremental_timestamp_value; incremental_seq_num := incremental_seq_num_value |}, bytes)
@@ -698,7 +698,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -708,9 +708,9 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -735,18 +735,18 @@ Module DeribitMarketDataApiV01.
       (increment_seq_num record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (instrument_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (increment_seq_num record).
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (increment_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (increment_seq_num_value, bytes) =>
                   Some ({| instrument_id := instrument_id_value; timestamp := timestamp_value; increment_seq_num := increment_seq_num_value |}, bytes)
@@ -757,7 +757,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -767,9 +767,9 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -790,10 +790,10 @@ Module DeribitMarketDataApiV01.
       (active_instrument_count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (active_instrument_count record).
+      encode_uint_le 4 (active_instrument_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (active_instrument_count_value, bytes) =>
           Some ({| active_instrument_count := active_instrument_count_value |}, bytes)
@@ -802,7 +802,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -810,7 +810,7 @@ Module DeribitMarketDataApiV01.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -833,11 +833,11 @@ Module DeribitMarketDataApiV01.
       (message_count_short record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (begin_seq_num record) ++
+      encode_uint_le 8 (begin_seq_num record) ++
       encode_uint 1 (message_count_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -850,7 +850,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -860,7 +860,7 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -886,12 +886,12 @@ Module DeribitMarketDataApiV01.
       (reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (retry_delay_nanos record) ++
+      encode_uint_le 8 (retry_delay_nanos record) ++
       encode_bytes 40 (details record) ++
       encode_uint 1 (reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (retry_delay_nanos_value, bytes) =>
           match decode_bytes 40 bytes with
@@ -908,7 +908,7 @@ Module DeribitMarketDataApiV01.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 49.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -918,7 +918,7 @@ Module DeribitMarketDataApiV01.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.

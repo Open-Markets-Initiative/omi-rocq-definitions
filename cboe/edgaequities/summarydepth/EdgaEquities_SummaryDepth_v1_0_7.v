@@ -49,13 +49,13 @@ Module EdgaEquitiesSummaryDepthV107.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module EdgaEquitiesSummaryDepthV107.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -76,7 +76,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module EdgaEquitiesSummaryDepthV107.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -164,12 +164,12 @@ Module EdgaEquitiesSummaryDepthV107.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (last_update_timestamp record) ++
+      encode_uint_le 8 (last_update_timestamp record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (last_update_timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -186,7 +186,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -196,7 +196,7 @@ Module EdgaEquitiesSummaryDepthV107.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
@@ -225,13 +225,13 @@ Module EdgaEquitiesSummaryDepthV107.
       Datatypes.length (session_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (market_status record) ++
       encode_bytes 1 (session_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -252,7 +252,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -262,7 +262,7 @@ Module EdgaEquitiesSummaryDepthV107.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -294,8 +294,8 @@ Module EdgaEquitiesSummaryDepthV107.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 4 (price_short record) ++
-      encode_uint 4 (quantity_short record).
+      encode_uint_le 4 (price_short record) ++
+      encode_uint_le 4 (quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -304,10 +304,10 @@ Module EdgaEquitiesSummaryDepthV107.
           match decode_bytes 1 bytes with
           | None => None
           | Some (side_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (price_short_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_short_value, bytes) =>
                       Some ({| reserved_1 := reserved_1_value; side := side_value; price_short := price_short_value; quantity_short := quantity_short_value |}, bytes)
@@ -319,7 +319,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -331,8 +331,8 @@ Module EdgaEquitiesSummaryDepthV107.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -361,8 +361,8 @@ Module EdgaEquitiesSummaryDepthV107.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 8 (quantity_long record).
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 8 (quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -371,10 +371,10 @@ Module EdgaEquitiesSummaryDepthV107.
           match decode_bytes 1 bytes with
           | None => None
           | Some (side_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_long_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (quantity_long_value, bytes) =>
                       Some ({| reserved_1 := reserved_1_value; side := side_value; price_long := price_long_value; quantity_long := quantity_long_value |}, bytes)
@@ -386,7 +386,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -398,8 +398,8 @@ Module EdgaEquitiesSummaryDepthV107.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -426,13 +426,13 @@ Module EdgaEquitiesSummaryDepthV107.
       Datatypes.length (retail_price_improvement record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (retail_price_improvement record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -453,7 +453,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -463,7 +463,7 @@ Module EdgaEquitiesSummaryDepthV107.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -495,14 +495,14 @@ Module EdgaEquitiesSummaryDepthV107.
       Datatypes.length (reg_sho_action record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (halt_status record) ++
       encode_bytes 1 (reg_sho_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -527,7 +527,7 @@ Module EdgaEquitiesSummaryDepthV107.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -537,7 +537,7 @@ Module EdgaEquitiesSummaryDepthV107.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.

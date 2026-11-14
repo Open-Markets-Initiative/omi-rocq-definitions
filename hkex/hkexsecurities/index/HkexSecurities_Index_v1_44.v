@@ -49,14 +49,14 @@ Module HkexSecuritiesIndexV144.
       (send_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (msg_count record) ++
       encode_bytes 1 (filler record) ++
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (send_time record).
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -65,10 +65,10 @@ Module HkexSecuritiesIndexV144.
               match decode_bytes 1 bytes with
               | None => None
               | Some (filler_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (send_time_value, bytes) =>
                           Some ({| pkt_size := pkt_size_value; msg_count := msg_count_value; filler := filler_value; seq_num := seq_num_value; send_time := send_time_value |}, bytes)
@@ -81,7 +81,7 @@ Module HkexSecuritiesIndexV144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -91,11 +91,11 @@ Module HkexSecuritiesIndexV144.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -118,14 +118,14 @@ Module HkexSecuritiesIndexV144.
       (msg_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_size record) ++
-      encode_uint 2 (msg_type record).
+      encode_uint_le 2 (msg_size record) ++
+      encode_uint_le 2 (msg_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
               Some ({| msg_size := msg_size_value; msg_type := msg_type_value |}, bytes)
@@ -135,7 +135,7 @@ Module HkexSecuritiesIndexV144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,8 +145,8 @@ Module HkexSecuritiesIndexV144.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -167,10 +167,10 @@ Module HkexSecuritiesIndexV144.
       (new_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record).
+      encode_uint_le 4 (new_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           Some ({| new_seq_no := new_seq_no_value |}, bytes)
@@ -179,7 +179,7 @@ Module HkexSecuritiesIndexV144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,7 +187,7 @@ Module HkexSecuritiesIndexV144.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -208,10 +208,10 @@ Module HkexSecuritiesIndexV144.
       (dr_status record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (dr_status record).
+      encode_uint_le 4 (dr_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (dr_status_value, bytes) =>
           Some ({| dr_status := dr_status_value |}, bytes)
@@ -220,7 +220,7 @@ Module HkexSecuritiesIndexV144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -228,7 +228,7 @@ Module HkexSecuritiesIndexV144.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -348,18 +348,18 @@ Module HkexSecuritiesIndexV144.
     Definition encode (record : t) : list byte :=
       encode_bytes 11 (index_code record) ++
       encode_bytes 1 (index_status record) ++
-      encode_uint 8 (index_time record) ++
-      encode_uint 8 (index_value record) ++
-      encode_uint 8 (net_chg_prev_day record) ++
-      encode_uint 8 (high_value record) ++
-      encode_uint 8 (low_value record) ++
-      encode_uint 8 (eas_value record) ++
-      encode_uint 8 (index_turnover record) ++
-      encode_uint 8 (opening_value record) ++
-      encode_uint 8 (closing_value record) ++
-      encode_uint 8 (previous_ses_close record) ++
-      encode_uint 8 (index_volume record) ++
-      encode_uint 4 (net_chg_prev_day_pct record) ++
+      encode_uint_le 8 (index_time record) ++
+      encode_uint_le 8 (index_value record) ++
+      encode_uint_le 8 (net_chg_prev_day record) ++
+      encode_uint_le 8 (high_value record) ++
+      encode_uint_le 8 (low_value record) ++
+      encode_uint_le 8 (eas_value record) ++
+      encode_uint_le 8 (index_turnover record) ++
+      encode_uint_le 8 (opening_value record) ++
+      encode_uint_le 8 (closing_value record) ++
+      encode_uint_le 8 (previous_ses_close record) ++
+      encode_uint_le 8 (index_volume record) ++
+      encode_uint_le 4 (net_chg_prev_day_pct record) ++
       encode_bytes 1 (exception record) ++
       encode_bytes 3 (filler_3 record).
 
@@ -370,40 +370,40 @@ Module HkexSecuritiesIndexV144.
           match decode_bytes 1 bytes with
           | None => None
           | Some (index_status_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (index_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (index_value_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (net_chg_prev_day_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (high_value_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (low_value_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (eas_value_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (index_turnover_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (opening_value_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (closing_value_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (previous_ses_close_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (index_volume_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (net_chg_prev_day_pct_value, bytes) =>
                                                               match decode_bytes 1 bytes with
@@ -433,7 +433,7 @@ Module HkexSecuritiesIndexV144.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 108.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -445,18 +445,18 @@ Module HkexSecuritiesIndexV144.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.

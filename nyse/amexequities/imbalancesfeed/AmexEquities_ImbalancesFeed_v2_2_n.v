@@ -45,14 +45,14 @@ Module AmexEquitiesImbalancesFeedV22N.
       (nanoseconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
+      encode_uint_le 4 (seconds record) ++
+      encode_uint_le 4 (nanoseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (nanoseconds_value, bytes) =>
               Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
@@ -62,7 +62,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -72,8 +72,8 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -102,14 +102,14 @@ Module AmexEquitiesImbalancesFeedV22N.
       SendTime.bounded (send_time record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (delivery_flag record) ++
       encode_uint 1 (number_msgs record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       SendTime.encode (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -118,7 +118,7 @@ Module AmexEquitiesImbalancesFeedV22N.
               match decode_uint 1 bytes with
               | None => None
               | Some (number_msgs_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match SendTime.decode bytes with
@@ -134,7 +134,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SendTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !SendTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -144,10 +144,10 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite SendTime.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -171,14 +171,14 @@ Module AmexEquitiesImbalancesFeedV22N.
       (message_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_size record) ++
-      encode_uint 2 (message_type record).
+      encode_uint_le 2 (message_size record) ++
+      encode_uint_le 2 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_type_value, bytes) =>
               Some ({| message_size := message_size_value; message_type := message_type_value |}, bytes)
@@ -188,7 +188,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -198,8 +198,8 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -226,16 +226,16 @@ Module AmexEquitiesImbalancesFeedV22N.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
               match decode_uint 1 bytes with
@@ -253,7 +253,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -263,8 +263,8 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -291,18 +291,18 @@ Module AmexEquitiesImbalancesFeedV22N.
       (source_time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (id record) ++
-      encode_uint 4 (symbol_seq_num record) ++
-      encode_uint 4 (source_time record).
+      encode_uint_le 4 (id record) ++
+      encode_uint_le 4 (symbol_seq_num record) ++
+      encode_uint_le 4 (source_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (source_time_value, bytes) =>
                   Some ({| id := id_value; symbol_seq_num := symbol_seq_num_value; source_time := source_time_value |}, bytes)
@@ -313,7 +313,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -323,9 +323,9 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -376,25 +376,25 @@ Module AmexEquitiesImbalancesFeedV22N.
       Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 2 (market_id record) ++
+      encode_uint_le 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
       encode_uint 1 (price_scale_code record) ++
       encode_bytes 1 (security_type record) ++
-      encode_uint 2 (lot_size record) ++
-      encode_uint 4 (prev_close_price record) ++
-      encode_uint 4 (prev_close_volume record) ++
+      encode_uint_le 2 (lot_size record) ++
+      encode_uint_le 4 (prev_close_price record) ++
+      encode_uint_le 4 (prev_close_volume record) ++
       encode_uint 1 (price_resolution record) ++
       encode_bytes 1 (round_lot record) ++
-      encode_uint 2 (mpv record) ++
-      encode_uint 2 (unit_of_trade record) ++
+      encode_uint_le 2 (mpv record) ++
+      encode_uint_le 2 (unit_of_trade record) ++
       encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 11 bytes with
@@ -403,7 +403,7 @@ Module AmexEquitiesImbalancesFeedV22N.
               match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (market_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -418,13 +418,13 @@ Module AmexEquitiesImbalancesFeedV22N.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (security_type_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (lot_size_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (prev_close_price_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (prev_close_volume_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -433,10 +433,10 @@ Module AmexEquitiesImbalancesFeedV22N.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (round_lot_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_uint_le 2 bytes with
                                                           | None => None
                                                           | Some (mpv_value, bytes) =>
-                                                              match decode_uint 2 bytes with
+                                                              match decode_uint_le 2 bytes with
                                                               | None => None
                                                               | Some (unit_of_trade_value, bytes) =>
                                                                   match decode_bytes 2 bytes with
@@ -463,7 +463,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -473,21 +473,21 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.
     Qed.
@@ -515,22 +515,22 @@ Module AmexEquitiesImbalancesFeedV22N.
       (next_source_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 4 (next_source_seq_num record).
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 4 (next_source_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (next_source_seq_num_value, bytes) =>
                       Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; next_source_seq_num := next_source_seq_num_value |}, bytes)
@@ -542,7 +542,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -552,10 +552,10 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -604,33 +604,33 @@ Module AmexEquitiesImbalancesFeedV22N.
       Datatypes.length (session_state record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 4 (symbol_seq_num record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
       encode_bytes 4 (reserved_4 record) ++
-      encode_uint 4 (price_1 record) ++
-      encode_uint 4 (price_2 record) ++
+      encode_uint_le 4 (price_1 record) ++
+      encode_uint_le 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
-      encode_uint 4 (ssr_triggering_volume record) ++
-      encode_uint 4 (time record) ++
+      encode_uint_le 4 (ssr_triggering_volume record) ++
+      encode_uint_le 4 (time record) ++
       encode_bytes 1 (ssr_state record) ++
       encode_bytes 1 (market_state record) ++
       encode_bytes 1 (session_state record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_seq_num_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -642,19 +642,19 @@ Module AmexEquitiesImbalancesFeedV22N.
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (price_1_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (price_2_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (ssr_triggering_exchange_id_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (ssr_triggering_volume_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (time_value, bytes) =>
                                                       match decode_bytes 1 bytes with
@@ -686,7 +686,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -696,18 +696,18 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
@@ -739,17 +739,17 @@ Module AmexEquitiesImbalancesFeedV22N.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_num_value, bytes) =>
               match decode_bytes 10 bytes with
@@ -771,7 +771,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -781,8 +781,8 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
@@ -814,14 +814,14 @@ Module AmexEquitiesImbalancesFeedV22N.
       (retransmit_method record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record) ++
       encode_uint 1 (retransmit_method record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -846,7 +846,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -856,7 +856,7 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -887,13 +887,13 @@ Module AmexEquitiesImbalancesFeedV22N.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -914,7 +914,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -924,7 +924,7 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -954,16 +954,16 @@ Module AmexEquitiesImbalancesFeedV22N.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_num_value, bytes) =>
               match decode_uint 1 bytes with
@@ -981,7 +981,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -991,8 +991,8 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -1027,22 +1027,22 @@ Module AmexEquitiesImbalancesFeedV22N.
       Datatypes.length (status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (request_seq_num record) ++
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (request_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record) ++
       encode_bytes 1 (status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (request_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (begin_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (end_seq_num_value, bytes) =>
                   match decode_bytes 10 bytes with
@@ -1069,7 +1069,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1079,9 +1079,9 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
@@ -1191,56 +1191,56 @@ Module AmexEquitiesImbalancesFeedV22N.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 4 (symbol_seq_num record) ++
-      encode_uint 4 (reference_price record) ++
-      encode_uint 4 (paired_qty record) ++
-      encode_uint 4 (total_imbalance_qty record) ++
-      encode_uint 4 (market_imbalance_qty record) ++
-      encode_uint 2 (auction_time record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_seq_num record) ++
+      encode_uint_le 4 (reference_price record) ++
+      encode_uint_le 4 (paired_qty record) ++
+      encode_uint_le 4 (total_imbalance_qty record) ++
+      encode_uint_le 4 (market_imbalance_qty record) ++
+      encode_uint_le 2 (auction_time record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (imbalance_side record) ++
-      encode_uint 4 (continuous_book_clearing_price record) ++
-      encode_uint 4 (auction_interest_clearing_price record) ++
-      encode_uint 4 (ssr_filing_price record) ++
-      encode_uint 4 (indicative_match_price record) ++
-      encode_uint 4 (upper_collar record) ++
-      encode_uint 4 (lower_collar record) ++
+      encode_uint_le 4 (continuous_book_clearing_price record) ++
+      encode_uint_le 4 (auction_interest_clearing_price record) ++
+      encode_uint_le 4 (ssr_filing_price record) ++
+      encode_uint_le 4 (indicative_match_price record) ++
+      encode_uint_le 4 (upper_collar record) ++
+      encode_uint_le 4 (lower_collar record) ++
       encode_uint 1 (auction_status record) ++
       encode_uint 1 (freeze_status record) ++
       encode_uint 1 (num_extensions record) ++
-      encode_uint 4 (unpaired_qty record) ++
+      encode_uint_le 4 (unpaired_qty record) ++
       encode_bytes 1 (unpaired_side record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (reference_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (paired_qty_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (total_imbalance_qty_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (market_imbalance_qty_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (auction_time_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -1249,22 +1249,22 @@ Module AmexEquitiesImbalancesFeedV22N.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (imbalance_side_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (continuous_book_clearing_price_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (auction_interest_clearing_price_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (ssr_filing_price_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (indicative_match_price_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (upper_collar_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (lower_collar_value, bytes) =>
                                                                           match decode_uint 1 bytes with
@@ -1276,7 +1276,7 @@ Module AmexEquitiesImbalancesFeedV22N.
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (num_extensions_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (unpaired_qty_value, bytes) =>
                                                                                           match decode_bytes 1 bytes with
@@ -1313,7 +1313,7 @@ Module AmexEquitiesImbalancesFeedV22N.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1323,27 +1323,27 @@ Module AmexEquitiesImbalancesFeedV22N.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 bound_22]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
       destruct record. reflexivity.

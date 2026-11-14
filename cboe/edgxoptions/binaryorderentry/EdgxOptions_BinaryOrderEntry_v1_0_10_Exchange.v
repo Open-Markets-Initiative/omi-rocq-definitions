@@ -52,21 +52,21 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (exchange_message_type record) ++
+      encode_uint_le 2 (start_of_message record) ++
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (exchange_message_type record) ++
       encode_uint 1 (matching_unit record) ++
       encode_bytes 1 (reserved_field record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (exchange_message_type_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sequence_number_value, bytes) =>
                               Some ({| start_of_message := start_of_message_value; message_length := message_length_value; exchange_message_type := exchange_message_type_value; matching_unit := matching_unit_value; reserved_field := reserved_field_value; sequence_number := sequence_number_value |}, bytes)
@@ -89,7 +89,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -99,12 +99,12 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -204,39 +204,39 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (display_price record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (display_price record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 4 (routing_firm_id record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 8 bytes with
@@ -245,13 +245,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                   match decode_bytes 4 bytes with
                                   | None => None
                                   | Some (clearing_firm_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (leaves_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (display_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (working_price_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -263,7 +263,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                           match decode_bytes 4 bytes with
                                                           | None => None
                                                           | Some (routing_firm_id_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (request_received_time_value, bytes) =>
                                                                   Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; order_id := order_id_value; side := side_value; price := price_value; symbol := symbol_value; clearing_firm := clearing_firm_value; leaves_qty := leaves_qty_value; display_price := display_price_value; working_price := working_price_value; base_liquidity_indicator := base_liquidity_indicator_value; sub_liquidity_indicator := sub_liquidity_indicator_value; routing_firm_id := routing_firm_id_value; request_received_time := request_received_time_value |}, bytes)
@@ -286,7 +286,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -296,21 +296,21 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       destruct record. reflexivity.
     Qed.
 
@@ -343,8 +343,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
@@ -352,10 +352,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -385,7 +385,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 99.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -395,8 +395,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -432,18 +432,18 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cross_id record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 1 (order_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -469,7 +469,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 95.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -479,8 +479,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -511,16 +511,16 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (quote_reject_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
       encode_bytes 1 (quote_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 16 bytes with
@@ -538,7 +538,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -548,8 +548,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
@@ -608,31 +608,31 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 8 (symbol record) ++
-      encode_uint 4 (order_qty record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (ord_type record) ++
-      encode_uint 4 (max_floor record) ++
-      encode_uint 8 (stop_px record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (display_price record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 4 (max_floor record) ++
+      encode_uint_le 8 (stop_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (display_price record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
-      encode_uint 8 (secondary_order_id record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (secondary_order_id record) ++
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -641,7 +641,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (orig_cl_ord_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
                           match decode_bytes 4 bytes with
@@ -653,37 +653,37 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                   match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (symbol_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (order_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (price_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (ord_type_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (max_floor_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (stop_px_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (leaves_qty_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (display_price_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (working_price_value, bytes) =>
                                                                       match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (base_liquidity_indicator_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (secondary_order_id_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (request_received_time_value, bytes) =>
                                                                                   Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; order_id := order_id_value; clearing_firm := clearing_firm_value; routing_firm_id := routing_firm_id_value; symbol := symbol_value; order_qty := order_qty_value; price := price_value; ord_type := ord_type_value; max_floor := max_floor_value; stop_px := stop_px_value; leaves_qty := leaves_qty_value; display_price := display_price_value; working_price := working_price_value; base_liquidity_indicator := base_liquidity_indicator_value; secondary_order_id := secondary_order_id_value; request_received_time := request_received_time_value |}, bytes)
@@ -710,7 +710,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 136.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -720,25 +720,25 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 bound_18]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
@@ -791,35 +791,35 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (last_px record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (order_restatement_reason record) ++
-      encode_uint 4 (order_qty record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (display_price record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (display_price record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
-      encode_uint 8 (secondary_order_id record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record).
+      encode_uint_le 8 (secondary_order_id record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 4 bytes with
@@ -834,31 +834,31 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (order_restatement_reason_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (order_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (price_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (leaves_qty_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (display_price_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (working_price_value, bytes) =>
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (base_liquidity_indicator_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (secondary_order_id_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (last_shares_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (last_px_value, bytes) =>
                                                                           Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; order_id := order_id_value; clearing_firm := clearing_firm_value; routing_firm_id := routing_firm_id_value; symbol := symbol_value; order_restatement_reason := order_restatement_reason_value; order_qty := order_qty_value; price := price_value; leaves_qty := leaves_qty_value; display_price := display_price_value; working_price := working_price_value; base_liquidity_indicator := base_liquidity_indicator_value; secondary_order_id := secondary_order_id_value; last_shares := last_shares_value; last_px := last_px_value |}, bytes)
@@ -883,7 +883,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 108.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -893,23 +893,23 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -946,33 +946,33 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (restatement_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (restatement_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 16 bytes with
               | None => None
               | Some (quote_update_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (leaves_qty_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (working_price_value, bytes) =>
                               match decode_bytes 6 bytes with
@@ -998,7 +998,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1008,12 +1008,12 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1051,8 +1051,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
@@ -1061,10 +1061,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -1098,7 +1098,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 119.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1108,8 +1108,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -1152,21 +1152,21 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 1 (cancel_reason record) ++
       encode_bytes 1 (cancel_sub_reason record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 8 (symbol record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -1187,7 +1187,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                   match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (symbol_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (request_received_time_value, bytes) =>
                                           Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; cancel_reason := cancel_reason_value; cancel_sub_reason := cancel_sub_reason_value; clearing_firm := clearing_firm_value; routing_firm_id := routing_firm_id_value; symbol := symbol_value; request_received_time := request_received_time_value |}, bytes)
@@ -1204,7 +1204,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1214,15 +1214,15 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -1257,26 +1257,26 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (cancel_sub_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (cancel_reason record) ++
       encode_bytes 1 (cancel_sub_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 16 bytes with
               | None => None
               | Some (quote_update_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 6 bytes with
@@ -1304,7 +1304,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1314,10 +1314,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -1354,8 +1354,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
@@ -1363,10 +1363,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -1396,7 +1396,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 99.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1406,8 +1406,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -1489,13 +1489,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (equity_ex_destination record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 4 (contra_broker record) ++
@@ -1508,37 +1508,37 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 2 (marketing_fee_code record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 1 (cross_exclusion_indicator record) ++
-      encode_uint 4 (trade_date record) ++
+      encode_uint_le 4 (trade_date record) ++
       encode_bytes 1 (multileg_reporting_type record) ++
-      encode_uint 8 (secondary_exec_id record) ++
+      encode_uint_le 8 (secondary_exec_id record) ++
       encode_bytes 1 (price_type record) ++
       encode_bytes 1 (trade_through_alert_type record) ++
       encode_bytes 1 (sender_location_id record) ++
       encode_bytes 3 (floor_trader_acronym record) ++
-      encode_uint 8 (floor_trade_time record) ++
+      encode_uint_le 8 (floor_trade_time record) ++
       encode_bytes 1 (ex_destination record) ++
       encode_bytes 1 (equity_ex_destination record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (exec_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (last_shares_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (last_px_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (leaves_qty_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1577,13 +1577,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                               match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (cross_exclusion_indicator_value, bytes) =>
-                                                                                  match decode_uint 4 bytes with
+                                                                                  match decode_uint_le 4 bytes with
                                                                                   | None => None
                                                                                   | Some (trade_date_value, bytes) =>
                                                                                       match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (multileg_reporting_type_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (secondary_exec_id_value, bytes) =>
                                                                                               match decode_bytes 1 bytes with
@@ -1598,7 +1598,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                                                           match decode_bytes 3 bytes with
                                                                                                           | None => None
                                                                                                           | Some (floor_trader_acronym_value, bytes) =>
-                                                                                                              match decode_uint 8 bytes with
+                                                                                                              match decode_uint_le 8 bytes with
                                                                                                               | None => None
                                                                                                               | Some (floor_trade_time_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
@@ -1641,7 +1641,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 116.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1651,13 +1651,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 bound_28]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1670,14 +1670,14 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
       destruct record. reflexivity.
@@ -1734,16 +1734,16 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (exec_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (exec_id record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 4 (contra_trader record) ++
       encode_bytes 1 (contra_capacity record) ++
       encode_bytes 1 (side record) ++
@@ -1751,22 +1751,22 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 2 (fee_code record) ++
       encode_bytes 2 (marketing_fee_code record) ++
-      encode_uint 4 (trade_date record).
+      encode_uint_le 4 (trade_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 16 bytes with
               | None => None
               | Some (quote_update_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (exec_id_value, bytes) =>
                           match decode_bytes 6 bytes with
@@ -1775,13 +1775,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (clearing_firm_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (last_shares_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_px_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (leaves_qty_value, bytes) =>
                                               match decode_bytes 4 bytes with
@@ -1805,7 +1805,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                       match decode_bytes 2 bytes with
                                                                       | None => None
                                                                       | Some (marketing_fee_code_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (trade_date_value, bytes) =>
                                                                               Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; quote_update_id := quote_update_id_value; order_id := order_id_value; exec_id := exec_id_value; quote_symbol := quote_symbol_value; clearing_firm := clearing_firm_value; last_shares := last_shares_value; last_px := last_px_value; leaves_qty := leaves_qty_value; contra_trader := contra_trader_value; contra_capacity := contra_capacity_value; side := side_value; base_liquidity_indicator := base_liquidity_indicator_value; sub_liquidity_indicator := sub_liquidity_indicator_value; fee_code := fee_code_value; marketing_fee_code := marketing_fee_code_value; trade_date := trade_date_value |}, bytes)
@@ -1831,7 +1831,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 84.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1841,16 +1841,16 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1858,7 +1858,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -1925,45 +1925,45 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (cmta_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (exec_ref_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (exec_ref_id record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (clearing_account record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 8 (corrected_price record) ++
-      encode_uint 4 (corrected_size record) ++
-      encode_uint 8 (orig_time record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 8 (corrected_price record) ++
+      encode_uint_le 4 (corrected_size record) ++
+      encode_uint_le 8 (orig_time record) ++
       encode_bytes 8 (symbol record) ++
-      encode_uint 4 (maturity_date record) ++
-      encode_uint 8 (strike_price record) ++
+      encode_uint_le 4 (maturity_date record) ++
+      encode_uint_le 8 (strike_price record) ++
       encode_bytes 1 (put_or_call record) ++
       encode_bytes 1 (capacity record) ++
       encode_bytes 1 (open_close record) ++
       encode_bytes 2 (marketing_fee_code record) ++
       encode_bytes 4 (target_party_id record) ++
-      encode_uint 4 (cmta_number record).
+      encode_uint_le 4 (cmta_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (exec_ref_id_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -1981,28 +1981,28 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                           match decode_bytes 4 bytes with
                                           | None => None
                                           | Some (clearing_account_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (last_shares_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (last_px_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (corrected_price_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (corrected_size_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (orig_time_value, bytes) =>
                                                                   match decode_bytes 8 bytes with
                                                                   | None => None
                                                                   | Some (symbol_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (maturity_date_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (strike_price_value, bytes) =>
                                                                               match decode_bytes 1 bytes with
@@ -2020,7 +2020,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                                               match decode_bytes 4 bytes with
                                                                                               | None => None
                                                                                               | Some (target_party_id_value, bytes) =>
-                                                                                                  match decode_uint 4 bytes with
+                                                                                                  match decode_uint_le 4 bytes with
                                                                                                   | None => None
                                                                                                   | Some (cmta_number_value, bytes) =>
                                                                                                       Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; order_id := order_id_value; exec_ref_id := exec_ref_id_value; side := side_value; base_liquidity_indicator := base_liquidity_indicator_value; sub_liquidity_indicator := sub_liquidity_indicator_value; clearing_firm := clearing_firm_value; clearing_account := clearing_account_value; last_shares := last_shares_value; last_px := last_px_value; corrected_price := corrected_price_value; corrected_size := corrected_size_value; orig_time := orig_time_value; symbol := symbol_value; maturity_date := maturity_date_value; strike_price := strike_price_value; put_or_call := put_or_call_value; capacity := capacity_value; open_close := open_close_value; marketing_fee_code := marketing_fee_code_value; target_party_id := target_party_id_value; cmta_number := cmta_number_value |}, bytes)
@@ -2052,7 +2052,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 122.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2062,30 +2062,30 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 bound_23]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_23.
       destruct record. reflexivity.
     Qed.
 
@@ -2114,17 +2114,17 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 1 (purge_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -2146,7 +2146,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 91.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2156,8 +2156,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -2187,13 +2187,13 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
+      encode_uint_le 2 (in_flight record) ++
       encode_bytes 16 (risk_status_id record) ++
       encode_bytes 1 (risk_reset_result record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
           match decode_bytes 16 bytes with
@@ -2202,7 +2202,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
               match decode_bytes 1 bytes with
               | None => None
               | Some (risk_reset_result_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (request_received_time_value, bytes) =>
                       Some ({| in_flight := in_flight_value; risk_status_id := risk_status_id_value; risk_reset_result := risk_reset_result_value; request_received_time := request_received_time_value |}, bytes)
@@ -2214,7 +2214,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2224,10 +2224,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -2256,26 +2256,26 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 4 (cancelled_order_count record) ++
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (mass_cancel_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (cancelled_order_count_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (request_received_time_value, bytes) =>
                           Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; mass_cancel_id := mass_cancel_id_value; cancelled_order_count := cancelled_order_count_value; request_received_time := request_received_time_value |}, bytes)
@@ -2288,7 +2288,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2298,11 +2298,11 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -2331,17 +2331,17 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 1 (mass_cancel_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -2363,7 +2363,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 91.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2373,8 +2373,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -2408,30 +2408,30 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record) ++
+      encode_uint_le 4 (cancelled_order_count record) ++
       encode_uint 1 (source_matching_unit record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (mass_cancel_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (cancelled_order_count_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (source_matching_unit_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (request_received_time_value, bytes) =>
                               Some ({| in_flight := in_flight_value; transaction_time := transaction_time_value; mass_cancel_id := mass_cancel_id_value; cancelled_order_count := cancelled_order_count_value; source_matching_unit := source_matching_unit_value; request_received_time := request_received_time_value |}, bytes)
@@ -2445,7 +2445,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2455,12 +2455,12 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -2495,26 +2495,26 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (mass_cancel_lockout record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record) ++
+      encode_uint_le 4 (cancelled_order_count record) ++
       encode_uint 1 (source_matching_unit record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 6 (risk_root record) ++
       encode_bytes 1 (mass_cancel_lockout record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (mass_cancel_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (cancelled_order_count_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -2542,7 +2542,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2552,10 +2552,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -2590,24 +2590,24 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 4 (no_of_securities record) ++
+      encode_uint_le 4 (no_of_securities record) ++
       encode_bytes 1 (order_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (no_of_securities_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -2627,7 +2627,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 95.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2637,10 +2637,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
@@ -2823,46 +2823,46 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (held record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (exec_inst record) ++
       encode_bytes 1 (ord_type record) ++
       encode_bytes 1 (time_in_force record) ++
-      encode_uint 4 (min_qty record) ++
+      encode_uint_le 4 (min_qty record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (capacity record) ++
       encode_bytes 16 (account record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (clearing_account record) ++
       encode_bytes 1 (display_indicator record) ++
-      encode_uint 4 (max_floor record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 4 (max_floor record) ++
+      encode_uint_le 4 (order_qty record) ++
       PreventMatch.encode (prevent_match record) ++
-      encode_uint 4 (maturity_date record) ++
-      encode_uint 8 (strike_price record) ++
+      encode_uint_le 4 (maturity_date record) ++
+      encode_uint_le 8 (strike_price record) ++
       encode_bytes 1 (put_or_call record) ++
       encode_bytes 1 (open_close record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (display_price record) ++
-      encode_uint 8 (working_price record) ++
-      encode_uint 8 (expire_time record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (display_price record) ++
+      encode_uint_le 8 (working_price record) ++
+      encode_uint_le 8 (expire_time record) ++
       encode_bytes 1 (attributed_quote record) ++
-      encode_uint 8 (stop_px record) ++
+      encode_uint_le 8 (stop_px record) ++
       encode_bytes 4 (routing_inst record) ++
       encode_bytes 6 (rout_strategy record) ++
       encode_bytes 3 (route_delivery_method record) ++
       encode_bytes 1 (ex_destination record) ++
       encode_bytes 4 (target_party_id record) ++
-      encode_uint 8 (auction_id record) ++
-      encode_uint 4 (cmta_number record) ++
+      encode_uint_le 8 (auction_id record) ++
+      encode_uint_le 4 (cmta_number record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 16 (clearing_optional_data record) ++
-      encode_uint 4 (cum_qty record) ++
-      encode_uint 8 (drill_thru_protection record) ++
+      encode_uint_le 4 (cum_qty record) ++
+      encode_uint_le 8 (drill_thru_protection record) ++
       encode_bytes 4 (equity_party_id record) ++
       encode_bytes 4 (client_id_attr record) ++
       encode_bytes 6 (frequent_trader_id record) ++
@@ -2877,22 +2877,22 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       encode_bytes 1 (held record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -2904,7 +2904,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (time_in_force_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (min_qty_value, bytes) =>
                                               match decode_bytes 8 bytes with
@@ -2925,19 +2925,19 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                   match decode_bytes 1 bytes with
                                                                   | None => None
                                                                   | Some (display_indicator_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (max_floor_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (order_qty_value, bytes) =>
                                                                               match PreventMatch.decode bytes with
                                                                               | None => None
                                                                               | Some (prevent_match_value, bytes) =>
-                                                                                  match decode_uint 4 bytes with
+                                                                                  match decode_uint_le 4 bytes with
                                                                                   | None => None
                                                                                   | Some (maturity_date_value, bytes) =>
-                                                                                      match decode_uint 8 bytes with
+                                                                                      match decode_uint_le 8 bytes with
                                                                                       | None => None
                                                                                       | Some (strike_price_value, bytes) =>
                                                                                           match decode_bytes 1 bytes with
@@ -2946,22 +2946,22 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                                               match decode_bytes 1 bytes with
                                                                                               | None => None
                                                                                               | Some (open_close_value, bytes) =>
-                                                                                                  match decode_uint 4 bytes with
+                                                                                                  match decode_uint_le 4 bytes with
                                                                                                   | None => None
                                                                                                   | Some (leaves_qty_value, bytes) =>
-                                                                                                      match decode_uint 8 bytes with
+                                                                                                      match decode_uint_le 8 bytes with
                                                                                                       | None => None
                                                                                                       | Some (display_price_value, bytes) =>
-                                                                                                          match decode_uint 8 bytes with
+                                                                                                          match decode_uint_le 8 bytes with
                                                                                                           | None => None
                                                                                                           | Some (working_price_value, bytes) =>
-                                                                                                              match decode_uint 8 bytes with
+                                                                                                              match decode_uint_le 8 bytes with
                                                                                                               | None => None
                                                                                                               | Some (expire_time_value, bytes) =>
                                                                                                                   match decode_bytes 1 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (attributed_quote_value, bytes) =>
-                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (stop_px_value, bytes) =>
                                                                                                                           match decode_bytes 4 bytes with
@@ -2979,10 +2979,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                                                                                           match decode_bytes 4 bytes with
                                                                                                                                           | None => None
                                                                                                                                           | Some (target_party_id_value, bytes) =>
-                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (auction_id_value, bytes) =>
-                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (cmta_number_value, bytes) =>
                                                                                                                                                       match decode_bytes 4 bytes with
@@ -2991,10 +2991,10 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
                                                                                                                                                           match decode_bytes 16 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (clearing_optional_data_value, bytes) =>
-                                                                                                                                                              match decode_uint 4 bytes with
+                                                                                                                                                              match decode_uint_le 4 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (cum_qty_value, bytes) =>
-                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (drill_thru_protection_value, bytes) =>
                                                                                                                                                                       match decode_bytes 4 bytes with
@@ -3090,7 +3090,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 240.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !PreventMatch.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !PreventMatch.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3100,46 +3100,46 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 [bound_40 [bound_41 [bound_42 [bound_43 [bound_44 [bound_45 [bound_46 [bound_47 [bound_48 [bound_49 [bound_50 bound_51]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite PreventMatch.decode_encode by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
-      rewrite decode_encode_uint by exact bound_28.
+      rewrite decode_encode_uint_le by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
-      rewrite decode_encode_uint by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_34.
+      rewrite decode_encode_uint_le by exact bound_35.
       rewrite decode_encode_bytes by exact bound_36.
       rewrite decode_encode_bytes by exact bound_37.
-      rewrite decode_encode_uint by exact bound_38.
-      rewrite decode_encode_uint by exact bound_39.
+      rewrite decode_encode_uint_le by exact bound_38.
+      rewrite decode_encode_uint_le by exact bound_39.
       rewrite decode_encode_bytes by exact bound_40.
       rewrite decode_encode_bytes by exact bound_41.
       rewrite decode_encode_bytes by exact bound_42.
@@ -3182,18 +3182,18 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       Datatypes.length (symbol record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (in_flight record) ++
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 2 (in_flight record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (routing_firm_id record) ++
       encode_bytes 8 (symbol record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (in_flight_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transaction_time_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -3219,7 +3219,7 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3229,8 +3229,8 @@ Module EdgxOptionsBinaryOrderEntryV1010Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.

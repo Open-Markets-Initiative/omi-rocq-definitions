@@ -47,18 +47,18 @@ Module NseCdRecoveryV68Tcp.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (stream_id record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (stream_id record) ++
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (stream_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (sequence_number_value, bytes) =>
                   Some ({| message_length := message_length_value; stream_id := stream_id_value; sequence_number := sequence_number_value |}, bytes)
@@ -69,7 +69,7 @@ Module NseCdRecoveryV68Tcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,9 +79,9 @@ Module NseCdRecoveryV68Tcp.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -102,10 +102,10 @@ Module NseCdRecoveryV68Tcp.
       (last_sequence_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (last_sequence_no record).
+      encode_uint_le 4 (last_sequence_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (last_sequence_no_value, bytes) =>
           Some ({| last_sequence_no := last_sequence_no_value |}, bytes)
@@ -114,7 +114,7 @@ Module NseCdRecoveryV68Tcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -122,7 +122,7 @@ Module NseCdRecoveryV68Tcp.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

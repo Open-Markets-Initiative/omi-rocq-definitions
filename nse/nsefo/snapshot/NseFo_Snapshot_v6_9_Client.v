@@ -45,18 +45,18 @@ Module NseFoSnapshotV69Client.
       (end_sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (stream_id record) ++
-      encode_uint 4 (start_sequence_number record) ++
-      encode_uint 4 (end_sequence_number record).
+      encode_uint_le 2 (stream_id record) ++
+      encode_uint_le 4 (start_sequence_number record) ++
+      encode_uint_le 4 (end_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (start_sequence_number_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (end_sequence_number_value, bytes) =>
                   Some ({| stream_id := stream_id_value; start_sequence_number := start_sequence_number_value; end_sequence_number := end_sequence_number_value |}, bytes)
@@ -67,7 +67,7 @@ Module NseFoSnapshotV69Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -77,9 +77,9 @@ Module NseFoSnapshotV69Client.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

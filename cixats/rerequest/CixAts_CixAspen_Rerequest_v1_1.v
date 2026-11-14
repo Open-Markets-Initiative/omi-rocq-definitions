@@ -46,8 +46,8 @@ Module CixAtsCixAspenRerequestV11.
     Definition encode (record : t) : list byte :=
       encode_bytes 9 (market_day_identifier record) ++
       encode_bytes 1 (feed_identifier record) ++
-      encode_uint 8 (sequence record) ++
-      encode_uint 2 (count record).
+      encode_uint_le 8 (sequence record) ++
+      encode_uint_le 2 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 9 bytes with
@@ -56,10 +56,10 @@ Module CixAtsCixAspenRerequestV11.
           match decode_bytes 1 bytes with
           | None => None
           | Some (feed_identifier_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sequence_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (count_value, bytes) =>
                       Some ({| market_day_identifier := market_day_identifier_value; feed_identifier := feed_identifier_value; sequence := sequence_value; count := count_value |}, bytes)
@@ -71,7 +71,7 @@ Module CixAtsCixAspenRerequestV11.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -83,8 +83,8 @@ Module CixAtsCixAspenRerequestV11.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

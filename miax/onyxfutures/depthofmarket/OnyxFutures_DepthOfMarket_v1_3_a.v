@@ -48,16 +48,16 @@ Module OnyxFuturesDepthOfMarketV13A.
       (session_number record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sequence_number record) ++
-      encode_uint 2 (packet_length record) ++
+      encode_uint_le 8 (sequence_number record) ++
+      encode_uint_le 2 (packet_length record) ++
       encode_uint 1 (packet_type record) ++
       encode_uint 1 (session_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (packet_length_value, bytes) =>
               match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,8 +85,8 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -187,8 +187,8 @@ Module OnyxFuturesDepthOfMarketV13A.
       (underlying_future_instrument_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 1 (underlying_asset_type record) ++
       encode_bytes 4 (underlying_asset_alphanumeric_4 record) ++
       encode_bytes 6 (product_group_code_alphanumeric_6 record) ++
@@ -200,39 +200,39 @@ Module OnyxFuturesDepthOfMarketV13A.
       encode_bytes 1 (currency record) ++
       encode_bytes 1 (settlement_currency record) ++
       encode_bytes 1 (match_algorithm record) ++
-      encode_uint 4 (minimum_size record) ++
-      encode_uint 4 (maximum_size record) ++
-      encode_uint 8 (tick record) ++
+      encode_uint_le 4 (minimum_size record) ++
+      encode_uint_le 4 (maximum_size record) ++
+      encode_uint_le 8 (tick record) ++
       encode_bytes 5 (unit_of_measure record) ++
-      encode_uint 4 (unit_of_measure_quantity record) ++
-      encode_uint 8 (settlement_price record) ++
+      encode_uint_le 4 (unit_of_measure_quantity record) ++
+      encode_uint_le 8 (settlement_price record) ++
       encode_bytes 1 (settlement_price_type_calc_method record) ++
-      encode_uint 4 (total_volume record) ++
-      encode_uint 4 (open_interest_quantity record) ++
-      encode_uint 8 (high_limit_price record) ++
-      encode_uint 8 (low_limit_price record) ++
+      encode_uint_le 4 (total_volume record) ++
+      encode_uint_le 4 (open_interest_quantity record) ++
+      encode_uint_le 8 (high_limit_price record) ++
+      encode_uint_le 8 (low_limit_price record) ++
       encode_bytes 1 (trading_collar_variation_type record) ++
-      encode_uint 8 (trading_collar_variation record) ++
-      encode_uint 4 (contract_date record) ++
-      encode_uint 2 (maturity_date record) ++
-      encode_uint 2 (valuation_date record) ++
-      encode_uint 2 (first_trade_date record) ++
-      encode_uint 2 (last_trade_date record) ++
-      encode_uint 2 (first_notice_date record) ++
-      encode_uint 2 (last_notice_date record) ++
-      encode_uint 2 (first_delivery_date record) ++
-      encode_uint 2 (last_delivery_date record) ++
-      encode_uint 8 (option_strike_price record) ++
+      encode_uint_le 8 (trading_collar_variation record) ++
+      encode_uint_le 4 (contract_date record) ++
+      encode_uint_le 2 (maturity_date record) ++
+      encode_uint_le 2 (valuation_date record) ++
+      encode_uint_le 2 (first_trade_date record) ++
+      encode_uint_le 2 (last_trade_date record) ++
+      encode_uint_le 2 (first_notice_date record) ++
+      encode_uint_le 2 (last_notice_date record) ++
+      encode_uint_le 2 (first_delivery_date record) ++
+      encode_uint_le 2 (last_delivery_date record) ++
+      encode_uint_le 8 (option_strike_price record) ++
       encode_bytes 1 (option_strike_currency record) ++
       encode_bytes 1 (option_type record) ++
       encode_bytes 1 (option_expiration_type record) ++
-      encode_uint 4 (underlying_future_instrument_id record).
+      encode_uint_le 4 (underlying_future_instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -268,73 +268,73 @@ Module OnyxFuturesDepthOfMarketV13A.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (match_algorithm_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (minimum_size_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (maximum_size_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (tick_value, bytes) =>
                                                                       match decode_bytes 5 bytes with
                                                                       | None => None
                                                                       | Some (unit_of_measure_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (unit_of_measure_quantity_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (settlement_price_value, bytes) =>
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (settlement_price_type_calc_method_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (total_volume_value, bytes) =>
-                                                                                          match decode_uint 4 bytes with
+                                                                                          match decode_uint_le 4 bytes with
                                                                                           | None => None
                                                                                           | Some (open_interest_quantity_value, bytes) =>
-                                                                                              match decode_uint 8 bytes with
+                                                                                              match decode_uint_le 8 bytes with
                                                                                               | None => None
                                                                                               | Some (high_limit_price_value, bytes) =>
-                                                                                                  match decode_uint 8 bytes with
+                                                                                                  match decode_uint_le 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (low_limit_price_value, bytes) =>
                                                                                                       match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (trading_collar_variation_type_value, bytes) =>
-                                                                                                          match decode_uint 8 bytes with
+                                                                                                          match decode_uint_le 8 bytes with
                                                                                                           | None => None
                                                                                                           | Some (trading_collar_variation_value, bytes) =>
-                                                                                                              match decode_uint 4 bytes with
+                                                                                                              match decode_uint_le 4 bytes with
                                                                                                               | None => None
                                                                                                               | Some (contract_date_value, bytes) =>
-                                                                                                                  match decode_uint 2 bytes with
+                                                                                                                  match decode_uint_le 2 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (maturity_date_value, bytes) =>
-                                                                                                                      match decode_uint 2 bytes with
+                                                                                                                      match decode_uint_le 2 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (valuation_date_value, bytes) =>
-                                                                                                                          match decode_uint 2 bytes with
+                                                                                                                          match decode_uint_le 2 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (first_trade_date_value, bytes) =>
-                                                                                                                              match decode_uint 2 bytes with
+                                                                                                                              match decode_uint_le 2 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (last_trade_date_value, bytes) =>
-                                                                                                                                  match decode_uint 2 bytes with
+                                                                                                                                  match decode_uint_le 2 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (first_notice_date_value, bytes) =>
-                                                                                                                                      match decode_uint 2 bytes with
+                                                                                                                                      match decode_uint_le 2 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (last_notice_date_value, bytes) =>
-                                                                                                                                          match decode_uint 2 bytes with
+                                                                                                                                          match decode_uint_le 2 bytes with
                                                                                                                                           | None => None
                                                                                                                                           | Some (first_delivery_date_value, bytes) =>
-                                                                                                                                              match decode_uint 2 bytes with
+                                                                                                                                              match decode_uint_le 2 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (last_delivery_date_value, bytes) =>
-                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (option_strike_price_value, bytes) =>
                                                                                                                                                       match decode_bytes 1 bytes with
@@ -346,7 +346,7 @@ Module OnyxFuturesDepthOfMarketV13A.
                                                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (option_expiration_type_value, bytes) =>
-                                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (underlying_future_instrument_id_value, bytes) =>
                                                                                                                                                                       Some ({| timestamp := timestamp_value; instrument_id := instrument_id_value; underlying_asset_type := underlying_asset_type_value; underlying_asset_alphanumeric_4 := underlying_asset_alphanumeric_4_value; product_group_code_alphanumeric_6 := product_group_code_alphanumeric_6_value; exchange := exchange_value; instrument_id_source := instrument_id_source_value; instrument_type := instrument_type_value; instrument_listing_status := instrument_listing_status_value; reserved_3 := reserved_3_value; currency := currency_value; settlement_currency := settlement_currency_value; match_algorithm := match_algorithm_value; minimum_size := minimum_size_value; maximum_size := maximum_size_value; tick := tick_value; unit_of_measure := unit_of_measure_value; unit_of_measure_quantity := unit_of_measure_quantity_value; settlement_price := settlement_price_value; settlement_price_type_calc_method := settlement_price_type_calc_method_value; total_volume := total_volume_value; open_interest_quantity := open_interest_quantity_value; high_limit_price := high_limit_price_value; low_limit_price := low_limit_price_value; trading_collar_variation_type := trading_collar_variation_type_value; trading_collar_variation := trading_collar_variation_value; contract_date := contract_date_value; maturity_date := maturity_date_value; valuation_date := valuation_date_value; first_trade_date := first_trade_date_value; last_trade_date := last_trade_date_value; first_notice_date := first_notice_date_value; last_notice_date := last_notice_date_value; first_delivery_date := first_delivery_date_value; last_delivery_date := last_delivery_date_value; option_strike_price := option_strike_price_value; option_strike_currency := option_strike_currency_value; option_type := option_type_value; option_expiration_type := option_expiration_type_value; underlying_future_instrument_id := underlying_future_instrument_id_value |}, bytes)
@@ -394,7 +394,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 138.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -404,8 +404,8 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 bound_39]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -417,33 +417,33 @@ Module OnyxFuturesDepthOfMarketV13A.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
-      rewrite decode_encode_uint by exact bound_27.
-      rewrite decode_encode_uint by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
-      rewrite decode_encode_uint by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
-      rewrite decode_encode_uint by exact bound_33.
-      rewrite decode_encode_uint by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_27.
+      rewrite decode_encode_uint_le by exact bound_28.
+      rewrite decode_encode_uint_le by exact bound_29.
+      rewrite decode_encode_uint_le by exact bound_30.
+      rewrite decode_encode_uint_le by exact bound_31.
+      rewrite decode_encode_uint_le by exact bound_32.
+      rewrite decode_encode_uint_le by exact bound_33.
+      rewrite decode_encode_uint_le by exact bound_34.
+      rewrite decode_encode_uint_le by exact bound_35.
       rewrite decode_encode_bytes by exact bound_36.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_bytes by exact bound_38.
-      rewrite decode_encode_uint by exact bound_39.
+      rewrite decode_encode_uint_le by exact bound_39.
       destruct record. reflexivity.
     Qed.
 
@@ -470,13 +470,13 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (system_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 8 (do_m_version record) ++
       encode_uint 1 (session_id record) ++
       encode_bytes 1 (system_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -497,7 +497,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -507,7 +507,7 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -537,16 +537,16 @@ Module OnyxFuturesDepthOfMarketV13A.
       (market_state record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (trading_status record) ++
       encode_uint 1 (market_state record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -564,7 +564,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -574,8 +574,8 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -606,23 +606,23 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (anticipated_opening_price record) ++
-      encode_uint 4 (opening_match_quantity record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (anticipated_opening_price record) ++
+      encode_uint_le 4 (opening_match_quantity record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (anticipated_opening_price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (opening_match_quantity_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -638,7 +638,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -648,10 +648,10 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -683,24 +683,24 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (settlement_price_type_calc_method record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (trade_date record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (settlement_price record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (trade_date record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (settlement_price record) ++
       encode_bytes 1 (settlement_price_type record) ++
       encode_bytes 1 (settlement_price_type_calc_method record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (trade_date_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (settlement_price_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -720,7 +720,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -730,10 +730,10 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
@@ -762,22 +762,22 @@ Module OnyxFuturesDepthOfMarketV13A.
       (open_interest_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (trade_date record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 4 (open_interest_quantity record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (trade_date record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 4 (open_interest_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (trade_date_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (open_interest_quantity_value, bytes) =>
                       Some ({| timestamp := timestamp_value; trade_date := trade_date_value; instrument_id := instrument_id_value; open_interest_quantity := open_interest_quantity_value |}, bytes)
@@ -789,7 +789,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -799,10 +799,10 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -829,22 +829,22 @@ Module OnyxFuturesDepthOfMarketV13A.
       (total_volume record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (trade_date record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 4 (total_volume record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (trade_date record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 4 (total_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (trade_date_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (total_volume_value, bytes) =>
                       Some ({| timestamp := timestamp_value; trade_date := trade_date_value; instrument_id := instrument_id_value; total_volume := total_volume_value |}, bytes)
@@ -856,7 +856,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -866,10 +866,10 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -892,14 +892,14 @@ Module OnyxFuturesDepthOfMarketV13A.
       (instrument_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               Some ({| timestamp := timestamp_value; instrument_id := instrument_id_value |}, bytes)
@@ -909,7 +909,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -919,8 +919,8 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -955,35 +955,35 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 1 (order_type record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (order_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (order_side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (size_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1002,7 +1002,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1012,13 +1012,13 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1052,28 +1052,28 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size_flags record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size_flags record) ++
       encode_bytes 1 (order_side record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (size_flags_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -1094,7 +1094,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1104,11 +1104,11 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -1139,20 +1139,20 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (order_side record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1171,7 +1171,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1181,9 +1181,9 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -1230,55 +1230,55 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (trade_date record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 8 (sell_order_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (trade_date record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 8 (sell_order_id record) ++
       encode_bytes 1 (aggressor_side record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_uint 1 (correction_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record) ++
       encode_bytes 1 (trade_type record) ++
-      encode_uint 8 (complex_trade_id record) ++
+      encode_uint_le 8 (complex_trade_id record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (trade_date_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (buy_order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (sell_order_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (aggressor_side_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (trade_id_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (correction_number_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (price_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (size_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (trade_type_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (complex_trade_id_value, bytes) =>
                                                       match decode_bytes 1 bytes with
@@ -1302,7 +1302,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1312,18 +1312,18 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
@@ -1359,35 +1359,35 @@ Module OnyxFuturesDepthOfMarketV13A.
       Datatypes.length (instrument_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (trade_date record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (trade_date record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_uint 1 (correction_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record) ++
       encode_bytes 1 (instrument_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (trade_date_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trade_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (correction_number_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (size_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1406,7 +1406,7 @@ Module OnyxFuturesDepthOfMarketV13A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1416,13 +1416,13 @@ Module OnyxFuturesDepthOfMarketV13A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.

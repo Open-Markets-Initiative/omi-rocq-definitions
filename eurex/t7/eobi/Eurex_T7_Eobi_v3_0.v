@@ -46,18 +46,18 @@ Module EurexT7EobiV30.
       (msg_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (body_len record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 4 (msg_seq_num record).
+      encode_uint_le 2 (body_len record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 4 (msg_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (body_len_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_seq_num_value, bytes) =>
                   Some ({| body_len := body_len_value; template_id := template_id_value; msg_seq_num := msg_seq_num_value |}, bytes)
@@ -68,7 +68,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -78,9 +78,9 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -116,22 +116,22 @@ Module EurexT7EobiV30.
 
     Definition encode (record : t) : list byte :=
       EobiHeader.encode (eobi_header record) ++
-      encode_uint 4 (appl_seq_num record) ++
-      encode_uint 4 (market_segment_id record) ++
+      encode_uint_le 4 (appl_seq_num record) ++
+      encode_uint_le 4 (market_segment_id record) ++
       encode_uint 1 (partition_id record) ++
       encode_uint 1 (completion_indicator record) ++
       encode_uint 1 (appl_seq_reset_indicator record) ++
       encode_bytes 5 (pad5 record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match EobiHeader.decode bytes with
       | None => None
       | Some (eobi_header_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (appl_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (market_segment_id_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -146,7 +146,7 @@ Module EurexT7EobiV30.
                               match decode_bytes 5 bytes with
                               | None => None
                               | Some (pad5_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (transact_time_value, bytes) =>
                                       Some ({| eobi_header := eobi_header_value; appl_seq_num := appl_seq_num_value; market_segment_id := market_segment_id_value; partition_id := partition_id_value; completion_indicator := completion_indicator_value; appl_seq_reset_indicator := appl_seq_reset_indicator_value; pad5 := pad5_value; transact_time := transact_time_value |}, bytes)
@@ -162,7 +162,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !EobiHeader.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !EobiHeader.encode_length, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -173,13 +173,13 @@ Module EurexT7EobiV30.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite EobiHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -203,18 +203,18 @@ Module EurexT7EobiV30.
       (msg_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (body_len record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 4 (msg_seq_num record).
+      encode_uint_le 2 (body_len record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 4 (msg_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (body_len_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_seq_num_value, bytes) =>
                   Some ({| body_len := body_len_value; template_id := template_id_value; msg_seq_num := msg_seq_num_value |}, bytes)
@@ -225,7 +225,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -235,9 +235,9 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -263,22 +263,22 @@ Module EurexT7EobiV30.
       (offer_px record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (bid_px record) ++
-      encode_uint 8 (offer_px record).
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (bid_px record) ++
+      encode_uint_le 8 (offer_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (security_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (bid_px_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (offer_px_value, bytes) =>
                       Some ({| transact_time := transact_time_value; security_id := security_id_value; bid_px := bid_px_value; offer_px := offer_px_value |}, bytes)
@@ -290,7 +290,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -300,10 +300,10 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -327,18 +327,18 @@ Module EurexT7EobiV30.
       (last_px record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (last_px record).
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (last_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (security_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (last_px_value, bytes) =>
                   Some ({| transact_time := transact_time_value; security_id := security_id_value; last_px := last_px_value |}, bytes)
@@ -349,7 +349,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -359,9 +359,9 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -387,22 +387,22 @@ Module EurexT7EobiV30.
       (transact_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 4 (last_qty record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 4 (last_qty record) ++
       encode_bytes 4 (pad4 record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_qty_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
               | Some (pad4_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (transact_time_value, bytes) =>
                       Some ({| security_id := security_id_value; last_qty := last_qty_value; pad4 := pad4_value; transact_time := transact_time_value |}, bytes)
@@ -414,7 +414,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -424,10 +424,10 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -467,32 +467,32 @@ Module EurexT7EobiV30.
       (resting_cxl_qty record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (aggressor_timestamp record) ++
-      encode_uint 8 (request_time record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 4 (last_qty record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (aggressor_timestamp record) ++
+      encode_uint_le 8 (request_time record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 4 (last_qty record) ++
       encode_uint 1 (aggressor_side record) ++
       encode_uint 1 (trade_condition record) ++
       encode_bytes 2 (pad2 record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (resting_hidden_qty record) ++
-      encode_uint 4 (resting_cxl_qty record).
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (resting_hidden_qty record) ++
+      encode_uint_le 4 (resting_cxl_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (aggressor_timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (exec_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (last_qty_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -504,13 +504,13 @@ Module EurexT7EobiV30.
                                   match decode_bytes 2 bytes with
                                   | None => None
                                   | Some (pad2_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_px_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (resting_hidden_qty_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (resting_cxl_qty_value, bytes) =>
                                                   Some ({| security_id := security_id_value; aggressor_timestamp := aggressor_timestamp_value; request_time := request_time_value; exec_id := exec_id_value; last_qty := last_qty_value; aggressor_side := aggressor_side_value; trade_condition := trade_condition_value; pad2 := pad2_value; last_px := last_px_value; resting_hidden_qty := resting_hidden_qty_value; resting_cxl_qty := resting_cxl_qty_value |}, bytes)
@@ -529,7 +529,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -539,17 +539,17 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -585,12 +585,12 @@ Module EurexT7EobiV30.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (side record) ++
       encode_bytes 7 (pad7 record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 4 (trd_match_id record) ++
-      encode_uint 4 (last_qty record) ++
-      encode_uint 8 (last_px record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (trd_reg_ts_time_priority record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 4 (trd_match_id record) ++
+      encode_uint_le 4 (last_qty record) ++
+      encode_uint_le 8 (last_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -599,22 +599,22 @@ Module EurexT7EobiV30.
           match decode_bytes 7 bytes with
           | None => None
           | Some (pad7_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trd_reg_ts_time_priority_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (security_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trd_match_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (last_qty_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_px_value, bytes) =>
                                       Some ({| side := side_value; pad7 := pad7_value; price := price_value; trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; security_id := security_id_value; trd_match_id := trd_match_id_value; last_qty := last_qty_value; last_px := last_px_value |}, bytes)
@@ -630,7 +630,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -642,12 +642,12 @@ Module EurexT7EobiV30.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -669,11 +669,11 @@ Module EurexT7EobiV30.
       Datatypes.length (pad4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (last_msg_seq_num_processed record) ++
+      encode_uint_le 4 (last_msg_seq_num_processed record) ++
       encode_bytes 4 (pad4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (last_msg_seq_num_processed_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -686,7 +686,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -696,7 +696,7 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -727,15 +727,15 @@ Module EurexT7EobiV30.
       (transact_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (security_id record) ++
       encode_uint 1 (security_status record) ++
       encode_uint 1 (security_trading_status record) ++
       encode_uint 1 (fast_market_indicator record) ++
       encode_bytes 5 (pad5 record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -750,7 +750,7 @@ Module EurexT7EobiV30.
                       match decode_bytes 5 bytes with
                       | None => None
                       | Some (pad5_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (transact_time_value, bytes) =>
                               Some ({| security_id := security_id_value; security_status := security_status_value; security_trading_status := security_trading_status_value; fast_market_indicator := fast_market_indicator_value; pad5 := pad5_value; transact_time := transact_time_value |}, bytes)
@@ -764,7 +764,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -774,12 +774,12 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -807,17 +807,17 @@ Module EurexT7EobiV30.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 4 (display_qty record) ++
+      encode_uint_le 8 (trd_reg_ts_time_priority record) ++
+      encode_uint_le 4 (display_qty record) ++
       encode_uint 1 (side record) ++
       encode_bytes 3 (pad3 record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_priority_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (display_qty_value, bytes) =>
               match decode_uint 1 bytes with
@@ -826,7 +826,7 @@ Module EurexT7EobiV30.
                   match decode_bytes 3 bytes with
                   | None => None
                   | Some (pad3_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           Some ({| trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; display_qty := display_qty_value; side := side_value; pad3 := pad3_value; price := price_value |}, bytes)
@@ -839,7 +839,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -849,11 +849,11 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -877,15 +877,15 @@ Module EurexT7EobiV30.
       OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (security_id record) ++
       OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_in_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (security_id_value, bytes) =>
               match OrderDetailsComp.decode bytes with
@@ -899,7 +899,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !OrderDetailsComp.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -909,8 +909,8 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite OrderDetailsComp.decode_encode by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -937,19 +937,19 @@ Module EurexT7EobiV30.
       OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (security_id record) ++
       OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_in_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transact_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (security_id_value, bytes) =>
                   match OrderDetailsComp.decode bytes with
@@ -964,7 +964,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !OrderDetailsComp.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -974,9 +974,9 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite OrderDetailsComp.decode_encode by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -999,14 +999,14 @@ Module EurexT7EobiV30.
       (transact_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transact_time_value, bytes) =>
               Some ({| security_id := security_id_value; transact_time := transact_time_value |}, bytes)
@@ -1016,7 +1016,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1026,8 +1026,8 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1059,31 +1059,31 @@ Module EurexT7EobiV30.
       OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (trd_reg_ts_prev_time_priority record) ++
-      encode_uint 8 (prev_price record) ++
-      encode_uint 4 (prev_display_qty record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (trd_reg_ts_prev_time_priority record) ++
+      encode_uint_le 8 (prev_price record) ++
+      encode_uint_le 4 (prev_display_qty record) ++
       encode_bytes 4 (pad4 record) ++
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (security_id record) ++
       OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_in_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (trd_reg_ts_prev_time_priority_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (prev_price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (prev_display_qty_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (pad4_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (security_id_value, bytes) =>
                               match OrderDetailsComp.decode bytes with
@@ -1101,7 +1101,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !OrderDetailsComp.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1111,12 +1111,12 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite OrderDetailsComp.decode_encode by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -1147,27 +1147,27 @@ Module EurexT7EobiV30.
       OrderDetailsComp.bounded (order_details_comp record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 4 (prev_display_qty record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 4 (prev_display_qty record) ++
       encode_bytes 4 (pad4 record) ++
-      encode_uint 8 (security_id record) ++
+      encode_uint_le 8 (security_id record) ++
       OrderDetailsComp.encode (order_details_comp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_in_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transact_time_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (prev_display_qty_value, bytes) =>
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (pad4_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (security_id_value, bytes) =>
                           match OrderDetailsComp.decode bytes with
@@ -1184,7 +1184,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !OrderDetailsComp.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !OrderDetailsComp.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1194,11 +1194,11 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite OrderDetailsComp.decode_encode by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -1235,12 +1235,12 @@ Module EurexT7EobiV30.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (side record) ++
       encode_bytes 7 (pad7 record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (trd_reg_ts_time_priority record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 4 (trd_match_id record) ++
-      encode_uint 4 (last_qty record) ++
-      encode_uint 8 (last_px record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (trd_reg_ts_time_priority record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 4 (trd_match_id record) ++
+      encode_uint_le 4 (last_qty record) ++
+      encode_uint_le 8 (last_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1249,22 +1249,22 @@ Module EurexT7EobiV30.
           match decode_bytes 7 bytes with
           | None => None
           | Some (pad7_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trd_reg_ts_time_priority_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (security_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trd_match_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (last_qty_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_px_value, bytes) =>
                                       Some ({| side := side_value; pad7 := pad7_value; price := price_value; trd_reg_ts_time_priority := trd_reg_ts_time_priority_value; security_id := security_id_value; trd_match_id := trd_match_id_value; last_qty := last_qty_value; last_px := last_px_value |}, bytes)
@@ -1280,7 +1280,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1292,12 +1292,12 @@ Module EurexT7EobiV30.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -1332,7 +1332,7 @@ Module EurexT7EobiV30.
       encode_uint 1 (trad_ses_status record) ++
       encode_uint 1 (fast_market_indicator record) ++
       encode_bytes 4 (pad4 record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -1350,7 +1350,7 @@ Module EurexT7EobiV30.
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (pad4_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (transact_time_value, bytes) =>
                               Some ({| trading_session_id := trading_session_id_value; trading_session_sub_id := trading_session_sub_id_value; trad_ses_status := trad_ses_status_value; fast_market_indicator := fast_market_indicator_value; pad4 := pad4_value; transact_time := transact_time_value |}, bytes)
@@ -1364,7 +1364,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1379,7 +1379,7 @@ Module EurexT7EobiV30.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -1407,14 +1407,14 @@ Module EurexT7EobiV30.
       (fast_market_indicator record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (last_msg_seq_num_processed record) ++
+      encode_uint_le 4 (last_msg_seq_num_processed record) ++
       encode_uint 1 (trading_session_id record) ++
       encode_uint 1 (trading_session_sub_id record) ++
       encode_uint 1 (trad_ses_status record) ++
       encode_uint 1 (fast_market_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (last_msg_seq_num_processed_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1439,7 +1439,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1449,7 +1449,7 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1481,17 +1481,17 @@ Module EurexT7EobiV30.
       (transact_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 4 (last_qty record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 4 (last_qty record) ++
       encode_uint 1 (side record) ++
       encode_bytes 3 (pad3 record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_qty_value, bytes) =>
               match decode_uint 1 bytes with
@@ -1500,7 +1500,7 @@ Module EurexT7EobiV30.
                   match decode_bytes 3 bytes with
                   | None => None
                   | Some (pad3_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (transact_time_value, bytes) =>
                           Some ({| security_id := security_id_value; last_qty := last_qty_value; side := side_value; pad3 := pad3_value; transact_time := transact_time_value |}, bytes)
@@ -1513,7 +1513,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1523,11 +1523,11 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1593,22 +1593,22 @@ Module EurexT7EobiV30.
       (offer_px record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (bid_px record) ++
-      encode_uint 8 (offer_px record).
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (bid_px record) ++
+      encode_uint_le 8 (offer_px record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (security_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (bid_px_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (offer_px_value, bytes) =>
                       Some ({| transact_time := transact_time_value; security_id := security_id_value; bid_px := bid_px_value; offer_px := offer_px_value |}, bytes)
@@ -1620,7 +1620,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1630,10 +1630,10 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1667,29 +1667,29 @@ Module EurexT7EobiV30.
       Datatypes.length (pad6 record) = 6.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 4 (trd_match_id record) ++
-      encode_uint 4 (last_qty record) ++
-      encode_uint 8 (last_px record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 4 (trd_match_id record) ++
+      encode_uint_le 4 (last_qty record) ++
+      encode_uint_le 8 (last_px record) ++
       encode_uint 1 (match_type record) ++
       encode_uint 1 (match_sub_type record) ++
       encode_bytes 6 (pad6 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (transact_time_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (trd_match_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (last_qty_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (last_px_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -1714,7 +1714,7 @@ Module EurexT7EobiV30.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1724,11 +1724,11 @@ Module EurexT7EobiV30.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.

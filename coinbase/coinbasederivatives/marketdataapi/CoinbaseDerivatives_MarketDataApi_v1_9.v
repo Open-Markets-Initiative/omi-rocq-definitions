@@ -51,26 +51,26 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (frame_length record) ++
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (frame_length record) ++
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (frame_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (block_length_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (template_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (schema_id_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (version_value, bytes) =>
                           Some ({| frame_length := frame_length_value; block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -83,7 +83,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -93,11 +93,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -132,11 +132,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (instrument_flags record) ++
       encode_uint 1 (instrument_side record) ++
-      encode_uint 4 (instrument_id record) ++
-      encode_uint 4 (instr_seq_num record) ++
-      encode_uint 2 (trading_session_date record) ++
-      encode_uint 2 (reserved record) ++
-      encode_uint 8 (transact_time record).
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint_le 4 (instr_seq_num record) ++
+      encode_uint_le 2 (trading_session_date record) ++
+      encode_uint_le 2 (reserved record) ++
+      encode_uint_le 8 (transact_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -145,19 +145,19 @@ Module CoinbaseDerivativesMarketDataApiV19.
           match decode_uint 1 bytes with
           | None => None
           | Some (instrument_side_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (instrument_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (instr_seq_num_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (trading_session_date_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (reserved_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (transact_time_value, bytes) =>
                                   Some ({| instrument_flags := instrument_flags_value; instrument_side := instrument_side_value; instrument_id := instrument_id_value; instr_seq_num := instr_seq_num_value; trading_session_date := trading_session_date_value; reserved := reserved_value; transact_time := transact_time_value |}, bytes)
@@ -172,7 +172,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -184,11 +184,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -215,22 +215,22 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (day_of_month record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
-      encode_uint 2 (month record) ++
-      encode_uint 2 (week_of_month record) ++
-      encode_uint 2 (day_of_month record).
+      encode_uint_le 2 (year record) ++
+      encode_uint_le 2 (month record) ++
+      encode_uint_le 2 (week_of_month record) ++
+      encode_uint_le 2 (day_of_month record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (month_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (week_of_month_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (day_of_month_value, bytes) =>
                       Some ({| year := year_value; month := month_value; week_of_month := week_of_month_value; day_of_month := day_of_month_value |}, bytes)
@@ -242,7 +242,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -252,10 +252,10 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -283,18 +283,18 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (limit_down_price record) ++
-      encode_uint 8 (limit_up_price record) ++
+      encode_uint_le 8 (limit_down_price record) ++
+      encode_uint_le 8 (limit_up_price record) ++
       encode_uint 1 (trading_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (limit_down_price_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (limit_up_price_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -309,7 +309,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -320,8 +320,8 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -350,21 +350,21 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_value, bytes) =>
                       Some ({| instr_header := instr_header_value; order_id := order_id_value; price := price_value; quantity := quantity_value |}, bytes)
@@ -376,7 +376,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -387,9 +387,9 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -413,13 +413,13 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| instr_header := instr_header_value; order_id := order_id_value |}, bytes)
@@ -429,7 +429,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -440,7 +440,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -470,25 +470,25 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (best_price record) ++
-      encode_uint 8 (next_price record) ++
-      encode_uint 4 (best_qty record) ++
-      encode_uint 4 (next_qty record).
+      encode_uint_le 8 (best_price record) ++
+      encode_uint_le 8 (next_price record) ++
+      encode_uint_le 4 (best_qty record) ++
+      encode_uint_le 4 (next_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (best_price_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (next_price_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (best_qty_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (next_qty_value, bytes) =>
                           Some ({| instr_header := instr_header_value; best_price := best_price_value; next_price := next_price_value; best_qty := best_qty_value; next_qty := next_qty_value |}, bytes)
@@ -501,7 +501,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -512,10 +512,10 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -547,29 +547,29 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (aggressor_order_id record) ++
-      encode_uint 8 (aggressor_receive_time record) ++
-      encode_uint 8 (vwap_price record) ++
-      encode_uint 8 (deepest_price record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 8 (aggressor_order_id record) ++
+      encode_uint_le 8 (aggressor_receive_time record) ++
+      encode_uint_le 8 (vwap_price record) ++
+      encode_uint_le 8 (deepest_price record) ++
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (aggressor_order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (aggressor_receive_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (vwap_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (deepest_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (quantity_value, bytes) =>
                               Some ({| instr_header := instr_header_value; aggressor_order_id := aggressor_order_id_value; aggressor_receive_time := aggressor_receive_time_value; vwap_price := vwap_price_value; deepest_price := deepest_price_value; quantity := quantity_value |}, bytes)
@@ -583,7 +583,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 58.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -594,11 +594,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -630,29 +630,29 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (match_id record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 8 (sell_order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 8 (match_id record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 8 (sell_order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (match_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (buy_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (sell_order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (quantity_value, bytes) =>
                               Some ({| instr_header := instr_header_value; match_id := match_id_value; buy_order_id := buy_order_id_value; sell_order_id := sell_order_id_value; price := price_value; quantity := quantity_value |}, bytes)
@@ -666,7 +666,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 58.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -677,11 +677,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -713,29 +713,29 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (match_id record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 8 (sell_order_id record) ++
-      encode_uint 8 (old_price record) ++
-      encode_uint 8 (new_price record).
+      encode_uint_le 8 (match_id record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 8 (sell_order_id record) ++
+      encode_uint_le 8 (old_price record) ++
+      encode_uint_le 8 (new_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (match_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (buy_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (sell_order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (old_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (new_price_value, bytes) =>
                               Some ({| instr_header := instr_header_value; match_id := match_id_value; buy_order_id := buy_order_id_value; sell_order_id := sell_order_id_value; old_price := old_price_value; new_price := new_price_value |}, bytes)
@@ -749,7 +749,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -760,11 +760,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -804,45 +804,45 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (match_id record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 8 (sell_order_id record) ++
-      encode_uint 8 (old_price record) ++
-      encode_uint 8 (new_price record) ++
-      encode_uint 8 (old_leg_1_price record) ++
-      encode_uint 8 (new_leg_1_price record) ++
-      encode_uint 8 (old_leg_2_price record) ++
-      encode_uint 8 (new_leg_2_price record).
+      encode_uint_le 8 (match_id record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 8 (sell_order_id record) ++
+      encode_uint_le 8 (old_price record) ++
+      encode_uint_le 8 (new_price record) ++
+      encode_uint_le 8 (old_leg_1_price record) ++
+      encode_uint_le 8 (new_leg_1_price record) ++
+      encode_uint_le 8 (old_leg_2_price record) ++
+      encode_uint_le 8 (new_leg_2_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (match_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (buy_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (sell_order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (old_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (new_price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (old_leg_1_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (new_leg_1_price_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (old_leg_2_price_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (new_leg_2_price_value, bytes) =>
                                               Some ({| instr_header := instr_header_value; match_id := match_id_value; buy_order_id := buy_order_id_value; sell_order_id := sell_order_id_value; old_price := old_price_value; new_price := new_price_value; old_leg_1_price := old_leg_1_price_value; new_leg_1_price := new_leg_1_price_value; old_leg_2_price := old_leg_2_price_value; new_leg_2_price := new_leg_2_price_value |}, bytes)
@@ -860,7 +860,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 94.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -871,15 +871,15 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -907,21 +907,21 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (match_id record) ++
-      encode_uint 8 (buy_order_id record) ++
-      encode_uint 8 (sell_order_id record).
+      encode_uint_le 8 (match_id record) ++
+      encode_uint_le 8 (buy_order_id record) ++
+      encode_uint_le 8 (sell_order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (match_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (buy_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (sell_order_id_value, bytes) =>
                       Some ({| instr_header := instr_header_value; match_id := match_id_value; buy_order_id := buy_order_id_value; sell_order_id := sell_order_id_value |}, bytes)
@@ -933,7 +933,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -944,9 +944,9 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -972,14 +972,14 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (stat_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (price_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -993,7 +993,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1004,7 +1004,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1031,17 +1031,17 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 8 (vwap_price record) ++
-      encode_uint 4 (trade_volume record).
+      encode_uint_le 8 (vwap_price record) ++
+      encode_uint_le 4 (trade_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (vwap_price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (trade_volume_value, bytes) =>
                   Some ({| instr_header := instr_header_value; vwap_price := vwap_price_value; trade_volume := trade_volume_value |}, bytes)
@@ -1052,7 +1052,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1063,8 +1063,8 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1088,13 +1088,13 @@ Module CoinbaseDerivativesMarketDataApiV19.
 
     Definition encode (record : t) : list byte :=
       InstrHeader.encode (instr_header record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match InstrHeader.decode bytes with
       | None => None
       | Some (instr_header_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
               Some ({| instr_header := instr_header_value; quantity := quantity_value |}, bytes)
@@ -1104,7 +1104,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !InstrHeader.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1115,7 +1115,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InstrHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1174,32 +1174,32 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (fair_value_limit record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (snapshot_seq_num record) ++
-      encode_uint 4 (last_instr_seq_num record) ++
+      encode_uint_le 2 (snapshot_seq_num record) ++
+      encode_uint_le 4 (last_instr_seq_num record) ++
       encode_bytes 24 (symbol record) ++
       encode_bytes 8 (product_code record) ++
       encode_bytes 32 (description record) ++
-      encode_uint 8 (tick_size record) ++
+      encode_uint_le 8 (tick_size record) ++
       encode_bytes 8 (cfi_code record) ++
       encode_bytes 8 (currency record) ++
-      encode_uint 4 (product_id record) ++
-      encode_uint 4 (old_contract_size record) ++
-      encode_uint 4 (order_count record) ++
-      encode_uint 2 (first_trading_session_date record) ++
-      encode_uint 2 (last_trading_session_date record) ++
-      encode_uint 2 (trading_session_date record) ++
+      encode_uint_le 4 (product_id record) ++
+      encode_uint_le 4 (old_contract_size record) ++
+      encode_uint_le 4 (order_count record) ++
+      encode_uint_le 2 (first_trading_session_date record) ++
+      encode_uint_le 2 (last_trading_session_date record) ++
+      encode_uint_le 2 (trading_session_date record) ++
       encode_uint 1 (product_group record) ++
       encode_uint 1 (trading_status record) ++
-      encode_uint 8 (contract_size record) ++
+      encode_uint_le 8 (contract_size record) ++
       LogicalExpiry.encode (logical_expiry record) ++
-      encode_uint 4 (funding_interval_minutes record) ++
-      encode_uint 4 (fair_value_limit record).
+      encode_uint_le 4 (funding_interval_minutes record) ++
+      encode_uint_le 4 (fair_value_limit record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (snapshot_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_instr_seq_num_value, bytes) =>
               match decode_bytes 24 bytes with
@@ -1211,7 +1211,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
                       match decode_bytes 32 bytes with
                       | None => None
                       | Some (description_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (tick_size_value, bytes) =>
                               match decode_bytes 8 bytes with
@@ -1220,22 +1220,22 @@ Module CoinbaseDerivativesMarketDataApiV19.
                                   match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (currency_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (product_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (old_contract_size_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (order_count_value, bytes) =>
-                                                  match decode_uint 2 bytes with
+                                                  match decode_uint_le 2 bytes with
                                                   | None => None
                                                   | Some (first_trading_session_date_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_uint_le 2 bytes with
                                                       | None => None
                                                       | Some (last_trading_session_date_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_uint_le 2 bytes with
                                                           | None => None
                                                           | Some (trading_session_date_value, bytes) =>
                                                               match decode_uint 1 bytes with
@@ -1244,16 +1244,16 @@ Module CoinbaseDerivativesMarketDataApiV19.
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (trading_status_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (contract_size_value, bytes) =>
                                                                           match LogicalExpiry.decode bytes with
                                                                           | None => None
                                                                           | Some (logical_expiry_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (funding_interval_minutes_value, bytes) =>
-                                                                                  match decode_uint 4 bytes with
+                                                                                  match decode_uint_le 4 bytes with
                                                                                   | None => None
                                                                                   | Some (fair_value_limit_value, bytes) =>
                                                                                       Some ({| snapshot_seq_num := snapshot_seq_num_value; last_instr_seq_num := last_instr_seq_num_value; symbol := symbol_value; product_code := product_code_value; description := description_value; tick_size := tick_size_value; cfi_code := cfi_code_value; currency := currency_value; product_id := product_id_value; old_contract_size := old_contract_size_value; order_count := order_count_value; first_trading_session_date := first_trading_session_date_value; last_trading_session_date := last_trading_session_date_value; trading_session_date := trading_session_date_value; product_group := product_group_value; trading_status := trading_status_value; contract_size := contract_size_value; logical_expiry := logical_expiry_value; funding_interval_minutes := funding_interval_minutes_value; fair_value_limit := fair_value_limit_value |}, bytes)
@@ -1281,7 +1281,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 138.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !LogicalExpiry.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length, !LogicalExpiry.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1291,26 +1291,26 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 bound_19]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_16.
       rewrite LogicalExpiry.decode_encode by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_19.
       destruct record. reflexivity.
     Qed.
 
@@ -1369,32 +1369,32 @@ Module CoinbaseDerivativesMarketDataApiV19.
       LogicalExpiry.bounded (logical_expiry record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (snapshot_seq_num record) ++
-      encode_uint 4 (last_instr_seq_num record) ++
+      encode_uint_le 2 (snapshot_seq_num record) ++
+      encode_uint_le 4 (last_instr_seq_num record) ++
       encode_bytes 24 (symbol record) ++
       encode_bytes 8 (product_code record) ++
       encode_bytes 32 (description record) ++
-      encode_uint 8 (tick_size record) ++
+      encode_uint_le 8 (tick_size record) ++
       encode_bytes 8 (cfi_code record) ++
       encode_bytes 8 (currency record) ++
-      encode_uint 4 (product_id record) ++
-      encode_uint 4 (old_contract_size record) ++
-      encode_uint 4 (order_count record) ++
-      encode_uint 2 (first_trading_session_date record) ++
-      encode_uint 2 (last_trading_session_date record) ++
-      encode_uint 2 (trading_session_date record) ++
+      encode_uint_le 4 (product_id record) ++
+      encode_uint_le 4 (old_contract_size record) ++
+      encode_uint_le 4 (order_count record) ++
+      encode_uint_le 2 (first_trading_session_date record) ++
+      encode_uint_le 2 (last_trading_session_date record) ++
+      encode_uint_le 2 (trading_session_date record) ++
       encode_uint 1 (product_group record) ++
       encode_uint 1 (trading_status record) ++
-      encode_uint 4 (leg_1_instrument_id record) ++
-      encode_uint 4 (leg_2_instrument_id record) ++
+      encode_uint_le 4 (leg_1_instrument_id record) ++
+      encode_uint_le 4 (leg_2_instrument_id record) ++
       encode_uint 1 (spread_buy_convention record) ++
       LogicalExpiry.encode (logical_expiry record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (snapshot_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_instr_seq_num_value, bytes) =>
               match decode_bytes 24 bytes with
@@ -1406,7 +1406,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
                       match decode_bytes 32 bytes with
                       | None => None
                       | Some (description_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (tick_size_value, bytes) =>
                               match decode_bytes 8 bytes with
@@ -1415,22 +1415,22 @@ Module CoinbaseDerivativesMarketDataApiV19.
                                   match decode_bytes 8 bytes with
                                   | None => None
                                   | Some (currency_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (product_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (old_contract_size_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (order_count_value, bytes) =>
-                                                  match decode_uint 2 bytes with
+                                                  match decode_uint_le 2 bytes with
                                                   | None => None
                                                   | Some (first_trading_session_date_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_uint_le 2 bytes with
                                                       | None => None
                                                       | Some (last_trading_session_date_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_uint_le 2 bytes with
                                                           | None => None
                                                           | Some (trading_session_date_value, bytes) =>
                                                               match decode_uint 1 bytes with
@@ -1439,10 +1439,10 @@ Module CoinbaseDerivativesMarketDataApiV19.
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (trading_status_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (leg_1_instrument_id_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (leg_2_instrument_id_value, bytes) =>
                                                                               match decode_uint 1 bytes with
@@ -1476,7 +1476,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 131.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !LogicalExpiry.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length, !LogicalExpiry.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1486,24 +1486,24 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 bound_19]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite LogicalExpiry.decode_encode by exact bound_19.
       destruct record. reflexivity.
@@ -1534,26 +1534,26 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (snapshot_seq_num record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 2 (snapshot_seq_num record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (snapshot_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transact_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           Some ({| snapshot_seq_num := snapshot_seq_num_value; quantity := quantity_value; transact_time := transact_time_value; order_id := order_id_value; price := price_value |}, bytes)
@@ -1566,7 +1566,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1576,11 +1576,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1601,10 +1601,10 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (active_instrument_count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (active_instrument_count record).
+      encode_uint_le 4 (active_instrument_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (active_instrument_count_value, bytes) =>
           Some ({| active_instrument_count := active_instrument_count_value |}, bytes)
@@ -1613,7 +1613,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1621,7 +1621,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1644,11 +1644,11 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (message_count record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (begin_seq_num record) ++
+      encode_uint_le 8 (begin_seq_num record) ++
       encode_uint 1 (message_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1661,7 +1661,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1671,7 +1671,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1697,12 +1697,12 @@ Module CoinbaseDerivativesMarketDataApiV19.
       (reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (retry_delay_nanos record) ++
+      encode_uint_le 8 (retry_delay_nanos record) ++
       encode_bytes 40 (details record) ++
       encode_uint 1 (reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (retry_delay_nanos_value, bytes) =>
           match decode_bytes 40 bytes with
@@ -1719,7 +1719,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 49.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1729,7 +1729,7 @@ Module CoinbaseDerivativesMarketDataApiV19.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.

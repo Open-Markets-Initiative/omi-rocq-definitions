@@ -52,21 +52,21 @@ Module NeoEquitiesOrderEntryV1019Firm.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (firm_message_type record) ++
+      encode_uint_le 2 (start_of_message record) ++
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (firm_message_type record) ++
       encode_uint 1 (matching_unit record) ++
       encode_bytes 1 (reserved_field record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (firm_message_type_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sequence_number_value, bytes) =>
                               Some ({| start_of_message := start_of_message_value; message_length := message_length_value; firm_message_type := firm_message_type_value; matching_unit := matching_unit_value; reserved_field := reserved_field_value; sequence_number := sequence_number_value |}, bytes)
@@ -89,7 +89,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -99,12 +99,12 @@ Module NeoEquitiesOrderEntryV1019Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -207,29 +207,29 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 1 (exec_inst record) ++
       encode_bytes 1 (handling_inst record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 1 (ord_type record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (stop_px record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (stop_px record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 14 (symbol record) ++
       encode_bytes 1 (time_in_force record) ++
       encode_uint 1 (settlement_type record) ++
-      encode_uint 4 (fut_settl_date record) ++
+      encode_uint_le 4 (fut_settl_date record) ++
       encode_bytes 1 (ex_destination record) ++
-      encode_uint 4 (max_floor record) ++
-      encode_uint 8 (expire_time record) ++
-      encode_uint 4 (expire_date record) ++
+      encode_uint_le 4 (max_floor record) ++
+      encode_uint_le 8 (expire_time record) ++
+      encode_uint_le 4 (expire_date record) ++
       encode_uint 1 (lei_order_origin record) ++
       encode_bytes 1 (lei_routing_arrangement_indicator record) ++
       encode_bytes 1 (umir_account_type record) ++
       encode_bytes 12 (umir_user_id record) ++
-      encode_uint 4 (basket_trade record) ++
+      encode_uint_le 4 (basket_trade record) ++
       encode_bytes 1 (program_trade record) ++
-      encode_uint 2 (jitney record) ++
+      encode_uint_le 2 (jitney record) ++
       encode_bytes 1 (anonymous record) ++
       encode_bytes 1 (umir_regulation_id record) ++
       encode_bytes 1 (non_resident record) ++
@@ -245,7 +245,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (routing_inst record) ++
       encode_bytes 1 (display_indicator record) ++
       encode_bytes 1 (matching_state_participation record) ++
-      encode_uint 4 (true_min_qty record).
+      encode_uint_le 4 (true_min_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -254,7 +254,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (broker_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -263,16 +263,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (handling_inst_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (order_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (ord_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (stop_px_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -287,19 +287,19 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (settlement_type_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (fut_settl_date_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (ex_destination_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (max_floor_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (expire_time_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (expire_date_value, bytes) =>
                                                                               match decode_uint 1 bytes with
@@ -314,13 +314,13 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (umir_user_id_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (basket_trade_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (program_trade_value, bytes) =>
-                                                                                                      match decode_uint 2 bytes with
+                                                                                                      match decode_uint_le 2 bytes with
                                                                                                       | None => None
                                                                                                       | Some (jitney_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
@@ -368,7 +368,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                                                                                                   match decode_bytes 1 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (matching_state_participation_value, bytes) =>
-                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                       | None => None
                                                                                                                                                                       | Some (true_min_qty_value, bytes) =>
                                                                                                                                                                           Some ({| account := account_value; cl_ord_id := cl_ord_id_value; broker_id := broker_id_value; exec_inst := exec_inst_value; handling_inst := handling_inst_value; order_qty := order_qty_value; ord_type := ord_type_value; price := price_value; stop_px := stop_px_value; side := side_value; symbol := symbol_value; time_in_force := time_in_force_value; settlement_type := settlement_type_value; fut_settl_date := fut_settl_date_value; ex_destination := ex_destination_value; max_floor := max_floor_value; expire_time := expire_time_value; expire_date := expire_date_value; lei_order_origin := lei_order_origin_value; lei_routing_arrangement_indicator := lei_routing_arrangement_indicator_value; umir_account_type := umir_account_type_value; umir_user_id := umir_user_id_value; basket_trade := basket_trade_value; program_trade := program_trade_value; jitney := jitney_value; anonymous := anonymous_value; umir_regulation_id := umir_regulation_id_value; non_resident := non_resident_value; bypass := bypass_value; ncib := ncib_value; no_trade_feat := no_trade_feat_value; no_trade_key := no_trade_key_value; short_marking_exempt := short_marking_exempt_value; lei_customer_account := lei_customer_account_value; lei_algorithm_id := lei_algorithm_id_value; customer_lei := customer_lei_value; broker_lei := broker_lei_value; routing_inst := routing_inst_value; display_indicator := display_indicator_value; matching_state_participation := matching_state_participation_value; true_min_qty := true_min_qty_value |}, bytes)
@@ -417,7 +417,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 253.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -429,29 +429,29 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
@@ -467,7 +467,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_bytes by exact bound_38.
       rewrite decode_encode_bytes by exact bound_39.
-      rewrite decode_encode_uint by exact bound_40.
+      rewrite decode_encode_uint_le by exact bound_40.
       destruct record. reflexivity.
     Qed.
 
@@ -572,29 +572,29 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 1 (exec_inst record) ++
       encode_bytes 1 (handling_inst record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 1 (ord_type record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (stop_px record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (stop_px record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 14 (symbol record) ++
       encode_bytes 1 (time_in_force record) ++
       encode_uint 1 (settlement_type record) ++
-      encode_uint 4 (fut_settl_date record) ++
+      encode_uint_le 4 (fut_settl_date record) ++
       encode_bytes 1 (ex_destination record) ++
-      encode_uint 4 (max_floor record) ++
-      encode_uint 8 (expire_time record) ++
-      encode_uint 4 (expire_date record) ++
+      encode_uint_le 4 (max_floor record) ++
+      encode_uint_le 8 (expire_time record) ++
+      encode_uint_le 4 (expire_date record) ++
       encode_uint 1 (lei_order_origin record) ++
       encode_bytes 1 (lei_routing_arrangement_indicator record) ++
       encode_bytes 1 (umir_account_type record) ++
       encode_bytes 12 (umir_user_id record) ++
-      encode_uint 4 (basket_trade record) ++
+      encode_uint_le 4 (basket_trade record) ++
       encode_bytes 1 (program_trade record) ++
-      encode_uint 2 (jitney record) ++
+      encode_uint_le 2 (jitney record) ++
       encode_bytes 1 (anonymous record) ++
       encode_bytes 1 (umir_regulation_id record) ++
       encode_bytes 1 (non_resident record) ++
@@ -610,8 +610,8 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (routing_inst record) ++
       encode_bytes 1 (display_indicator record) ++
       encode_bytes 1 (matching_state_participation record) ++
-      encode_uint 4 (true_min_qty record) ++
-      encode_uint 8 (peg_difference record).
+      encode_uint_le 4 (true_min_qty record) ++
+      encode_uint_le 8 (peg_difference record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -620,7 +620,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (broker_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -629,16 +629,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (handling_inst_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (order_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (ord_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (stop_px_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -653,19 +653,19 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (settlement_type_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (fut_settl_date_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (ex_destination_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (max_floor_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (expire_time_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (expire_date_value, bytes) =>
                                                                               match decode_uint 1 bytes with
@@ -680,13 +680,13 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                           match decode_bytes 12 bytes with
                                                                                           | None => None
                                                                                           | Some (umir_user_id_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (basket_trade_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (program_trade_value, bytes) =>
-                                                                                                      match decode_uint 2 bytes with
+                                                                                                      match decode_uint_le 2 bytes with
                                                                                                       | None => None
                                                                                                       | Some (jitney_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
@@ -734,10 +734,10 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                                                                                                   match decode_bytes 1 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (matching_state_participation_value, bytes) =>
-                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                       | None => None
                                                                                                                                                                       | Some (true_min_qty_value, bytes) =>
-                                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                                           | None => None
                                                                                                                                                                           | Some (peg_difference_value, bytes) =>
                                                                                                                                                                               Some ({| account := account_value; cl_ord_id := cl_ord_id_value; broker_id := broker_id_value; exec_inst := exec_inst_value; handling_inst := handling_inst_value; order_qty := order_qty_value; ord_type := ord_type_value; price := price_value; stop_px := stop_px_value; side := side_value; symbol := symbol_value; time_in_force := time_in_force_value; settlement_type := settlement_type_value; fut_settl_date := fut_settl_date_value; ex_destination := ex_destination_value; max_floor := max_floor_value; expire_time := expire_time_value; expire_date := expire_date_value; lei_order_origin := lei_order_origin_value; lei_routing_arrangement_indicator := lei_routing_arrangement_indicator_value; umir_account_type := umir_account_type_value; umir_user_id := umir_user_id_value; basket_trade := basket_trade_value; program_trade := program_trade_value; jitney := jitney_value; anonymous := anonymous_value; umir_regulation_id := umir_regulation_id_value; non_resident := non_resident_value; bypass := bypass_value; ncib := ncib_value; no_trade_feat := no_trade_feat_value; no_trade_key := no_trade_key_value; short_marking_exempt := short_marking_exempt_value; lei_customer_account := lei_customer_account_value; lei_algorithm_id := lei_algorithm_id_value; customer_lei := customer_lei_value; broker_lei := broker_lei_value; routing_inst := routing_inst_value; display_indicator := display_indicator_value; matching_state_participation := matching_state_participation_value; true_min_qty := true_min_qty_value; peg_difference := peg_difference_value |}, bytes)
@@ -787,7 +787,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 261.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -799,29 +799,29 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
@@ -837,8 +837,8 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_bytes by exact bound_38.
       rewrite decode_encode_bytes by exact bound_39.
-      rewrite decode_encode_uint by exact bound_40.
-      rewrite decode_encode_uint by exact bound_41.
+      rewrite decode_encode_uint_le by exact bound_40.
+      rewrite decode_encode_uint_le by exact bound_41.
       destruct record. reflexivity.
     Qed.
 
@@ -899,14 +899,14 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 16 (account record) ++
-      encode_uint 4 (order_qty record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (stop_px record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (stop_px record) ++
       encode_bytes 1 (time_in_force record) ++
-      encode_uint 4 (max_floor record) ++
-      encode_uint 4 (expire_date record) ++
+      encode_uint_le 4 (max_floor record) ++
+      encode_uint_le 4 (expire_date record) ++
       encode_uint 1 (lei_order_origin record) ++
       encode_bytes 1 (lei_routing_arrangement_indicator record) ++
       encode_bytes 1 (umir_account_type record) ++
@@ -915,8 +915,8 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 52 (customer_lei record) ++
       encode_bytes 20 (broker_lei record) ++
       encode_bytes 1 (cancel_orig_on_reject record) ++
-      encode_uint 4 (true_min_qty record) ++
-      encode_uint 8 (expire_time record).
+      encode_uint_le 4 (true_min_qty record) ++
+      encode_uint_le 8 (expire_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
@@ -925,28 +925,28 @@ Module NeoEquitiesOrderEntryV1019Firm.
           match decode_bytes 20 bytes with
           | None => None
           | Some (orig_cl_ord_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (broker_id_value, bytes) =>
                   match decode_bytes 16 bytes with
                   | None => None
                   | Some (account_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (order_qty_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (stop_px_value, bytes) =>
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (time_in_force_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (max_floor_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (expire_date_value, bytes) =>
                                               match decode_uint 1 bytes with
@@ -973,10 +973,10 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                           match decode_bytes 1 bytes with
                                                                           | None => None
                                                                           | Some (cancel_orig_on_reject_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (true_min_qty_value, bytes) =>
-                                                                                  match decode_uint 8 bytes with
+                                                                                  match decode_uint_le 8 bytes with
                                                                                   | None => None
                                                                                   | Some (expire_time_value, bytes) =>
                                                                                       Some ({| cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; broker_id := broker_id_value; account := account_value; order_qty := order_qty_value; price := price_value; stop_px := stop_px_value; time_in_force := time_in_force_value; max_floor := max_floor_value; expire_date := expire_date_value; lei_order_origin := lei_order_origin_value; lei_routing_arrangement_indicator := lei_routing_arrangement_indicator_value; umir_account_type := umir_account_type_value; lei_customer_account := lei_customer_account_value; lei_algorithm_id := lei_algorithm_id_value; customer_lei := customer_lei_value; broker_lei := broker_lei_value; cancel_orig_on_reject := cancel_orig_on_reject_value; true_min_qty := true_min_qty_value; expire_time := expire_time_value |}, bytes)
@@ -1004,7 +1004,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 215.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1016,14 +1016,14 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1032,8 +1032,8 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_19.
       destruct record. reflexivity.
     Qed.
 
@@ -1056,11 +1056,11 @@ Module NeoEquitiesOrderEntryV1019Firm.
       Datatypes.length (orig_cl_ord_id record) = 20.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 20 (orig_cl_ord_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (broker_id_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1073,7 +1073,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1083,7 +1083,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1175,16 +1175,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
       Datatypes.length (sell_lei_routing_arrangement_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 18 (cross_cl_ord_id record) ++
       encode_bytes 1 (cross_type record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 14 (symbol record) ++
       encode_uint 1 (settlement_type record) ++
-      encode_uint 4 (fut_settl_date record) ++
+      encode_uint_le 4 (fut_settl_date record) ++
       encode_bytes 12 (umir_user_id record) ++
-      encode_uint 4 (basket_trade record) ++
+      encode_uint_le 4 (basket_trade record) ++
       encode_bytes 1 (program_trade record) ++
       encode_bytes 1 (non_resident record) ++
       encode_bytes 1 (bypass record) ++
@@ -1194,7 +1194,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (buy_umir_account_type record) ++
       encode_bytes 16 (buy_account record) ++
       encode_bytes 1 (buy_umir_regulation_id record) ++
-      encode_uint 2 (buy_jitney record) ++
+      encode_uint_le 2 (buy_jitney record) ++
       encode_bytes 20 (buy_lei_customer_account record) ++
       encode_bytes 20 (buy_lei_algorithm_id record) ++
       encode_bytes 52 (buy_customer_lei record) ++
@@ -1204,7 +1204,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (sell_umir_account_type record) ++
       encode_bytes 16 (sell_account record) ++
       encode_bytes 1 (sell_umir_regulation_id record) ++
-      encode_uint 2 (sell_jitney record) ++
+      encode_uint_le 2 (sell_jitney record) ++
       encode_bytes 20 (sell_lei_customer_account record) ++
       encode_bytes 20 (sell_lei_algorithm_id record) ++
       encode_bytes 52 (sell_customer_lei record) ++
@@ -1213,7 +1213,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (sell_lei_routing_arrangement_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (broker_id_value, bytes) =>
           match decode_bytes 18 bytes with
@@ -1222,10 +1222,10 @@ Module NeoEquitiesOrderEntryV1019Firm.
               match decode_bytes 1 bytes with
               | None => None
               | Some (cross_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (order_qty_value, bytes) =>
                           match decode_bytes 14 bytes with
@@ -1234,13 +1234,13 @@ Module NeoEquitiesOrderEntryV1019Firm.
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (settlement_type_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (fut_settl_date_value, bytes) =>
                                       match decode_bytes 12 bytes with
                                       | None => None
                                       | Some (umir_user_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (basket_trade_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -1270,7 +1270,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                               match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (buy_umir_regulation_id_value, bytes) =>
-                                                                                  match decode_uint 2 bytes with
+                                                                                  match decode_uint_le 2 bytes with
                                                                                   | None => None
                                                                                   | Some (buy_jitney_value, bytes) =>
                                                                                       match decode_bytes 20 bytes with
@@ -1300,7 +1300,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (sell_umir_regulation_id_value, bytes) =>
-                                                                                                                          match decode_uint 2 bytes with
+                                                                                                                          match decode_uint_le 2 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (sell_jitney_value, bytes) =>
                                                                                                                               match decode_bytes 20 bytes with
@@ -1362,7 +1362,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 342.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1372,16 +1372,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 bound_35]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1391,7 +1391,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
@@ -1401,7 +1401,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
+      rewrite decode_encode_uint_le by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
@@ -1502,16 +1502,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
       Datatypes.length (reserved record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (broker_id record) ++
+      encode_uint_le 2 (broker_id record) ++
       encode_bytes 18 (cross_cl_ord_id record) ++
       encode_bytes 1 (cross_type record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 14 (symbol record) ++
       encode_uint 1 (settlement_type record) ++
-      encode_uint 4 (fut_settl_date record) ++
+      encode_uint_le 4 (fut_settl_date record) ++
       encode_bytes 12 (umir_user_id record) ++
-      encode_uint 4 (basket_trade record) ++
+      encode_uint_le 4 (basket_trade record) ++
       encode_bytes 1 (program_trade record) ++
       encode_bytes 1 (non_resident record) ++
       encode_bytes 1 (bypass record) ++
@@ -1521,7 +1521,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (buy_umir_account_type record) ++
       encode_bytes 16 (buy_account record) ++
       encode_bytes 1 (buy_umir_regulation_id record) ++
-      encode_uint 2 (buy_jitney record) ++
+      encode_uint_le 2 (buy_jitney record) ++
       encode_bytes 20 (buy_lei_customer_account record) ++
       encode_bytes 20 (buy_lei_algorithm_id record) ++
       encode_bytes 52 (buy_customer_lei record) ++
@@ -1531,7 +1531,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 1 (sell_umir_account_type record) ++
       encode_bytes 16 (sell_account record) ++
       encode_bytes 1 (sell_umir_regulation_id record) ++
-      encode_uint 2 (sell_jitney record) ++
+      encode_uint_le 2 (sell_jitney record) ++
       encode_bytes 20 (sell_lei_customer_account record) ++
       encode_bytes 20 (sell_lei_algorithm_id record) ++
       encode_bytes 52 (sell_customer_lei record) ++
@@ -1542,7 +1542,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       encode_bytes 4 (reserved record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (broker_id_value, bytes) =>
           match decode_bytes 18 bytes with
@@ -1551,10 +1551,10 @@ Module NeoEquitiesOrderEntryV1019Firm.
               match decode_bytes 1 bytes with
               | None => None
               | Some (cross_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (order_qty_value, bytes) =>
                           match decode_bytes 14 bytes with
@@ -1563,13 +1563,13 @@ Module NeoEquitiesOrderEntryV1019Firm.
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (settlement_type_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (fut_settl_date_value, bytes) =>
                                       match decode_bytes 12 bytes with
                                       | None => None
                                       | Some (umir_user_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (basket_trade_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -1599,7 +1599,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                               match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (buy_umir_regulation_id_value, bytes) =>
-                                                                                  match decode_uint 2 bytes with
+                                                                                  match decode_uint_le 2 bytes with
                                                                                   | None => None
                                                                                   | Some (buy_jitney_value, bytes) =>
                                                                                       match decode_bytes 20 bytes with
@@ -1629,7 +1629,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (sell_umir_regulation_id_value, bytes) =>
-                                                                                                                          match decode_uint 2 bytes with
+                                                                                                                          match decode_uint_le 2 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (sell_jitney_value, bytes) =>
                                                                                                                               match decode_bytes 20 bytes with
@@ -1699,7 +1699,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 347.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1709,16 +1709,16 @@ Module NeoEquitiesOrderEntryV1019Firm.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 bound_37]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
@@ -1728,7 +1728,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
@@ -1738,7 +1738,7 @@ Module NeoEquitiesOrderEntryV1019Firm.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
+      rewrite decode_encode_uint_le by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.

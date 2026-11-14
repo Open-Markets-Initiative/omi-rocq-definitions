@@ -48,16 +48,16 @@ Module MiaxOptionsAisV25Udp.
       (session_number record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sequence_number record) ++
-      encode_uint 2 (packet_length record) ++
+      encode_uint_le 8 (sequence_number record) ++
+      encode_uint_le 2 (packet_length record) ++
       encode_uint 1 (packet_type record) ++
       encode_uint 1 (session_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (packet_length_value, bytes) =>
               match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,8 +85,8 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -109,10 +109,10 @@ Module MiaxOptionsAisV25Udp.
       (seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record).
+      encode_uint_le 4 (seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
           Some ({| seconds := seconds_value |}, bytes)
@@ -121,7 +121,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -129,7 +129,7 @@ Module MiaxOptionsAisV25Udp.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -182,12 +182,12 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (product_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (product_id record) ++
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 6 (security_symbol record) ++
       encode_bytes 8 (expiration_date record) ++
-      encode_uint 4 (strike_price record) ++
+      encode_uint_le 4 (strike_price record) ++
       encode_bytes 1 (call_or_put record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
@@ -197,14 +197,14 @@ Module MiaxOptionsAisV25Udp.
       encode_bytes 1 (miax_bbo_posting_increment_indicator record) ++
       encode_bytes 1 (liquidity_acceptance_increment_indicator record) ++
       encode_bytes 1 (opening_underlying_market_code record) ++
-      encode_uint 4 (priority_quote_width record) ++
+      encode_uint_le 4 (priority_quote_width record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (product_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -216,7 +216,7 @@ Module MiaxOptionsAisV25Udp.
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (expiration_date_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (strike_price_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -246,7 +246,7 @@ Module MiaxOptionsAisV25Udp.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (opening_underlying_market_code_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (priority_quote_width_value, bytes) =>
                                                                       match decode_bytes 8 bytes with
@@ -274,7 +274,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -284,12 +284,12 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -299,7 +299,7 @@ Module MiaxOptionsAisV25Udp.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       destruct record. reflexivity.
     Qed.
@@ -327,19 +327,19 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (system_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 8 (ais_version record) ++
-      encode_uint 4 (session_id record) ++
+      encode_uint_le 4 (session_id record) ++
       encode_bytes 1 (system_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 8 bytes with
           | None => None
           | Some (ais_version_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (session_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -354,7 +354,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -364,9 +364,9 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -410,48 +410,48 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (product_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (product_id record) ++
       encode_bytes 1 (event_type record) ++
-      encode_uint 4 (event_id record) ++
-      encode_uint 4 (price_short record) ++
+      encode_uint_le 4 (event_id record) ++
+      encode_uint_le 4 (price_short record) ++
       encode_bytes 1 (imbalance_side record) ++
-      encode_uint 4 (quantity_1 record) ++
-      encode_uint 4 (quantity_2 record) ++
-      encode_uint 4 (quantity_3 record) ++
-      encode_uint 4 (quantity_4 record) ++
+      encode_uint_le 4 (quantity_1 record) ++
+      encode_uint_le 4 (quantity_2 record) ++
+      encode_uint_le 4 (quantity_3 record) ++
+      encode_uint_le 4 (quantity_4 record) ++
       encode_bytes 4 (attributable_id record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (product_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (event_type_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (event_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (price_short_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (imbalance_side_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (quantity_1_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (quantity_2_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (quantity_3_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (quantity_4_value, bytes) =>
                                               match decode_bytes 4 bytes with
@@ -477,7 +477,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -487,16 +487,16 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
@@ -537,40 +537,40 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (strategy_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (strategy_id record) ++
       encode_bytes 1 (event_type record) ++
-      encode_uint 4 (event_id record) ++
+      encode_uint_le 4 (event_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 4 (matched_quantity record) ++
-      encode_uint 4 (imbalance_quantity_signed record) ++
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 4 (matched_quantity record) ++
+      encode_uint_le 4 (imbalance_quantity_signed record) ++
       encode_bytes 4 (attributable_id record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (strategy_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (event_type_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (event_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_long_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (matched_quantity_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (imbalance_quantity_signed_value, bytes) =>
                                       match decode_bytes 4 bytes with
@@ -594,7 +594,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -604,14 +604,14 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -644,15 +644,15 @@ Module MiaxOptionsAisV25Udp.
       (expected_event_time_nano_seconds_part record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (event_reason record) ++
-      encode_uint 4 (expected_event_time_seconds_part record) ++
-      encode_uint 4 (expected_event_time_nano_seconds_part record).
+      encode_uint_le 4 (expected_event_time_seconds_part record) ++
+      encode_uint_le 4 (expected_event_time_nano_seconds_part record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 11 bytes with
@@ -664,10 +664,10 @@ Module MiaxOptionsAisV25Udp.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (event_reason_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (expected_event_time_seconds_part_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (expected_event_time_nano_seconds_part_value, bytes) =>
                               Some ({| nanoseconds := nanoseconds_value; underlying_symbol := underlying_symbol_value; trading_status := trading_status_value; event_reason := event_reason_value; expected_event_time_seconds_part := expected_event_time_seconds_part_value; expected_event_time_nano_seconds_part := expected_event_time_nano_seconds_part_value |}, bytes)
@@ -681,7 +681,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -691,12 +691,12 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -769,39 +769,39 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (product_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (product_id record) ++
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 6 (security_symbol record) ++
       encode_bytes 8 (expiration_date record) ++
-      encode_uint 4 (strike_price record) ++
+      encode_uint_le 4 (strike_price record) ++
       encode_bytes 1 (call_or_put record) ++
       encode_bytes 1 (option_state record) ++
-      encode_uint 4 (prior_day_reference_price record) ++
-      encode_uint 4 (settlement_reference_price record) ++
+      encode_uint_le 4 (prior_day_reference_price record) ++
+      encode_uint_le 4 (settlement_reference_price record) ++
       encode_bytes 1 (settlement_reference_price_type record) ++
-      encode_uint 4 (sao_buy_quantity_1 record) ++
-      encode_uint 4 (sao_sell_quantity_1 record) ++
-      encode_uint 4 (sao_buy_quantity_2 record) ++
-      encode_uint 4 (sao_sell_quantity_2 record) ++
-      encode_uint 4 (non_sao_buy_quantity record) ++
-      encode_uint 4 (non_sao_sell_quantity record) ++
-      encode_uint 4 (total_buy_quantity record) ++
-      encode_uint 4 (total_sell_quantity record) ++
+      encode_uint_le 4 (sao_buy_quantity_1 record) ++
+      encode_uint_le 4 (sao_sell_quantity_1 record) ++
+      encode_uint_le 4 (sao_buy_quantity_2 record) ++
+      encode_uint_le 4 (sao_sell_quantity_2 record) ++
+      encode_uint_le 4 (non_sao_buy_quantity record) ++
+      encode_uint_le 4 (non_sao_sell_quantity record) ++
+      encode_uint_le 4 (total_buy_quantity record) ++
+      encode_uint_le 4 (total_sell_quantity record) ++
       encode_bytes 1 (imbalance_side record) ++
-      encode_uint 4 (imbalance_quantity_unsigned record) ++
-      encode_uint 4 (must_fill_quantity record) ++
-      encode_uint 4 (matched_quantity record) ++
+      encode_uint_le 4 (imbalance_quantity_unsigned record) ++
+      encode_uint_le 4 (must_fill_quantity record) ++
+      encode_uint_le 4 (matched_quantity record) ++
       encode_bytes 1 (opening_condition record) ++
-      encode_uint 4 (mbb record) ++
-      encode_uint 4 (mbo record) ++
+      encode_uint_le 4 (mbb record) ++
+      encode_uint_le 4 (mbo record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (product_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -813,7 +813,7 @@ Module MiaxOptionsAisV25Udp.
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (expiration_date_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (strike_price_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -822,58 +822,58 @@ Module MiaxOptionsAisV25Udp.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (option_state_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (prior_day_reference_price_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (settlement_reference_price_value, bytes) =>
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (settlement_reference_price_type_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (sao_buy_quantity_1_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (sao_sell_quantity_1_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (sao_buy_quantity_2_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (sao_sell_quantity_2_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (non_sao_buy_quantity_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (non_sao_sell_quantity_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (total_buy_quantity_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (total_sell_quantity_value, bytes) =>
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (imbalance_side_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (imbalance_quantity_unsigned_value, bytes) =>
-                                                                                          match decode_uint 4 bytes with
+                                                                                          match decode_uint_le 4 bytes with
                                                                                           | None => None
                                                                                           | Some (must_fill_quantity_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (matched_quantity_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
                                                                                                   | None => None
                                                                                                   | Some (opening_condition_value, bytes) =>
-                                                                                                      match decode_uint 4 bytes with
+                                                                                                      match decode_uint_le 4 bytes with
                                                                                                       | None => None
                                                                                                       | Some (mbb_value, bytes) =>
-                                                                                                          match decode_uint 4 bytes with
+                                                                                                          match decode_uint_le 4 bytes with
                                                                                                           | None => None
                                                                                                           | Some (mbo_value, bytes) =>
                                                                                                               match decode_bytes 8 bytes with
@@ -911,7 +911,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 110.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -921,32 +921,32 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 bound_26]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       destruct record. reflexivity.
     Qed.
@@ -974,19 +974,19 @@ Module MiaxOptionsAisV25Udp.
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 8 (settlement_symbol record) ++
-      encode_uint 4 (theoretical_settlement_price record) ++
+      encode_uint_le 4 (theoretical_settlement_price record) ++
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 8 bytes with
           | None => None
           | Some (settlement_symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (theoretical_settlement_price_value, bytes) =>
                   match decode_bytes 16 bytes with
@@ -1001,7 +1001,7 @@ Module MiaxOptionsAisV25Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1011,9 +1011,9 @@ Module MiaxOptionsAisV25Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.

@@ -52,21 +52,21 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (exchange_message_type record) ++
+      encode_uint_le 2 (start_of_message record) ++
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (exchange_message_type record) ++
       encode_uint 1 (matching_unit record) ++
       encode_bytes 1 (reserved_field record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (exchange_message_type_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sequence_number_value, bytes) =>
                               Some ({| start_of_message := start_of_message_value; message_length := message_length_value; exchange_message_type := exchange_message_type_value; matching_unit := matching_unit_value; reserved_field := reserved_field_value; sequence_number := sequence_number_value |}, bytes)
@@ -89,7 +89,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -99,12 +99,12 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -218,21 +218,21 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (company_id record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 10 (account record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 1 (ord_type record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (capacity record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (time_in_force record) ++
-      encode_uint 8 (expire_time record) ++
+      encode_uint_le 8 (expire_time record) ++
       encode_bytes 1 (cash_margin record) ++
-      encode_uint 2 (risk_group_id record) ++
+      encode_uint_le 2 (risk_group_id record) ++
       encode_bytes 1 (no_trade_feat record) ++
       encode_bytes 10 (no_trade_key record) ++
       encode_bytes 1 (posting_instruction record) ++
@@ -242,7 +242,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       encode_bytes 4 (company_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -254,16 +254,16 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (cl_ord_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (order_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (ord_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -278,13 +278,13 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (time_in_force_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (expire_time_value, bytes) =>
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (cash_margin_value, bytes) =>
-                                                              match decode_uint 2 bytes with
+                                                              match decode_uint_le 2 bytes with
                                                               | None => None
                                                               | Some (risk_group_id_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -335,7 +335,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 104.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -345,21 +345,21 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
@@ -395,14 +395,14 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 1 (order_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -427,7 +427,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -437,7 +437,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -480,19 +480,19 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (company_id record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 4 (company_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -501,19 +501,19 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (order_qty_value, bytes) =>
                       match decode_bytes 20 bytes with
                       | None => None
                       | Some (orig_cl_ord_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (leaves_qty_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -537,7 +537,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 81.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -547,14 +547,14 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -587,7 +587,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
@@ -595,7 +595,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -624,7 +624,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 113.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -634,7 +634,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -682,21 +682,21 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (restatement_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (order_qty record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (secondary_order_id record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (last_shares record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (secondary_order_id record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (last_shares record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (restatement_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -705,25 +705,25 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (order_qty_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (leaves_qty_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (secondary_order_id_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_px_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (last_shares_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -749,7 +749,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 78.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -759,16 +759,16 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
@@ -811,20 +811,20 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (base_liquidity_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_id record) ++
+      encode_uint_le 8 (exec_id record) ++
       encode_bytes 1 (last_capacity record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (last_shares record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 8 (symbol record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -833,16 +833,16 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
               match decode_bytes 20 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (exec_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (last_capacity_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (last_px_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (last_shares_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -851,7 +851,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
                                       match decode_bytes 8 bytes with
                                       | None => None
                                       | Some (symbol_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (leaves_qty_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -873,7 +873,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -883,16 +883,16 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
@@ -920,13 +920,13 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (cancel_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 1 (cancel_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -947,7 +947,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 33.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -957,7 +957,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -989,14 +989,14 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 4 (trading_firm record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 1 (cancel_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -1021,7 +1021,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1031,7 +1031,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1060,18 +1060,18 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       (cancelled_order_count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record).
+      encode_uint_le 4 (cancelled_order_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (mass_cancel_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (cancelled_order_count_value, bytes) =>
                   Some ({| transaction_time := transaction_time_value; mass_cancel_id := mass_cancel_id_value; cancelled_order_count := cancelled_order_count_value |}, bytes)
@@ -1082,7 +1082,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1092,9 +1092,9 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1121,13 +1121,13 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 1 (purge_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1148,7 +1148,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 89.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1158,7 +1158,7 @@ Module CxjEquitiesBinaryOrderEntryV1012Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.

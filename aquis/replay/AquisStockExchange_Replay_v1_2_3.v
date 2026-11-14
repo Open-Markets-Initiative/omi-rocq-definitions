@@ -47,7 +47,7 @@ Module AquisStockExchangeReplayV123.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (msg_type record) ++
       encode_uint 1 (msg_length record) ++
-      encode_uint 4 (seq_no record).
+      encode_uint_le 4 (seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -56,7 +56,7 @@ Module AquisStockExchangeReplayV123.
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_length_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (seq_no_value, bytes) =>
                   Some ({| msg_type := msg_type_value; msg_length := msg_length_value; seq_no := seq_no_value |}, bytes)
@@ -67,7 +67,7 @@ Module AquisStockExchangeReplayV123.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,7 +79,7 @@ Module AquisStockExchangeReplayV123.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -153,14 +153,14 @@ Module AquisStockExchangeReplayV123.
       (end_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_no record) ++
-      encode_uint 4 (end_seq_no record).
+      encode_uint_le 4 (begin_seq_no record) ++
+      encode_uint_le 4 (end_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_no_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_no_value, bytes) =>
               Some ({| begin_seq_no := begin_seq_no_value; end_seq_no := end_seq_no_value |}, bytes)
@@ -170,7 +170,7 @@ Module AquisStockExchangeReplayV123.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -180,8 +180,8 @@ Module AquisStockExchangeReplayV123.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

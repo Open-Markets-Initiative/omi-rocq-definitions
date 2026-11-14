@@ -47,14 +47,14 @@ Module SpectraFutInfoIncrementalV990.
       (exchange_trading_session_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transact_time record) ++
-      encode_uint 4 (exchange_trading_session_id record).
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 4 (exchange_trading_session_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transact_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (exchange_trading_session_id_value, bytes) =>
               Some ({| transact_time := transact_time_value; exchange_trading_session_id := exchange_trading_session_id_value |}, bytes)
@@ -64,7 +64,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -74,8 +74,8 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -102,22 +102,22 @@ Module SpectraFutInfoIncrementalV990.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -129,7 +129,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,10 +139,10 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -163,10 +163,10 @@ Module SpectraFutInfoIncrementalV990.
       (new_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record).
+      encode_uint_le 4 (new_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           Some ({| new_seq_no := new_seq_no_value |}, bytes)
@@ -175,7 +175,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -183,7 +183,7 @@ Module SpectraFutInfoIncrementalV990.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -222,19 +222,19 @@ Module SpectraFutInfoIncrementalV990.
       (low_limit_px_weekend record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_id record) ++
+      encode_uint_le 4 (security_id record) ++
       encode_bytes 25 (symbol record) ++
       encode_uint 1 (security_trading_status record) ++
-      encode_uint 8 (high_limit_px record) ++
-      encode_uint 8 (low_limit_px record) ++
-      encode_uint 8 (initial_margin_on_buy record) ++
-      encode_uint 8 (initial_margin_on_sell record) ++
-      encode_uint 8 (initial_margin_syntetic record) ++
-      encode_uint 8 (high_limit_px_weekend record) ++
-      encode_uint 8 (low_limit_px_weekend record).
+      encode_uint_le 8 (high_limit_px record) ++
+      encode_uint_le 8 (low_limit_px record) ++
+      encode_uint_le 8 (initial_margin_on_buy record) ++
+      encode_uint_le 8 (initial_margin_on_sell record) ++
+      encode_uint_le 8 (initial_margin_syntetic record) ++
+      encode_uint_le 8 (high_limit_px_weekend record) ++
+      encode_uint_le 8 (low_limit_px_weekend record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
           match decode_bytes 25 bytes with
@@ -243,25 +243,25 @@ Module SpectraFutInfoIncrementalV990.
               match decode_uint 1 bytes with
               | None => None
               | Some (security_trading_status_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (high_limit_px_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (low_limit_px_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (initial_margin_on_buy_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (initial_margin_on_sell_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (initial_margin_syntetic_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (high_limit_px_weekend_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (low_limit_px_weekend_value, bytes) =>
                                               Some ({| security_id := security_id_value; symbol := symbol_value; security_trading_status := security_trading_status_value; high_limit_px := high_limit_px_value; low_limit_px := low_limit_px_value; initial_margin_on_buy := initial_margin_on_buy_value; initial_margin_on_sell := initial_margin_on_sell_value; initial_margin_syntetic := initial_margin_syntetic_value; high_limit_px_weekend := high_limit_px_weekend_value; low_limit_px_weekend := low_limit_px_weekend_value |}, bytes)
@@ -279,7 +279,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 86.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -289,16 +289,16 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -337,28 +337,28 @@ Module SpectraFutInfoIncrementalV990.
       (clr_sess_begin record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trad_ses_open_time record) ++
-      encode_uint 8 (trad_ses_close_time record) ++
+      encode_uint_le 8 (trad_ses_open_time record) ++
+      encode_uint_le 8 (trad_ses_close_time record) ++
       encode_uint 1 (trading_session_id record) ++
-      encode_uint 4 (exchange_trading_session_id_int_32_null_optional record) ++
+      encode_uint_le 4 (exchange_trading_session_id_int_32_null_optional record) ++
       encode_uint 1 (trad_ses_status record) ++
       encode_bytes 1 (market_segment_id record) ++
       encode_uint 1 (trad_ses_event record) ++
-      encode_uint 8 (trade_period_id record) ++
-      encode_uint 8 (settl_sess_begin record) ++
-      encode_uint 8 (clr_sess_begin record).
+      encode_uint_le 8 (trade_period_id record) ++
+      encode_uint_le 8 (settl_sess_begin record) ++
+      encode_uint_le 8 (clr_sess_begin record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trad_ses_open_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (trad_ses_close_time_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (trading_session_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (exchange_trading_session_id_int_32_null_optional_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -370,13 +370,13 @@ Module SpectraFutInfoIncrementalV990.
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (trad_ses_event_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (trade_period_id_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (settl_sess_begin_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (clr_sess_begin_value, bytes) =>
                                               Some ({| trad_ses_open_time := trad_ses_open_time_value; trad_ses_close_time := trad_ses_close_time_value; trading_session_id := trading_session_id_value; exchange_trading_session_id_int_32_null_optional := exchange_trading_session_id_int_32_null_optional_value; trad_ses_status := trad_ses_status_value; market_segment_id := market_segment_id_value; trad_ses_event := trad_ses_event_value; trade_period_id := trade_period_id_value; settl_sess_begin := settl_sess_begin_value; clr_sess_begin := clr_sess_begin_value |}, bytes)
@@ -394,7 +394,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -404,16 +404,16 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -436,11 +436,11 @@ Module SpectraFutInfoIncrementalV990.
       (num_in_group_uint_8 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group_uint_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -453,7 +453,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -463,7 +463,7 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -487,14 +487,14 @@ Module SpectraFutInfoIncrementalV990.
       (num_in_group_uint_16 record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (num_in_group_uint_16 record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (num_in_group_uint_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (num_in_group_uint_16_value, bytes) =>
               Some ({| block_length := block_length_value; num_in_group_uint_16 := num_in_group_uint_16_value |}, bytes)
@@ -504,7 +504,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -514,8 +514,8 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -550,38 +550,38 @@ Module SpectraFutInfoIncrementalV990.
       (status_change_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (security_group_id record) ++
+      encode_uint_le 8 (security_group_id record) ++
       encode_uint 1 (halt_type record) ++
-      encode_uint 4 (trade_mode_mask record) ++
-      encode_uint 8 (group_mask_int_64_null_optional record) ++
-      encode_uint 4 (section_id_int_32_null_optional record) ++
-      encode_uint 4 (base_contract_id_int_32_null_optional record) ++
+      encode_uint_le 4 (trade_mode_mask record) ++
+      encode_uint_le 8 (group_mask_int_64_null_optional record) ++
+      encode_uint_le 4 (section_id_int_32_null_optional record) ++
+      encode_uint_le 4 (base_contract_id_int_32_null_optional record) ++
       encode_uint 1 (security_trading_status record) ++
-      encode_uint 8 (status_change_time record).
+      encode_uint_le 8 (status_change_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (security_group_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (halt_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (trade_mode_mask_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (group_mask_int_64_null_optional_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (section_id_int_32_null_optional_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (base_contract_id_int_32_null_optional_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (security_trading_status_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (status_change_time_value, bytes) =>
                                       Some ({| security_group_id := security_group_id_value; halt_type := halt_type_value; trade_mode_mask := trade_mode_mask_value; group_mask_int_64_null_optional := group_mask_int_64_null_optional_value; section_id_int_32_null_optional := section_id_int_32_null_optional_value; base_contract_id_int_32_null_optional := base_contract_id_int_32_null_optional_value; security_trading_status := security_trading_status_value; status_change_time := status_change_time_value |}, bytes)
@@ -597,7 +597,7 @@ Module SpectraFutInfoIncrementalV990.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 38.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -607,14 +607,14 @@ Module SpectraFutInfoIncrementalV990.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

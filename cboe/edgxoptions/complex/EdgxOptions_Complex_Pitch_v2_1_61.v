@@ -48,13 +48,13 @@ Module EdgxOptionsComplexV2161.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -63,7 +63,7 @@ Module EdgxOptionsComplexV2161.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -75,7 +75,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,10 +85,10 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -159,10 +159,10 @@ Module EdgxOptionsComplexV2161.
       (time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time record).
+      encode_uint_le 4 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_value, bytes) =>
           Some ({| time := time_value |}, bytes)
@@ -171,7 +171,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -179,7 +179,7 @@ Module EdgxOptionsComplexV2161.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -200,10 +200,10 @@ Module EdgxOptionsComplexV2161.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -212,7 +212,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -220,7 +220,7 @@ Module EdgxOptionsComplexV2161.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -241,10 +241,10 @@ Module EdgxOptionsComplexV2161.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -253,7 +253,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -261,7 +261,7 @@ Module EdgxOptionsComplexV2161.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -282,10 +282,10 @@ Module EdgxOptionsComplexV2161.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -294,7 +294,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -302,7 +302,7 @@ Module EdgxOptionsComplexV2161.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -402,31 +402,31 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (quantity_long record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 6 (complex_instrument_id_short record) ++
-      encode_uint 8 (signed_price_long record) ++
+      encode_uint_le 8 (signed_price_long record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_long_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (complex_instrument_id_short_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -444,7 +444,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -454,12 +454,12 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -493,31 +493,31 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (quantity_short record) ++
+      encode_uint_le 2 (quantity_short record) ++
       encode_bytes 6 (complex_instrument_id_short record) ++
-      encode_uint 2 (signed_price_short record) ++
+      encode_uint_le 2 (signed_price_short record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (quantity_short_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (complex_instrument_id_short_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (signed_price_short_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -535,7 +535,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -545,12 +545,12 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -592,12 +592,12 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (reserved_5 record) = 5.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (quantity_long record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 8 (complex_instrument_id_long record) ++
-      encode_uint 8 (signed_price_long record) ++
+      encode_uint_le 8 (signed_price_long record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (participant_id record) ++
       encode_bytes 1 (customer_indicator record) ++
@@ -605,22 +605,22 @@ Module EdgxOptionsComplexV2161.
       encode_bytes 5 (reserved_5 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_long_value, bytes) =>
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (complex_instrument_id_long_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -654,7 +654,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -664,12 +664,12 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -703,23 +703,23 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (execution_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -735,7 +735,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -745,10 +745,10 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -782,31 +782,31 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (executed_quantity record) ++
-      encode_uint 4 (remaining_quantity record) ++
-      encode_uint 8 (execution_id record) ++
-      encode_uint 8 (signed_price_long record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (executed_quantity record) ++
+      encode_uint_le 4 (remaining_quantity record) ++
+      encode_uint_le 8 (execution_id record) ++
+      encode_uint_le 8 (signed_price_long record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (executed_quantity_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (remaining_quantity_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (execution_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -824,7 +824,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 37.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -834,12 +834,12 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -865,18 +865,18 @@ Module EdgxOptionsComplexV2161.
       (canceled_quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (canceled_quantity_long record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (canceled_quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (canceled_quantity_long_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_long := canceled_quantity_long_value |}, bytes)
@@ -887,7 +887,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -897,9 +897,9 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -924,18 +924,18 @@ Module EdgxOptionsComplexV2161.
       (canceled_quantity_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (canceled_quantity_short record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (canceled_quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (canceled_quantity_short_value, bytes) =>
                   Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_short := canceled_quantity_short_value |}, bytes)
@@ -946,7 +946,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -956,9 +956,9 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -987,23 +987,23 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (quantity_long record) ++
-      encode_uint 8 (signed_price_long record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (quantity_long record) ++
+      encode_uint_le 8 (signed_price_long record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (quantity_long_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (signed_price_long_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1019,7 +1019,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1029,10 +1029,10 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -1062,23 +1062,23 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 2 (quantity_short record) ++
-      encode_uint 2 (signed_price_short record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 2 (quantity_short record) ++
+      encode_uint_le 2 (signed_price_short record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (quantity_short_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (signed_price_short_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1094,7 +1094,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1104,10 +1104,10 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -1131,14 +1131,14 @@ Module EdgxOptionsComplexV2161.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; order_id := order_id_value |}, bytes)
@@ -1148,7 +1148,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1158,8 +1158,8 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1194,35 +1194,35 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 4 (quantity_long record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 6 (complex_instrument_id_short record) ++
-      encode_uint 8 (signed_price_long record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 8 (signed_price_long record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_long_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (complex_instrument_id_short_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1241,7 +1241,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1251,13 +1251,13 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1293,35 +1293,35 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (trade_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint 2 (quantity_short record) ++
+      encode_uint_le 2 (quantity_short record) ++
       encode_bytes 6 (complex_instrument_id_short record) ++
-      encode_uint 2 (signed_price_short record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 2 (signed_price_short record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (trade_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (quantity_short_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (complex_instrument_id_short_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (signed_price_short_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1340,7 +1340,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1350,13 +1350,13 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -1398,26 +1398,26 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (client_id record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (complex_instrument_id_short record) ++
-      encode_uint 8 (auction_id record) ++
+      encode_uint_le 8 (auction_id record) ++
       encode_bytes 1 (notification_auction_type record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (signed_price_long record) ++
-      encode_uint 4 (quantity_long record) ++
+      encode_uint_le 8 (signed_price_long record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 1 (customer_indicator record) ++
       encode_bytes 4 (participant_id record) ++
-      encode_uint 4 (auction_end_offset record) ++
+      encode_uint_le 4 (auction_end_offset record) ++
       encode_bytes 4 (client_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (complex_instrument_id_short_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (auction_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1426,10 +1426,10 @@ Module EdgxOptionsComplexV2161.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (signed_price_long_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (quantity_long_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1438,7 +1438,7 @@ Module EdgxOptionsComplexV2161.
                                       match decode_bytes 4 bytes with
                                       | None => None
                                       | Some (participant_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (auction_end_offset_value, bytes) =>
                                               match decode_bytes 4 bytes with
@@ -1460,7 +1460,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1470,16 +1470,16 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
@@ -1503,14 +1503,14 @@ Module EdgxOptionsComplexV2161.
       (auction_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (auction_id record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (auction_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (auction_id_value, bytes) =>
               Some ({| time_offset := time_offset_value; auction_id := auction_id_value |}, bytes)
@@ -1520,7 +1520,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1530,8 +1530,8 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1560,26 +1560,26 @@ Module EdgxOptionsComplexV2161.
       (quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
-      encode_uint 8 (auction_id record) ++
-      encode_uint 8 (execution_id record) ++
-      encode_uint 8 (signed_price_long record) ++
-      encode_uint 4 (quantity_long record).
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 8 (auction_id record) ++
+      encode_uint_le 8 (execution_id record) ++
+      encode_uint_le 8 (signed_price_long record) ++
+      encode_uint_le 4 (quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (auction_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (execution_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (signed_price_long_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_long_value, bytes) =>
                           Some ({| time_offset := time_offset_value; auction_id := auction_id_value; execution_id := execution_id_value; signed_price_long := signed_price_long_value; quantity_long := quantity_long_value |}, bytes)
@@ -1592,7 +1592,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1602,11 +1602,11 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1639,7 +1639,7 @@ Module EdgxOptionsComplexV2161.
       Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (complex_symbol_id record) ++
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
@@ -1648,7 +1648,7 @@ Module EdgxOptionsComplexV2161.
       encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -1681,7 +1681,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1691,7 +1691,7 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1738,20 +1738,20 @@ Module EdgxOptionsComplexV2161.
       (composite_market_offer_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (complex_instrument_id_long record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (reference_price record) ++
-      encode_uint 4 (buy_contracts record) ++
-      encode_uint 4 (sell_contracts record) ++
-      encode_uint 8 (indicative_price record) ++
-      encode_uint 8 (auction_only_price record) ++
+      encode_uint_le 8 (reference_price record) ++
+      encode_uint_le 4 (buy_contracts record) ++
+      encode_uint_le 4 (sell_contracts record) ++
+      encode_uint_le 8 (indicative_price record) ++
+      encode_uint_le 8 (auction_only_price record) ++
       encode_bytes 1 (opening_condition record) ++
-      encode_uint 8 (composite_market_bid_price record) ++
-      encode_uint 8 (composite_market_offer_price record).
+      encode_uint_le 8 (composite_market_bid_price record) ++
+      encode_uint_le 8 (composite_market_offer_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -1760,28 +1760,28 @@ Module EdgxOptionsComplexV2161.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (reference_price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (buy_contracts_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sell_contracts_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (indicative_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (auction_only_price_value, bytes) =>
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (opening_condition_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (composite_market_bid_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (composite_market_offer_price_value, bytes) =>
                                                   Some ({| time_offset := time_offset_value; complex_instrument_id_long := complex_instrument_id_long_value; auction_type := auction_type_value; reference_price := reference_price_value; buy_contracts := buy_contracts_value; sell_contracts := sell_contracts_value; indicative_price := indicative_price_value; auction_only_price := auction_only_price_value; opening_condition := opening_condition_value; composite_market_bid_price := composite_market_bid_price_value; composite_market_offer_price := composite_market_offer_price_value |}, bytes)
@@ -1800,7 +1800,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 62.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1810,17 +1810,17 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -1849,14 +1849,14 @@ Module EdgxOptionsComplexV2161.
       (quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (complex_instrument_id_long record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (signed_price_long record) ++
-      encode_uint 4 (quantity_long record).
+      encode_uint_le 8 (signed_price_long record) ++
+      encode_uint_le 4 (quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -1865,10 +1865,10 @@ Module EdgxOptionsComplexV2161.
               match decode_bytes 1 bytes with
               | None => None
               | Some (auction_type_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (signed_price_long_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_long_value, bytes) =>
                           Some ({| time_offset := time_offset_value; complex_instrument_id_long := complex_instrument_id_long_value; auction_type := auction_type_value; signed_price_long := signed_price_long_value; quantity_long := quantity_long_value |}, bytes)
@@ -1881,7 +1881,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1891,11 +1891,11 @@ Module EdgxOptionsComplexV2161.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1916,10 +1916,10 @@ Module EdgxOptionsComplexV2161.
       (time_offset record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record).
+      encode_uint_le 4 (time_offset record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           Some ({| time_offset := time_offset_value |}, bytes)
@@ -1928,7 +1928,7 @@ Module EdgxOptionsComplexV2161.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1936,7 +1936,7 @@ Module EdgxOptionsComplexV2161.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

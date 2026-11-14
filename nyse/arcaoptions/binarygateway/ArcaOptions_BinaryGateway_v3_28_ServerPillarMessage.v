@@ -48,14 +48,14 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       (msg_length record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_type record) ++
-      encode_uint 2 (msg_length record).
+      encode_uint_le 2 (msg_type record) ++
+      encode_uint_le 2 (msg_length record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (msg_length_value, bytes) =>
               Some ({| msg_type := msg_type_value; msg_length := msg_length_value |}, bytes)
@@ -65,7 +65,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -75,8 +75,8 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -99,14 +99,14 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       (value record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sess record) ++
-      encode_uint 4 (value record).
+      encode_uint_le 4 (sess record) ++
+      encode_uint_le 4 (value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sess_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (value_value, bytes) =>
               Some ({| sess := sess_value; value := value_value |}, bytes)
@@ -116,7 +116,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -126,8 +126,8 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -151,13 +151,13 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
 
     Definition encode (record : t) : list byte :=
       StreamId.encode (stream_id record) ++
-      encode_uint 8 (seq record).
+      encode_uint_le 8 (seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match StreamId.decode bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (seq_value, bytes) =>
               Some ({| stream_id := stream_id_value; seq := seq_value |}, bytes)
@@ -167,7 +167,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !StreamId.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !StreamId.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -178,7 +178,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite StreamId.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -201,14 +201,14 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       (seq_msg_length record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (seq_msg_type record) ++
-      encode_uint 2 (seq_msg_length record).
+      encode_uint_le 2 (seq_msg_type record) ++
+      encode_uint_le 2 (seq_msg_length record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (seq_msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (seq_msg_length_value, bytes) =>
               Some ({| seq_msg_type := seq_msg_type_value; seq_msg_length := seq_msg_length_value |}, bytes)
@@ -218,7 +218,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -228,8 +228,8 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -252,14 +252,14 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       (sub_msg_length record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (sub_msg_type record) ++
-      encode_uint 2 (sub_msg_length record).
+      encode_uint_le 2 (sub_msg_type record) ++
+      encode_uint_le 2 (sub_msg_length record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (sub_msg_type_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (sub_msg_length_value, bytes) =>
               Some ({| sub_msg_type := sub_msg_type_value; sub_msg_length := sub_msg_length_value |}, bytes)
@@ -269,7 +269,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -279,8 +279,8 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -304,13 +304,13 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
 
     Definition encode (record : t) : list byte :=
       StreamId.encode (stream_id record) ++
-      encode_uint 8 (seq record).
+      encode_uint_le 8 (seq record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match StreamId.decode bytes with
       | None => None
       | Some (stream_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (seq_value, bytes) =>
               Some ({| stream_id := stream_id_value; seq := seq_value |}, bytes)
@@ -320,7 +320,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !StreamId.encode_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !StreamId.encode_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -331,7 +331,7 @@ Module ArcaOptionsBinaryGatewayV328ServerPillarMessage.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite StreamId.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

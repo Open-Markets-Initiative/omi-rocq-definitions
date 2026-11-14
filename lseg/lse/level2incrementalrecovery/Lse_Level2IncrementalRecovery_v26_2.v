@@ -49,13 +49,13 @@ Module LseLevel2IncrementalRecoveryV262.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module LseLevel2IncrementalRecoveryV262.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_data_group_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_number_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; market_data_group := market_data_group_value; sequence_number := sequence_number_value |}, bytes)
@@ -76,7 +76,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -112,11 +112,11 @@ Module LseLevel2IncrementalRecoveryV262.
       (message_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_uint 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -129,7 +129,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,7 +139,7 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -217,19 +217,19 @@ Module LseLevel2IncrementalRecoveryV262.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (request_level record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_bytes 6 (group_id record) ++
       encode_uint 1 (request_order_book_type record) ++
-      encode_uint 2 (source_venue record) ++
+      encode_uint_le 2 (source_venue record) ++
       encode_uint 1 (recovery_type record) ++
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (request_id record).
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (request_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (request_level_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
               match decode_bytes 6 bytes with
@@ -238,16 +238,16 @@ Module LseLevel2IncrementalRecoveryV262.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (request_order_book_type_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (source_venue_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (recovery_type_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (sequence_number_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (request_id_value, bytes) =>
                                       Some ({| request_level := request_level_value; instrument := instrument_value; group_id := group_id_value; request_order_book_type := request_order_book_type_value; source_venue := source_venue_value; recovery_type := recovery_type_value; sequence_number := sequence_number_value; request_id := request_id_value |}, bytes)
@@ -263,7 +263,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -274,13 +274,13 @@ Module LseLevel2IncrementalRecoveryV262.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -348,22 +348,22 @@ Module LseLevel2IncrementalRecoveryV262.
       (request_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (count record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (count record) ++
       encode_bytes 1 (recovery_status record) ++
-      encode_uint 4 (request_id record).
+      encode_uint_le 4 (request_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (count_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (recovery_status_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (request_id_value, bytes) =>
                       Some ({| sequence_number := sequence_number_value; count := count_value; recovery_status := recovery_status_value; request_id := request_id_value |}, bytes)
@@ -375,7 +375,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -385,10 +385,10 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -411,11 +411,11 @@ Module LseLevel2IncrementalRecoveryV262.
       Datatypes.length (trading_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (request_id record) ++
+      encode_uint_le 4 (request_id record) ++
       encode_bytes 1 (trading_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (request_id_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -428,7 +428,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -438,7 +438,7 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -464,18 +464,18 @@ Module LseLevel2IncrementalRecoveryV262.
       (source_venue record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (event_code record) ++
-      encode_uint 2 (source_venue record).
+      encode_uint_le 2 (source_venue record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (event_code_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
                   Some ({| timestamp := timestamp_value; event_code := event_code_value; source_venue := source_venue_value |}, bytes)
@@ -486,7 +486,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -496,9 +496,9 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -531,22 +531,22 @@ Module LseLevel2IncrementalRecoveryV262.
       (order_book_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
       encode_bytes 1 (trading_status record) ++
       encode_uint 1 (session_change_reason record) ++
       encode_bytes 6 (new_end_time record) ++
       encode_uint 1 (order_book_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -573,7 +573,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -583,9 +583,9 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -632,42 +632,42 @@ Module LseLevel2IncrementalRecoveryV262.
       Datatypes.length (rfq_id record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (size record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (transaction_time record) ++
-      encode_uint 2 (source_venue record) ++
+      encode_uint_le 8 (size record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (transaction_time record) ++
+      encode_uint_le 2 (source_venue record) ++
       encode_uint 1 (order_book_type record) ++
       encode_bytes 11 (participant record) ++
       encode_uint 1 (order_type record) ++
       encode_bytes 10 (rfq_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (size_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (instrument_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (transaction_time_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (source_venue_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -699,7 +699,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 74.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -709,14 +709,14 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
@@ -747,19 +747,19 @@ Module LseLevel2IncrementalRecoveryV262.
       (order_book_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_uint 1 (order_book_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (source_venue_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -774,7 +774,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -784,9 +784,9 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -884,102 +884,102 @@ Module LseLevel2IncrementalRecoveryV262.
       (dynamic_reference_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (volume record) ++
-      encode_uint 8 (volume_on_book_only record) ++
-      encode_uint 8 (vwap record) ++
-      encode_uint 8 (vwap_on_book_only record) ++
-      encode_uint 4 (number_of_trades record) ++
-      encode_uint 4 (number_of_trades_on_book_only record) ++
-      encode_uint 8 (turnover record) ++
-      encode_uint 8 (turnover_on_book_only record) ++
-      encode_uint 8 (official_opening_price record) ++
-      encode_uint 8 (official_closing_price record) ++
-      encode_uint 8 (trade_high_on_book_only record) ++
-      encode_uint 8 (trade_low_on_book_only record) ++
-      encode_uint 8 (trade_high record) ++
-      encode_uint 8 (trade_low record) ++
-      encode_uint 8 (fifty_two_week_trade_high record) ++
-      encode_uint 8 (fifty_two_week_trade_low record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (volume record) ++
+      encode_uint_le 8 (volume_on_book_only record) ++
+      encode_uint_le 8 (vwap record) ++
+      encode_uint_le 8 (vwap_on_book_only record) ++
+      encode_uint_le 4 (number_of_trades record) ++
+      encode_uint_le 4 (number_of_trades_on_book_only record) ++
+      encode_uint_le 8 (turnover record) ++
+      encode_uint_le 8 (turnover_on_book_only record) ++
+      encode_uint_le 8 (official_opening_price record) ++
+      encode_uint_le 8 (official_closing_price record) ++
+      encode_uint_le 8 (trade_high_on_book_only record) ++
+      encode_uint_le 8 (trade_low_on_book_only record) ++
+      encode_uint_le 8 (trade_high record) ++
+      encode_uint_le 8 (trade_low record) ++
+      encode_uint_le 8 (fifty_two_week_trade_high record) ++
+      encode_uint_le 8 (fifty_two_week_trade_low record) ++
       encode_bytes 1 (opening_price_indicator record) ++
       encode_bytes 1 (closing_price_indicator record) ++
-      encode_uint 8 (iau_price record) ++
-      encode_uint 8 (iau_paired_size record) ++
-      encode_uint 8 (imbalance_quantity record) ++
+      encode_uint_le 8 (iau_price record) ++
+      encode_uint_le 8 (iau_paired_size record) ++
+      encode_uint_le 8 (imbalance_quantity record) ++
       encode_bytes 1 (imbalance_direction record) ++
-      encode_uint 8 (best_closing_bid_price record) ++
-      encode_uint 8 (best_closing_ask_price record) ++
-      encode_uint 8 (best_closing_bid_size record) ++
-      encode_uint 8 (best_closing_ask_size record) ++
+      encode_uint_le 8 (best_closing_bid_price record) ++
+      encode_uint_le 8 (best_closing_ask_price record) ++
+      encode_uint_le 8 (best_closing_bid_size record) ++
+      encode_uint_le 8 (best_closing_ask_size record) ++
       encode_bytes 8 (reserved_8 record) ++
       encode_bytes 8 (second_reserved_8 record) ++
       encode_bytes 8 (third_reserved_8 record) ++
       encode_bytes 8 (fourth_reserved_8 record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (last_trade_price record) ++
-      encode_uint 8 (last_trade_quantity record) ++
-      encode_uint 8 (last_trade_time record) ++
-      encode_uint 8 (static_reference_price record) ++
-      encode_uint 8 (dynamic_reference_price record).
+      encode_uint_le 8 (last_trade_price record) ++
+      encode_uint_le 8 (last_trade_quantity record) ++
+      encode_uint_le 8 (last_trade_time record) ++
+      encode_uint_le 8 (static_reference_price record) ++
+      encode_uint_le 8 (dynamic_reference_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (volume_on_book_only_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (vwap_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (vwap_on_book_only_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (number_of_trades_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (number_of_trades_on_book_only_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (turnover_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (turnover_on_book_only_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (official_opening_price_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (official_closing_price_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (trade_high_on_book_only_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (trade_low_on_book_only_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (trade_high_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (trade_low_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (fifty_two_week_trade_high_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (fifty_two_week_trade_low_value, bytes) =>
                                                                                   match decode_bytes 1 bytes with
@@ -988,28 +988,28 @@ Module LseLevel2IncrementalRecoveryV262.
                                                                                       match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (closing_price_indicator_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (iau_price_value, bytes) =>
-                                                                                              match decode_uint 8 bytes with
+                                                                                              match decode_uint_le 8 bytes with
                                                                                               | None => None
                                                                                               | Some (iau_paired_size_value, bytes) =>
-                                                                                                  match decode_uint 8 bytes with
+                                                                                                  match decode_uint_le 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (imbalance_quantity_value, bytes) =>
                                                                                                       match decode_bytes 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (imbalance_direction_value, bytes) =>
-                                                                                                          match decode_uint 8 bytes with
+                                                                                                          match decode_uint_le 8 bytes with
                                                                                                           | None => None
                                                                                                           | Some (best_closing_bid_price_value, bytes) =>
-                                                                                                              match decode_uint 8 bytes with
+                                                                                                              match decode_uint_le 8 bytes with
                                                                                                               | None => None
                                                                                                               | Some (best_closing_ask_price_value, bytes) =>
-                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (best_closing_bid_size_value, bytes) =>
-                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (best_closing_ask_size_value, bytes) =>
                                                                                                                           match decode_bytes 8 bytes with
@@ -1027,19 +1027,19 @@ Module LseLevel2IncrementalRecoveryV262.
                                                                                                                                           match decode_bytes 1 bytes with
                                                                                                                                           | None => None
                                                                                                                                           | Some (auction_type_value, bytes) =>
-                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (last_trade_price_value, bytes) =>
-                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (last_trade_quantity_value, bytes) =>
-                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                       | None => None
                                                                                                                                                       | Some (last_trade_time_value, bytes) =>
-                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                           | None => None
                                                                                                                                                           | Some (static_reference_price_value, bytes) =>
-                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (dynamic_reference_price_value, bytes) =>
                                                                                                                                                                   Some ({| timestamp := timestamp_value; instrument := instrument_value; source_venue := source_venue_value; volume := volume_value; volume_on_book_only := volume_on_book_only_value; vwap := vwap_value; vwap_on_book_only := vwap_on_book_only_value; number_of_trades := number_of_trades_value; number_of_trades_on_book_only := number_of_trades_on_book_only_value; turnover := turnover_value; turnover_on_book_only := turnover_on_book_only_value; official_opening_price := official_opening_price_value; official_closing_price := official_closing_price_value; trade_high_on_book_only := trade_high_on_book_only_value; trade_low_on_book_only := trade_low_on_book_only_value; trade_high := trade_high_value; trade_low := trade_low_value; fifty_two_week_trade_high := fifty_two_week_trade_high_value; fifty_two_week_trade_low := fifty_two_week_trade_low_value; opening_price_indicator := opening_price_indicator_value; closing_price_indicator := closing_price_indicator_value; iau_price := iau_price_value; iau_paired_size := iau_paired_size_value; imbalance_quantity := imbalance_quantity_value; imbalance_direction := imbalance_direction_value; best_closing_bid_price := best_closing_bid_price_value; best_closing_ask_price := best_closing_ask_price_value; best_closing_bid_size := best_closing_bid_size_value; best_closing_ask_size := best_closing_ask_size_value; reserved_8 := reserved_8_value; second_reserved_8 := second_reserved_8_value; third_reserved_8 := third_reserved_8_value; fourth_reserved_8 := fourth_reserved_8_value; auction_type := auction_type_value; last_trade_price := last_trade_price_value; last_trade_quantity := last_trade_quantity_value; last_trade_time := last_trade_time_value; static_reference_price := static_reference_price_value; dynamic_reference_price := dynamic_reference_price_value |}, bytes)
@@ -1086,7 +1086,7 @@ Module LseLevel2IncrementalRecoveryV262.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 270.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1096,45 +1096,45 @@ Module LseLevel2IncrementalRecoveryV262.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 bound_38]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
-      rewrite decode_encode_uint by exact bound_27.
-      rewrite decode_encode_uint by exact bound_28.
+      rewrite decode_encode_uint_le by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_27.
+      rewrite decode_encode_uint_le by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_bytes by exact bound_31.
       rewrite decode_encode_bytes by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
-      rewrite decode_encode_uint by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
-      rewrite decode_encode_uint by exact bound_36.
-      rewrite decode_encode_uint by exact bound_37.
-      rewrite decode_encode_uint by exact bound_38.
+      rewrite decode_encode_uint_le by exact bound_34.
+      rewrite decode_encode_uint_le by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_36.
+      rewrite decode_encode_uint_le by exact bound_37.
+      rewrite decode_encode_uint_le by exact bound_38.
       destruct record. reflexivity.
     Qed.
 

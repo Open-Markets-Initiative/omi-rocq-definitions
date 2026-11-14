@@ -52,21 +52,21 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (exchange_message_type record) ++
+      encode_uint_le 2 (start_of_message record) ++
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (exchange_message_type record) ++
       encode_uint 1 (matching_unit record) ++
       encode_bytes 1 (reserved_field record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (exchange_message_type_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_field_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (sequence_number_value, bytes) =>
                               Some ({| start_of_message := start_of_message_value; message_length := message_length_value; exchange_message_type := exchange_message_type_value; matching_unit := matching_unit_value; reserved_field := reserved_field_value; sequence_number := sequence_number_value |}, bytes)
@@ -89,7 +89,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -99,12 +99,12 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -292,51 +292,51 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (ord_type record) ++
       encode_bytes 1 (time_in_force record) ++
-      encode_uint 4 (min_qty record) ++
+      encode_uint_le 4 (min_qty record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (capacity record) ++
       encode_bytes 16 (account record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (clearing_account record) ++
-      encode_uint 4 (order_qty record) ++
+      encode_uint_le 4 (order_qty record) ++
       PreventMatch.encode (prevent_match record) ++
-      encode_uint 4 (maturity_date record) ++
+      encode_uint_le 4 (maturity_date record) ++
       encode_bytes 1 (open_close record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
-      encode_uint 8 (expire_time record) ++
+      encode_uint_le 8 (expire_time record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
-      encode_uint 8 (stop_px record) ++
-      encode_uint 4 (cmta_number record) ++
+      encode_uint_le 8 (stop_px record) ++
+      encode_uint_le 4 (cmta_number record) ++
       encode_bytes 1 (cti_code record) ++
       encode_bytes 1 (manual_order_indicator record) ++
       encode_bytes 18 (oeo_id record) ++
-      encode_uint 4 (cum_qty record) ++
+      encode_uint_le 4 (cum_qty record) ++
       encode_bytes 6 (frequent_trader_id record) ++
       encode_bytes 1 (cust_order_handling_inst record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -345,7 +345,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (time_in_force_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (min_qty_value, bytes) =>
                                       match decode_bytes 8 bytes with
@@ -363,34 +363,34 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                       match decode_bytes 4 bytes with
                                                       | None => None
                                                       | Some (clearing_account_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (order_qty_value, bytes) =>
                                                               match PreventMatch.decode bytes with
                                                               | None => None
                                                               | Some (prevent_match_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (maturity_date_value, bytes) =>
                                                                       match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (open_close_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (leaves_qty_value, bytes) =>
                                                                               match decode_bytes 1 bytes with
                                                                               | None => None
                                                                               | Some (base_liquidity_indicator_value, bytes) =>
-                                                                                  match decode_uint 8 bytes with
+                                                                                  match decode_uint_le 8 bytes with
                                                                                   | None => None
                                                                                   | Some (expire_time_value, bytes) =>
                                                                                       match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (sub_liquidity_indicator_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (stop_px_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (cmta_number_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
@@ -402,7 +402,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                                                                           match decode_bytes 18 bytes with
                                                                                                           | None => None
                                                                                                           | Some (oeo_id_value, bytes) =>
-                                                                                                              match decode_uint 4 bytes with
+                                                                                                              match decode_uint_le 4 bytes with
                                                                                                               | None => None
                                                                                                               | Some (cum_qty_value, bytes) =>
                                                                                                                   match decode_bytes 6 bytes with
@@ -411,7 +411,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                                                                                       match decode_bytes 1 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (cust_order_handling_inst_value, bytes) =>
-                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                           | None => None
                                                                                                                           | Some (request_received_time_value, bytes) =>
                                                                                                                               Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; order_id := order_id_value; side := side_value; price := price_value; ord_type := ord_type_value; time_in_force := time_in_force_value; min_qty := min_qty_value; symbol := symbol_value; capacity := capacity_value; account := account_value; clearing_firm := clearing_firm_value; clearing_account := clearing_account_value; order_qty := order_qty_value; prevent_match := prevent_match_value; maturity_date := maturity_date_value; open_close := open_close_value; leaves_qty := leaves_qty_value; base_liquidity_indicator := base_liquidity_indicator_value; expire_time := expire_time_value; sub_liquidity_indicator := sub_liquidity_indicator_value; stop_px := stop_px_value; cmta_number := cmta_number_value; cti_code := cti_code_value; manual_order_indicator := manual_order_indicator_value; oeo_id := oeo_id_value; cum_qty := cum_qty_value; frequent_trader_id := frequent_trader_id_value; cust_order_handling_inst := cust_order_handling_inst_value; request_received_time := request_received_time_value |}, bytes)
@@ -449,7 +449,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 161.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !PreventMatch.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !PreventMatch.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -459,36 +459,36 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 bound_29]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite PreventMatch.decode_encode by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
-      rewrite decode_encode_uint by exact bound_29.
+      rewrite decode_encode_uint_le by exact bound_29.
       destruct record. reflexivity.
     Qed.
 
@@ -517,14 +517,14 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 1 (order_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -549,7 +549,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -559,7 +559,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -610,23 +610,23 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (ord_type record) ++
-      encode_uint 4 (order_qty record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
-      encode_uint 8 (stop_px record) ++
+      encode_uint_le 8 (stop_px record) ++
       encode_bytes 6 (frequent_trader_id record) ++
       encode_bytes 1 (cust_order_handling_inst record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -635,28 +635,28 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
               match decode_bytes 20 bytes with
               | None => None
               | Some (orig_cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (clearing_firm_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (ord_type_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (order_qty_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (leaves_qty_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (base_liquidity_indicator_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (stop_px_value, bytes) =>
                                                   match decode_bytes 6 bytes with
@@ -665,7 +665,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (cust_order_handling_inst_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (request_received_time_value, bytes) =>
                                                               Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; order_id := order_id_value; clearing_firm := clearing_firm_value; price := price_value; ord_type := ord_type_value; order_qty := order_qty_value; leaves_qty := leaves_qty_value; base_liquidity_indicator := base_liquidity_indicator_value; stop_px := stop_px_value; frequent_trader_id := frequent_trader_id_value; cust_order_handling_inst := cust_order_handling_inst_value; request_received_time := request_received_time_value |}, bytes)
@@ -687,7 +687,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 101.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -697,20 +697,20 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       destruct record. reflexivity.
     Qed.
 
@@ -741,7 +741,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 20 (orig_cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
@@ -749,7 +749,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -778,7 +778,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 113.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -788,7 +788,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -848,42 +848,42 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (secondary_exec_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 4 (maturity_date record) ++
+      encode_uint_le 4 (maturity_date record) ++
       encode_bytes 2 (fee_code record) ++
-      encode_uint 4 (trade_date record) ++
-      encode_uint 4 (clearing_size record) ++
+      encode_uint_le 4 (trade_date record) ++
+      encode_uint_le 4 (clearing_size record) ++
       encode_bytes 1 (pending_status record) ++
       encode_bytes 1 (multileg_reporting_type record) ++
-      encode_uint 8 (secondary_exec_id record).
+      encode_uint_le 8 (secondary_exec_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (exec_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (last_shares_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (last_px_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -901,16 +901,16 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                               match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (clearing_firm_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (maturity_date_value, bytes) =>
                                                       match decode_bytes 2 bytes with
                                                       | None => None
                                                       | Some (fee_code_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (trade_date_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (clearing_size_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -919,7 +919,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                                       match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (multileg_reporting_type_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (secondary_exec_id_value, bytes) =>
                                                                               Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; exec_id := exec_id_value; last_shares := last_shares_value; last_px := last_px_value; leaves_qty := leaves_qty_value; base_liquidity_indicator := base_liquidity_indicator_value; sub_liquidity_indicator := sub_liquidity_indicator_value; side := side_value; symbol := symbol_value; clearing_firm := clearing_firm_value; maturity_date := maturity_date_value; fee_code := fee_code_value; trade_date := trade_date_value; clearing_size := clearing_size_value; pending_status := pending_status_value; multileg_reporting_type := multileg_reporting_type_value; secondary_exec_id := secondary_exec_id_value |}, bytes)
@@ -945,7 +945,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 91.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -955,24 +955,24 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -1027,12 +1027,12 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (secondary_exec_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_id record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 1 (side record) ++
@@ -1040,29 +1040,29 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 16 (security_desc record) ++
       encode_bytes 2 (fee_code record) ++
-      encode_uint 4 (trade_date record) ++
-      encode_uint 4 (clearing_size record) ++
+      encode_uint_le 4 (trade_date record) ++
+      encode_uint_le 4 (clearing_size record) ++
       encode_bytes 1 (pending_status record) ++
       encode_bytes 1 (multileg_reporting_type record) ++
-      encode_uint 8 (secondary_exec_id record).
+      encode_uint_le 8 (secondary_exec_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (exec_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (last_shares_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (last_px_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -1086,10 +1086,10 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                       match decode_bytes 2 bytes with
                                                       | None => None
                                                       | Some (fee_code_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (trade_date_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (clearing_size_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -1098,7 +1098,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                                       match decode_bytes 1 bytes with
                                                                       | None => None
                                                                       | Some (multileg_reporting_type_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (secondary_exec_id_value, bytes) =>
                                                                               Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; exec_id := exec_id_value; last_shares := last_shares_value; last_px := last_px_value; leaves_qty := leaves_qty_value; base_liquidity_indicator := base_liquidity_indicator_value; sub_liquidity_indicator := sub_liquidity_indicator_value; side := side_value; symbol := symbol_value; clearing_firm := clearing_firm_value; security_desc := security_desc_value; fee_code := fee_code_value; trade_date := trade_date_value; clearing_size := clearing_size_value; pending_status := pending_status_value; multileg_reporting_type := multileg_reporting_type_value; secondary_exec_id := secondary_exec_id_value |}, bytes)
@@ -1124,7 +1124,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 103.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1134,12 +1134,12 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1147,11 +1147,11 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_17.
       destruct record. reflexivity.
     Qed.
 
@@ -1180,14 +1180,14 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 1 (cancel_reason record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1199,7 +1199,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (cancel_reason_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (request_received_time_value, bytes) =>
                           Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; clearing_firm := clearing_firm_value; cancel_reason := cancel_reason_value; request_received_time := request_received_time_value |}, bytes)
@@ -1212,7 +1212,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1222,11 +1222,11 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1255,14 +1255,14 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 1 (cancel_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1287,7 +1287,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1297,7 +1297,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1328,22 +1328,22 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 4 (cancelled_order_count record) ++
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (mass_cancel_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (cancelled_order_count_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (request_received_time_value, bytes) =>
                       Some ({| transaction_time := transaction_time_value; mass_cancel_id := mass_cancel_id_value; cancelled_order_count := cancelled_order_count_value; request_received_time := request_received_time_value |}, bytes)
@@ -1355,7 +1355,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1365,10 +1365,10 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1395,13 +1395,13 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 1 (mass_cancel_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1422,7 +1422,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 89.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1432,7 +1432,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1462,22 +1462,22 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (request_received_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
-      encode_uint 4 (cancelled_order_count record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 4 (cancelled_order_count record) ++
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (mass_cancel_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (cancelled_order_count_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (request_received_time_value, bytes) =>
                       Some ({| transaction_time := transaction_time_value; mass_cancel_id := mass_cancel_id_value; cancelled_order_count := cancelled_order_count_value; request_received_time := request_received_time_value |}, bytes)
@@ -1489,7 +1489,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1499,10 +1499,10 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1529,13 +1529,13 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (mass_cancel_id record) ++
       encode_bytes 1 (purge_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1556,7 +1556,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 89.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1566,7 +1566,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -1620,31 +1620,31 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (cmta_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_ref_id record) ++
+      encode_uint_le 8 (exec_ref_id record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (clearing_account record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 8 (corrected_price record) ++
-      encode_uint 8 (orig_time record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 8 (corrected_price record) ++
+      encode_uint_le 8 (orig_time record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 4 (maturity_date record) ++
+      encode_uint_le 4 (maturity_date record) ++
       encode_bytes 1 (open_close record) ++
-      encode_uint 4 (cmta_number record).
+      encode_uint_le 4 (cmta_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (exec_ref_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1659,16 +1659,16 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (clearing_account_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (last_shares_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_px_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (corrected_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (orig_time_value, bytes) =>
                                                   match decode_bytes 8 bytes with
@@ -1677,13 +1677,13 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (capacity_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (maturity_date_value, bytes) =>
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (open_close_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (cmta_number_value, bytes) =>
                                                                       Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; exec_ref_id := exec_ref_id_value; side := side_value; base_liquidity_indicator := base_liquidity_indicator_value; clearing_firm := clearing_firm_value; clearing_account := clearing_account_value; last_shares := last_shares_value; last_px := last_px_value; corrected_price := corrected_price_value; orig_time := orig_time_value; symbol := symbol_value; capacity := capacity_value; maturity_date := maturity_date_value; open_close := open_close_value; cmta_number := cmta_number_value |}, bytes)
@@ -1707,7 +1707,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 92.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1717,22 +1717,22 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -1783,31 +1783,31 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (cmta_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (exec_ref_id record) ++
+      encode_uint_le 8 (exec_ref_id record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 4 (clearing_account record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 8 (corrected_price record) ++
-      encode_uint 8 (orig_time record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 8 (corrected_price record) ++
+      encode_uint_le 8 (orig_time record) ++
       encode_bytes 8 (symbol record) ++
       encode_bytes 1 (capacity record) ++
       encode_bytes 16 (security_desc record) ++
       encode_bytes 1 (open_close record) ++
-      encode_uint 4 (cmta_number record).
+      encode_uint_le 4 (cmta_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (cl_ord_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (exec_ref_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -1822,16 +1822,16 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (clearing_account_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (last_shares_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_px_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (corrected_price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (orig_time_value, bytes) =>
                                                   match decode_bytes 8 bytes with
@@ -1846,7 +1846,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (open_close_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (cmta_number_value, bytes) =>
                                                                       Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; exec_ref_id := exec_ref_id_value; side := side_value; base_liquidity_indicator := base_liquidity_indicator_value; clearing_firm := clearing_firm_value; clearing_account := clearing_account_value; last_shares := last_shares_value; last_px := last_px_value; corrected_price := corrected_price_value; orig_time := orig_time_value; symbol := symbol_value; capacity := capacity_value; security_desc := security_desc_value; open_close := open_close_value; cmta_number := cmta_number_value |}, bytes)
@@ -1870,7 +1870,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 104.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1880,22 +1880,22 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -1946,25 +1946,25 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (secondary_exec_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 8 (exec_id record) ++
+      encode_uint_le 8 (exec_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 8 (symbol record) ++
-      encode_uint 4 (maturity_date record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
+      encode_uint_le 4 (maturity_date record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
       encode_bytes 2 (fee_code record) ++
-      encode_uint 4 (trade_date record) ++
-      encode_uint 8 (clearing_price record) ++
+      encode_uint_le 4 (trade_date record) ++
+      encode_uint_le 8 (clearing_price record) ++
       encode_bytes 8 (clearing_symbol record) ++
       encode_bytes 1 (multileg_reporting_type record) ++
-      encode_uint 8 (secondary_exec_id record).
+      encode_uint_le 8 (secondary_exec_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -1973,34 +1973,34 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
               match decode_bytes 4 bytes with
               | None => None
               | Some (clearing_firm_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (exec_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (side_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 8 bytes with
                               | None => None
                               | Some (symbol_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (maturity_date_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (last_shares_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (last_px_value, bytes) =>
                                               match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (fee_code_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (trade_date_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (clearing_price_value, bytes) =>
                                                           match decode_bytes 8 bytes with
@@ -2009,7 +2009,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (multileg_reporting_type_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (secondary_exec_id_value, bytes) =>
                                                                       Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; clearing_firm := clearing_firm_value; exec_id := exec_id_value; side := side_value; price := price_value; symbol := symbol_value; maturity_date := maturity_date_value; last_shares := last_shares_value; last_px := last_px_value; fee_code := fee_code_value; trade_date := trade_date_value; clearing_price := clearing_price_value; clearing_symbol := clearing_symbol_value; multileg_reporting_type := multileg_reporting_type_value; secondary_exec_id := secondary_exec_id_value |}, bytes)
@@ -2033,7 +2033,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 104.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2043,22 +2043,22 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -2083,12 +2083,12 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (quote_reject_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
       encode_bytes 1 (quote_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 16 bytes with
@@ -2105,7 +2105,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2115,7 +2115,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
@@ -2152,29 +2152,29 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (restatement_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (restatement_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 16 bytes with
           | None => None
           | Some (quote_update_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (leaves_qty_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (working_price_value, bytes) =>
                           match decode_bytes 6 bytes with
@@ -2199,7 +2199,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2209,11 +2209,11 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -2261,31 +2261,31 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (fee_code record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (exec_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (exec_id record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 4 (clearing_firm record) ++
-      encode_uint 4 (last_shares record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (last_shares record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (base_liquidity_indicator record) ++
       encode_bytes 1 (sub_liquidity_indicator record) ++
       encode_bytes 2 (fee_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 16 bytes with
           | None => None
           | Some (quote_update_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (exec_id_value, bytes) =>
                       match decode_bytes 6 bytes with
@@ -2294,13 +2294,13 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                           match decode_bytes 4 bytes with
                           | None => None
                           | Some (clearing_firm_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (last_shares_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_px_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (leaves_qty_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -2333,7 +2333,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2343,15 +2343,15 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -2386,21 +2386,21 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (cancel_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (cancel_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 16 bytes with
           | None => None
           | Some (quote_update_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 6 bytes with
@@ -2423,7 +2423,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2433,9 +2433,9 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -2469,21 +2469,21 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       (clearing_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 16 (quote_update_id record) ++
-      encode_uint 8 (exec_id record) ++
+      encode_uint_le 8 (exec_id record) ++
       encode_bytes 6 (quote_symbol record) ++
       encode_bytes 8 (clearing_symbol record) ++
-      encode_uint 8 (clearing_price record).
+      encode_uint_le 8 (clearing_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 16 bytes with
           | None => None
           | Some (quote_update_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (exec_id_value, bytes) =>
                   match decode_bytes 6 bytes with
@@ -2492,7 +2492,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (clearing_symbol_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (clearing_price_value, bytes) =>
                               Some ({| transaction_time := transaction_time_value; quote_update_id := quote_update_id_value; exec_id := exec_id_value; quote_symbol := quote_symbol_value; clearing_symbol := clearing_symbol_value; clearing_price := clearing_price_value |}, bytes)
@@ -2506,7 +2506,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2516,12 +2516,12 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -2548,7 +2548,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (risk_status_id record) ++
       encode_bytes 1 (risk_reset_result record) ++
-      encode_uint 8 (request_received_time record).
+      encode_uint_le 8 (request_received_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -2557,7 +2557,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
           match decode_bytes 1 bytes with
           | None => None
           | Some (risk_reset_result_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_received_time_value, bytes) =>
                   Some ({| risk_status_id := risk_status_id_value; risk_reset_result := risk_reset_result_value; request_received_time := request_received_time_value |}, bytes)
@@ -2568,7 +2568,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2580,7 +2580,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -2609,14 +2609,14 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       Datatypes.length (text record) = 60.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (transaction_time record) ++
+      encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_bytes 4 (clearing_firm record) ++
       encode_bytes 1 (complex_instrument_reject_reason record) ++
       encode_bytes 60 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (transaction_time_value, bytes) =>
           match decode_bytes 20 bytes with
@@ -2641,7 +2641,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 93.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2651,7 +2651,7 @@ Module CfeFuturesBinaryOrderEntryV1120Exchange.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.

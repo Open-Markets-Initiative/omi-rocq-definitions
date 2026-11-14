@@ -49,13 +49,13 @@ Module CfeFuturesOofMulticastTopV108.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module CfeFuturesOofMulticastTopV108.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -76,7 +76,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -166,22 +166,22 @@ Module CfeFuturesOofMulticastTopV108.
       (trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (midnight_reference record) ++
-      encode_uint 4 (time_reference record) ++
-      encode_uint 4 (time_offset record) ++
-      encode_uint 4 (trade_date record).
+      encode_uint_le 4 (midnight_reference record) ++
+      encode_uint_le 4 (time_reference record) ++
+      encode_uint_le 4 (time_offset record) ++
+      encode_uint_le 4 (trade_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (midnight_reference_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (time_reference_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (time_offset_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (trade_date_value, bytes) =>
                       Some ({| midnight_reference := midnight_reference_value; time_reference := time_reference_value; time_offset := time_offset_value; trade_date := trade_date_value |}, bytes)
@@ -193,7 +193,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -203,10 +203,10 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -229,14 +229,14 @@ Module CfeFuturesOofMulticastTopV108.
       (epoch_time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_reference record) ++
-      encode_uint 4 (epoch_time record).
+      encode_uint_le 4 (time_reference record) ++
+      encode_uint_le 4 (epoch_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_reference_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (epoch_time_value, bytes) =>
               Some ({| time_reference := time_reference_value; epoch_time := epoch_time_value |}, bytes)
@@ -246,7 +246,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -256,8 +256,8 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -296,19 +296,19 @@ Module CfeFuturesOofMulticastTopV108.
       Datatypes.length (symbol_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (feed_symbol record) ++
       encode_bytes 8 (futures_product record) ++
-      encode_uint 4 (futures_expiration record) ++
+      encode_uint_le 4 (futures_expiration record) ++
       encode_bytes 6 (futures_symbol record) ++
-      encode_uint 8 (strike_price record) ++
+      encode_uint_le 8 (strike_price record) ++
       encode_bytes 1 (call_put_indicator record) ++
-      encode_uint 4 (options_expiration record) ++
+      encode_uint_le 4 (options_expiration record) ++
       encode_bytes 16 (options_on_futures_name record) ++
       encode_bytes 1 (symbol_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -317,19 +317,19 @@ Module CfeFuturesOofMulticastTopV108.
               match decode_bytes 8 bytes with
               | None => None
               | Some (futures_product_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (futures_expiration_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (futures_symbol_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (strike_price_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (call_put_indicator_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (options_expiration_value, bytes) =>
                                       match decode_bytes 16 bytes with
@@ -353,7 +353,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 58.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -363,14 +363,14 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -401,26 +401,26 @@ Module CfeFuturesOofMulticastTopV108.
       (reserved_3 record < 256 ^ N.of_nat 3)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (reserved_2 record) ++
+      encode_uint_le 2 (reserved_2 record) ++
       encode_bytes 1 (trading_status record) ++
-      encode_uint 3 (reserved_3 record).
+      encode_uint_le 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (reserved_2_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (trading_status_value, bytes) =>
-                      match decode_uint 3 bytes with
+                      match decode_uint_le 3 bytes with
                       | None => None
                       | Some (reserved_3_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol := symbol_value; reserved_2 := reserved_2_value; trading_status := trading_status_value; reserved_3 := reserved_3_value |}, bytes)
@@ -433,7 +433,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -443,11 +443,11 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -476,14 +476,14 @@ Module CfeFuturesOofMulticastTopV108.
       (quantity_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 2 (price_short record) ++
-      encode_uint 2 (quantity_short record).
+      encode_uint_le 2 (price_short record) ++
+      encode_uint_le 2 (quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -492,10 +492,10 @@ Module CfeFuturesOofMulticastTopV108.
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (price_short_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (quantity_short_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol := symbol_value; side := side_value; price_short := price_short_value; quantity_short := quantity_short_value |}, bytes)
@@ -508,7 +508,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 15.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -518,11 +518,11 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -551,14 +551,14 @@ Module CfeFuturesOofMulticastTopV108.
       (quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (price_long record) ++
-      encode_uint 4 (quantity_long record).
+      encode_uint_le 8 (price_long record) ++
+      encode_uint_le 4 (quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
@@ -567,10 +567,10 @@ Module CfeFuturesOofMulticastTopV108.
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_long_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_long_value, bytes) =>
                           Some ({| time_offset := time_offset_value; symbol := symbol_value; side := side_value; price_long := price_long_value; quantity_long := quantity_long_value |}, bytes)
@@ -583,7 +583,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -593,11 +593,11 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -628,30 +628,30 @@ Module CfeFuturesOofMulticastTopV108.
       (ask_quantity_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 2 (bid_price_short record) ++
-      encode_uint 2 (bid_quantity_short record) ++
-      encode_uint 2 (ask_price_short record) ++
-      encode_uint 2 (ask_quantity_short record).
+      encode_uint_le 2 (bid_price_short record) ++
+      encode_uint_le 2 (bid_quantity_short record) ++
+      encode_uint_le 2 (ask_price_short record) ++
+      encode_uint_le 2 (ask_quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (bid_price_short_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (bid_quantity_short_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (ask_price_short_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (ask_quantity_short_value, bytes) =>
                               Some ({| time_offset := time_offset_value; symbol := symbol_value; bid_price_short := bid_price_short_value; bid_quantity_short := bid_quantity_short_value; ask_price_short := ask_price_short_value; ask_quantity_short := ask_quantity_short_value |}, bytes)
@@ -665,7 +665,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -675,12 +675,12 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -711,30 +711,30 @@ Module CfeFuturesOofMulticastTopV108.
       (ask_quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 8 (bid_price_long record) ++
-      encode_uint 4 (bid_quantity_long record) ++
-      encode_uint 8 (ask_price_long record) ++
-      encode_uint 4 (ask_quantity_long record).
+      encode_uint_le 8 (bid_price_long record) ++
+      encode_uint_le 4 (bid_quantity_long record) ++
+      encode_uint_le 8 (ask_price_long record) ++
+      encode_uint_le 4 (ask_quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (bid_price_long_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (bid_quantity_long_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (ask_price_long_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (ask_quantity_long_value, bytes) =>
                               Some ({| time_offset := time_offset_value; symbol := symbol_value; bid_price_long := bid_price_long_value; bid_quantity_long := bid_quantity_long_value; ask_price_long := ask_price_long_value; ask_quantity_long := ask_quantity_long_value |}, bytes)
@@ -748,7 +748,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -758,12 +758,12 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -792,23 +792,23 @@ Module CfeFuturesOofMulticastTopV108.
       Datatypes.length (issue record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (time_offset record) ++
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 6 (symbol record) ++
-      encode_uint 4 (trade_date record) ++
-      encode_uint 8 (settlement_price record) ++
+      encode_uint_le 4 (trade_date record) ++
+      encode_uint_le 8 (settlement_price record) ++
       encode_bytes 1 (issue record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (time_offset_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (trade_date_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (settlement_price_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -824,7 +824,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -834,10 +834,10 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -967,10 +967,10 @@ Module CfeFuturesOofMulticastTopV108.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -979,7 +979,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -987,7 +987,7 @@ Module CfeFuturesOofMulticastTopV108.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1008,10 +1008,10 @@ Module CfeFuturesOofMulticastTopV108.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -1020,7 +1020,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1028,7 +1028,7 @@ Module CfeFuturesOofMulticastTopV108.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1053,15 +1053,15 @@ Module CfeFuturesOofMulticastTopV108.
       Datatypes.length (spin_response_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record) ++
-      encode_uint 4 (order_count record) ++
+      encode_uint_le 4 (sequence record) ++
+      encode_uint_le 4 (order_count record) ++
       encode_bytes 1 (spin_response_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (order_count_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -1075,7 +1075,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1085,8 +1085,8 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1108,10 +1108,10 @@ Module CfeFuturesOofMulticastTopV108.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -1120,7 +1120,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1128,7 +1128,7 @@ Module CfeFuturesOofMulticastTopV108.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1149,10 +1149,10 @@ Module CfeFuturesOofMulticastTopV108.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
           Some ({| sequence := sequence_value |}, bytes)
@@ -1161,7 +1161,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1169,7 +1169,7 @@ Module CfeFuturesOofMulticastTopV108.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -1194,15 +1194,15 @@ Module CfeFuturesOofMulticastTopV108.
       Datatypes.length (instrument_definition_response_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence record) ++
-      encode_uint 4 (instrument_count record) ++
+      encode_uint_le 4 (sequence record) ++
+      encode_uint_le 4 (instrument_count record) ++
       encode_bytes 1 (instrument_definition_response_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (instrument_count_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -1216,7 +1216,7 @@ Module CfeFuturesOofMulticastTopV108.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1226,8 +1226,8 @@ Module CfeFuturesOofMulticastTopV108.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.

@@ -63,14 +63,14 @@ Module IexEquitiesTopsV156.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (version record) ++
       encode_bytes 1 (reserved record) ++
-      encode_uint 2 (message_protocol_id record) ++
-      encode_uint 4 (channel_id record) ++
-      encode_uint 4 (session_id record) ++
-      encode_uint 2 (payload_length record) ++
-      encode_uint 2 (message_count record) ++
-      encode_uint 8 (stream_offset record) ++
-      encode_uint 8 (first_message_sequence_number record) ++
-      encode_uint 8 (send_time record).
+      encode_uint_le 2 (message_protocol_id record) ++
+      encode_uint_le 4 (channel_id record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 2 (payload_length record) ++
+      encode_uint_le 2 (message_count record) ++
+      encode_uint_le 8 (stream_offset record) ++
+      encode_uint_le 8 (first_message_sequence_number record) ++
+      encode_uint_le 8 (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -79,28 +79,28 @@ Module IexEquitiesTopsV156.
           match decode_bytes 1 bytes with
           | None => None
           | Some (reserved_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (message_protocol_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (channel_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (session_id_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (payload_length_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_uint_le 2 bytes with
                               | None => None
                               | Some (message_count_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (stream_offset_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (first_message_sequence_number_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (send_time_value, bytes) =>
                                               Some ({| version := version_value; reserved := reserved_value; message_protocol_id := message_protocol_id_value; channel_id := channel_id_value; session_id := session_id_value; payload_length := payload_length_value; message_count := message_count_value; stream_offset := stream_offset_value; first_message_sequence_number := first_message_sequence_number_value; send_time := send_time_value |}, bytes)
@@ -118,7 +118,7 @@ Module IexEquitiesTopsV156.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -130,14 +130,14 @@ Module IexEquitiesTopsV156.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -160,11 +160,11 @@ Module IexEquitiesTopsV156.
       Datatypes.length (message_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_bytes 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -177,7 +177,7 @@ Module IexEquitiesTopsV156.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,7 +187,7 @@ Module IexEquitiesTopsV156.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.

@@ -47,18 +47,18 @@ Module A2XEquitiesTradingProtocolV293.
       (msg_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (msg_type record) ++
-      encode_uint 4 (msg_seq_no record).
+      encode_uint_le 4 (msg_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_seq_no_value, bytes) =>
                   Some ({| length_ := length__value; msg_type := msg_type_value; msg_seq_no := msg_seq_no_value |}, bytes)
@@ -69,7 +69,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,9 +79,9 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -110,14 +110,14 @@ Module A2XEquitiesTradingProtocolV293.
       (atp_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (protocol_version record) ++
+      encode_uint_le 2 (protocol_version record) ++
       encode_bytes 16 (sender_id record) ++
       encode_bytes 16 (password record) ++
-      encode_uint 2 (inactivity_timeout record) ++
-      encode_uint 4 (atp_seq_no record).
+      encode_uint_le 2 (inactivity_timeout record) ++
+      encode_uint_le 4 (atp_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (protocol_version_value, bytes) =>
           match decode_bytes 16 bytes with
@@ -126,10 +126,10 @@ Module A2XEquitiesTradingProtocolV293.
               match decode_bytes 16 bytes with
               | None => None
               | Some (password_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (inactivity_timeout_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (atp_seq_no_value, bytes) =>
                           Some ({| protocol_version := protocol_version_value; sender_id := sender_id_value; password := password_value; inactivity_timeout := inactivity_timeout_value; atp_seq_no := atp_seq_no_value |}, bytes)
@@ -142,7 +142,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -152,11 +152,11 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -180,13 +180,13 @@ Module A2XEquitiesTradingProtocolV293.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (result_code record) ++
-      encode_uint 4 (client_seq_no record).
+      encode_uint_le 4 (client_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (result_code_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (client_seq_no_value, bytes) =>
               Some ({| result_code := result_code_value; client_seq_no := client_seq_no_value |}, bytes)
@@ -196,7 +196,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -207,7 +207,7 @@ Module A2XEquitiesTradingProtocolV293.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -297,19 +297,19 @@ Module A2XEquitiesTradingProtocolV293.
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_id_long record) ++
+      encode_uint_le 4 (security_id_long record) ++
       encode_uint 1 (order_type record) ++
       encode_uint 1 (time_in_force record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (price record) ++
       encode_uint 1 (order_capacity record) ++
-      encode_uint 2 (account record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 2 (account record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_id_long_value, bytes) =>
           match decode_uint 1 bytes with
@@ -321,19 +321,19 @@ Module A2XEquitiesTradingProtocolV293.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (order_capacity_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (account_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (user_tag_value, bytes) =>
                                           match decode_bytes 16 bytes with
@@ -354,7 +354,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -364,15 +364,15 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
@@ -416,21 +416,21 @@ Module A2XEquitiesTradingProtocolV293.
       (min_qty record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_id_long record) ++
+      encode_uint_le 4 (security_id_long record) ++
       encode_uint 1 (order_type record) ++
       encode_uint 1 (time_in_force record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (price record) ++
       encode_uint 1 (order_capacity record) ++
-      encode_uint 2 (account record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 2 (account record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 16 (reserved_16 record) ++
-      encode_uint 4 (display_quantity record) ++
-      encode_uint 4 (min_qty record).
+      encode_uint_le 4 (display_quantity record) ++
+      encode_uint_le 4 (min_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_id_long_value, bytes) =>
           match decode_uint 1 bytes with
@@ -442,28 +442,28 @@ Module A2XEquitiesTradingProtocolV293.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (quantity_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (order_capacity_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (account_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (user_tag_value, bytes) =>
                                           match decode_bytes 16 bytes with
                                           | None => None
                                           | Some (reserved_16_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (display_quantity_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (min_qty_value, bytes) =>
                                                       Some ({| security_id_long := security_id_long_value; order_type := order_type_value; time_in_force := time_in_force_value; side := side_value; quantity := quantity_value; price := price_value; order_capacity := order_capacity_value; account := account_value; user_tag := user_tag_value; reserved_16 := reserved_16_value; display_quantity := display_quantity_value; min_qty := min_qty_value |}, bytes)
@@ -483,7 +483,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -493,18 +493,18 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       destruct record. reflexivity.
     Qed.
 
@@ -529,15 +529,15 @@ Module A2XEquitiesTradingProtocolV293.
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (user_tag_value, bytes) =>
               match decode_bytes 16 bytes with
@@ -551,7 +551,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -561,8 +561,8 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -594,24 +594,24 @@ Module A2XEquitiesTradingProtocolV293.
       (order_capacity record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 16 (reserved_16 record) ++
       encode_uint 1 (order_capacity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (user_tag_value, bytes) =>
                       match decode_bytes 16 bytes with
@@ -631,7 +631,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -641,10 +641,10 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
@@ -679,25 +679,25 @@ Module A2XEquitiesTradingProtocolV293.
       (display_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 16 (reserved_16 record) ++
       encode_uint 1 (order_capacity record) ++
-      encode_uint 4 (display_quantity record).
+      encode_uint_le 4 (display_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (user_tag_value, bytes) =>
                       match decode_bytes 16 bytes with
@@ -706,7 +706,7 @@ Module A2XEquitiesTradingProtocolV293.
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (order_capacity_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (display_quantity_value, bytes) =>
                                   Some ({| order_ref := order_ref_value; price := price_value; quantity := quantity_value; user_tag := user_tag_value; reserved_16 := reserved_16_value; order_capacity := order_capacity_value; display_quantity := display_quantity_value |}, bytes)
@@ -721,7 +721,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -731,13 +731,13 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -764,22 +764,22 @@ Module A2XEquitiesTradingProtocolV293.
       (quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 4 (orig_a2_x_ord_id record) ++
-      encode_uint 4 (new_a2_x_ord_id record) ++
-      encode_uint 4 (quantity record).
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 4 (orig_a2_x_ord_id record) ++
+      encode_uint_le 4 (new_a2_x_ord_id record) ++
+      encode_uint_le 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (orig_a2_x_ord_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (new_a2_x_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (quantity_value, bytes) =>
                       Some ({| order_ref := order_ref_value; orig_a2_x_ord_id := orig_a2_x_ord_id_value; new_a2_x_ord_id := new_a2_x_ord_id_value; quantity := quantity_value |}, bytes)
@@ -791,7 +791,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -801,10 +801,10 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -847,27 +847,27 @@ Module A2XEquitiesTradingProtocolV293.
       (sell_order_capacity record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (security_id_long record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (security_id_long record) ++
       encode_uint 1 (trade_capture_type record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 8 (user_tag record) ++
+      encode_uint_le 8 (user_tag record) ++
       encode_bytes 8 (reserved_8 record) ++
-      encode_uint 2 (buy_account record) ++
+      encode_uint_le 2 (buy_account record) ++
       encode_uint 1 (buy_order_capacity record) ++
       encode_bytes 8 (reserved_long_2 record) ++
-      encode_uint 2 (sell_account record) ++
+      encode_uint_le 2 (sell_account record) ++
       encode_uint 1 (sell_order_capacity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (quantity_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (price_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (security_id_long_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -876,13 +876,13 @@ Module A2XEquitiesTradingProtocolV293.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (user_tag_value, bytes) =>
                               match decode_bytes 8 bytes with
                               | None => None
                               | Some (reserved_8_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (buy_account_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -891,7 +891,7 @@ Module A2XEquitiesTradingProtocolV293.
                                           match decode_bytes 8 bytes with
                                           | None => None
                                           | Some (reserved_long_2_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_uint_le 2 bytes with
                                               | None => None
                                               | Some (sell_account_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -914,7 +914,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 48.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -924,17 +924,17 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       destruct record. reflexivity.
     Qed.
@@ -974,31 +974,31 @@ Module A2XEquitiesTradingProtocolV293.
       (user_tag record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (price record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (trade_ref record) ++
+      encode_uint_le 4 (trade_ref record) ++
       encode_uint 1 (ccp_code record) ++
       encode_uint 1 (liq_indicator record) ++
-      encode_uint 2 (security_id_short record) ++
-      encode_uint 8 (trade_timestamp record) ++
-      encode_uint 8 (user_tag record).
+      encode_uint_le 2 (security_id_short record) ++
+      encode_uint_le 8 (trade_timestamp record) ++
+      encode_uint_le 8 (user_tag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (trade_ref_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -1007,13 +1007,13 @@ Module A2XEquitiesTradingProtocolV293.
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (liq_indicator_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (security_id_short_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (trade_timestamp_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (user_tag_value, bytes) =>
                                               Some ({| order_ref := order_ref_value; quantity := quantity_value; price := price_value; side := side_value; trade_ref := trade_ref_value; ccp_code := ccp_code_value; liq_indicator := liq_indicator_value; security_id_short := security_id_short_value; trade_timestamp := trade_timestamp_value; user_tag := user_tag_value |}, bytes)
@@ -1031,7 +1031,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1041,16 +1041,16 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -1081,30 +1081,30 @@ Module A2XEquitiesTradingProtocolV293.
       (bust_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (order_ref record) ++
-      encode_uint 4 (quantity record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (order_ref record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 8 (price record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (trade_ref record) ++
-      encode_uint 8 (bust_timestamp record).
+      encode_uint_le 4 (trade_ref record) ++
+      encode_uint_le 8 (bust_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (order_ref_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (price_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (trade_ref_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (bust_timestamp_value, bytes) =>
                               Some ({| order_ref := order_ref_value; quantity := quantity_value; price := price_value; side := side_value; trade_ref := trade_ref_value; bust_timestamp := bust_timestamp_value |}, bytes)
@@ -1118,7 +1118,7 @@ Module A2XEquitiesTradingProtocolV293.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 29.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1128,12 +1128,12 @@ Module A2XEquitiesTradingProtocolV293.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

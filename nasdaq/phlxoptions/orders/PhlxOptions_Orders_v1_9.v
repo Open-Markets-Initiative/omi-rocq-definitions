@@ -47,17 +47,17 @@ Module PhlxOptionsOrdersV19.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 10 (session record) ++
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 2 (message_count record).
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 2 (message_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 10 bytes with
       | None => None
       | Some (session_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (message_count_value, bytes) =>
                   Some ({| session := session_value; sequence_number := sequence_number_value; message_count := message_count_value |}, bytes)
@@ -68,7 +68,7 @@ Module PhlxOptionsOrdersV19.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,8 +79,8 @@ Module PhlxOptionsOrdersV19.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

@@ -45,14 +45,14 @@ Module EurexT7EtiV60Server.
       (template_id record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (body_len record) ++
-      encode_uint 2 (template_id record).
+      encode_uint_le 4 (body_len record) ++
+      encode_uint_le 2 (template_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (body_len_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
               Some ({| body_len := body_len_value; template_id := template_id_value |}, bytes)
@@ -62,7 +62,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -72,8 +72,8 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -109,36 +109,36 @@ Module EurexT7EtiV60Server.
       Datatypes.length (pad3 record) = 3.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (request_time record) ++
-      encode_uint 8 (request_out record) ++
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (trd_reg_ts_time_out record) ++
-      encode_uint 8 (response_in record) ++
-      encode_uint 8 (sending_time record) ++
-      encode_uint 4 (msg_seq_num record) ++
+      encode_uint_le 8 (request_time record) ++
+      encode_uint_le 8 (request_out record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (trd_reg_ts_time_out record) ++
+      encode_uint_le 8 (response_in record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
       encode_uint 1 (last_fragment record) ++
       encode_bytes 3 (pad3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (request_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (request_out_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trd_reg_ts_time_in_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trd_reg_ts_time_out_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (response_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (sending_time_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (msg_seq_num_value, bytes) =>
                                   match decode_uint 1 bytes with
@@ -161,7 +161,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -171,13 +171,13 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -199,10 +199,10 @@ Module EurexT7EtiV60Server.
       (sending_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sending_time record).
+      encode_uint_le 8 (sending_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sending_time_value, bytes) =>
           Some ({| sending_time := sending_time_value |}, bytes)
@@ -211,7 +211,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -219,7 +219,7 @@ Module EurexT7EtiV60Server.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -257,11 +257,11 @@ Module EurexT7EtiV60Server.
       Datatypes.length (pad7 record) = 7.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (trd_reg_ts_time_out record) ++
-      encode_uint 8 (notification_in record) ++
-      encode_uint 8 (sending_time record) ++
-      encode_uint 4 (appl_sub_id record) ++
-      encode_uint 2 (partition_id record) ++
+      encode_uint_le 8 (trd_reg_ts_time_out record) ++
+      encode_uint_le 8 (notification_in record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 4 (appl_sub_id record) ++
+      encode_uint_le 2 (partition_id record) ++
       encode_bytes 16 (appl_msg_id record) ++
       encode_uint 1 (appl_id record) ++
       encode_uint 1 (appl_resend_flag record) ++
@@ -269,19 +269,19 @@ Module EurexT7EtiV60Server.
       encode_bytes 7 (pad7 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (trd_reg_ts_time_out_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (notification_in_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sending_time_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (appl_sub_id_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (partition_id_value, bytes) =>
                           match decode_bytes 16 bytes with
@@ -314,7 +314,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 56.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -324,11 +324,11 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
@@ -373,41 +373,41 @@ Module EurexT7EtiV60Server.
       (last_fragment record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (request_time record) ++
-      encode_uint 8 (request_out record) ++
-      encode_uint 8 (trd_reg_ts_time_in record) ++
-      encode_uint 8 (trd_reg_ts_time_out record) ++
-      encode_uint 8 (response_in record) ++
-      encode_uint 8 (sending_time record) ++
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 2 (partition_id record) ++
+      encode_uint_le 8 (request_time record) ++
+      encode_uint_le 8 (request_out record) ++
+      encode_uint_le 8 (trd_reg_ts_time_in record) ++
+      encode_uint_le 8 (trd_reg_ts_time_out record) ++
+      encode_uint_le 8 (response_in record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 2 (partition_id record) ++
       encode_uint 1 (appl_id record) ++
       encode_bytes 16 (appl_msg_id record) ++
       encode_uint 1 (last_fragment record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (request_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (request_out_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trd_reg_ts_time_in_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (trd_reg_ts_time_out_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (response_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (sending_time_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (msg_seq_num_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (partition_id_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -435,7 +435,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -445,14 +445,14 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
@@ -481,19 +481,19 @@ Module EurexT7EtiV60Server.
       Datatypes.length (pad4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (request_time record) ++
-      encode_uint 8 (sending_time record) ++
-      encode_uint 4 (msg_seq_num record) ++
+      encode_uint_le 8 (request_time record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
       encode_bytes 4 (pad4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (request_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (sending_time_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_seq_num_value, bytes) =>
                   match decode_bytes 4 bytes with
@@ -508,7 +508,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -518,9 +518,9 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -555,26 +555,26 @@ Module EurexT7EtiV60Server.
       Datatypes.length (pad7 record) = 7.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sending_time record) ++
-      encode_uint 8 (appl_seq_num record) ++
-      encode_uint 4 (appl_sub_id record) ++
-      encode_uint 2 (partition_id record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 8 (appl_seq_num record) ++
+      encode_uint_le 4 (appl_sub_id record) ++
+      encode_uint_le 2 (partition_id record) ++
       encode_uint 1 (appl_resend_flag record) ++
       encode_uint 1 (appl_id record) ++
       encode_uint 1 (last_fragment record) ++
       encode_bytes 7 (pad7 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sending_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (appl_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (appl_sub_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (partition_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -602,7 +602,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -612,10 +612,10 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -647,17 +647,17 @@ Module EurexT7EtiV60Server.
       Datatypes.length (pad2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sending_time record) ++
-      encode_uint 4 (appl_sub_id record) ++
+      encode_uint_le 8 (sending_time record) ++
+      encode_uint_le 4 (appl_sub_id record) ++
       encode_uint 1 (appl_id record) ++
       encode_uint 1 (last_fragment record) ++
       encode_bytes 2 (pad2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sending_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (appl_sub_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -679,7 +679,7 @@ Module EurexT7EtiV60Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -689,8 +689,8 @@ Module EurexT7EtiV60Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.

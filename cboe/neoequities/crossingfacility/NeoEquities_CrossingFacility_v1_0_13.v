@@ -48,13 +48,13 @@ Module NeoEquitiesCrossingFacilityV1013.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -63,7 +63,7 @@ Module NeoEquitiesCrossingFacilityV1013.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -75,7 +75,7 @@ Module NeoEquitiesCrossingFacilityV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,10 +85,10 @@ Module NeoEquitiesCrossingFacilityV1013.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -210,7 +210,7 @@ Module NeoEquitiesCrossingFacilityV1013.
       Datatypes.length (halt_reason record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_uint 1 (order_book_type record) ++
       encode_bytes 14 (symbol record) ++
       encode_bytes 1 (trading_status record) ++
@@ -218,7 +218,7 @@ Module NeoEquitiesCrossingFacilityV1013.
       encode_bytes 1 (halt_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_uint 1 bytes with
@@ -247,7 +247,7 @@ Module NeoEquitiesCrossingFacilityV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -257,7 +257,7 @@ Module NeoEquitiesCrossingFacilityV1013.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -293,15 +293,15 @@ Module NeoEquitiesCrossingFacilityV1013.
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_uint 1 (order_book_type record) ++
       encode_bytes 14 (symbol record) ++
-      encode_uint 4 (original_quantity record) ++
-      encode_uint 8 (original_price record) ++
-      encode_uint 8 (execution_id record).
+      encode_uint_le 4 (original_quantity record) ++
+      encode_uint_le 8 (original_price record) ++
+      encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_uint 1 bytes with
@@ -310,13 +310,13 @@ Module NeoEquitiesCrossingFacilityV1013.
               match decode_bytes 14 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (original_quantity_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (original_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (execution_id_value, bytes) =>
                               Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; symbol := symbol_value; original_quantity := original_quantity_value; original_price := original_price_value; execution_id := execution_id_value |}, bytes)
@@ -330,7 +330,7 @@ Module NeoEquitiesCrossingFacilityV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -340,12 +340,12 @@ Module NeoEquitiesCrossingFacilityV1013.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -388,21 +388,21 @@ Module NeoEquitiesCrossingFacilityV1013.
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_uint 1 (order_book_type record) ++
       encode_bytes 14 (symbol record) ++
-      encode_uint 4 (original_quantity record) ++
-      encode_uint 8 (original_price record) ++
+      encode_uint_le 4 (original_quantity record) ++
+      encode_uint_le 8 (original_price record) ++
       encode_uint 1 (original_settlement_type record) ++
-      encode_uint 4 (original_settlement_date record) ++
-      encode_uint 4 (corrected_quantity record) ++
-      encode_uint 8 (corrected_price record) ++
+      encode_uint_le 4 (original_settlement_date record) ++
+      encode_uint_le 4 (corrected_quantity record) ++
+      encode_uint_le 8 (corrected_price record) ++
       encode_uint 1 (corrected_settlement_type record) ++
-      encode_uint 4 (corrected_settlement_date record) ++
-      encode_uint 8 (execution_id record).
+      encode_uint_le 4 (corrected_settlement_date record) ++
+      encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_uint 1 bytes with
@@ -411,31 +411,31 @@ Module NeoEquitiesCrossingFacilityV1013.
               match decode_bytes 14 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (original_quantity_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (original_price_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (original_settlement_type_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (original_settlement_date_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (corrected_quantity_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (corrected_price_value, bytes) =>
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (corrected_settlement_type_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (corrected_settlement_date_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (execution_id_value, bytes) =>
                                                       Some ({| timestamp := timestamp_value; order_book_type := order_book_type_value; symbol := symbol_value; original_quantity := original_quantity_value; original_price := original_price_value; original_settlement_type := original_settlement_type_value; original_settlement_date := original_settlement_date_value; corrected_quantity := corrected_quantity_value; corrected_price := corrected_price_value; corrected_settlement_type := corrected_settlement_type_value; corrected_settlement_date := corrected_settlement_date_value; execution_id := execution_id_value |}, bytes)
@@ -455,7 +455,7 @@ Module NeoEquitiesCrossingFacilityV1013.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 65.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -465,18 +465,18 @@ Module NeoEquitiesCrossingFacilityV1013.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       destruct record. reflexivity.
     Qed.
 

@@ -46,14 +46,14 @@ Module CmeGlobexStreamlinedV59Udp.
       (sending_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (packet_sequence_number record) ++
-      encode_uint 8 (sending_time record).
+      encode_uint_le 4 (packet_sequence_number record) ++
+      encode_uint_le 8 (sending_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (packet_sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (sending_time_value, bytes) =>
               Some ({| packet_sequence_number := packet_sequence_number_value; sending_time := sending_time_value |}, bytes)
@@ -63,7 +63,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,8 +73,8 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -101,22 +101,22 @@ Module CmeGlobexStreamlinedV59Udp.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -128,7 +128,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -138,10 +138,10 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -164,11 +164,11 @@ Module CmeGlobexStreamlinedV59Udp.
       SimpleBinaryHeader.bounded (simple_binary_header record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_size record) ++
+      encode_uint_le 2 (message_size record) ++
       SimpleBinaryHeader.encode (simple_binary_header record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_size_value, bytes) =>
           match SimpleBinaryHeader.decode bytes with
@@ -181,7 +181,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SimpleBinaryHeader.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !SimpleBinaryHeader.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -191,7 +191,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite SimpleBinaryHeader.decode_encode by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -297,11 +297,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (num_in_group_8 record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -314,7 +314,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -324,7 +324,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -348,11 +348,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -365,7 +365,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -375,7 +375,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -399,11 +399,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -416,7 +416,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -426,7 +426,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -450,11 +450,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -467,7 +467,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -477,7 +477,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -501,11 +501,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -518,7 +518,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -528,7 +528,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -552,11 +552,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -569,7 +569,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -579,7 +579,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -603,11 +603,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -620,7 +620,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -630,7 +630,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -654,11 +654,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -671,7 +671,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -681,7 +681,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -705,11 +705,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -722,7 +722,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -732,7 +732,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -756,11 +756,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -773,7 +773,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -783,7 +783,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -807,11 +807,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -824,7 +824,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -834,7 +834,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -858,11 +858,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -875,7 +875,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -885,7 +885,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -909,11 +909,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -926,7 +926,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -936,7 +936,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -960,11 +960,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -977,7 +977,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -987,7 +987,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1011,11 +1011,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1028,7 +1028,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1038,7 +1038,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1062,11 +1062,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1079,7 +1079,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1089,7 +1089,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1113,11 +1113,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1130,7 +1130,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1140,7 +1140,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1164,11 +1164,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1181,7 +1181,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1191,7 +1191,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1215,11 +1215,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1232,7 +1232,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1242,7 +1242,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1266,11 +1266,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1283,7 +1283,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1293,7 +1293,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1317,11 +1317,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1334,7 +1334,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1344,7 +1344,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1368,11 +1368,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1385,7 +1385,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1395,7 +1395,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1419,11 +1419,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1436,7 +1436,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1446,7 +1446,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1470,11 +1470,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1487,7 +1487,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1497,7 +1497,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1525,13 +1525,13 @@ Module CmeGlobexStreamlinedV59Udp.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1552,7 +1552,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1562,7 +1562,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1592,13 +1592,13 @@ Module CmeGlobexStreamlinedV59Udp.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1619,7 +1619,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1629,7 +1629,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1659,13 +1659,13 @@ Module CmeGlobexStreamlinedV59Udp.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1686,7 +1686,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1696,7 +1696,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1722,14 +1722,14 @@ Module CmeGlobexStreamlinedV59Udp.
       (num_in_group record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (num_in_group record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (num_in_group_value, bytes) =>
               Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
@@ -1739,7 +1739,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1749,8 +1749,8 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1773,11 +1773,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1790,7 +1790,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1800,7 +1800,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1824,11 +1824,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1841,7 +1841,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1851,7 +1851,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1875,11 +1875,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1892,7 +1892,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1902,7 +1902,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1926,11 +1926,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1943,7 +1943,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1953,7 +1953,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1977,11 +1977,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1994,7 +1994,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2004,7 +2004,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2028,11 +2028,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2045,7 +2045,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2055,7 +2055,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2079,11 +2079,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2096,7 +2096,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2106,7 +2106,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2130,11 +2130,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2147,7 +2147,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2157,7 +2157,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2181,11 +2181,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2198,7 +2198,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2208,7 +2208,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2232,11 +2232,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2249,7 +2249,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2259,7 +2259,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2283,11 +2283,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2300,7 +2300,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2310,7 +2310,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2334,11 +2334,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2351,7 +2351,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2361,7 +2361,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2385,11 +2385,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2402,7 +2402,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2412,7 +2412,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2436,11 +2436,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2453,7 +2453,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2463,7 +2463,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2487,11 +2487,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2504,7 +2504,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2514,7 +2514,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -2538,11 +2538,11 @@ Module CmeGlobexStreamlinedV59Udp.
       (exponent_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2555,7 +2555,7 @@ Module CmeGlobexStreamlinedV59Udp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2565,7 +2565,7 @@ Module CmeGlobexStreamlinedV59Udp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.

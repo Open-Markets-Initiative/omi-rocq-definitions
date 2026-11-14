@@ -47,14 +47,14 @@ Module IceFuturesBgwV70.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -64,7 +64,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -74,8 +74,8 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -98,14 +98,14 @@ Module IceFuturesBgwV70.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -115,7 +115,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -125,8 +125,8 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -203,8 +203,8 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (user_id record) ++
-      encode_uint 4 (client_id record) ++
-      encode_uint 2 (heart_beat_interval record) ++
+      encode_uint_le 4 (client_id record) ++
+      encode_uint_le 2 (heart_beat_interval record) ++
       encode_bytes 30 (application_name record) ++
       encode_bytes 50 (application_version record) ++
       encode_bytes 30 (application_vendor record) ++
@@ -215,10 +215,10 @@ Module IceFuturesBgwV70.
       match decode_bytes 20 bytes with
       | None => None
       | Some (user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (client_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (heart_beat_interval_value, bytes) =>
                   match decode_bytes 30 bytes with
@@ -249,7 +249,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 236.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -260,8 +260,8 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -296,22 +296,22 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (user_id record) ++
-      encode_uint 2 (heart_beat_interval record) ++
+      encode_uint_le 2 (heart_beat_interval record) ++
       encode_uint 1 (severity_level record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (user_id_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (heart_beat_interval_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (severity_level_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (exchange_code_value, bytes) =>
                       match decode_bytes 100 bytes with
@@ -327,7 +327,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 127.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -338,9 +338,9 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -408,14 +408,14 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (user_id record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (exchange_code_value, bytes) =>
               match decode_bytes 100 bytes with
@@ -429,7 +429,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 124.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -440,7 +440,7 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -470,14 +470,14 @@ Module IceFuturesBgwV70.
       Datatypes.length (text record) = 100.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (ref_sequence_id record) ++
+      encode_uint_le 4 (ref_sequence_id record) ++
       encode_uint 1 (severity_level record) ++
       encode_bytes 20 (supported_schema_version record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (ref_sequence_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -486,7 +486,7 @@ Module IceFuturesBgwV70.
               match decode_bytes 20 bytes with
               | None => None
               | Some (supported_schema_version_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (exchange_code_value, bytes) =>
                       match decode_bytes 100 bytes with
@@ -502,7 +502,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 129.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -512,10 +512,10 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -539,14 +539,14 @@ Module IceFuturesBgwV70.
       (num_in_group record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (num_in_group record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (num_in_group_value, bytes) =>
               Some ({| block_length := block_length_value; num_in_group := num_in_group_value |}, bytes)
@@ -556,7 +556,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -566,8 +566,8 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -600,16 +600,16 @@ Module IceFuturesBgwV70.
       Datatypes.length (text record) = 100.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_req_id record) ++
+      encode_uint_le 4 (security_req_id record) ++
       encode_uint 1 (security_response_type record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_id record) ++
+      encode_uint_le 4 (market_type_id record) ++
       encode_uint 1 (security_type_optional record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_req_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -618,13 +618,13 @@ Module IceFuturesBgwV70.
               match decode_uint 1 bytes with
               | None => None
               | Some (security_request_type_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (market_type_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (security_type_optional_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (exchange_code_value, bytes) =>
                               match decode_bytes 100 bytes with
@@ -642,7 +642,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 115.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -652,12 +652,12 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -683,18 +683,18 @@ Module IceFuturesBgwV70.
       (market_type_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_req_id record) ++
+      encode_uint_le 4 (security_req_id record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_id record).
+      encode_uint_le 4 (market_type_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_req_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (security_request_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (market_type_id_value, bytes) =>
                   Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_id := market_type_id_value |}, bytes)
@@ -705,7 +705,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -715,9 +715,9 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -761,10 +761,10 @@ Module IceFuturesBgwV70.
       encode_uint 1 (trading_capacity record) ++
       encode_uint 1 (liquidity_provision record) ++
       encode_uint 1 (commodity_deriv_indicator record) ++
-      encode_uint 8 (investment_decision record) ++
-      encode_uint 8 (execution_decision record) ++
-      encode_uint 8 (client_id_code record) ++
-      encode_uint 8 (mifid_id record) ++
+      encode_uint_le 8 (investment_decision record) ++
+      encode_uint_le 8 (execution_decision record) ++
+      encode_uint_le 8 (client_id_code record) ++
+      encode_uint_le 8 (mifid_id record) ++
       encode_bytes 50 (raw_data record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -783,16 +783,16 @@ Module IceFuturesBgwV70.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (commodity_deriv_indicator_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (investment_decision_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_decision_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (client_id_code_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (mifid_id_value, bytes) =>
                                           match decode_bytes 50 bytes with
@@ -813,7 +813,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 106.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -828,10 +828,10 @@ Module IceFuturesBgwV70.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
@@ -860,18 +860,18 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (client_id record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (client_id record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (originator_user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (client_id_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (exchange_code_value, bytes) =>
                   match decode_bytes 100 bytes with
@@ -886,7 +886,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 128.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -897,8 +897,8 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -966,14 +966,14 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (originator_user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (exchange_code_value, bytes) =>
               match decode_bytes 100 bytes with
@@ -987,7 +987,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 124.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -998,7 +998,7 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -1090,31 +1090,31 @@ Module IceFuturesBgwV70.
       Datatypes.length (on_behalf_of_location_id record) = 41.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (order_qty record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (order_qty record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (time_in_force record) ++
       encode_uint 1 (side record) ++
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 1 (ord_type record) ++
       encode_uint 1 (manual_order_indicator record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (max_show record) ++
-      encode_uint 8 (stop_px record) ++
-      encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm record) ++
-      encode_uint 8 (self_match_prevention_id record) ++
-      encode_uint 2 (expire_date record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (max_show record) ++
+      encode_uint_le 8 (stop_px record) ++
+      encode_uint_le 4 (give_up_clearing_firm record) ++
+      encode_uint_le 4 (clearing_firm record) ++
+      encode_uint_le 8 (self_match_prevention_id record) ++
+      encode_uint_le 2 (expire_date record) ++
       encode_bytes 1 (self_match_prevention_instruction record) ++
       encode_bytes 1 (exec_inst record) ++
       encode_uint 1 (direct_electronic_access record) ++
       encode_uint 1 (trading_capacity record) ++
       encode_uint 1 (liquidity_provision record) ++
       encode_uint 1 (commodity_deriv_indicator record) ++
-      encode_uint 8 (investment_decision record) ++
-      encode_uint 8 (execution_decision record) ++
-      encode_uint 8 (client_id_code record) ++
-      encode_uint 8 (mifid_id record) ++
+      encode_uint_le 8 (investment_decision record) ++
+      encode_uint_le 8 (execution_decision record) ++
+      encode_uint_le 8 (client_id_code record) ++
+      encode_uint_le 8 (mifid_id record) ++
       encode_bytes 1 (cust_order_handling_inst record) ++
       encode_bytes 1 (position_effect record) ++
       encode_bytes 1 (alloc_handl_inst record) ++
@@ -1128,13 +1128,13 @@ Module IceFuturesBgwV70.
       encode_bytes 41 (on_behalf_of_location_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (price_optional_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_qty_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1152,25 +1152,25 @@ Module IceFuturesBgwV70.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (manual_order_indicator_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (cl_ord_id_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (max_show_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (stop_px_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (give_up_clearing_firm_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (clearing_firm_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (self_match_prevention_id_value, bytes) =>
-                                                              match decode_uint 2 bytes with
+                                                              match decode_uint_le 2 bytes with
                                                               | None => None
                                                               | Some (expire_date_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -1191,16 +1191,16 @@ Module IceFuturesBgwV70.
                                                                                       match decode_uint 1 bytes with
                                                                                       | None => None
                                                                                       | Some (commodity_deriv_indicator_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (investment_decision_value, bytes) =>
-                                                                                              match decode_uint 8 bytes with
+                                                                                              match decode_uint_le 8 bytes with
                                                                                               | None => None
                                                                                               | Some (execution_decision_value, bytes) =>
-                                                                                                  match decode_uint 8 bytes with
+                                                                                                  match decode_uint_le 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (client_id_code_value, bytes) =>
-                                                                                                      match decode_uint 8 bytes with
+                                                                                                      match decode_uint_le 8 bytes with
                                                                                                       | None => None
                                                                                                       | Some (mifid_id_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
@@ -1277,7 +1277,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 327.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1287,31 +1287,31 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 bound_35]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
@@ -1411,32 +1411,32 @@ Module IceFuturesBgwV70.
       Datatypes.length (on_behalf_of_location_id record) = 41.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (order_qty record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (order_qty record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (time_in_force record) ++
       encode_uint 1 (side record) ++
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 1 (ord_type record) ++
       encode_uint 1 (manual_order_indicator record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (orig_cl_ord_id record) ++
-      encode_uint 8 (max_show record) ++
-      encode_uint 8 (stop_px record) ++
-      encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm record) ++
-      encode_uint 8 (self_match_prevention_id record) ++
-      encode_uint 2 (expire_date record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
+      encode_uint_le 8 (max_show record) ++
+      encode_uint_le 8 (stop_px record) ++
+      encode_uint_le 4 (give_up_clearing_firm record) ++
+      encode_uint_le 4 (clearing_firm record) ++
+      encode_uint_le 8 (self_match_prevention_id record) ++
+      encode_uint_le 2 (expire_date record) ++
       encode_bytes 1 (self_match_prevention_instruction record) ++
       encode_bytes 1 (exec_inst record) ++
       encode_uint 1 (direct_electronic_access record) ++
       encode_uint 1 (trading_capacity record) ++
       encode_uint 1 (liquidity_provision record) ++
       encode_uint 1 (commodity_deriv_indicator record) ++
-      encode_uint 8 (investment_decision record) ++
-      encode_uint 8 (execution_decision record) ++
-      encode_uint 8 (client_id_code record) ++
-      encode_uint 8 (mifid_id record) ++
+      encode_uint_le 8 (investment_decision record) ++
+      encode_uint_le 8 (execution_decision record) ++
+      encode_uint_le 8 (client_id_code record) ++
+      encode_uint_le 8 (mifid_id record) ++
       encode_bytes 1 (alloc_handl_inst record) ++
       encode_uint 1 (price_type record) ++
       encode_bytes 14 (clearing_account record) ++
@@ -1448,13 +1448,13 @@ Module IceFuturesBgwV70.
       encode_bytes 41 (on_behalf_of_location_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (price_optional_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_qty_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1472,28 +1472,28 @@ Module IceFuturesBgwV70.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (manual_order_indicator_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (cl_ord_id_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (orig_cl_ord_id_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (max_show_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (stop_px_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (give_up_clearing_firm_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (clearing_firm_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (self_match_prevention_id_value, bytes) =>
-                                                                  match decode_uint 2 bytes with
+                                                                  match decode_uint_le 2 bytes with
                                                                   | None => None
                                                                   | Some (expire_date_value, bytes) =>
                                                                       match decode_bytes 1 bytes with
@@ -1514,16 +1514,16 @@ Module IceFuturesBgwV70.
                                                                                           match decode_uint 1 bytes with
                                                                                           | None => None
                                                                                           | Some (commodity_deriv_indicator_value, bytes) =>
-                                                                                              match decode_uint 8 bytes with
+                                                                                              match decode_uint_le 8 bytes with
                                                                                               | None => None
                                                                                               | Some (investment_decision_value, bytes) =>
-                                                                                                  match decode_uint 8 bytes with
+                                                                                                  match decode_uint_le 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (execution_decision_value, bytes) =>
-                                                                                                      match decode_uint 8 bytes with
+                                                                                                      match decode_uint_le 8 bytes with
                                                                                                       | None => None
                                                                                                       | Some (client_id_code_value, bytes) =>
-                                                                                                          match decode_uint 8 bytes with
+                                                                                                          match decode_uint_le 8 bytes with
                                                                                                           | None => None
                                                                                                           | Some (mifid_id_value, bytes) =>
                                                                                                               match decode_bytes 1 bytes with
@@ -1593,7 +1593,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 333.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1603,32 +1603,32 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 bound_34]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
       rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_uint by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
@@ -1666,23 +1666,23 @@ Module IceFuturesBgwV70.
       (side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (orig_cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
       encode_uint 1 (side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_value, bytes) =>
           match decode_bytes 20 bytes with
           | None => None
           | Some (originator_user_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (orig_cl_ord_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -1698,7 +1698,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1708,10 +1708,10 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -1753,10 +1753,10 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 1 (side_optional record) ++
-      encode_uint 8 (order_qty_optional record) ++
-      encode_uint 8 (rfq_req_id record) ++
-      encode_uint 4 (symbol record) ++
-      encode_uint 4 (clearing_firm_optional record) ++
+      encode_uint_le 8 (order_qty_optional record) ++
+      encode_uint_le 8 (rfq_req_id record) ++
+      encode_uint_le 4 (symbol record) ++
+      encode_uint_le 4 (clearing_firm_optional record) ++
       encode_bytes 14 (clearing_account_optional record) ++
       encode_bytes 41 (on_behalf_of_comp_id record) ++
       encode_bytes 41 (on_behalf_of_sub_id record) ++
@@ -1769,16 +1769,16 @@ Module IceFuturesBgwV70.
           match decode_uint 1 bytes with
           | None => None
           | Some (side_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_qty_optional_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (rfq_req_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (clearing_firm_optional_value, bytes) =>
                               match decode_bytes 14 bytes with
@@ -1808,7 +1808,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 182.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1820,10 +1820,10 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -1869,10 +1869,10 @@ Module IceFuturesBgwV70.
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 1 (ord_type_optional record) ++
       encode_uint 1 (side_optional record) ++
-      encode_uint 4 (symbol_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (market_type_i_d_optional record) ++
-      encode_uint 8 (price_optional record) ++
+      encode_uint_le 4 (symbol_optional record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 4 (market_type_i_d_optional record) ++
+      encode_uint_le 8 (price_optional record) ++
       encode_uint 1 (mass_cancel_request_type record) ++
       encode_uint 1 (time_in_force_optional record) ++
       encode_bytes 41 (on_behalf_of_sub_i_d_optional record).
@@ -1887,16 +1887,16 @@ Module IceFuturesBgwV70.
               match decode_uint 1 bytes with
               | None => None
               | Some (side_optional_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_optional_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (cl_ord_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (market_type_i_d_optional_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_optional_value, bytes) =>
                                   match decode_uint 1 bytes with
@@ -1923,7 +1923,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 89.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1936,10 +1936,10 @@ Module IceFuturesBgwV70.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1977,38 +1977,38 @@ Module IceFuturesBgwV70.
       (strike_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_req_id record) ++
+      encode_uint_le 4 (security_req_id record) ++
       encode_uint 1 (security_request_type record) ++
-      encode_uint 4 (market_type_id record) ++
+      encode_uint_le 4 (market_type_id record) ++
       encode_uint 1 (security_type record) ++
-      encode_uint 2 (maturity_date record) ++
-      encode_uint 4 (product_i_d_optional record) ++
-      encode_uint 4 (symbol_optional record) ++
-      encode_uint 8 (strike_price record).
+      encode_uint_le 2 (maturity_date record) ++
+      encode_uint_le 4 (product_i_d_optional record) ++
+      encode_uint_le 4 (symbol_optional record) ++
+      encode_uint_le 8 (strike_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_req_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (security_request_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (market_type_id_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (security_type_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (maturity_date_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (product_i_d_optional_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (symbol_optional_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (strike_price_value, bytes) =>
                                       Some ({| security_req_id := security_req_id_value; security_request_type := security_request_type_value; market_type_id := market_type_id_value; security_type := security_type_value; maturity_date := maturity_date_value; product_i_d_optional := product_i_d_optional_value; symbol_optional := symbol_optional_value; strike_price := strike_price_value |}, bytes)
@@ -2024,7 +2024,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2034,14 +2034,14 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -2066,18 +2066,18 @@ Module IceFuturesBgwV70.
       (transact_time_utc_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (system_id record) ++
-      encode_uint 4 (system_sequence_id record) ++
-      encode_uint 8 (transact_time_utc_timestamp record).
+      encode_uint_le 8 (system_id record) ++
+      encode_uint_le 4 (system_sequence_id record) ++
+      encode_uint_le 8 (transact_time_utc_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (system_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (system_sequence_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transact_time_utc_timestamp_value, bytes) =>
                   Some ({| system_id := system_id_value; system_sequence_id := system_sequence_id_value; transact_time_utc_timestamp := transact_time_utc_timestamp_value |}, bytes)
@@ -2088,7 +2088,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2098,9 +2098,9 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -2123,14 +2123,14 @@ Module IceFuturesBgwV70.
       (original_creation_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (original_system_id record) ++
-      encode_uint 8 (original_creation_timestamp record).
+      encode_uint_le 8 (original_system_id record) ++
+      encode_uint_le 8 (original_creation_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (original_system_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (original_creation_timestamp_value, bytes) =>
               Some ({| original_system_id := original_system_id_value; original_creation_timestamp := original_creation_timestamp_value |}, bytes)
@@ -2140,7 +2140,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2150,8 +2150,8 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -2198,15 +2198,15 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (ord_type record) ++
       encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (leaves_qty record) ++
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (me_acceptance_time record) ++
-      encode_uint 8 (time_priority record) ++
+      encode_uint_le 8 (leaves_qty record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (me_acceptance_time record) ++
+      encode_uint_le 8 (time_priority record) ++
       encode_uint 1 (order_status record) ++
       encode_bytes 30 (memo record).
 
@@ -2217,10 +2217,10 @@ Module IceFuturesBgwV70.
           match ExecIDOrderExecId.decode bytes with
           | None => None
           | Some (exec_i_d_order_exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -2232,16 +2232,16 @@ Module IceFuturesBgwV70.
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (leaves_qty_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (price_optional_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (me_acceptance_time_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (time_priority_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -2268,7 +2268,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 133.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_le_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2280,15 +2280,15 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite ExecIDOrderExecId.decode_encode by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite OrigOrderId.decode_encode by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
@@ -2337,16 +2337,16 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (ord_type record) ++
       encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_optional record) ++
-      encode_uint 8 (me_acceptance_time record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 8 (orig_cl_ord_i_d_optional record) ++
+      encode_uint_le 8 (me_acceptance_time record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_uint 1 (cancel_reason record) ++
-      encode_uint 8 (cross_i_d_optional record) ++
+      encode_uint_le 8 (cross_i_d_optional record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2356,10 +2356,10 @@ Module IceFuturesBgwV70.
           match ExecIDOrderExecId.decode bytes with
           | None => None
           | Some (exec_i_d_order_exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -2371,19 +2371,19 @@ Module IceFuturesBgwV70.
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (orig_cl_ord_i_d_optional_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (me_acceptance_time_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (exchange_code_value, bytes) =>
                                               match decode_uint 1 bytes with
                                               | None => None
                                               | Some (cancel_reason_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (cross_i_d_optional_value, bytes) =>
                                                       match decode_bytes 100 bytes with
@@ -2407,7 +2407,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 199.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_le_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2419,16 +2419,16 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite ExecIDOrderExecId.decode_encode by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite OrigOrderId.decode_encode by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
@@ -2478,16 +2478,16 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (ord_type_optional record) ++
       encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (orig_cl_ord_i_d_optional record) ++
+      encode_uint_le 8 (orig_cl_ord_i_d_optional record) ++
       encode_uint 1 (order_status record) ++
       encode_uint 1 (reject_response_to record) ++
       encode_uint 1 (reject_reason record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 30 (memo record) ++
       encode_bytes 100 (text record).
 
@@ -2498,10 +2498,10 @@ Module IceFuturesBgwV70.
           match ExecIDOrderExecId.decode bytes with
           | None => None
           | Some (exec_i_d_order_exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -2513,7 +2513,7 @@ Module IceFuturesBgwV70.
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (orig_cl_ord_i_d_optional_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -2525,7 +2525,7 @@ Module IceFuturesBgwV70.
                                               match decode_uint 1 bytes with
                                               | None => None
                                               | Some (reject_reason_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (exchange_code_value, bytes) =>
                                                       match decode_bytes 30 bytes with
@@ -2553,7 +2553,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 215.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_le_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2565,16 +2565,16 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite ExecIDOrderExecId.decode_encode by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite OrigOrderId.decode_encode by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       destruct record. reflexivity.
@@ -2679,32 +2679,32 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       ExecIDOrderExecId.encode (exec_i_d_order_exec_id record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 4 (symbol record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 4 (symbol record) ++
       encode_uint 1 (ord_type record) ++
       encode_uint 1 (side record) ++
       OrigOrderId.encode (orig_order_id record) ++
-      encode_uint 8 (max_show record) ++
-      encode_uint 8 (leaves_qty record) ++
-      encode_uint 8 (cum_qty record) ++
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (stop_px record) ++
-      encode_uint 2 (expire_date record) ++
-      encode_uint 8 (time_priority record) ++
+      encode_uint_le 8 (max_show record) ++
+      encode_uint_le 8 (leaves_qty record) ++
+      encode_uint_le 8 (cum_qty record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (stop_px record) ++
+      encode_uint_le 2 (expire_date record) ++
+      encode_uint_le 8 (time_priority record) ++
       encode_uint 1 (time_in_force record) ++
       encode_uint 1 (order_status record) ++
       encode_uint 1 (order_state record) ++
-      encode_uint 4 (give_up_clearing_firm record) ++
-      encode_uint 4 (clearing_firm_optional record) ++
+      encode_uint_le 4 (give_up_clearing_firm record) ++
+      encode_uint_le 4 (clearing_firm_optional record) ++
       encode_uint 1 (direct_electronic_access record) ++
       encode_uint 1 (trading_capacity record) ++
       encode_uint 1 (liquidity_provision record) ++
       encode_uint 1 (commodity_deriv_indicator record) ++
-      encode_uint 8 (investment_decision record) ++
-      encode_uint 8 (execution_decision record) ++
-      encode_uint 8 (client_id_code record) ++
-      encode_uint 8 (mifid_id record) ++
-      encode_uint 8 (self_match_prevention_id record) ++
+      encode_uint_le 8 (investment_decision record) ++
+      encode_uint_le 8 (execution_decision record) ++
+      encode_uint_le 8 (client_id_code record) ++
+      encode_uint_le 8 (mifid_id record) ++
+      encode_uint_le 8 (self_match_prevention_id record) ++
       encode_bytes 1 (self_match_prevention_instruction record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_bytes 1 (exec_inst record) ++
@@ -2726,10 +2726,10 @@ Module IceFuturesBgwV70.
           match ExecIDOrderExecId.decode bytes with
           | None => None
           | Some (exec_i_d_order_exec_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -2741,25 +2741,25 @@ Module IceFuturesBgwV70.
                               match OrigOrderId.decode bytes with
                               | None => None
                               | Some (orig_order_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (max_show_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (leaves_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (cum_qty_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (price_optional_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (stop_px_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_uint_le 2 bytes with
                                                       | None => None
                                                       | Some (expire_date_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (time_priority_value, bytes) =>
                                                               match decode_uint 1 bytes with
@@ -2771,10 +2771,10 @@ Module IceFuturesBgwV70.
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (order_state_value, bytes) =>
-                                                                          match decode_uint 4 bytes with
+                                                                          match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (give_up_clearing_firm_value, bytes) =>
-                                                                              match decode_uint 4 bytes with
+                                                                              match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (clearing_firm_optional_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
@@ -2789,19 +2789,19 @@ Module IceFuturesBgwV70.
                                                                                               match decode_uint 1 bytes with
                                                                                               | None => None
                                                                                               | Some (commodity_deriv_indicator_value, bytes) =>
-                                                                                                  match decode_uint 8 bytes with
+                                                                                                  match decode_uint_le 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (investment_decision_value, bytes) =>
-                                                                                                      match decode_uint 8 bytes with
+                                                                                                      match decode_uint_le 8 bytes with
                                                                                                       | None => None
                                                                                                       | Some (execution_decision_value, bytes) =>
-                                                                                                          match decode_uint 8 bytes with
+                                                                                                          match decode_uint_le 8 bytes with
                                                                                                           | None => None
                                                                                                           | Some (client_id_code_value, bytes) =>
-                                                                                                              match decode_uint 8 bytes with
+                                                                                                              match decode_uint_le 8 bytes with
                                                                                                               | None => None
                                                                                                               | Some (mifid_id_value, bytes) =>
-                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (self_match_prevention_id_value, bytes) =>
                                                                                                                       match decode_bytes 1 bytes with
@@ -2889,7 +2889,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 380.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !ExecIDOrderExecId.encode_length, !encode_uint_le_length, !encode_uint_length, !OrigOrderId.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2901,32 +2901,32 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite ExecIDOrderExecId.decode_encode by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite OrigOrderId.decode_encode by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
       rewrite decode_encode_uint by exact bound_20.
       rewrite decode_encode_uint by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
-      rewrite decode_encode_uint by exact bound_26.
-      rewrite decode_encode_uint by exact bound_27.
+      rewrite decode_encode_uint_le by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_26.
+      rewrite decode_encode_uint_le by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_uint by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
@@ -2978,12 +2978,12 @@ Module IceFuturesBgwV70.
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
       encode_uint 1 (side_optional record) ++
-      encode_uint 4 (symbol record) ++
-      encode_uint 8 (rfq_req_id record) ++
-      encode_uint 8 (rfq_system_id record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (order_qty_optional record) ++
-      encode_uint 2 (quote_ack_status record) ++
+      encode_uint_le 4 (symbol record) ++
+      encode_uint_le 8 (rfq_req_id record) ++
+      encode_uint_le 8 (rfq_system_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (order_qty_optional record) ++
+      encode_uint_le 2 (quote_ack_status record) ++
       encode_uint 1 (quote_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2993,22 +2993,22 @@ Module IceFuturesBgwV70.
           match decode_uint 1 bytes with
           | None => None
           | Some (side_optional_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (rfq_req_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (rfq_system_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (transact_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (order_qty_optional_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (quote_ack_status_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -3028,7 +3028,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 60.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3040,12 +3040,12 @@ Module IceFuturesBgwV70.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -3080,30 +3080,30 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (symbol record) ++
-      encode_uint 8 (cross_id record) ++
-      encode_uint 8 (transact_time record) ++
+      encode_uint_le 4 (symbol record) ++
+      encode_uint_le 8 (cross_id record) ++
+      encode_uint_le 8 (transact_time record) ++
       encode_uint 1 (rfc_status record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (originator_user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cross_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (transact_time_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (rfc_status_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (exchange_code_value, bytes) =>
                               match decode_bytes 100 bytes with
@@ -3121,7 +3121,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 145.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3132,11 +3132,11 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -3177,30 +3177,30 @@ Module IceFuturesBgwV70.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (originator_user_id record) ++
-      encode_uint 4 (symbol_optional record) ++
-      encode_uint 8 (cl_ord_id record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 4 (market_type_i_d_optional record) ++
+      encode_uint_le 4 (symbol_optional record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 4 (market_type_i_d_optional record) ++
       encode_uint 1 (mass_cancel_request_type record) ++
       encode_uint 1 (mass_cancel_response record) ++
       encode_uint 1 (mass_cancel_reject_reason record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
       | Some (originator_user_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_optional_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (cl_ord_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (transact_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (market_type_i_d_optional_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -3212,7 +3212,7 @@ Module IceFuturesBgwV70.
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (mass_cancel_reject_reason_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (exchange_code_value, bytes) =>
                                           match decode_bytes 100 bytes with
@@ -3233,7 +3233,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 151.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3244,14 +3244,14 @@ Module IceFuturesBgwV70.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
     Qed.
@@ -3275,14 +3275,14 @@ Module IceFuturesBgwV70.
       (end_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_no record) ++
-      encode_uint 4 (end_seq_no record).
+      encode_uint_le 4 (begin_seq_no record) ++
+      encode_uint_le 4 (end_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_no_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_no_value, bytes) =>
               Some ({| begin_seq_no := begin_seq_no_value; end_seq_no := end_seq_no_value |}, bytes)
@@ -3292,7 +3292,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3302,8 +3302,8 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -3332,23 +3332,23 @@ Module IceFuturesBgwV70.
       Datatypes.length (text record) = 100.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_no record) ++
-      encode_uint 4 (end_seq_no record) ++
+      encode_uint_le 4 (begin_seq_no record) ++
+      encode_uint_le 4 (end_seq_no record) ++
       encode_uint 1 (status record) ++
-      encode_uint 4 (exchange_code record) ++
+      encode_uint_le 4 (exchange_code record) ++
       encode_bytes 100 (text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_no_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_no_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (status_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (exchange_code_value, bytes) =>
                       match decode_bytes 100 bytes with
@@ -3364,7 +3364,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 113.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3374,10 +3374,10 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -3401,11 +3401,11 @@ Module IceFuturesBgwV70.
       (gap_fill_flag record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record) ++
+      encode_uint_le 4 (new_seq_no record) ++
       encode_uint 1 (gap_fill_flag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           match decode_uint 1 bytes with
@@ -3418,7 +3418,7 @@ Module IceFuturesBgwV70.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -3428,7 +3428,7 @@ Module IceFuturesBgwV70.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.

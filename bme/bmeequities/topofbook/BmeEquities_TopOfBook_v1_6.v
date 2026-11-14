@@ -44,11 +44,11 @@ Module BmeEquitiesTopOfBookV16.
       (message_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_size record) ++
+      encode_uint_le 2 (message_size record) ++
       encode_uint 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -61,7 +61,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -71,7 +71,7 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -107,17 +107,17 @@ Module BmeEquitiesTopOfBookV16.
       (sequence_number_to record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_uint 1 (heart_bt_int record) ++
       encode_bytes 6 (protocol_version record) ++
       encode_bytes 1 (test_production_ind record) ++
       encode_bytes 2 (environment_code record) ++
-      encode_uint 4 (session_date record) ++
-      encode_uint 4 (expected_sequence_number record) ++
-      encode_uint 4 (sequence_number_to record).
+      encode_uint_le 4 (session_date record) ++
+      encode_uint_le 4 (expected_sequence_number record) ++
+      encode_uint_le 4 (sequence_number_to record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_uint 1 bytes with
@@ -132,13 +132,13 @@ Module BmeEquitiesTopOfBookV16.
                       match decode_bytes 2 bytes with
                       | None => None
                       | Some (environment_code_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (session_date_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (expected_sequence_number_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (sequence_number_to_value, bytes) =>
                                       Some ({| sequence_number := sequence_number_value; heart_bt_int := heart_bt_int_value; protocol_version := protocol_version_value; test_production_ind := test_production_ind_value; environment_code := environment_code_value; session_date := session_date_value; expected_sequence_number := expected_sequence_number_value; sequence_number_to := sequence_number_to_value |}, bytes)
@@ -154,7 +154,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -164,14 +164,14 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -194,11 +194,11 @@ Module BmeEquitiesTopOfBookV16.
       (logout_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_uint 1 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_uint 1 bytes with
@@ -211,7 +211,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -221,7 +221,7 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -243,10 +243,10 @@ Module BmeEquitiesTopOfBookV16.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           Some ({| sequence_number := sequence_number_value |}, bytes)
@@ -255,7 +255,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -263,7 +263,7 @@ Module BmeEquitiesTopOfBookV16.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -286,11 +286,11 @@ Module BmeEquitiesTopOfBookV16.
       (network_status_value record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_uint 1 (network_status_value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_uint 1 bytes with
@@ -303,7 +303,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -313,7 +313,7 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -343,14 +343,14 @@ Module BmeEquitiesTopOfBookV16.
       (transaction_date_and_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_uint 1 (trading_session_id record) ++
       encode_uint 1 (trading_session_sub_id record) ++
       encode_uint 1 (trad_ses_status record) ++
-      encode_uint 8 (transaction_date_and_time record).
+      encode_uint_le 8 (transaction_date_and_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_uint 1 bytes with
@@ -362,7 +362,7 @@ Module BmeEquitiesTopOfBookV16.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (trad_ses_status_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (transaction_date_and_time_value, bytes) =>
                           Some ({| sequence_number := sequence_number_value; trading_session_id := trading_session_id_value; trading_session_sub_id := trading_session_sub_id_value; trad_ses_status := trad_ses_status_value; transaction_date_and_time := transaction_date_and_time_value |}, bytes)
@@ -375,7 +375,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 15.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -385,11 +385,11 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -412,11 +412,11 @@ Module BmeEquitiesTopOfBookV16.
       Datatypes.length (news_text record) = 78.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 78 (news_text record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_bytes 78 bytes with
@@ -429,7 +429,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 82.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -439,7 +439,7 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -471,15 +471,15 @@ Module BmeEquitiesTopOfBookV16.
       Datatypes.length (symbol_isin record) = 12.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 4 (market_id record) ++
       encode_bytes 4 (market_segment_id record) ++
-      encode_uint 4 (security_code record) ++
+      encode_uint_le 4 (security_code record) ++
       encode_bytes 22 (symbol record) ++
       encode_bytes 12 (symbol_isin record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -488,7 +488,7 @@ Module BmeEquitiesTopOfBookV16.
               match decode_bytes 4 bytes with
               | None => None
               | Some (market_segment_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (security_code_value, bytes) =>
                       match decode_bytes 22 bytes with
@@ -508,7 +508,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -518,10 +518,10 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
@@ -718,10 +718,10 @@ Module BmeEquitiesTopOfBookV16.
       (self_match_prevention record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 4 (market_id record) ++
       encode_bytes 4 (market_segment_id record) ++
-      encode_uint 4 (security_code record) ++
+      encode_uint_le 4 (security_code record) ++
       encode_bytes 22 (symbol record) ++
       encode_bytes 12 (symbol_isin record) ++
       encode_bytes 35 (fisn record) ++
@@ -729,19 +729,19 @@ Module BmeEquitiesTopOfBookV16.
       encode_bytes 2 (security_group record) ++
       encode_bytes 6 (cfi_code record) ++
       encode_bytes 2 (security_type record) ++
-      encode_uint 4 (maturity_date record) ++
-      encode_uint 4 (issue_date record) ++
-      encode_uint 8 (contract_multiplier record) ++
-      encode_uint 8 (li_spre record) ++
-      encode_uint 8 (sst_ipre record) ++
-      encode_uint 8 (li_spost record) ++
-      encode_uint 8 (sst_ipost record) ++
+      encode_uint_le 4 (maturity_date record) ++
+      encode_uint_le 4 (issue_date record) ++
+      encode_uint_le 8 (contract_multiplier record) ++
+      encode_uint_le 8 (li_spre record) ++
+      encode_uint_le 8 (sst_ipre record) ++
+      encode_uint_le 8 (li_spost record) ++
+      encode_uint_le 8 (sst_ipost record) ++
       encode_uint 1 (liquid_instrument record) ++
       encode_uint 1 (admission_requested_by_issuer record) ++
-      encode_uint 4 (min_trade_vol record) ++
-      encode_uint 4 (round_lot record) ++
+      encode_uint_le 4 (min_trade_vol record) ++
+      encode_uint_le 4 (round_lot record) ++
       encode_bytes 3 (currency record) ++
-      encode_uint 4 (modality_mask_b_4 record) ++
+      encode_uint_le 4 (modality_mask_b_4 record) ++
       encode_bytes 80 (security_description record) ++
       encode_uint 1 (trading_obligation record) ++
       encode_bytes 40 (security_name record) ++
@@ -749,66 +749,66 @@ Module BmeEquitiesTopOfBookV16.
       encode_bytes 2 (security_sub_type record) ++
       encode_bytes 8 (maturity_month_year record) ++
       encode_bytes 1 (security_status record) ++
-      encode_uint 8 (strike_price record) ++
-      encode_uint 8 (strike_value record) ++
+      encode_uint_le 8 (strike_price record) ++
+      encode_uint_le 8 (strike_value record) ++
       encode_bytes 1 (exercise_style record) ++
       encode_bytes 1 (put_or_call record) ++
-      encode_uint 8 (position_limit record) ++
-      encode_uint 8 (nt_position_limit record) ++
+      encode_uint_le 8 (position_limit record) ++
+      encode_uint_le 8 (nt_position_limit record) ++
       encode_bytes 12 (issuer record) ++
       encode_uint 1 (cp_reg_type record) ++
-      encode_uint 8 (barrier record) ++
-      encode_uint 4 (last_trading_day record) ++
+      encode_uint_le 8 (barrier record) ++
+      encode_uint_le 4 (last_trading_day record) ++
       encode_uint 1 (automatic_expiration record) ++
       encode_bytes 2 (fee_type record) ++
-      encode_uint 8 (barrier_2 record) ++
-      encode_uint 8 (trigger_barrier record) ++
-      encode_uint 8 (trigger_upper_barrier record) ++
-      encode_uint 8 (average_quarterly_turnover record) ++
+      encode_uint_le 8 (barrier_2 record) ++
+      encode_uint_le 8 (trigger_barrier record) ++
+      encode_uint_le 8 (trigger_upper_barrier record) ++
+      encode_uint_le 8 (average_quarterly_turnover record) ++
       encode_uint 1 (trading_scope record) ++
       encode_bytes 4 (sicav_counterparty_member record) ++
       encode_uint 1 (net_asset_value_indicator record) ++
       encode_bytes 1 (reference_trading_venue record) ++
-      encode_uint 8 (outstanding_capital record) ++
-      encode_uint 4 (first_trading_date record) ++
+      encode_uint_le 8 (outstanding_capital record) ++
+      encode_uint_le 4 (first_trading_date record) ++
       encode_bytes 1 (settlement_system record) ++
       encode_uint 1 (number_of_decimals record) ++
-      encode_uint 4 (number_of_holders record) ++
-      encode_uint 4 (outstanding_shares record) ++
-      encode_uint 4 (minimum_authorized_shares record) ++
-      encode_uint 8 (minimum_capital record) ++
-      encode_uint 4 (last_admission_date record) ++
-      encode_uint 8 (barrier_return record) ++
+      encode_uint_le 4 (number_of_holders record) ++
+      encode_uint_le 4 (outstanding_shares record) ++
+      encode_uint_le 4 (minimum_authorized_shares record) ++
+      encode_uint_le 8 (minimum_capital record) ++
+      encode_uint_le 4 (last_admission_date record) ++
+      encode_uint_le 8 (barrier_return record) ++
       encode_bytes 80 (investment_fund_manager record) ++
-      encode_uint 8 (effective_amount_filters_routed_orders record) ++
+      encode_uint_le 8 (effective_amount_filters_routed_orders record) ++
       encode_uint 1 (order_number_of_decimals record) ++
       encode_uint 1 (investment_fund_class record) ++
       encode_bytes 80 (master_fund_name record) ++
       encode_bytes 80 (investment_fund_management_company record) ++
       encode_bytes 80 (investment_fund_depository record) ++
       encode_bytes 80 (investment_fund_category record) ++
-      encode_uint 8 (investment_fund_minimum_subscription_amount record) ++
-      encode_uint 8 (investment_fund_minimum_maintenance_amount record) ++
-      encode_uint 8 (investment_fund_cut_off_time record) ++
+      encode_uint_le 8 (investment_fund_minimum_subscription_amount record) ++
+      encode_uint_le 8 (investment_fund_minimum_maintenance_amount record) ++
+      encode_uint_le 8 (investment_fund_cut_off_time record) ++
       encode_bytes 1 (nav_communication_term record) ++
       encode_uint 1 (investment_fund_number_of_decimals record) ++
       encode_bytes 1 (commodity_derivative_indicator record) ++
       encode_uint 1 (double_volume_cap_reached record) ++
-      encode_uint 8 (adt record) ++
+      encode_uint_le 8 (adt record) ++
       encode_bytes 4 (base_product record) ++
       encode_bytes 4 (sub_product record) ++
       encode_bytes 4 (further_sub_product record) ++
-      encode_uint 8 (adnt record) ++
+      encode_uint_le 8 (adnt record) ++
       encode_uint 1 (price_tick_rule record) ++
       encode_bytes 22 (underlying_symbol record) ++
       encode_bytes 12 (underlying_isin record) ++
       encode_bytes 3 (underlying_currency record) ++
-      encode_uint 4 (minimum_display_qty record) ++
+      encode_uint_le 4 (minimum_display_qty record) ++
       encode_uint 1 (retail_service_flag record) ++
       encode_uint 1 (self_match_prevention record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -817,7 +817,7 @@ Module BmeEquitiesTopOfBookV16.
               match decode_bytes 4 bytes with
               | None => None
               | Some (market_segment_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (security_code_value, bytes) =>
                       match decode_bytes 22 bytes with
@@ -841,25 +841,25 @@ Module BmeEquitiesTopOfBookV16.
                                               match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (security_type_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (maturity_date_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (issue_date_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (contract_multiplier_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (li_spre_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (sst_ipre_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (li_spost_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (sst_ipost_value, bytes) =>
                                                                               match decode_uint 1 bytes with
@@ -868,16 +868,16 @@ Module BmeEquitiesTopOfBookV16.
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (admission_requested_by_issuer_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (min_trade_vol_value, bytes) =>
-                                                                                          match decode_uint 4 bytes with
+                                                                                          match decode_uint_le 4 bytes with
                                                                                           | None => None
                                                                                           | Some (round_lot_value, bytes) =>
                                                                                               match decode_bytes 3 bytes with
                                                                                               | None => None
                                                                                               | Some (currency_value, bytes) =>
-                                                                                                  match decode_uint 4 bytes with
+                                                                                                  match decode_uint_le 4 bytes with
                                                                                                   | None => None
                                                                                                   | Some (modality_mask_b_4_value, bytes) =>
                                                                                                       match decode_bytes 80 bytes with
@@ -901,10 +901,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (security_status_value, bytes) =>
-                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (strike_price_value, bytes) =>
-                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (strike_value_value, bytes) =>
                                                                                                                                           match decode_bytes 1 bytes with
@@ -913,10 +913,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (put_or_call_value, bytes) =>
-                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (position_limit_value, bytes) =>
-                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                       | None => None
                                                                                                                                                       | Some (nt_position_limit_value, bytes) =>
                                                                                                                                                           match decode_bytes 12 bytes with
@@ -925,10 +925,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                               match decode_uint 1 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (cp_reg_type_value, bytes) =>
-                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (barrier_value, bytes) =>
-                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                       | None => None
                                                                                                                                                                       | Some (last_trading_day_value, bytes) =>
                                                                                                                                                                           match decode_uint 1 bytes with
@@ -937,16 +937,16 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                               match decode_bytes 2 bytes with
                                                                                                                                                                               | None => None
                                                                                                                                                                               | Some (fee_type_value, bytes) =>
-                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                   | None => None
                                                                                                                                                                                   | Some (barrier_2_value, bytes) =>
-                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                       | None => None
                                                                                                                                                                                       | Some (trigger_barrier_value, bytes) =>
-                                                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                                                           | None => None
                                                                                                                                                                                           | Some (trigger_upper_barrier_value, bytes) =>
-                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                               | None => None
                                                                                                                                                                                               | Some (average_quarterly_turnover_value, bytes) =>
                                                                                                                                                                                                   match decode_uint 1 bytes with
@@ -961,10 +961,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                               | Some (reference_trading_venue_value, bytes) =>
-                                                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                   | Some (outstanding_capital_value, bytes) =>
-                                                                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                       | Some (first_trading_date_value, bytes) =>
                                                                                                                                                                                                                           match decode_bytes 1 bytes with
@@ -973,28 +973,28 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                               match decode_uint 1 bytes with
                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                               | Some (number_of_decimals_value, bytes) =>
-                                                                                                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                   | Some (number_of_holders_value, bytes) =>
-                                                                                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                       | Some (outstanding_shares_value, bytes) =>
-                                                                                                                                                                                                                                          match decode_uint 4 bytes with
+                                                                                                                                                                                                                                          match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                           | Some (minimum_authorized_shares_value, bytes) =>
-                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                               | Some (minimum_capital_value, bytes) =>
-                                                                                                                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                   | Some (last_admission_date_value, bytes) =>
-                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                       | Some (barrier_return_value, bytes) =>
                                                                                                                                                                                                                                                           match decode_bytes 80 bytes with
                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                           | Some (investment_fund_manager_value, bytes) =>
-                                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                               | Some (effective_amount_filters_routed_orders_value, bytes) =>
                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
@@ -1015,13 +1015,13 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                       match decode_bytes 80 bytes with
                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                       | Some (investment_fund_category_value, bytes) =>
-                                                                                                                                                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                           | Some (investment_fund_minimum_subscription_amount_value, bytes) =>
-                                                                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                               | Some (investment_fund_minimum_maintenance_amount_value, bytes) =>
-                                                                                                                                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                   | Some (investment_fund_cut_off_time_value, bytes) =>
                                                                                                                                                                                                                                                                                                       match decode_bytes 1 bytes with
@@ -1036,7 +1036,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                   | Some (double_volume_cap_reached_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                       | Some (adt_value, bytes) =>
                                                                                                                                                                                                                                                                                                                           match decode_bytes 4 bytes with
@@ -1048,7 +1048,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                                   match decode_bytes 4 bytes with
                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                   | Some (further_sub_product_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                       | Some (adnt_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                           match decode_uint 1 bytes with
@@ -1063,7 +1063,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                                                       match decode_bytes 3 bytes with
                                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                                       | Some (underlying_currency_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                          match decode_uint 4 bytes with
+                                                                                                                                                                                                                                                                                                                                                          match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                                                                                           | Some (minimum_display_qty_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                                               match decode_uint 1 bytes with
@@ -1165,7 +1165,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 976.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1175,10 +1175,10 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 [bound_40 [bound_41 [bound_42 [bound_43 [bound_44 [bound_45 [bound_46 [bound_47 [bound_48 [bound_49 [bound_50 [bound_51 [bound_52 [bound_53 [bound_54 [bound_55 [bound_56 [bound_57 [bound_58 [bound_59 [bound_60 [bound_61 [bound_62 [bound_63 [bound_64 [bound_65 [bound_66 [bound_67 [bound_68 [bound_69 [bound_70 [bound_71 [bound_72 [bound_73 [bound_74 [bound_75 [bound_76 [bound_77 [bound_78 [bound_79 [bound_80 [bound_81 [bound_82 [bound_83 [bound_84 [bound_85 [bound_86 bound_87]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -1186,19 +1186,19 @@ Module BmeEquitiesTopOfBookV16.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_uint by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
@@ -1206,61 +1206,61 @@ Module BmeEquitiesTopOfBookV16.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
+      rewrite decode_encode_uint_le by exact bound_31.
+      rewrite decode_encode_uint_le by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
       rewrite decode_encode_bytes by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
-      rewrite decode_encode_uint by exact bound_36.
+      rewrite decode_encode_uint_le by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_36.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_uint by exact bound_38.
-      rewrite decode_encode_uint by exact bound_39.
-      rewrite decode_encode_uint by exact bound_40.
+      rewrite decode_encode_uint_le by exact bound_39.
+      rewrite decode_encode_uint_le by exact bound_40.
       rewrite decode_encode_uint by exact bound_41.
       rewrite decode_encode_bytes by exact bound_42.
-      rewrite decode_encode_uint by exact bound_43.
-      rewrite decode_encode_uint by exact bound_44.
-      rewrite decode_encode_uint by exact bound_45.
-      rewrite decode_encode_uint by exact bound_46.
+      rewrite decode_encode_uint_le by exact bound_43.
+      rewrite decode_encode_uint_le by exact bound_44.
+      rewrite decode_encode_uint_le by exact bound_45.
+      rewrite decode_encode_uint_le by exact bound_46.
       rewrite decode_encode_uint by exact bound_47.
       rewrite decode_encode_bytes by exact bound_48.
       rewrite decode_encode_uint by exact bound_49.
       rewrite decode_encode_bytes by exact bound_50.
-      rewrite decode_encode_uint by exact bound_51.
-      rewrite decode_encode_uint by exact bound_52.
+      rewrite decode_encode_uint_le by exact bound_51.
+      rewrite decode_encode_uint_le by exact bound_52.
       rewrite decode_encode_bytes by exact bound_53.
       rewrite decode_encode_uint by exact bound_54.
-      rewrite decode_encode_uint by exact bound_55.
-      rewrite decode_encode_uint by exact bound_56.
-      rewrite decode_encode_uint by exact bound_57.
-      rewrite decode_encode_uint by exact bound_58.
-      rewrite decode_encode_uint by exact bound_59.
-      rewrite decode_encode_uint by exact bound_60.
+      rewrite decode_encode_uint_le by exact bound_55.
+      rewrite decode_encode_uint_le by exact bound_56.
+      rewrite decode_encode_uint_le by exact bound_57.
+      rewrite decode_encode_uint_le by exact bound_58.
+      rewrite decode_encode_uint_le by exact bound_59.
+      rewrite decode_encode_uint_le by exact bound_60.
       rewrite decode_encode_bytes by exact bound_61.
-      rewrite decode_encode_uint by exact bound_62.
+      rewrite decode_encode_uint_le by exact bound_62.
       rewrite decode_encode_uint by exact bound_63.
       rewrite decode_encode_uint by exact bound_64.
       rewrite decode_encode_bytes by exact bound_65.
       rewrite decode_encode_bytes by exact bound_66.
       rewrite decode_encode_bytes by exact bound_67.
       rewrite decode_encode_bytes by exact bound_68.
-      rewrite decode_encode_uint by exact bound_69.
-      rewrite decode_encode_uint by exact bound_70.
-      rewrite decode_encode_uint by exact bound_71.
+      rewrite decode_encode_uint_le by exact bound_69.
+      rewrite decode_encode_uint_le by exact bound_70.
+      rewrite decode_encode_uint_le by exact bound_71.
       rewrite decode_encode_bytes by exact bound_72.
       rewrite decode_encode_uint by exact bound_73.
       rewrite decode_encode_bytes by exact bound_74.
       rewrite decode_encode_uint by exact bound_75.
-      rewrite decode_encode_uint by exact bound_76.
+      rewrite decode_encode_uint_le by exact bound_76.
       rewrite decode_encode_bytes by exact bound_77.
       rewrite decode_encode_bytes by exact bound_78.
       rewrite decode_encode_bytes by exact bound_79.
-      rewrite decode_encode_uint by exact bound_80.
+      rewrite decode_encode_uint_le by exact bound_80.
       rewrite decode_encode_uint by exact bound_81.
       rewrite decode_encode_bytes by exact bound_82.
       rewrite decode_encode_bytes by exact bound_83.
       rewrite decode_encode_bytes by exact bound_84.
-      rewrite decode_encode_uint by exact bound_85.
+      rewrite decode_encode_uint_le by exact bound_85.
       rewrite decode_encode_uint by exact bound_86.
       rewrite decode_encode_uint by exact bound_87.
       destruct record. reflexivity.
@@ -1457,10 +1457,10 @@ Module BmeEquitiesTopOfBookV16.
       (self_match_prevention record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 4 (market_id record) ++
       encode_bytes 4 (market_segment_id record) ++
-      encode_uint 4 (security_code record) ++
+      encode_uint_le 4 (security_code record) ++
       encode_bytes 22 (symbol record) ++
       encode_bytes 12 (symbol_isin record) ++
       encode_bytes 35 (fisn record) ++
@@ -1468,19 +1468,19 @@ Module BmeEquitiesTopOfBookV16.
       encode_bytes 2 (security_group record) ++
       encode_bytes 6 (cfi_code record) ++
       encode_bytes 2 (security_type record) ++
-      encode_uint 4 (maturity_date record) ++
-      encode_uint 4 (issue_date record) ++
-      encode_uint 8 (contract_multiplier record) ++
-      encode_uint 8 (li_spre record) ++
-      encode_uint 8 (sst_ipre record) ++
-      encode_uint 8 (li_spost record) ++
-      encode_uint 8 (sst_ipost record) ++
+      encode_uint_le 4 (maturity_date record) ++
+      encode_uint_le 4 (issue_date record) ++
+      encode_uint_le 8 (contract_multiplier record) ++
+      encode_uint_le 8 (li_spre record) ++
+      encode_uint_le 8 (sst_ipre record) ++
+      encode_uint_le 8 (li_spost record) ++
+      encode_uint_le 8 (sst_ipost record) ++
       encode_uint 1 (liquid_instrument record) ++
       encode_uint 1 (admission_requested_by_issuer record) ++
-      encode_uint 4 (min_trade_vol record) ++
-      encode_uint 4 (round_lot record) ++
+      encode_uint_le 4 (min_trade_vol record) ++
+      encode_uint_le 4 (round_lot record) ++
       encode_bytes 3 (currency record) ++
-      encode_uint 4 (modality_mask_b_4 record) ++
+      encode_uint_le 4 (modality_mask_b_4 record) ++
       encode_bytes 80 (security_description record) ++
       encode_uint 1 (trading_obligation record) ++
       encode_bytes 40 (security_name record) ++
@@ -1488,66 +1488,66 @@ Module BmeEquitiesTopOfBookV16.
       encode_bytes 2 (security_sub_type record) ++
       encode_bytes 8 (maturity_month_year record) ++
       encode_bytes 1 (security_status record) ++
-      encode_uint 8 (strike_price record) ++
-      encode_uint 8 (strike_value record) ++
+      encode_uint_le 8 (strike_price record) ++
+      encode_uint_le 8 (strike_value record) ++
       encode_bytes 1 (exercise_style record) ++
       encode_bytes 1 (put_or_call record) ++
-      encode_uint 8 (position_limit record) ++
-      encode_uint 8 (nt_position_limit record) ++
+      encode_uint_le 8 (position_limit record) ++
+      encode_uint_le 8 (nt_position_limit record) ++
       encode_bytes 12 (issuer record) ++
       encode_uint 1 (cp_reg_type record) ++
-      encode_uint 8 (barrier record) ++
-      encode_uint 4 (last_trading_day record) ++
+      encode_uint_le 8 (barrier record) ++
+      encode_uint_le 4 (last_trading_day record) ++
       encode_uint 1 (automatic_expiration record) ++
       encode_bytes 2 (fee_type record) ++
-      encode_uint 8 (barrier_2 record) ++
-      encode_uint 8 (trigger_barrier record) ++
-      encode_uint 8 (trigger_upper_barrier record) ++
-      encode_uint 8 (average_quarterly_turnover record) ++
+      encode_uint_le 8 (barrier_2 record) ++
+      encode_uint_le 8 (trigger_barrier record) ++
+      encode_uint_le 8 (trigger_upper_barrier record) ++
+      encode_uint_le 8 (average_quarterly_turnover record) ++
       encode_uint 1 (trading_scope record) ++
       encode_bytes 4 (sicav_counterparty_member record) ++
       encode_uint 1 (net_asset_value_indicator record) ++
       encode_bytes 1 (reference_trading_venue record) ++
-      encode_uint 8 (outstanding_capital record) ++
-      encode_uint 4 (first_trading_date record) ++
+      encode_uint_le 8 (outstanding_capital record) ++
+      encode_uint_le 4 (first_trading_date record) ++
       encode_bytes 1 (settlement_system record) ++
       encode_uint 1 (number_of_decimals record) ++
-      encode_uint 4 (number_of_holders record) ++
-      encode_uint 4 (outstanding_shares record) ++
-      encode_uint 4 (minimum_authorized_shares record) ++
-      encode_uint 8 (minimum_capital record) ++
-      encode_uint 4 (last_admission_date record) ++
-      encode_uint 8 (barrier_return record) ++
+      encode_uint_le 4 (number_of_holders record) ++
+      encode_uint_le 4 (outstanding_shares record) ++
+      encode_uint_le 4 (minimum_authorized_shares record) ++
+      encode_uint_le 8 (minimum_capital record) ++
+      encode_uint_le 4 (last_admission_date record) ++
+      encode_uint_le 8 (barrier_return record) ++
       encode_bytes 80 (investment_fund_manager record) ++
-      encode_uint 8 (effective_amount_filters_routed_orders record) ++
+      encode_uint_le 8 (effective_amount_filters_routed_orders record) ++
       encode_uint 1 (order_number_of_decimals record) ++
       encode_uint 1 (investment_fund_class record) ++
       encode_bytes 80 (master_fund_name record) ++
       encode_bytes 80 (investment_fund_management_company record) ++
       encode_bytes 80 (investment_fund_depository record) ++
       encode_bytes 80 (investment_fund_category record) ++
-      encode_uint 8 (investment_fund_minimum_subscription_amount record) ++
-      encode_uint 8 (investment_fund_minimum_maintenance_amount record) ++
-      encode_uint 8 (investment_fund_cut_off_time record) ++
+      encode_uint_le 8 (investment_fund_minimum_subscription_amount record) ++
+      encode_uint_le 8 (investment_fund_minimum_maintenance_amount record) ++
+      encode_uint_le 8 (investment_fund_cut_off_time record) ++
       encode_bytes 1 (nav_communication_term record) ++
       encode_uint 1 (investment_fund_number_of_decimals record) ++
       encode_bytes 1 (commodity_derivative_indicator record) ++
       encode_uint 1 (double_volume_cap_reached record) ++
-      encode_uint 8 (adt record) ++
+      encode_uint_le 8 (adt record) ++
       encode_bytes 4 (base_product record) ++
       encode_bytes 4 (sub_product record) ++
       encode_bytes 4 (further_sub_product record) ++
-      encode_uint 8 (adnt record) ++
+      encode_uint_le 8 (adnt record) ++
       encode_uint 1 (price_tick_rule record) ++
       encode_bytes 22 (underlying_symbol record) ++
       encode_bytes 12 (underlying_isin record) ++
       encode_bytes 3 (underlying_currency record) ++
-      encode_uint 4 (minimum_display_qty record) ++
+      encode_uint_le 4 (minimum_display_qty record) ++
       encode_uint 1 (retail_service_flag record) ++
       encode_uint 1 (self_match_prevention record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -1556,7 +1556,7 @@ Module BmeEquitiesTopOfBookV16.
               match decode_bytes 4 bytes with
               | None => None
               | Some (market_segment_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (security_code_value, bytes) =>
                       match decode_bytes 22 bytes with
@@ -1580,25 +1580,25 @@ Module BmeEquitiesTopOfBookV16.
                                               match decode_bytes 2 bytes with
                                               | None => None
                                               | Some (security_type_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (maturity_date_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (issue_date_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (contract_multiplier_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (li_spre_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (sst_ipre_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (li_spost_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (sst_ipost_value, bytes) =>
                                                                               match decode_uint 1 bytes with
@@ -1607,16 +1607,16 @@ Module BmeEquitiesTopOfBookV16.
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (admission_requested_by_issuer_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (min_trade_vol_value, bytes) =>
-                                                                                          match decode_uint 4 bytes with
+                                                                                          match decode_uint_le 4 bytes with
                                                                                           | None => None
                                                                                           | Some (round_lot_value, bytes) =>
                                                                                               match decode_bytes 3 bytes with
                                                                                               | None => None
                                                                                               | Some (currency_value, bytes) =>
-                                                                                                  match decode_uint 4 bytes with
+                                                                                                  match decode_uint_le 4 bytes with
                                                                                                   | None => None
                                                                                                   | Some (modality_mask_b_4_value, bytes) =>
                                                                                                       match decode_bytes 80 bytes with
@@ -1640,10 +1640,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (security_status_value, bytes) =>
-                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (strike_price_value, bytes) =>
-                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (strike_value_value, bytes) =>
                                                                                                                                           match decode_bytes 1 bytes with
@@ -1652,10 +1652,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                                               | None => None
                                                                                                                                               | Some (put_or_call_value, bytes) =>
-                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (position_limit_value, bytes) =>
-                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                       | None => None
                                                                                                                                                       | Some (nt_position_limit_value, bytes) =>
                                                                                                                                                           match decode_bytes 12 bytes with
@@ -1664,10 +1664,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                               match decode_uint 1 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (cp_reg_type_value, bytes) =>
-                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                   | None => None
                                                                                                                                                                   | Some (barrier_value, bytes) =>
-                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                       | None => None
                                                                                                                                                                       | Some (last_trading_day_value, bytes) =>
                                                                                                                                                                           match decode_uint 1 bytes with
@@ -1676,16 +1676,16 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                               match decode_bytes 2 bytes with
                                                                                                                                                                               | None => None
                                                                                                                                                                               | Some (fee_type_value, bytes) =>
-                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                   | None => None
                                                                                                                                                                                   | Some (barrier_2_value, bytes) =>
-                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                       | None => None
                                                                                                                                                                                       | Some (trigger_barrier_value, bytes) =>
-                                                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                                                           | None => None
                                                                                                                                                                                           | Some (trigger_upper_barrier_value, bytes) =>
-                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                               | None => None
                                                                                                                                                                                               | Some (average_quarterly_turnover_value, bytes) =>
                                                                                                                                                                                                   match decode_uint 1 bytes with
@@ -1700,10 +1700,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                               match decode_bytes 1 bytes with
                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                               | Some (reference_trading_venue_value, bytes) =>
-                                                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                   | Some (outstanding_capital_value, bytes) =>
-                                                                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                       | Some (first_trading_date_value, bytes) =>
                                                                                                                                                                                                                           match decode_bytes 1 bytes with
@@ -1712,28 +1712,28 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                               match decode_uint 1 bytes with
                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                               | Some (number_of_decimals_value, bytes) =>
-                                                                                                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                   | Some (number_of_holders_value, bytes) =>
-                                                                                                                                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                       | Some (outstanding_shares_value, bytes) =>
-                                                                                                                                                                                                                                          match decode_uint 4 bytes with
+                                                                                                                                                                                                                                          match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                           | Some (minimum_authorized_shares_value, bytes) =>
-                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                               | Some (minimum_capital_value, bytes) =>
-                                                                                                                                                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                                                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                   | Some (last_admission_date_value, bytes) =>
-                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                       | Some (barrier_return_value, bytes) =>
                                                                                                                                                                                                                                                           match decode_bytes 80 bytes with
                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                           | Some (investment_fund_manager_value, bytes) =>
-                                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                               | Some (effective_amount_filters_routed_orders_value, bytes) =>
                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
@@ -1754,13 +1754,13 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                       match decode_bytes 80 bytes with
                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                       | Some (investment_fund_category_value, bytes) =>
-                                                                                                                                                                                                                                                                                          match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                          match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                           | Some (investment_fund_minimum_subscription_amount_value, bytes) =>
-                                                                                                                                                                                                                                                                                              match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                              match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                               | None => None
                                                                                                                                                                                                                                                                                               | Some (investment_fund_minimum_maintenance_amount_value, bytes) =>
-                                                                                                                                                                                                                                                                                                  match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                  match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                   | Some (investment_fund_cut_off_time_value, bytes) =>
                                                                                                                                                                                                                                                                                                       match decode_bytes 1 bytes with
@@ -1775,7 +1775,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                   | Some (double_volume_cap_reached_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                       | Some (adt_value, bytes) =>
                                                                                                                                                                                                                                                                                                                           match decode_bytes 4 bytes with
@@ -1787,7 +1787,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                                   match decode_bytes 4 bytes with
                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                   | Some (further_sub_product_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                                                                                                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                       | Some (adnt_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                           match decode_uint 1 bytes with
@@ -1802,7 +1802,7 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                                                                                                                                                                                                                                                                       match decode_bytes 3 bytes with
                                                                                                                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                                                                                                                       | Some (underlying_currency_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                          match decode_uint 4 bytes with
+                                                                                                                                                                                                                                                                                                                                                          match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                                                                                                                                           | None => None
                                                                                                                                                                                                                                                                                                                                                           | Some (minimum_display_qty_value, bytes) =>
                                                                                                                                                                                                                                                                                                                                                               match decode_uint 1 bytes with
@@ -1904,7 +1904,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 976.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1914,10 +1914,10 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 [bound_40 [bound_41 [bound_42 [bound_43 [bound_44 [bound_45 [bound_46 [bound_47 [bound_48 [bound_49 [bound_50 [bound_51 [bound_52 [bound_53 [bound_54 [bound_55 [bound_56 [bound_57 [bound_58 [bound_59 [bound_60 [bound_61 [bound_62 [bound_63 [bound_64 [bound_65 [bound_66 [bound_67 [bound_68 [bound_69 [bound_70 [bound_71 [bound_72 [bound_73 [bound_74 [bound_75 [bound_76 [bound_77 [bound_78 [bound_79 [bound_80 [bound_81 [bound_82 [bound_83 [bound_84 [bound_85 [bound_86 bound_87]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -1925,19 +1925,19 @@ Module BmeEquitiesTopOfBookV16.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_uint by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
@@ -1945,61 +1945,61 @@ Module BmeEquitiesTopOfBookV16.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
-      rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
+      rewrite decode_encode_uint_le by exact bound_31.
+      rewrite decode_encode_uint_le by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
       rewrite decode_encode_bytes by exact bound_34.
-      rewrite decode_encode_uint by exact bound_35.
-      rewrite decode_encode_uint by exact bound_36.
+      rewrite decode_encode_uint_le by exact bound_35.
+      rewrite decode_encode_uint_le by exact bound_36.
       rewrite decode_encode_bytes by exact bound_37.
       rewrite decode_encode_uint by exact bound_38.
-      rewrite decode_encode_uint by exact bound_39.
-      rewrite decode_encode_uint by exact bound_40.
+      rewrite decode_encode_uint_le by exact bound_39.
+      rewrite decode_encode_uint_le by exact bound_40.
       rewrite decode_encode_uint by exact bound_41.
       rewrite decode_encode_bytes by exact bound_42.
-      rewrite decode_encode_uint by exact bound_43.
-      rewrite decode_encode_uint by exact bound_44.
-      rewrite decode_encode_uint by exact bound_45.
-      rewrite decode_encode_uint by exact bound_46.
+      rewrite decode_encode_uint_le by exact bound_43.
+      rewrite decode_encode_uint_le by exact bound_44.
+      rewrite decode_encode_uint_le by exact bound_45.
+      rewrite decode_encode_uint_le by exact bound_46.
       rewrite decode_encode_uint by exact bound_47.
       rewrite decode_encode_bytes by exact bound_48.
       rewrite decode_encode_uint by exact bound_49.
       rewrite decode_encode_bytes by exact bound_50.
-      rewrite decode_encode_uint by exact bound_51.
-      rewrite decode_encode_uint by exact bound_52.
+      rewrite decode_encode_uint_le by exact bound_51.
+      rewrite decode_encode_uint_le by exact bound_52.
       rewrite decode_encode_bytes by exact bound_53.
       rewrite decode_encode_uint by exact bound_54.
-      rewrite decode_encode_uint by exact bound_55.
-      rewrite decode_encode_uint by exact bound_56.
-      rewrite decode_encode_uint by exact bound_57.
-      rewrite decode_encode_uint by exact bound_58.
-      rewrite decode_encode_uint by exact bound_59.
-      rewrite decode_encode_uint by exact bound_60.
+      rewrite decode_encode_uint_le by exact bound_55.
+      rewrite decode_encode_uint_le by exact bound_56.
+      rewrite decode_encode_uint_le by exact bound_57.
+      rewrite decode_encode_uint_le by exact bound_58.
+      rewrite decode_encode_uint_le by exact bound_59.
+      rewrite decode_encode_uint_le by exact bound_60.
       rewrite decode_encode_bytes by exact bound_61.
-      rewrite decode_encode_uint by exact bound_62.
+      rewrite decode_encode_uint_le by exact bound_62.
       rewrite decode_encode_uint by exact bound_63.
       rewrite decode_encode_uint by exact bound_64.
       rewrite decode_encode_bytes by exact bound_65.
       rewrite decode_encode_bytes by exact bound_66.
       rewrite decode_encode_bytes by exact bound_67.
       rewrite decode_encode_bytes by exact bound_68.
-      rewrite decode_encode_uint by exact bound_69.
-      rewrite decode_encode_uint by exact bound_70.
-      rewrite decode_encode_uint by exact bound_71.
+      rewrite decode_encode_uint_le by exact bound_69.
+      rewrite decode_encode_uint_le by exact bound_70.
+      rewrite decode_encode_uint_le by exact bound_71.
       rewrite decode_encode_bytes by exact bound_72.
       rewrite decode_encode_uint by exact bound_73.
       rewrite decode_encode_bytes by exact bound_74.
       rewrite decode_encode_uint by exact bound_75.
-      rewrite decode_encode_uint by exact bound_76.
+      rewrite decode_encode_uint_le by exact bound_76.
       rewrite decode_encode_bytes by exact bound_77.
       rewrite decode_encode_bytes by exact bound_78.
       rewrite decode_encode_bytes by exact bound_79.
-      rewrite decode_encode_uint by exact bound_80.
+      rewrite decode_encode_uint_le by exact bound_80.
       rewrite decode_encode_uint by exact bound_81.
       rewrite decode_encode_bytes by exact bound_82.
       rewrite decode_encode_bytes by exact bound_83.
       rewrite decode_encode_bytes by exact bound_84.
-      rewrite decode_encode_uint by exact bound_85.
+      rewrite decode_encode_uint_le by exact bound_85.
       rewrite decode_encode_uint by exact bound_86.
       rewrite decode_encode_uint by exact bound_87.
       destruct record. reflexivity.
@@ -2064,58 +2064,58 @@ Module BmeEquitiesTopOfBookV16.
       (block_static_range record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (security_code record) ++
-      encode_uint 8 (transaction_date_and_time record) ++
-      encode_uint 8 (reference_price record) ++
-      encode_uint 8 (static_price record) ++
-      encode_uint 8 (dynamic_price_oscilation_percentage record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (security_code record) ++
+      encode_uint_le 8 (transaction_date_and_time record) ++
+      encode_uint_le 8 (reference_price record) ++
+      encode_uint_le 8 (static_price record) ++
+      encode_uint_le 8 (dynamic_price_oscilation_percentage record) ++
       encode_uint 1 (dynamic_range_multiplier record) ++
-      encode_uint 8 (auction_trigger_price record) ++
-      encode_uint 8 (auction_end_time record) ++
-      encode_uint 4 (liquidative_value_date record) ++
+      encode_uint_le 8 (auction_trigger_price record) ++
+      encode_uint_le 8 (auction_end_time record) ++
+      encode_uint_le 4 (liquidative_value_date record) ++
       encode_uint 1 (bonus_warrants_with_active_bonus record) ++
       encode_uint 1 (security_trading_status record) ++
       encode_uint 1 (auction_origin record) ++
       encode_uint 1 (non_availability_reason record) ++
       encode_bytes 1 (exemption_situation record) ++
-      encode_uint 8 (block_oscilation_percentage record) ++
-      encode_uint 8 (high_limit_price record) ++
-      encode_uint 8 (low_limit_price record) ++
-      encode_uint 8 (liquidative_value record) ++
+      encode_uint_le 8 (block_oscilation_percentage record) ++
+      encode_uint_le 8 (high_limit_price record) ++
+      encode_uint_le 8 (low_limit_price record) ++
+      encode_uint_le 8 (liquidative_value record) ++
       encode_bytes 1 (static_range_type record) ++
-      encode_uint 8 (order_static_range record) ++
-      encode_uint 8 (block_static_range record).
+      encode_uint_le 8 (order_static_range record) ++
+      encode_uint_le 8 (block_static_range record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (security_code_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transaction_date_and_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (reference_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (static_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (dynamic_price_oscilation_percentage_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (dynamic_range_multiplier_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (auction_trigger_price_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (auction_end_time_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (liquidative_value_date_value, bytes) =>
                                               match decode_uint 1 bytes with
@@ -2133,25 +2133,25 @@ Module BmeEquitiesTopOfBookV16.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (exemption_situation_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (block_oscilation_percentage_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (high_limit_price_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (low_limit_price_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (liquidative_value_value, bytes) =>
                                                                                   match decode_bytes 1 bytes with
                                                                                   | None => None
                                                                                   | Some (static_range_type_value, bytes) =>
-                                                                                      match decode_uint 8 bytes with
+                                                                                      match decode_uint_le 8 bytes with
                                                                                       | None => None
                                                                                       | Some (order_static_range_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (block_static_range_value, bytes) =>
                                                                                               Some ({| sequence_number := sequence_number_value; security_code := security_code_value; transaction_date_and_time := transaction_date_and_time_value; reference_price := reference_price_value; static_price := static_price_value; dynamic_price_oscilation_percentage := dynamic_price_oscilation_percentage_value; dynamic_range_multiplier := dynamic_range_multiplier_value; auction_trigger_price := auction_trigger_price_value; auction_end_time := auction_end_time_value; liquidative_value_date := liquidative_value_date_value; bonus_warrants_with_active_bonus := bonus_warrants_with_active_bonus_value; security_trading_status := security_trading_status_value; auction_origin := auction_origin_value; non_availability_reason := non_availability_reason_value; exemption_situation := exemption_situation_value; block_oscilation_percentage := block_oscilation_percentage_value; high_limit_price := high_limit_price_value; low_limit_price := low_limit_price_value; liquidative_value := liquidative_value_value; static_range_type := static_range_type_value; order_static_range := order_static_range_value; block_static_range := block_static_range_value |}, bytes)
@@ -2181,7 +2181,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 115.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2191,28 +2191,28 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 bound_21]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_21.
       destruct record. reflexivity.
     Qed.
 
@@ -2263,31 +2263,31 @@ Module BmeEquitiesTopOfBookV16.
       Datatypes.length (transaction_category record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (security_code record) ++
-      encode_uint 8 (transaction_date_and_time record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (security_code record) ++
+      encode_uint_le 8 (transaction_date_and_time record) ++
       encode_bytes 4 (market_segment_id record) ++
       encode_uint 1 (trading_session_id record) ++
-      encode_uint 4 (trd_match_id record) ++
+      encode_uint_le 4 (trd_match_id record) ++
       encode_bytes 1 (trade_type record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (last_qty record) ++
-      encode_uint 8 (gross_trade_amt record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (last_qty record) ++
+      encode_uint_le 8 (gross_trade_amt record) ++
       encode_bytes 1 (designation record) ++
       encode_bytes 1 (market_mechanism record) ++
       encode_uint 1 (algo_flag record) ++
       encode_bytes 1 (buyer_bolsa_code record) ++
-      encode_uint 4 (settl_date record) ++
+      encode_uint_le 4 (settl_date record) ++
       encode_bytes 1 (transaction_category record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (security_code_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transaction_date_and_time_value, bytes) =>
                   match decode_bytes 4 bytes with
@@ -2296,19 +2296,19 @@ Module BmeEquitiesTopOfBookV16.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (trading_session_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trd_match_id_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (trade_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_px_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (last_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (gross_trade_amt_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -2323,7 +2323,7 @@ Module BmeEquitiesTopOfBookV16.
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (buyer_bolsa_code_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (settl_date_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -2350,7 +2350,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 55.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2360,21 +2360,21 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       destruct record. reflexivity.
     Qed.
@@ -2452,44 +2452,44 @@ Module BmeEquitiesTopOfBookV16.
       (amended_trade_date record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (security_code record) ++
-      encode_uint 8 (transaction_date_and_time record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (security_code record) ++
+      encode_uint_le 8 (transaction_date_and_time record) ++
       encode_bytes 4 (market_segment_id record) ++
       encode_uint 1 (trading_session_id record) ++
-      encode_uint 4 (trd_match_id record) ++
+      encode_uint_le 4 (trd_match_id record) ++
       encode_bytes 1 (trade_type record) ++
-      encode_uint 8 (last_px record) ++
-      encode_uint 4 (last_qty record) ++
-      encode_uint 8 (gross_trade_amt record) ++
+      encode_uint_le 8 (last_px record) ++
+      encode_uint_le 4 (last_qty record) ++
+      encode_uint_le 8 (gross_trade_amt record) ++
       encode_bytes 1 (designation record) ++
       encode_bytes 1 (market_mechanism record) ++
       encode_uint 1 (algo_flag record) ++
       encode_bytes 1 (buyer_bolsa_code record) ++
-      encode_uint 4 (settl_date record) ++
+      encode_uint_le 4 (settl_date record) ++
       encode_bytes 1 (transaction_category record) ++
       encode_uint 1 (last_change_flag record) ++
       encode_bytes 1 (benc_rfpt_flag record) ++
       encode_bytes 1 (trade_price_condition record) ++
       encode_bytes 1 (pre_trade_transparency_waiver record) ++
       encode_bytes 1 (deferral_waiver record) ++
-      encode_uint 8 (publish_date_and_time record) ++
-      encode_uint 8 (trade_date record) ++
-      encode_uint 4 (trade_session_date record) ++
-      encode_uint 8 (volume_float record) ++
+      encode_uint_le 8 (publish_date_and_time record) ++
+      encode_uint_le 8 (trade_date record) ++
+      encode_uint_le 4 (trade_session_date record) ++
+      encode_uint_le 8 (volume_float record) ++
       encode_bytes 1 (sicav_fund_counterparty_side record) ++
       encode_bytes 1 (amended_trade_type record) ++
-      encode_uint 4 (exec_ref_id record) ++
-      encode_uint 4 (amended_trade_date record).
+      encode_uint_le 4 (exec_ref_id record) ++
+      encode_uint_le 4 (amended_trade_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (security_code_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transaction_date_and_time_value, bytes) =>
                   match decode_bytes 4 bytes with
@@ -2498,19 +2498,19 @@ Module BmeEquitiesTopOfBookV16.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (trading_session_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trd_match_id_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (trade_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_px_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (last_qty_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (gross_trade_amt_value, bytes) =>
                                               match decode_bytes 1 bytes with
@@ -2525,7 +2525,7 @@ Module BmeEquitiesTopOfBookV16.
                                                           match decode_bytes 1 bytes with
                                                           | None => None
                                                           | Some (buyer_bolsa_code_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (settl_date_value, bytes) =>
                                                                   match decode_bytes 1 bytes with
@@ -2546,16 +2546,16 @@ Module BmeEquitiesTopOfBookV16.
                                                                                       match decode_bytes 1 bytes with
                                                                                       | None => None
                                                                                       | Some (deferral_waiver_value, bytes) =>
-                                                                                          match decode_uint 8 bytes with
+                                                                                          match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (publish_date_and_time_value, bytes) =>
-                                                                                              match decode_uint 8 bytes with
+                                                                                              match decode_uint_le 8 bytes with
                                                                                               | None => None
                                                                                               | Some (trade_date_value, bytes) =>
-                                                                                                  match decode_uint 4 bytes with
+                                                                                                  match decode_uint_le 4 bytes with
                                                                                                   | None => None
                                                                                                   | Some (trade_session_date_value, bytes) =>
-                                                                                                      match decode_uint 8 bytes with
+                                                                                                      match decode_uint_le 8 bytes with
                                                                                                       | None => None
                                                                                                       | Some (volume_float_value, bytes) =>
                                                                                                           match decode_bytes 1 bytes with
@@ -2564,10 +2564,10 @@ Module BmeEquitiesTopOfBookV16.
                                                                                                               match decode_bytes 1 bytes with
                                                                                                               | None => None
                                                                                                               | Some (amended_trade_type_value, bytes) =>
-                                                                                                                  match decode_uint 4 bytes with
+                                                                                                                  match decode_uint_le 4 bytes with
                                                                                                                   | None => None
                                                                                                                   | Some (exec_ref_id_value, bytes) =>
-                                                                                                                      match decode_uint 4 bytes with
+                                                                                                                      match decode_uint_le 4 bytes with
                                                                                                                       | None => None
                                                                                                                       | Some (amended_trade_date_value, bytes) =>
                                                                                                                           Some ({| sequence_number := sequence_number_value; security_code := security_code_value; transaction_date_and_time := transaction_date_and_time_value; market_segment_id := market_segment_id_value; trading_session_id := trading_session_id_value; trd_match_id := trd_match_id_value; trade_type := trade_type_value; last_px := last_px_value; last_qty := last_qty_value; gross_trade_amt := gross_trade_amt_value; designation := designation_value; market_mechanism := market_mechanism_value; algo_flag := algo_flag_value; buyer_bolsa_code := buyer_bolsa_code_value; settl_date := settl_date_value; transaction_category := transaction_category_value; last_change_flag := last_change_flag_value; benc_rfpt_flag := benc_rfpt_flag_value; trade_price_condition := trade_price_condition_value; pre_trade_transparency_waiver := pre_trade_transparency_waiver_value; deferral_waiver := deferral_waiver_value; publish_date_and_time := publish_date_and_time_value; trade_date := trade_date_value; trade_session_date := trade_session_date_value; volume_float := volume_float_value; sicav_fund_counterparty_side := sicav_fund_counterparty_side_value; amended_trade_type := amended_trade_type_value; exec_ref_id := exec_ref_id_value; amended_trade_date := amended_trade_date_value |}, bytes)
@@ -2604,7 +2604,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 98.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2614,35 +2614,35 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 bound_28]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_14.
       rewrite decode_encode_bytes by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
       rewrite decode_encode_bytes by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
-      rewrite decode_encode_uint by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
-      rewrite decode_encode_uint by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_21.
+      rewrite decode_encode_uint_le by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_23.
+      rewrite decode_encode_uint_le by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
-      rewrite decode_encode_uint by exact bound_27.
-      rewrite decode_encode_uint by exact bound_28.
+      rewrite decode_encode_uint_le by exact bound_27.
+      rewrite decode_encode_uint_le by exact bound_28.
       destruct record. reflexivity.
     Qed.
 
@@ -2679,42 +2679,42 @@ Module BmeEquitiesTopOfBookV16.
       (ask_px_1 record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (security_code record) ++
-      encode_uint 8 (transaction_date_and_time record) ++
-      encode_uint 2 (bid_orders_1 record) ++
-      encode_uint 4 (bid_size_1 record) ++
-      encode_uint 8 (bid_px_1 record) ++
-      encode_uint 2 (ask_orders_1 record) ++
-      encode_uint 4 (ask_size_1 record) ++
-      encode_uint 8 (ask_px_1 record).
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (security_code record) ++
+      encode_uint_le 8 (transaction_date_and_time record) ++
+      encode_uint_le 2 (bid_orders_1 record) ++
+      encode_uint_le 4 (bid_size_1 record) ++
+      encode_uint_le 8 (bid_px_1 record) ++
+      encode_uint_le 2 (ask_orders_1 record) ++
+      encode_uint_le 4 (ask_size_1 record) ++
+      encode_uint_le 8 (ask_px_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (security_code_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (transaction_date_and_time_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (bid_orders_1_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (bid_size_1_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (bid_px_1_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_uint_le 2 bytes with
                               | None => None
                               | Some (ask_orders_1_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (ask_size_1_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (ask_px_1_value, bytes) =>
                                           Some ({| sequence_number := sequence_number_value; security_code := security_code_value; transaction_date_and_time := transaction_date_and_time_value; bid_orders_1 := bid_orders_1_value; bid_size_1 := bid_size_1_value; bid_px_1 := bid_px_1_value; ask_orders_1 := ask_orders_1_value; ask_size_1 := ask_size_1_value; ask_px_1 := ask_px_1_value |}, bytes)
@@ -2731,7 +2731,7 @@ Module BmeEquitiesTopOfBookV16.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2741,15 +2741,15 @@ Module BmeEquitiesTopOfBookV16.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 

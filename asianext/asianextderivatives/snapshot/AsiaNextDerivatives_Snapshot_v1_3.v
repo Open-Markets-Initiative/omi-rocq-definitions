@@ -89,7 +89,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (msg_type record) ++
       encode_uint 1 (msg_length record) ++
-      encode_uint 4 (seq_no record).
+      encode_uint_le 4 (seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -98,7 +98,7 @@ Module AsiaNextDerivativesSnapshotV13.
           match decode_uint 1 bytes with
           | None => None
           | Some (msg_length_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (seq_no_value, bytes) =>
                   Some ({| msg_type := msg_type_value; msg_length := msg_length_value; seq_no := seq_no_value |}, bytes)
@@ -109,7 +109,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -121,7 +121,7 @@ Module AsiaNextDerivativesSnapshotV13.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -146,18 +146,18 @@ Module AsiaNextDerivativesSnapshotV13.
       (timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (stream_seq_no record) ++
-      encode_uint 4 (security_count record) ++
-      encode_uint 8 (timestamp record).
+      encode_uint_le 4 (stream_seq_no record) ++
+      encode_uint_le 4 (security_count record) ++
+      encode_uint_le 8 (timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (stream_seq_no_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (security_count_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (timestamp_value, bytes) =>
                   Some ({| stream_seq_no := stream_seq_no_value; security_count := security_count_value; timestamp := timestamp_value |}, bytes)
@@ -168,7 +168,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -178,9 +178,9 @@ Module AsiaNextDerivativesSnapshotV13.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -209,26 +209,26 @@ Module AsiaNextDerivativesSnapshotV13.
       (order_ref record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (security_id record) ++
+      encode_uint_le 4 (security_id record) ++
       encode_uint 1 (side record) ++
-      encode_uint 8 (quantity record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (order_ref record).
+      encode_uint_le 8 (quantity record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (order_ref record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (security_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (side_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (quantity_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_ref_value, bytes) =>
                           Some ({| security_id := security_id_value; side := side_value; quantity := quantity_value; price := price_value; order_ref := order_ref_value |}, bytes)
@@ -241,7 +241,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 29.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -251,11 +251,11 @@ Module AsiaNextDerivativesSnapshotV13.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -284,8 +284,8 @@ Module AsiaNextDerivativesSnapshotV13.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (tick_table_id record) ++
       encode_bytes 10 (name record) ++
-      encode_uint 8 (threshold record) ++
-      encode_uint 8 (tick_size record).
+      encode_uint_le 8 (threshold record) ++
+      encode_uint_le 8 (tick_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -294,10 +294,10 @@ Module AsiaNextDerivativesSnapshotV13.
           match decode_bytes 10 bytes with
           | None => None
           | Some (name_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (threshold_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (tick_size_value, bytes) =>
                       Some ({| tick_table_id := tick_table_id_value; name := name_value; threshold := threshold_value; tick_size := tick_size_value |}, bytes)
@@ -309,7 +309,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -321,8 +321,8 @@ Module AsiaNextDerivativesSnapshotV13.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -345,11 +345,11 @@ Module AsiaNextDerivativesSnapshotV13.
       (lot_size_decimal record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (lot_size record) ++
+      encode_uint_le 8 (lot_size record) ++
       encode_uint 1 (lot_size_decimal record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (lot_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -362,7 +362,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -372,7 +372,7 @@ Module AsiaNextDerivativesSnapshotV13.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -396,11 +396,11 @@ Module AsiaNextDerivativesSnapshotV13.
       (contract_size_decimals record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (contract_size record) ++
+      encode_uint_le 8 (contract_size record) ++
       encode_uint 1 (contract_size_decimals record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (contract_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -413,7 +413,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -423,7 +423,7 @@ Module AsiaNextDerivativesSnapshotV13.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -445,10 +445,10 @@ Module AsiaNextDerivativesSnapshotV13.
       (next_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (next_seq_no record).
+      encode_uint_le 4 (next_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (next_seq_no_value, bytes) =>
           Some ({| next_seq_no := next_seq_no_value |}, bytes)
@@ -457,7 +457,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -465,7 +465,7 @@ Module AsiaNextDerivativesSnapshotV13.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

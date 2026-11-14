@@ -47,14 +47,14 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_bytes 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -68,7 +68,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,7 +79,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -170,11 +170,11 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       Datatypes.length (password_expiry_day_count record) = 30.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_bytes 30 (password_expiry_day_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (reject_code_value, bytes) =>
           match decode_bytes 30 bytes with
@@ -187,7 +187,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -197,7 +197,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -263,13 +263,13 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (app_id record) ++
-      encode_uint 4 (last_msg_seq_num record).
+      encode_uint_le 4 (last_msg_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (app_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (last_msg_seq_num_value, bytes) =>
               Some ({| app_id := app_id_value; last_msg_seq_num := last_msg_seq_num_value |}, bytes)
@@ -279,7 +279,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -290,7 +290,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -399,13 +399,13 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       Datatypes.length (client_order_id record) = 20.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_bytes 30 (reject_reason record) ++
       encode_bytes 1 (rejected_message_type record) ++
       encode_bytes 20 (client_order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (reject_code_value, bytes) =>
           match decode_bytes 30 bytes with
@@ -426,7 +426,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 55.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -436,7 +436,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -513,14 +513,14 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       (nanoseconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
+      encode_uint_le 4 (seconds record) ++
+      encode_uint_le 4 (nanoseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (nanoseconds_value, bytes) =>
               Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
@@ -530,7 +530,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -540,8 +540,8 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -577,10 +577,10 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (app_id record) ++
-      encode_uint 4 (sequence_no record) ++
+      encode_uint_le 4 (sequence_no record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_uint 1 (mass_cancel_response record) ++
-      encode_uint 4 (mass_cancel_reject_reason record) ++
+      encode_uint_le 4 (mass_cancel_reject_reason record) ++
       encode_bytes 4 (reserved_4 record) ++
       TransactTime.encode (transact_time record) ++
       encode_bytes 10 (reserved_10 record).
@@ -589,7 +589,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       match decode_uint 1 bytes with
       | None => None
       | Some (app_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_no_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -598,7 +598,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (mass_cancel_response_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (mass_cancel_reject_reason_value, bytes) =>
                           match decode_bytes 4 bytes with
@@ -623,7 +623,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -634,10 +634,10 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite TransactTime.decode_encode by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
@@ -686,24 +686,24 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 20 (quote_msg_id record) ++
       encode_bytes 10 (quote_req_id record) ++
       encode_uint 1 (quote_status record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_uint 1 (order_book record) ++
       encode_bytes 60 (market_makers record) ++
       encode_bytes 10 (rfq_id record) ++
-      encode_uint 4 (expire_time record) ++
+      encode_uint_le 4 (expire_time record) ++
       encode_bytes 12 (bid_id record) ++
       encode_bytes 12 (offer_id record) ++
-      encode_uint 4 (expire_time_milliseconds record).
+      encode_uint_le 4 (expire_time_milliseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -715,7 +715,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (quote_status_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (reject_code_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -727,7 +727,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                                       match decode_bytes 10 bytes with
                                       | None => None
                                       | Some (rfq_id_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (expire_time_value, bytes) =>
                                               match decode_bytes 12 bytes with
@@ -736,7 +736,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                                                   match decode_bytes 12 bytes with
                                                   | None => None
                                                   | Some (offer_id_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (expire_time_milliseconds_value, bytes) =>
                                                           Some ({| partition_id := partition_id_value; sequence_number := sequence_number_value; quote_msg_id := quote_msg_id_value; quote_req_id := quote_req_id_value; quote_status := quote_status_value; reject_code := reject_code_value; order_book := order_book_value; market_makers := market_makers_value; rfq_id := rfq_id_value; expire_time := expire_time_value; bid_id := bid_id_value; offer_id := offer_id_value; expire_time_milliseconds := expire_time_milliseconds_value |}, bytes)
@@ -757,7 +757,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 143.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -768,18 +768,18 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -821,13 +821,13 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 10 (quote_req_id record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_uint 1 (order_book record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (order_quantity record) ++
+      encode_uint_le 4 (order_quantity record) ++
       encode_bytes 60 (market_makers record) ++
       encode_bytes 11 (contra_trader record) ++
       encode_bytes 10 (rfq_id record).
@@ -836,25 +836,25 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 10 bytes with
               | None => None
               | Some (quote_req_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (reject_code_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (order_book_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (instrument_id_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (side_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (order_quantity_value, bytes) =>
                                       match decode_bytes 60 bytes with
@@ -882,7 +882,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 110.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -893,13 +893,13 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
@@ -940,20 +940,20 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 20 (quote_msg_id record) ++
       encode_bytes 10 (rfq_id record) ++
       encode_bytes 12 (bid_id record) ++
       encode_bytes 12 (offer_id record) ++
       encode_uint 1 (quote_ack_status record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_uint 1 (order_book record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -971,7 +971,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (quote_ack_status_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (reject_code_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -991,7 +991,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 65.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1002,13 +1002,13 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       destruct record. reflexivity.
     Qed.
@@ -1059,14 +1059,14 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 20 (quote_msg_id record) ++
       encode_bytes 10 (rfq_id record) ++
       encode_uint 1 (quote_resp_type record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (order_quantity record) ++
-      encode_uint 8 (limit_price record) ++
+      encode_uint_le 4 (order_quantity record) ++
+      encode_uint_le 8 (limit_price record) ++
       encode_uint 1 (order_book record) ++
       encode_bytes 12 (bid_id record) ++
       encode_bytes 12 (offer_id record) ++
@@ -1078,7 +1078,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -1090,16 +1090,16 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (quote_resp_type_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (instrument_id_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (side_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (order_quantity_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (limit_price_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -1140,7 +1140,7 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 88.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1151,14 +1151,14 @@ Module LsegMillenniumNativeTradingGatewayRecoveryV212.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.

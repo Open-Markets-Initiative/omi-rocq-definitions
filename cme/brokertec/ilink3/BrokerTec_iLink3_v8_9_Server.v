@@ -47,14 +47,14 @@ Module BrokerTecILink3V89Server.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -64,7 +64,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -74,8 +74,8 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -102,22 +102,22 @@ Module BrokerTecILink3V89Server.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -129,7 +129,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,10 +139,10 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -176,9 +176,9 @@ Module BrokerTecILink3V89Server.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 2 (error_codes record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 2 (error_codes record) ++
       encode_uint 1 (fault_tolerance_indicator record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (environment_indicator record).
@@ -187,13 +187,13 @@ Module BrokerTecILink3V89Server.
       match decode_bytes 48 bytes with
       | None => None
       | Some (reason_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (error_codes_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -217,7 +217,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 69.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -228,9 +228,9 @@ Module BrokerTecILink3V89Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
@@ -272,37 +272,37 @@ Module BrokerTecILink3V89Server.
       (environment_indicator record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (next_seq_no record) ++
-      encode_uint 4 (previous_seq_no record) ++
-      encode_uint 8 (previous_uuid record) ++
-      encode_uint 2 (keep_alive_interval record) ++
-      encode_uint 2 (secret_key_secure_id_expiration record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (next_seq_no record) ++
+      encode_uint_le 4 (previous_seq_no record) ++
+      encode_uint_le 8 (previous_uuid record) ++
+      encode_uint_le 2 (keep_alive_interval record) ++
+      encode_uint_le 2 (secret_key_secure_id_expiration record) ++
       encode_uint 1 (fault_tolerance_indicator record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (environment_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (request_timestamp_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (next_seq_no_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (previous_seq_no_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (previous_uuid_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (keep_alive_interval_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_uint_le 2 bytes with
                               | None => None
                               | Some (secret_key_secure_id_expiration_value, bytes) =>
                                   match decode_uint 1 bytes with
@@ -329,7 +329,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -339,13 +339,13 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
@@ -384,10 +384,10 @@ Module BrokerTecILink3V89Server.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (next_seq_no record) ++
-      encode_uint 2 (error_codes record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (next_seq_no record) ++
+      encode_uint_le 2 (error_codes record) ++
       encode_uint 1 (fault_tolerance_indicator record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (environment_indicator record).
@@ -396,16 +396,16 @@ Module BrokerTecILink3V89Server.
       match decode_bytes 48 bytes with
       | None => None
       | Some (reason_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (next_seq_no_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (error_codes_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -430,7 +430,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 73.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -441,10 +441,10 @@ Module BrokerTecILink3V89Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
@@ -474,16 +474,16 @@ Module BrokerTecILink3V89Server.
       (keep_alive_interval_lapsed record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 4 (next_seq_no record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 4 (next_seq_no record) ++
       encode_uint 1 (fault_tolerance_indicator record) ++
       encode_uint 1 (keep_alive_interval_lapsed record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (next_seq_no_value, bytes) =>
               match decode_uint 1 bytes with
@@ -501,7 +501,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -511,8 +511,8 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -544,22 +544,22 @@ Module BrokerTecILink3V89Server.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 2 (error_codes record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 2 (error_codes record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 48 bytes with
       | None => None
       | Some (reason_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (error_codes_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -575,7 +575,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -586,9 +586,9 @@ Module BrokerTecILink3V89Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -620,27 +620,27 @@ Module BrokerTecILink3V89Server.
       (split_msg record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (last_uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (from_seq_no record) ++
-      encode_uint 2 (msg_count_16 record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (last_uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (from_seq_no record) ++
+      encode_uint_le 2 (msg_count_16 record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (last_uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (from_seq_no_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (msg_count_16_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -657,7 +657,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 31.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -667,11 +667,11 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -704,26 +704,26 @@ Module BrokerTecILink3V89Server.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 48 (reason record) ++
-      encode_uint 8 (uuid record) ++
-      encode_uint 8 (last_uuid record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 2 (error_codes record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 8 (last_uuid record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 2 (error_codes record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 48 bytes with
       | None => None
       | Some (reason_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (last_uuid_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (request_timestamp_value, bytes) =>
-                      match decode_uint 2 bytes with
+                      match decode_uint_le 2 bytes with
                       | None => None
                       | Some (error_codes_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -740,7 +740,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 75.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -751,10 +751,10 @@ Module BrokerTecILink3V89Server.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -782,19 +782,19 @@ Module BrokerTecILink3V89Server.
       (split_msg record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (uuid record) ++
-      encode_uint 4 (from_seq_no record) ++
-      encode_uint 4 (msg_count record) ++
+      encode_uint_le 8 (uuid record) ++
+      encode_uint_le 4 (from_seq_no record) ++
+      encode_uint_le 4 (msg_count record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (uuid_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (from_seq_no_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (msg_count_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -809,7 +809,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -819,9 +819,9 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -845,11 +845,11 @@ Module BrokerTecILink3V89Server.
       (num_in_group record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -862,7 +862,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -872,7 +872,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -922,27 +922,27 @@ Module BrokerTecILink3V89Server.
       (split_msg record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (uuid record) ++
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (uuid record) ++
       encode_bytes 256 (text record) ++
       encode_bytes 20 (sender_id_optional record) ++
-      encode_uint 8 (party_details_list_req_id_optional record) ++
-      encode_uint 8 (sending_time_epoch record) ++
-      encode_uint 8 (business_reject_ref_id record) ++
+      encode_uint_le 8 (party_details_list_req_id_optional record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (business_reject_ref_id record) ++
       encode_bytes 5 (location_optional record) ++
-      encode_uint 4 (ref_seq_num record) ++
-      encode_uint 2 (ref_tag_id record) ++
-      encode_uint 2 (business_reject_reason record) ++
+      encode_uint_le 4 (ref_seq_num record) ++
+      encode_uint_le 2 (ref_tag_id record) ++
+      encode_uint_le 2 (business_reject_reason record) ++
       encode_bytes 2 (ref_msg_type record) ++
       encode_uint 1 (poss_retrans_flag record) ++
       encode_uint 1 (manual_order_indicator_optional record) ++
       encode_uint 1 (split_msg record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
               match decode_bytes 256 bytes with
@@ -951,25 +951,25 @@ Module BrokerTecILink3V89Server.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (sender_id_optional_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (party_details_list_req_id_optional_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (sending_time_epoch_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (business_reject_ref_id_value, bytes) =>
                                   match decode_bytes 5 bytes with
                                   | None => None
                                   | Some (location_optional_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (ref_seq_num_value, bytes) =>
-                                          match decode_uint 2 bytes with
+                                          match decode_uint_le 2 bytes with
                                           | None => None
                                           | Some (ref_tag_id_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_uint_le 2 bytes with
                                               | None => None
                                               | Some (business_reject_reason_value, bytes) =>
                                                   match decode_bytes 2 bytes with
@@ -1004,7 +1004,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 330.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1014,17 +1014,17 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
@@ -1051,11 +1051,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1068,7 +1068,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1078,7 +1078,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1102,11 +1102,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1119,7 +1119,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1129,7 +1129,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1153,11 +1153,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1170,7 +1170,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1180,7 +1180,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1204,11 +1204,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1221,7 +1221,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1231,7 +1231,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1255,11 +1255,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (mantissa_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1272,7 +1272,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1282,7 +1282,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1306,11 +1306,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1323,7 +1323,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1333,7 +1333,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1357,11 +1357,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1374,7 +1374,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1384,7 +1384,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1408,11 +1408,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1425,7 +1425,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1435,7 +1435,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1493,31 +1493,31 @@ Module BrokerTecILink3V89Server.
       (delay_to_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (uuid record) ++
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (uuid record) ++
       encode_bytes 256 (text record) ++
       encode_bytes 40 (exec_id record) ++
       encode_bytes 20 (sender_id record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (sending_time_epoch record) ++
-      encode_uint 8 (order_request_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (order_request_id record) ++
       encode_bytes 5 (location record) ++
-      encode_uint 2 (cxl_rej_reason record) ++
-      encode_uint 2 (delay_duration record) ++
+      encode_uint_le 2 (cxl_rej_reason record) ++
+      encode_uint_le 2 (delay_duration record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_uint 1 (poss_retrans_flag record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (liquidity_flag record) ++
-      encode_uint 8 (delay_to_time record).
+      encode_uint_le 8 (delay_to_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
               match decode_bytes 256 bytes with
@@ -1532,28 +1532,28 @@ Module BrokerTecILink3V89Server.
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (cl_ord_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (party_details_list_req_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (order_id_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (transact_time_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (sending_time_epoch_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (order_request_id_value, bytes) =>
                                                   match decode_bytes 5 bytes with
                                                   | None => None
                                                   | Some (location_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_uint_le 2 bytes with
                                                       | None => None
                                                       | Some (cxl_rej_reason_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_uint_le 2 bytes with
                                                           | None => None
                                                           | Some (delay_duration_value, bytes) =>
                                                               match decode_uint 1 bytes with
@@ -1568,7 +1568,7 @@ Module BrokerTecILink3V89Server.
                                                                           match decode_uint 1 bytes with
                                                                           | None => None
                                                                           | Some (liquidity_flag_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (delay_to_time_value, bytes) =>
                                                                                   Some ({| seq_num := seq_num_value; uuid := uuid_value; text := text_value; exec_id := exec_id_value; sender_id := sender_id_value; cl_ord_id := cl_ord_id_value; party_details_list_req_id := party_details_list_req_id_value; order_id := order_id_value; transact_time := transact_time_value; sending_time_epoch := sending_time_epoch_value; order_request_id := order_request_id_value; location := location_value; cxl_rej_reason := cxl_rej_reason_value; delay_duration := delay_duration_value; manual_order_indicator := manual_order_indicator_value; poss_retrans_flag := poss_retrans_flag_value; split_msg := split_msg_value; liquidity_flag := liquidity_flag_value; delay_to_time := delay_to_time_value |}, bytes)
@@ -1595,7 +1595,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 409.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1605,25 +1605,25 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 bound_18]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
@@ -1680,31 +1680,31 @@ Module BrokerTecILink3V89Server.
       (delay_to_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (uuid record) ++
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (uuid record) ++
       encode_bytes 256 (text record) ++
       encode_bytes 40 (exec_id record) ++
       encode_bytes 20 (sender_id record) ++
       encode_bytes 20 (cl_ord_id record) ++
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (transact_time record) ++
-      encode_uint 8 (sending_time_epoch record) ++
-      encode_uint 8 (order_request_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (transact_time record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (order_request_id record) ++
       encode_bytes 5 (location record) ++
-      encode_uint 2 (cxl_rej_reason record) ++
-      encode_uint 2 (delay_duration record) ++
+      encode_uint_le 2 (cxl_rej_reason record) ++
+      encode_uint_le 2 (delay_duration record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_uint 1 (poss_retrans_flag record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (liquidity_flag record) ++
-      encode_uint 8 (delay_to_time record).
+      encode_uint_le 8 (delay_to_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
               match decode_bytes 256 bytes with
@@ -1719,28 +1719,28 @@ Module BrokerTecILink3V89Server.
                           match decode_bytes 20 bytes with
                           | None => None
                           | Some (cl_ord_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (party_details_list_req_id_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (order_id_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (transact_time_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (sending_time_epoch_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (order_request_id_value, bytes) =>
                                                   match decode_bytes 5 bytes with
                                                   | None => None
                                                   | Some (location_value, bytes) =>
-                                                      match decode_uint 2 bytes with
+                                                      match decode_uint_le 2 bytes with
                                                       | None => None
                                                       | Some (cxl_rej_reason_value, bytes) =>
-                                                          match decode_uint 2 bytes with
+                                                          match decode_uint_le 2 bytes with
                                                           | None => None
                                                           | Some (delay_duration_value, bytes) =>
                                                               match decode_uint 1 bytes with
@@ -1755,7 +1755,7 @@ Module BrokerTecILink3V89Server.
                                                                           match decode_uint 1 bytes with
                                                                           | None => None
                                                                           | Some (liquidity_flag_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (delay_to_time_value, bytes) =>
                                                                                   Some ({| seq_num := seq_num_value; uuid := uuid_value; text := text_value; exec_id := exec_id_value; sender_id := sender_id_value; cl_ord_id := cl_ord_id_value; party_details_list_req_id := party_details_list_req_id_value; order_id := order_id_value; transact_time := transact_time_value; sending_time_epoch := sending_time_epoch_value; order_request_id := order_request_id_value; location := location_value; cxl_rej_reason := cxl_rej_reason_value; delay_duration := delay_duration_value; manual_order_indicator := manual_order_indicator_value; poss_retrans_flag := poss_retrans_flag_value; split_msg := split_msg_value; liquidity_flag := liquidity_flag_value; delay_to_time := delay_to_time_value |}, bytes)
@@ -1782,7 +1782,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 409.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1792,25 +1792,25 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 bound_18]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_18.
       destruct record. reflexivity.
     Qed.
 
@@ -1863,29 +1863,29 @@ Module BrokerTecILink3V89Server.
       (delay_to_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (uuid record) ++
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (uuid record) ++
       encode_bytes 256 (text record) ++
       encode_bytes 20 (sender_id record) ++
       encode_bytes 17 (exchange_quote_req_id record) ++
-      encode_uint 8 (party_details_list_req_id record) ++
-      encode_uint 8 (request_time record) ++
-      encode_uint 8 (sending_time_epoch record) ++
-      encode_uint 8 (quote_req_id record) ++
+      encode_uint_le 8 (party_details_list_req_id record) ++
+      encode_uint_le 8 (request_time record) ++
+      encode_uint_le 8 (sending_time_epoch record) ++
+      encode_uint_le 8 (quote_req_id record) ++
       encode_bytes 5 (location record) ++
-      encode_uint 2 (quote_reject_reason record) ++
-      encode_uint 2 (delay_duration record) ++
+      encode_uint_le 2 (quote_reject_reason record) ++
+      encode_uint_le 2 (delay_duration record) ++
       encode_uint 1 (quote_ack_status record) ++
       encode_uint 1 (manual_order_indicator record) ++
       encode_uint 1 (split_msg record) ++
       encode_uint 1 (poss_retrans_flag record) ++
-      encode_uint 8 (delay_to_time record).
+      encode_uint_le 8 (delay_to_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (uuid_value, bytes) =>
               match decode_bytes 256 bytes with
@@ -1897,25 +1897,25 @@ Module BrokerTecILink3V89Server.
                       match decode_bytes 17 bytes with
                       | None => None
                       | Some (exchange_quote_req_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (party_details_list_req_id_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (request_time_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (sending_time_epoch_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (quote_req_id_value, bytes) =>
                                           match decode_bytes 5 bytes with
                                           | None => None
                                           | Some (location_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_uint_le 2 bytes with
                                               | None => None
                                               | Some (quote_reject_reason_value, bytes) =>
-                                                  match decode_uint 2 bytes with
+                                                  match decode_uint_le 2 bytes with
                                                   | None => None
                                                   | Some (delay_duration_value, bytes) =>
                                                       match decode_uint 1 bytes with
@@ -1930,7 +1930,7 @@ Module BrokerTecILink3V89Server.
                                                                   match decode_uint 1 bytes with
                                                                   | None => None
                                                                   | Some (poss_retrans_flag_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (delay_to_time_value, bytes) =>
                                                                           Some ({| seq_num := seq_num_value; uuid := uuid_value; text := text_value; sender_id := sender_id_value; exchange_quote_req_id := exchange_quote_req_id_value; party_details_list_req_id := party_details_list_req_id_value; request_time := request_time_value; sending_time_epoch := sending_time_epoch_value; quote_req_id := quote_req_id_value; location := location_value; quote_reject_reason := quote_reject_reason_value; delay_duration := delay_duration_value; quote_ack_status := quote_ack_status_value; manual_order_indicator := manual_order_indicator_value; split_msg := split_msg_value; poss_retrans_flag := poss_retrans_flag_value; delay_to_time := delay_to_time_value |}, bytes)
@@ -1955,7 +1955,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 358.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1965,23 +1965,23 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
       rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -2008,13 +2008,13 @@ Module BrokerTecILink3V89Server.
       (week record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (year record) ++
+      encode_uint_le 2 (year record) ++
       encode_uint 1 (month record) ++
       encode_uint 1 (day record) ++
       encode_uint 1 (week record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (year_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2035,7 +2035,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2045,7 +2045,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -2071,11 +2071,11 @@ Module BrokerTecILink3V89Server.
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (mantissa_32 record) ++
+      encode_uint_le 4 (mantissa_32 record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (mantissa_32_value, bytes) =>
           match decode_uint 1 bytes with
@@ -2088,7 +2088,7 @@ Module BrokerTecILink3V89Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2098,7 +2098,7 @@ Module BrokerTecILink3V89Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.

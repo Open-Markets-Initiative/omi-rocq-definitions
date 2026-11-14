@@ -4,9 +4,10 @@
     every message proof leans on: an encoding is as wide as its field says, and decoding what was
     encoded gives the value back and leaves the following bytes alone.
 
-    A field of n bytes holds a number below 256^n, written most significant byte first. The bound
-    is not in the type - a field is an N - so it is stated where it is needed: each generated
-    record carries a bound predicate of its own, and its round trip theorem asks for it. *)
+    A field of n bytes holds a number below 256^n, written most significant byte first, or least
+    significant byte first where the protocol states that order. The bound is not in the type - a
+    field is an N - so it is stated where it is needed: each generated record carries a bound
+    predicate of its own, and its round trip theorem asks for it. *)
 
 From Stdlib Require Import List.
 From Stdlib Require Import NArith.
@@ -83,6 +84,75 @@ Proof.
     rewrite byted_to_N by exact high.
     rewrite N.mul_comm, <- N.div_mod by lia.
     reflexivity.
+Qed.
+
+(** * Little endian fields
+
+    The same field with its bytes the other way round: least significant byte first. A protocol
+    states the order per field, and a definition that read a little endian field with the encoder
+    above would read the right bytes in the wrong order - and still prove, because encode and
+    decode would agree with each other while disagreeing with the wire.
+
+    Written least significant byte first and recursing on the high bytes, which is the mirror of
+    the big endian pair and peels the way its decoder does, so the induction lines up the same. *)
+
+Fixpoint encode_uint_le (width : nat) (value : N) : list byte :=
+  match width with
+  | O => []
+  | S rest => byted (value mod 256)%N :: encode_uint_le rest (value / 256)%N
+  end.
+
+Fixpoint decode_uint_le (width : nat) (bytes : list byte) : option (N * list byte) :=
+  match width with
+  | O => Some (0%N, bytes)
+  | S rest =>
+      match bytes with
+      | [] => None
+      | b :: tail =>
+          match decode_uint_le rest tail with
+          | Some (value, after) => Some ((Byte.to_N b + 256 * value)%N, after)
+          | None => None
+          end
+      end
+  end.
+
+Lemma encode_uint_le_length :
+  forall width value, Datatypes.length (encode_uint_le width value) = width.
+Proof.
+  induction width as [| rest IH]; intros value; simpl; [reflexivity | now rewrite IH].
+Qed.
+
+(** Decoding what was encoded gives the value back and leaves the bytes after it alone *)
+Theorem decode_encode_uint_le :
+  forall width value after,
+    (value < 256 ^ N.of_nat width)%N ->
+    decode_uint_le width (encode_uint_le width value ++ after) = Some (value, after).
+Proof.
+  (* cbn names what to unfold rather than simpl: the shift by a literal 256 is computable, and
+     simpl rewrites it into a match on the binary representation, after which the div_mod
+     identity has no 256 * (value / 256) left to match. The big endian proof shifts by
+     256 ^ rest, which is not computable, so it can simpl freely. *)
+  induction width as [| rest IH]; intros value after bound;
+    cbn [encode_uint_le decode_uint_le app].
+  - replace value with 0%N by (simpl in bound; lia). reflexivity.
+  - assert (high : (value / 256 < 256 ^ N.of_nat rest)%N).
+    { apply N.Div0.div_lt_upper_bound.
+      rewrite <- N.pow_succ_r'.
+      replace (N.succ (N.of_nat rest)) with (N.of_nat (S rest)) by lia. exact bound. }
+    rewrite IH by exact high.
+    rewrite byted_to_N by (apply N.mod_lt; lia).
+    rewrite N.add_comm, <- N.div_mod by lia.
+    reflexivity.
+Qed.
+
+(** One byte is the same byte either way round, which is why a field of a single byte is read
+    through the big endian pair whatever order the protocol states for it: there is no order for
+    one byte to show, and writing one into the proof would churn every definition for nothing. *)
+Lemma encode_uint_one_byte :
+  forall value, (value < 256)%N -> encode_uint 1 value = encode_uint_le 1 value.
+Proof.
+  intros value bound. cbn.
+  rewrite N.div_1_r, N.mod_small by exact bound. reflexivity.
 Qed.
 
 (** * Byte runs

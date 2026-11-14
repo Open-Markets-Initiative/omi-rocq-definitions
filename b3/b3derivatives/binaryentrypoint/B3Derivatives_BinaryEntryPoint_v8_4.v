@@ -46,14 +46,14 @@ Module B3DerivativesBinaryEntryPointV84.
       (encoding_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (encoding_type record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (encoding_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (encoding_type_value, bytes) =>
               Some ({| message_length := message_length_value; encoding_type := encoding_type_value |}, bytes)
@@ -63,7 +63,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,8 +73,8 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -101,22 +101,22 @@ Module B3DerivativesBinaryEntryPointV84.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -128,7 +128,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -138,10 +138,10 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -237,23 +237,23 @@ Module B3DerivativesBinaryEntryPointV84.
       SemanticVersion.bounded (semantic_version record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (session_ver_id record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (entering_firm record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (session_ver_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (entering_firm record) ++
       SemanticVersion.encode (semantic_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (session_ver_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (entering_firm_value, bytes) =>
                       match SemanticVersion.decode bytes with
@@ -269,7 +269,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 28.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SemanticVersion.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !SemanticVersion.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -279,10 +279,10 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite SemanticVersion.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -316,25 +316,25 @@ Module B3DerivativesBinaryEntryPointV84.
       (current_session_ver_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (session_ver_id record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (entering_firm_optional record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (session_ver_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (entering_firm_optional record) ++
       encode_uint 1 (negotiation_reject_code record) ++
       encode_bytes 3 (offset_25_padding_3 record) ++
-      encode_uint 8 (current_session_ver_id record).
+      encode_uint_le 8 (current_session_ver_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (session_ver_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (entering_firm_optional_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -343,7 +343,7 @@ Module B3DerivativesBinaryEntryPointV84.
                           match decode_bytes 3 bytes with
                           | None => None
                           | Some (offset_25_padding_3_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (current_session_ver_id_value, bytes) =>
                                   Some ({| session_id := session_id_value; session_ver_id := session_ver_id_value; request_timestamp := request_timestamp_value; entering_firm_optional := entering_firm_optional_value; negotiation_reject_code := negotiation_reject_code_value; offset_25_padding_3 := offset_25_padding_3_value; current_session_ver_id := current_session_ver_id_value |}, bytes)
@@ -358,7 +358,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -368,13 +368,13 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -407,31 +407,31 @@ Module B3DerivativesBinaryEntryPointV84.
       SemanticVersion.bounded (semantic_version record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (session_ver_id record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 8 (keep_alive_interval record) ++
-      encode_uint 4 (next_seq_no record) ++
-      encode_uint 4 (last_incoming_seq_no record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (session_ver_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 8 (keep_alive_interval record) ++
+      encode_uint_le 4 (next_seq_no record) ++
+      encode_uint_le 4 (last_incoming_seq_no record) ++
       SemanticVersion.encode (semantic_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (session_ver_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (keep_alive_interval_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (next_seq_no_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (last_incoming_seq_no_value, bytes) =>
                               match SemanticVersion.decode bytes with
@@ -449,7 +449,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SemanticVersion.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !SemanticVersion.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -459,12 +459,12 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite SemanticVersion.decode_encode by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -496,21 +496,21 @@ Module B3DerivativesBinaryEntryPointV84.
       (last_incoming_seq_no_optional record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (session_ver_id record) ++
-      encode_uint 8 (request_timestamp record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (session_ver_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
       encode_uint 1 (establishment_reject_code record) ++
       encode_bytes 1 (offset_21_padding_1 record) ++
-      encode_uint 4 (last_incoming_seq_no_optional record).
+      encode_uint_le 4 (last_incoming_seq_no_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (session_ver_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (request_timestamp_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -519,7 +519,7 @@ Module B3DerivativesBinaryEntryPointV84.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (offset_21_padding_1_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (last_incoming_seq_no_optional_value, bytes) =>
                               Some ({| session_id := session_id_value; session_ver_id := session_ver_id_value; request_timestamp := request_timestamp_value; establishment_reject_code := establishment_reject_code_value; offset_21_padding_1 := offset_21_padding_1_value; last_incoming_seq_no_optional := last_incoming_seq_no_optional_value |}, bytes)
@@ -533,7 +533,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -543,12 +543,12 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -573,15 +573,15 @@ Module B3DerivativesBinaryEntryPointV84.
       (termination_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (session_ver_id record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (session_ver_id record) ++
       encode_uint 1 (termination_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (session_ver_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -595,7 +595,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -605,8 +605,8 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -630,14 +630,14 @@ Module B3DerivativesBinaryEntryPointV84.
       (count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (from_seq_no record) ++
-      encode_uint 4 (count record).
+      encode_uint_le 4 (from_seq_no record) ++
+      encode_uint_le 4 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (from_seq_no_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (count_value, bytes) =>
               Some ({| from_seq_no := from_seq_no_value; count := count_value |}, bytes)
@@ -647,7 +647,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -657,8 +657,8 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -679,10 +679,10 @@ Module B3DerivativesBinaryEntryPointV84.
       (next_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (next_seq_no record).
+      encode_uint_le 4 (next_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (next_seq_no_value, bytes) =>
           Some ({| next_seq_no := next_seq_no_value |}, bytes)
@@ -691,7 +691,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -699,7 +699,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -726,22 +726,22 @@ Module B3DerivativesBinaryEntryPointV84.
       (count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 4 (from_seq_no record) ++
-      encode_uint 4 (count record).
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 4 (from_seq_no record) ++
+      encode_uint_le 4 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (from_seq_no_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (count_value, bytes) =>
                       Some ({| session_id := session_id_value; timestamp := timestamp_value; from_seq_no := from_seq_no_value; count := count_value |}, bytes)
@@ -753,7 +753,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -763,10 +763,10 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -793,22 +793,22 @@ Module B3DerivativesBinaryEntryPointV84.
       (count record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (request_timestamp record) ++
-      encode_uint 4 (next_seq_no record) ++
-      encode_uint 4 (count record).
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
+      encode_uint_le 4 (next_seq_no record) ++
+      encode_uint_le 4 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (request_timestamp_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (next_seq_no_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (count_value, bytes) =>
                       Some ({| session_id := session_id_value; request_timestamp := request_timestamp_value; next_seq_no := next_seq_no_value; count := count_value |}, bytes)
@@ -820,7 +820,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -830,10 +830,10 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -858,15 +858,15 @@ Module B3DerivativesBinaryEntryPointV84.
       (retransmit_reject_code record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 8 (request_timestamp record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 8 (request_timestamp record) ++
       encode_uint 1 (retransmit_reject_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (request_timestamp_value, bytes) =>
               match decode_uint 1 bytes with
@@ -880,7 +880,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -890,8 +890,8 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -921,20 +921,20 @@ Module B3DerivativesBinaryEntryPointV84.
       Datatypes.length (padding record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (sending_time record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (sending_time record) ++
       encode_uint 1 (market_segment_id record) ++
       encode_bytes 1 (padding record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (msg_seq_num_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sending_time_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -953,7 +953,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -963,9 +963,9 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
@@ -992,18 +992,18 @@ Module B3DerivativesBinaryEntryPointV84.
       (document record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (prefix record) ++
+      encode_uint_le 2 (prefix record) ++
       encode_bytes 2 (offset_2_padding_2 record) ++
-      encode_uint 4 (document record).
+      encode_uint_le 4 (document record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (prefix_value, bytes) =>
           match decode_bytes 2 bytes with
           | None => None
           | Some (offset_2_padding_2_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (document_value, bytes) =>
                   Some ({| prefix := prefix_value; offset_2_padding_2 := offset_2_padding_2_value; document := document_value |}, bytes)
@@ -1014,7 +1014,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1024,9 +1024,9 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1051,18 +1051,18 @@ Module B3DerivativesBinaryEntryPointV84.
       (custody_allocation_type record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (custodian record) ++
-      encode_uint 4 (custody_account record) ++
-      encode_uint 4 (custody_allocation_type record).
+      encode_uint_le 4 (custodian record) ++
+      encode_uint_le 4 (custody_account record) ++
+      encode_uint_le 4 (custody_allocation_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (custodian_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (custody_account_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (custody_allocation_type_value, bytes) =>
                   Some ({| custodian := custodian_value; custody_account := custody_account_value; custody_allocation_type := custody_allocation_type_value |}, bytes)
@@ -1073,7 +1073,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1083,9 +1083,9 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1108,11 +1108,11 @@ Module B3DerivativesBinaryEntryPointV84.
       (num_in_group record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
+      encode_uint_le 2 (block_length record) ++
       encode_uint 1 (num_in_group record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1125,7 +1125,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1135,7 +1135,7 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1165,20 +1165,20 @@ Module B3DerivativesBinaryEntryPointV84.
       (market_segment_id_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (sending_time record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (sending_time record) ++
       encode_uint 1 (event_indicator record) ++
       encode_uint 1 (market_segment_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (msg_seq_num_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sending_time_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1197,7 +1197,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1207,9 +1207,9 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
@@ -1234,14 +1234,14 @@ Module B3DerivativesBinaryEntryPointV84.
       (no_related_trades record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (event_id record) ++
-      encode_uint 2 (no_related_trades record).
+      encode_uint_le 4 (event_id record) ++
+      encode_uint_le 2 (no_related_trades record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (event_id_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (no_related_trades_value, bytes) =>
               Some ({| event_id := event_id_value; no_related_trades := no_related_trades_value |}, bytes)
@@ -1251,7 +1251,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1261,8 +1261,8 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -1303,12 +1303,12 @@ Module B3DerivativesBinaryEntryPointV84.
     Definition encode (record : t) : list byte :=
       OutboundBusinessHeader.encode (outbound_business_header record) ++
       encode_bytes 2 (offset_18_padding_2 record) ++
-      encode_uint 8 (security_req_id record) ++
-      encode_uint 8 (security_id_optional record) ++
+      encode_uint_le 8 (security_req_id record) ++
+      encode_uint_le 8 (security_id_optional record) ++
       encode_uint 1 (security_response_type record) ++
       encode_bytes 3 (security_strategy_type record) ++
       encode_bytes 20 (symbol record) ++
-      encode_uint 8 (security_response_id record) ++
+      encode_uint_le 8 (security_response_id record) ++
       encode_bytes 10 (sender_location record) ++
       encode_bytes 5 (entering_trader record).
 
@@ -1319,10 +1319,10 @@ Module B3DerivativesBinaryEntryPointV84.
           match decode_bytes 2 bytes with
           | None => None
           | Some (offset_18_padding_2_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (security_req_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (security_id_optional_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -1334,7 +1334,7 @@ Module B3DerivativesBinaryEntryPointV84.
                               match decode_bytes 20 bytes with
                               | None => None
                               | Some (symbol_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (security_response_id_value, bytes) =>
                                       match decode_bytes 10 bytes with
@@ -1358,7 +1358,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 83.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !OutboundBusinessHeader.encode_length, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !OutboundBusinessHeader.encode_length, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1370,12 +1370,12 @@ Module B3DerivativesBinaryEntryPointV84.
       rewrite <- !app_assoc.
       rewrite OutboundBusinessHeader.decode_encode by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -1408,21 +1408,21 @@ Module B3DerivativesBinaryEntryPointV84.
       Datatypes.length (padding_char_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (session_id record) ++
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (sending_time record) ++
+      encode_uint_le 4 (session_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (sending_time record) ++
       encode_uint 1 (event_indicator record) ++
       encode_uint 1 (market_segment_id_optional record) ++
       encode_bytes 2 (padding_char_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (session_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (msg_seq_num_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sending_time_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -1445,7 +1445,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1455,9 +1455,9 @@ Module B3DerivativesBinaryEntryPointV84.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -1494,10 +1494,10 @@ Module B3DerivativesBinaryEntryPointV84.
 
     Definition encode (record : t) : list byte :=
       InboundBusinessHeader.encode (inbound_business_header record) ++
-      encode_uint 8 (pos_req_id record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (orig_pos_req_ref_id record) ++
-      encode_uint 8 (pos_maint_rpt_ref_id record) ++
+      encode_uint_le 8 (pos_req_id record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (orig_pos_req_ref_id record) ++
+      encode_uint_le 8 (pos_maint_rpt_ref_id record) ++
       encode_bytes 10 (sender_location record) ++
       encode_bytes 5 (entering_trader record).
 
@@ -1505,16 +1505,16 @@ Module B3DerivativesBinaryEntryPointV84.
       match InboundBusinessHeader.decode bytes with
       | None => None
       | Some (inbound_business_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (pos_req_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (security_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (orig_pos_req_ref_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (pos_maint_rpt_ref_id_value, bytes) =>
                           match decode_bytes 10 bytes with
@@ -1535,7 +1535,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 65.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InboundBusinessHeader.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !InboundBusinessHeader.encode_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1546,10 +1546,10 @@ Module B3DerivativesBinaryEntryPointV84.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite InboundBusinessHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -1601,17 +1601,17 @@ Module B3DerivativesBinaryEntryPointV84.
 
     Definition encode (record : t) : list byte :=
       OutboundBusinessHeader.encode (outbound_business_header record) ++
-      encode_uint 8 (alloc_id record) ++
-      encode_uint 8 (security_id record) ++
-      encode_uint 8 (alloc_report_id record) ++
+      encode_uint_le 8 (alloc_id record) ++
+      encode_uint_le 8 (security_id record) ++
+      encode_uint_le 8 (alloc_report_id record) ++
       encode_bytes 1 (alloc_trans_type record) ++
       encode_bytes 1 (alloc_report_type record) ++
       encode_bytes 1 (alloc_no_orders_type record) ++
-      encode_uint 4 (alloc_rej_code record) ++
-      encode_uint 8 (quantity record) ++
+      encode_uint_le 4 (alloc_rej_code record) ++
+      encode_uint_le 8 (quantity record) ++
       encode_bytes 1 (alloc_status record) ++
-      encode_uint 2 (trade_date_optional record) ++
-      encode_uint 8 (transact_time record) ++
+      encode_uint_le 2 (trade_date_optional record) ++
+      encode_uint_le 8 (transact_time record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 10 (sender_location record) ++
       encode_bytes 5 (entering_trader record).
@@ -1620,13 +1620,13 @@ Module B3DerivativesBinaryEntryPointV84.
       match OutboundBusinessHeader.decode bytes with
       | None => None
       | Some (outbound_business_header_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (alloc_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (security_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (alloc_report_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1638,19 +1638,19 @@ Module B3DerivativesBinaryEntryPointV84.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (alloc_no_orders_type_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (alloc_rej_code_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (quantity_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (alloc_status_value, bytes) =>
-                                              match decode_uint 2 bytes with
+                                              match decode_uint_le 2 bytes with
                                               | None => None
                                               | Some (trade_date_optional_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (transact_time_value, bytes) =>
                                                       match decode_bytes 1 bytes with
@@ -1682,7 +1682,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 84.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !OutboundBusinessHeader.encode_length, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !OutboundBusinessHeader.encode_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1693,17 +1693,17 @@ Module B3DerivativesBinaryEntryPointV84.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite OutboundBusinessHeader.decode_encode by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
@@ -1750,13 +1750,13 @@ Module B3DerivativesBinaryEntryPointV84.
       InboundBusinessHeader.encode (inbound_business_header record) ++
       encode_uint 1 (mass_action_type record) ++
       encode_uint 1 (mass_action_scope record) ++
-      encode_uint 8 (cl_ord_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
       encode_uint 1 (mass_cancel_restatement_reason record) ++
       encode_uint 1 (ord_tag_id record) ++
       encode_bytes 1 (side_optional record) ++
       encode_bytes 1 (offset_31_padding_1 record) ++
       encode_bytes 6 (asset record) ++
-      encode_uint 8 (security_id_optional record) ++
+      encode_uint_le 8 (security_id_optional record) ++
       InvestorId.encode (investor_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1769,7 +1769,7 @@ Module B3DerivativesBinaryEntryPointV84.
               match decode_uint 1 bytes with
               | None => None
               | Some (mass_action_scope_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (cl_ord_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -1787,7 +1787,7 @@ Module B3DerivativesBinaryEntryPointV84.
                                       match decode_bytes 6 bytes with
                                       | None => None
                                       | Some (asset_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (security_id_optional_value, bytes) =>
                                               match InvestorId.decode bytes with
@@ -1809,7 +1809,7 @@ Module B3DerivativesBinaryEntryPointV84.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !InboundBusinessHeader.encode_length, !encode_uint_length, !encode_bytes_length, !InvestorId.encode_length. reflexivity.
+      rewrite !length_app, !InboundBusinessHeader.encode_length, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length, !InvestorId.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1822,13 +1822,13 @@ Module B3DerivativesBinaryEntryPointV84.
       rewrite InboundBusinessHeader.decode_encode by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite InvestorId.decode_encode by exact bound_10.
       destruct record. reflexivity.
     Qed.

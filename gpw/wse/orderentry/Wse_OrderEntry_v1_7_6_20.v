@@ -51,26 +51,26 @@ Module WseOrderEntryV17620.
       (source_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
-      encode_uint 2 (message_type record) ++
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (source_timestamp record).
+      encode_uint_le 2 (message_length record) ++
+      encode_uint_le 2 (message_type record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (source_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (sequence_number_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (timestamp_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (source_timestamp_value, bytes) =>
                           Some ({| message_length := message_length_value; message_type := message_type_value; sequence_number := sequence_number_value; timestamp := timestamp_value; source_timestamp := source_timestamp_value |}, bytes)
@@ -83,7 +83,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -93,11 +93,11 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -126,26 +126,26 @@ Module WseOrderEntryV17620.
       (last_sent_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (version record) ++
+      encode_uint_le 2 (version record) ++
       encode_bytes 8 (token record) ++
-      encode_uint 2 (connection_id record) ++
-      encode_uint 4 (next_expected_seq_num record) ++
-      encode_uint 4 (last_sent_seq_num record).
+      encode_uint_le 2 (connection_id record) ++
+      encode_uint_le 4 (next_expected_seq_num record) ++
+      encode_uint_le 4 (last_sent_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (version_value, bytes) =>
           match decode_bytes 8 bytes with
           | None => None
           | Some (token_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (connection_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (next_expected_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (last_sent_seq_num_value, bytes) =>
                           Some ({| version := version_value; token := token_value; connection_id := connection_id_value; next_expected_seq_num := next_expected_seq_num_value; last_sent_seq_num := last_sent_seq_num_value |}, bytes)
@@ -158,7 +158,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -168,11 +168,11 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -200,21 +200,21 @@ Module WseOrderEntryV17620.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (result_login_result record) ++
-      encode_uint 4 (next_expected_seq_num record) ++
-      encode_uint 4 (last_replay_seq_num record) ++
-      encode_uint 2 (session_id record).
+      encode_uint_le 4 (next_expected_seq_num record) ++
+      encode_uint_le 4 (last_replay_seq_num record) ++
+      encode_uint_le 2 (session_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (result_login_result_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (next_expected_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (last_replay_seq_num_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (session_id_value, bytes) =>
                       Some ({| result_login_result := result_login_result_value; next_expected_seq_num := next_expected_seq_num_value; last_replay_seq_num := last_replay_seq_num_value; session_id := session_id_value |}, bytes)
@@ -226,7 +226,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -237,9 +237,9 @@ Module WseOrderEntryV17620.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -303,11 +303,11 @@ Module WseOrderEntryV17620.
       (reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (ref_seq_num record) ++
+      encode_uint_le 4 (ref_seq_num record) ++
       encode_uint 1 (reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (ref_seq_num_value, bytes) =>
           match decode_uint 1 bytes with
@@ -320,7 +320,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -330,7 +330,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -352,10 +352,10 @@ Module WseOrderEntryV17620.
       (target_timestamp record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (target_timestamp record).
+      encode_uint_le 8 (target_timestamp record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (target_timestamp_value, bytes) =>
           Some ({| target_timestamp := target_timestamp_value |}, bytes)
@@ -364,7 +364,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -372,7 +372,7 @@ Module WseOrderEntryV17620.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -449,14 +449,14 @@ Module WseOrderEntryV17620.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (market_id record) ++
-      encode_uint 4 (date record) ++
+      encode_uint_le 4 (date record) ++
       encode_uint 1 (trading_session_event record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 4 bytes with
       | None => None
       | Some (market_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (date_value, bytes) =>
               match decode_uint 1 bytes with
@@ -470,7 +470,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 9.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -481,7 +481,7 @@ Module WseOrderEntryV17620.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -505,11 +505,11 @@ Module WseOrderEntryV17620.
       (qualifier record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (short_code record) ++
+      encode_uint_le 4 (short_code record) ++
       encode_uint 1 (qualifier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (short_code_value, bytes) =>
           match decode_uint 1 bytes with
@@ -522,7 +522,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -532,7 +532,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -556,11 +556,11 @@ Module WseOrderEntryV17620.
       (qualifier record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (short_code record) ++
+      encode_uint_le 4 (short_code record) ++
       encode_uint 1 (qualifier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (short_code_value, bytes) =>
           match decode_uint 1 bytes with
@@ -573,7 +573,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -583,7 +583,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -607,11 +607,11 @@ Module WseOrderEntryV17620.
       (qualifier record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (short_code record) ++
+      encode_uint_le 4 (short_code record) ++
       encode_uint 1 (qualifier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (short_code_value, bytes) =>
           match decode_uint 1 bytes with
@@ -624,7 +624,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -634,7 +634,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -729,9 +729,9 @@ Module WseOrderEntryV17620.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (mass_cancel_request_type record) ++
       encode_uint 1 (target_party_role record) ++
-      encode_uint 4 (target_party_id record) ++
-      encode_uint 4 (market_segment_id record) ++
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (target_party_id record) ++
+      encode_uint_le 4 (market_segment_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       ExecutingTrader.encode (executing_trader record) ++
       encode_bytes 20 (client_order_id record).
 
@@ -742,13 +742,13 @@ Module WseOrderEntryV17620.
           match decode_uint 1 bytes with
           | None => None
           | Some (target_party_role_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (target_party_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (market_segment_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (instrument_id_value, bytes) =>
                           match ExecutingTrader.decode bytes with
@@ -769,7 +769,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !ExecutingTrader.encode_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !ExecutingTrader.encode_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -781,9 +781,9 @@ Module WseOrderEntryV17620.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite ExecutingTrader.decode_encode by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -808,14 +808,14 @@ Module WseOrderEntryV17620.
       (quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price record) ++
-      encode_uint 8 (quantity record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (price_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
               Some ({| price := price_value; quantity := quantity_value |}, bytes)
@@ -825,7 +825,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -835,8 +835,8 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -859,14 +859,14 @@ Module WseOrderEntryV17620.
       (quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (price record) ++
-      encode_uint 8 (quantity record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (price_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (quantity_value, bytes) =>
               Some ({| price := price_value; quantity := quantity_value |}, bytes)
@@ -876,7 +876,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -886,8 +886,8 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -912,12 +912,12 @@ Module WseOrderEntryV17620.
       Ask.bounded (ask record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       Bid.encode (bid record) ++
       Ask.encode (ask record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match Bid.decode bytes with
@@ -934,7 +934,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !Bid.encode_length, !Ask.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !Bid.encode_length, !Ask.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -944,7 +944,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite Bid.decode_encode by exact bound_1.
       rewrite Ask.decode_encode by exact bound_2.
       destruct record. reflexivity.
@@ -969,11 +969,11 @@ Module WseOrderEntryV17620.
       (action record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -986,7 +986,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -996,7 +996,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1022,18 +1022,18 @@ Module WseOrderEntryV17620.
       (rejection_code record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (ref_id record) ++
+      encode_uint_le 4 (ref_id record) ++
       encode_uint 1 (result_command_result record) ++
-      encode_uint 2 (rejection_code record).
+      encode_uint_le 2 (rejection_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (ref_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (result_command_result_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (rejection_code_value, bytes) =>
                   Some ({| ref_id := ref_id_value; result_command_result := result_command_result_value; rejection_code := rejection_code_value |}, bytes)
@@ -1044,7 +1044,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 7.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1054,9 +1054,9 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -1079,11 +1079,11 @@ Module WseOrderEntryV17620.
       (reason_request_for_execution_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (reason_request_for_execution_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
@@ -1096,7 +1096,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1106,7 +1106,7 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -1138,30 +1138,30 @@ Module WseOrderEntryV17620.
       (offer_orders record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (instrument_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint 1 (update_type record) ++
-      encode_uint 8 (total_bid_size record) ++
-      encode_uint 8 (total_offer_size record) ++
-      encode_uint 4 (bid_orders record) ++
-      encode_uint 4 (offer_orders record).
+      encode_uint_le 8 (total_bid_size record) ++
+      encode_uint_le 8 (total_offer_size record) ++
+      encode_uint_le 4 (bid_orders record) ++
+      encode_uint_le 4 (offer_orders record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (update_type_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (total_bid_size_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (total_offer_size_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (bid_orders_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (offer_orders_value, bytes) =>
                               Some ({| instrument_id := instrument_id_value; update_type := update_type_value; total_bid_size := total_bid_size_value; total_offer_size := total_offer_size_value; bid_orders := bid_orders_value; offer_orders := offer_orders_value |}, bytes)
@@ -1175,7 +1175,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 29.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1185,12 +1185,12 @@ Module WseOrderEntryV17620.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -1211,10 +1211,10 @@ Module WseOrderEntryV17620.
       (trade_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (trade_id record).
+      encode_uint_le 4 (trade_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (trade_id_value, bytes) =>
           Some ({| trade_id := trade_id_value |}, bytes)
@@ -1223,7 +1223,7 @@ Module WseOrderEntryV17620.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1231,7 +1231,7 @@ Module WseOrderEntryV17620.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

@@ -47,13 +47,13 @@ Module CboeEuropeLatencyFeedV14.
       (sequence record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_uint 1 (unit_ record) ++
-      encode_uint 4 (sequence record).
+      encode_uint_le 4 (sequence record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -62,7 +62,7 @@ Module CboeEuropeLatencyFeedV14.
               match decode_uint 1 bytes with
               | None => None
               | Some (unit__value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; unit_ := unit__value; sequence := sequence_value |}, bytes)
@@ -74,7 +74,7 @@ Module CboeEuropeLatencyFeedV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -84,10 +84,10 @@ Module CboeEuropeLatencyFeedV14.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -192,21 +192,21 @@ Module CboeEuropeLatencyFeedV14.
     Definition encode (record : t) : list byte :=
       encode_uint 1 (measurement_type record) ++
       encode_uint 1 (matching_unit record) ++
-      encode_uint 4 (begin_time record) ++
-      encode_uint 4 (end_time record) ++
-      encode_uint 4 (count record) ++
-      encode_uint 8 (minimum record) ++
-      encode_uint 8 (maximum record) ++
-      encode_uint 8 (average record) ++
-      encode_uint 8 (standard_deviation record) ++
-      encode_uint 8 (mode record) ++
-      encode_uint 8 (percentile_99_point_9 record) ++
-      encode_uint 8 (percentile_99 record) ++
-      encode_uint 8 (percentile_95 record) ++
-      encode_uint 8 (percentile_90 record) ++
-      encode_uint 8 (percentile_75 record) ++
-      encode_uint 8 (percentile_50 record) ++
-      encode_uint 8 (percentile_25 record).
+      encode_uint_le 4 (begin_time record) ++
+      encode_uint_le 4 (end_time record) ++
+      encode_uint_le 4 (count record) ++
+      encode_uint_le 8 (minimum record) ++
+      encode_uint_le 8 (maximum record) ++
+      encode_uint_le 8 (average record) ++
+      encode_uint_le 8 (standard_deviation record) ++
+      encode_uint_le 8 (mode record) ++
+      encode_uint_le 8 (percentile_99_point_9 record) ++
+      encode_uint_le 8 (percentile_99 record) ++
+      encode_uint_le 8 (percentile_95 record) ++
+      encode_uint_le 8 (percentile_90 record) ++
+      encode_uint_le 8 (percentile_75 record) ++
+      encode_uint_le 8 (percentile_50 record) ++
+      encode_uint_le 8 (percentile_25 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -215,49 +215,49 @@ Module CboeEuropeLatencyFeedV14.
           match decode_uint 1 bytes with
           | None => None
           | Some (matching_unit_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (begin_time_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (end_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (count_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (minimum_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (maximum_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (average_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (standard_deviation_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (mode_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (percentile_99_point_9_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (percentile_99_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (percentile_95_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (percentile_90_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (percentile_75_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (percentile_50_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (percentile_25_value, bytes) =>
                                                                           Some ({| measurement_type := measurement_type_value; matching_unit := matching_unit_value; begin_time := begin_time_value; end_time := end_time_value; count := count_value; minimum := minimum_value; maximum := maximum_value; average := average_value; standard_deviation := standard_deviation_value; mode := mode_value; percentile_99_point_9 := percentile_99_point_9_value; percentile_99 := percentile_99_value; percentile_95 := percentile_95_value; percentile_90 := percentile_90_value; percentile_75 := percentile_75_value; percentile_50 := percentile_50_value; percentile_25 := percentile_25_value |}, bytes)
@@ -282,7 +282,7 @@ Module CboeEuropeLatencyFeedV14.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 110.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -294,21 +294,21 @@ Module CboeEuropeLatencyFeedV14.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       destruct record. reflexivity.
     Qed.
 

@@ -44,14 +44,14 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       (nanoseconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
+      encode_uint_le 4 (seconds record) ++
+      encode_uint_le 4 (nanoseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (nanoseconds_value, bytes) =>
               Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
@@ -61,7 +61,7 @@ Module AmexEquitiesDepthFeedRequestV16Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -71,8 +71,8 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -101,14 +101,14 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       SendTime.bounded (send_time record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (delivery_flag record) ++
       encode_uint 1 (number_msgs record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       SendTime.encode (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -117,7 +117,7 @@ Module AmexEquitiesDepthFeedRequestV16Server.
               match decode_uint 1 bytes with
               | None => None
               | Some (number_msgs_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match SendTime.decode bytes with
@@ -133,7 +133,7 @@ Module AmexEquitiesDepthFeedRequestV16Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SendTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !SendTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -143,10 +143,10 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite SendTime.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -170,14 +170,14 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       (message_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_size record) ++
-      encode_uint 2 (message_type record).
+      encode_uint_le 2 (message_size record) ++
+      encode_uint_le 2 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_type_value, bytes) =>
               Some ({| message_size := message_size_value; message_type := message_type_value |}, bytes)
@@ -187,7 +187,7 @@ Module AmexEquitiesDepthFeedRequestV16Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -197,8 +197,8 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -231,22 +231,22 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       Datatypes.length (status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (request_seq_num record) ++
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (request_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record) ++
       encode_bytes 1 (status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (request_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (begin_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (end_seq_num_value, bytes) =>
                   match decode_bytes 10 bytes with
@@ -273,7 +273,7 @@ Module AmexEquitiesDepthFeedRequestV16Server.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -283,9 +283,9 @@ Module AmexEquitiesDepthFeedRequestV16Server.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.

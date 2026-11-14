@@ -49,13 +49,13 @@ Module TurquoiseReplayV263.
       (sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_uint 1 (message_count record) ++
       encode_bytes 1 (market_data_group record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_uint 1 bytes with
@@ -64,7 +64,7 @@ Module TurquoiseReplayV263.
               match decode_bytes 1 bytes with
               | None => None
               | Some (market_data_group_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (sequence_number_value, bytes) =>
                       Some ({| length_ := length__value; message_count := message_count_value; market_data_group := market_data_group_value; sequence_number := sequence_number_value |}, bytes)
@@ -76,7 +76,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -86,10 +86,10 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -112,11 +112,11 @@ Module TurquoiseReplayV263.
       (message_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_uint 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -129,7 +129,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -139,7 +139,7 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -206,18 +206,18 @@ Module TurquoiseReplayV263.
       (request_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (first_message record) ++
-      encode_uint 4 (count record) ++
-      encode_uint 4 (request_id record).
+      encode_uint_le 4 (first_message record) ++
+      encode_uint_le 4 (count record) ++
+      encode_uint_le 4 (request_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (first_message_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (count_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (request_id_value, bytes) =>
                   Some ({| first_message := first_message_value; count := count_value; request_id := request_id_value |}, bytes)
@@ -228,7 +228,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -238,9 +238,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -308,22 +308,22 @@ Module TurquoiseReplayV263.
       (request_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (first_message record) ++
-      encode_uint 4 (count record) ++
+      encode_uint_le 4 (first_message record) ++
+      encode_uint_le 4 (count record) ++
       encode_bytes 1 (replay_status record) ++
-      encode_uint 4 (request_id record).
+      encode_uint_le 4 (request_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (first_message_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (count_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (replay_status_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (request_id_value, bytes) =>
                       Some ({| first_message := first_message_value; count := count_value; replay_status := replay_status_value; request_id := request_id_value |}, bytes)
@@ -335,7 +335,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -345,10 +345,10 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -371,11 +371,11 @@ Module TurquoiseReplayV263.
       Datatypes.length (trading_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (request_id record) ++
+      encode_uint_le 4 (request_id record) ++
       encode_bytes 1 (trading_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (request_id_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -388,7 +388,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -398,7 +398,7 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -424,18 +424,18 @@ Module TurquoiseReplayV263.
       (source_venue record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (event_code record) ++
-      encode_uint 2 (source_venue record).
+      encode_uint_le 2 (source_venue record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (event_code_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
                   Some ({| timestamp := timestamp_value; event_code := event_code_value; source_venue := source_venue_value |}, bytes)
@@ -446,7 +446,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -456,9 +456,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -491,22 +491,22 @@ Module TurquoiseReplayV263.
       (order_book_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
       encode_bytes 1 (trading_status record) ++
       encode_uint 1 (session_change_reason record) ++
       encode_bytes 6 (new_end_time record) ++
       encode_uint 1 (order_book_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -533,7 +533,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -543,9 +543,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -592,42 +592,42 @@ Module TurquoiseReplayV263.
       Datatypes.length (rfq_id record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (size record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 8 (price_price_8 record) ++
-      encode_uint 8 (transaction_time record) ++
-      encode_uint 2 (source_venue record) ++
+      encode_uint_le 8 (size record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 8 (price_price_8 record) ++
+      encode_uint_le 8 (transaction_time record) ++
+      encode_uint_le 2 (source_venue record) ++
       encode_uint 1 (order_book_type record) ++
       encode_bytes 11 (participant record) ++
       encode_uint 1 (order_type record) ++
       encode_bytes 10 (rfq_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (size_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (instrument_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_price_8_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (transaction_time_value, bytes) =>
-                                  match decode_uint 2 bytes with
+                                  match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (source_venue_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -659,7 +659,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 74.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -669,14 +669,14 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
@@ -717,24 +717,24 @@ Module TurquoiseReplayV263.
       (transaction_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_bytes 1 (side record) ++
       encode_uint 1 (order_book_type record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (previous_price record) ++
-      encode_uint 8 (previous_quantity record) ++
-      encode_uint 8 (transaction_time record).
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (previous_price record) ++
+      encode_uint_le 8 (previous_quantity record) ++
+      encode_uint_le 8 (transaction_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -743,16 +743,16 @@ Module TurquoiseReplayV263.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (order_book_type_value, bytes) =>
-                          match decode_uint 2 bytes with
+                          match decode_uint_le 2 bytes with
                           | None => None
                           | Some (source_venue_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (previous_price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (previous_quantity_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (transaction_time_value, bytes) =>
                                           Some ({| timestamp := timestamp_value; order_id := order_id_value; instrument := instrument_value; side := side_value; order_book_type := order_book_type_value; source_venue := source_venue_value; previous_price := previous_price_value; previous_quantity := previous_quantity_value; transaction_time := transaction_time_value |}, bytes)
@@ -769,7 +769,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -779,15 +779,15 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       destruct record. reflexivity.
     Qed.
 
@@ -814,19 +814,19 @@ Module TurquoiseReplayV263.
       (order_book_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_uint 1 (order_book_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (source_venue_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -841,7 +841,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -851,9 +851,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -895,50 +895,50 @@ Module TurquoiseReplayV263.
       (turnover_on_book_only record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (volume record) ++
-      encode_uint 8 (volume_on_book_only record) ++
-      encode_uint 8 (vwap record) ++
-      encode_uint 8 (vwap_on_book_only record) ++
-      encode_uint 4 (number_of_trades record) ++
-      encode_uint 4 (number_of_trades_on_book_only record) ++
-      encode_uint 8 (turnover record) ++
-      encode_uint 8 (turnover_on_book_only record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (volume record) ++
+      encode_uint_le 8 (volume_on_book_only record) ++
+      encode_uint_le 8 (vwap record) ++
+      encode_uint_le 8 (vwap_on_book_only record) ++
+      encode_uint_le 4 (number_of_trades record) ++
+      encode_uint_le 4 (number_of_trades_on_book_only record) ++
+      encode_uint_le 8 (turnover record) ++
+      encode_uint_le 8 (turnover_on_book_only record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (volume_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (volume_on_book_only_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (vwap_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (vwap_on_book_only_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (number_of_trades_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (number_of_trades_on_book_only_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (turnover_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (turnover_on_book_only_value, bytes) =>
                                                   Some ({| timestamp := timestamp_value; instrument := instrument_value; source_venue := source_venue_value; volume := volume_value; volume_on_book_only := volume_on_book_only_value; vwap := vwap_value; vwap_on_book_only := vwap_on_book_only_value; number_of_trades := number_of_trades_value; number_of_trades_on_book_only := number_of_trades_on_book_only_value; turnover := turnover_value; turnover_on_book_only := turnover_on_book_only_value |}, bytes)
@@ -957,7 +957,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 74.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -967,17 +967,17 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -1016,40 +1016,40 @@ Module TurquoiseReplayV263.
       Datatypes.length (opening_closing_price_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 2 (statistic_type record) ++
-      encode_uint 8 (statistic_price record) ++
-      encode_uint 8 (statistic_size record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 2 (statistic_type record) ++
+      encode_uint_le 8 (statistic_price record) ++
+      encode_uint_le 8 (statistic_size record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint 8 (imbalance_quantity record) ++
+      encode_uint_le 8 (imbalance_quantity record) ++
       encode_bytes 1 (auction_info record) ++
       encode_bytes 1 (opening_closing_price_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (statistic_type_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (statistic_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (statistic_size_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (auction_type_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (imbalance_quantity_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -1073,7 +1073,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 47.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1083,14 +1083,14 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -1195,9 +1195,9 @@ Module TurquoiseReplayV263.
       Datatypes.length (duplicative_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_bytes 52 (transaction_identification_code record) ++
       encode_uint 1 (trade_type record) ++
       encode_bytes 1 (auction_type record) ++
@@ -1239,13 +1239,13 @@ Module TurquoiseReplayV263.
       encode_bytes 1 (duplicative_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (source_venue_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
                   match decode_bytes 52 bytes with
@@ -1412,7 +1412,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 289.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1422,9 +1422,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 [bound_40 bound_41]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
@@ -1564,9 +1564,9 @@ Module TurquoiseReplayV263.
       Datatypes.length (duplicative_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (instrument record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (instrument record) ++
       encode_bytes 52 (transaction_identification_code record) ++
       encode_bytes 20 (cross_id record) ++
       encode_uint 1 (cross_type record) ++
@@ -1607,13 +1607,13 @@ Module TurquoiseReplayV263.
       encode_bytes 1 (duplicative_indicator record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (source_venue_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (instrument_value, bytes) =>
                   match decode_bytes 52 bytes with
@@ -1776,7 +1776,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 307.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1786,9 +1786,9 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 [bound_36 [bound_37 [bound_38 [bound_39 bound_40]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
@@ -1871,58 +1871,58 @@ Module TurquoiseReplayV263.
       (best_offer_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (transaction_time record) ++
-      encode_uint 8 (far_price record) ++
-      encode_uint 8 (total_executed_quantity record) ++
-      encode_uint 8 (total_hidden_executed_quantity record) ++
-      encode_uint 8 (deleted_order_quantity record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (transaction_time record) ++
+      encode_uint_le 8 (far_price record) ++
+      encode_uint_le 8 (total_executed_quantity record) ++
+      encode_uint_le 8 (total_hidden_executed_quantity record) ++
+      encode_uint_le 8 (deleted_order_quantity record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 8 (best_bid_size record) ++
-      encode_uint 8 (best_bid_price record) ++
-      encode_uint 8 (best_offer_size record) ++
-      encode_uint 8 (best_offer_price record).
+      encode_uint_le 8 (best_bid_size record) ++
+      encode_uint_le 8 (best_bid_price record) ++
+      encode_uint_le 8 (best_offer_size record) ++
+      encode_uint_le 8 (best_offer_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (transaction_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (far_price_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (total_executed_quantity_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (total_hidden_executed_quantity_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (deleted_order_quantity_value, bytes) =>
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (side_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (best_bid_size_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (best_bid_price_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (best_offer_size_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (best_offer_price_value, bytes) =>
                                                           Some ({| timestamp := timestamp_value; instrument := instrument_value; source_venue := source_venue_value; transaction_time := transaction_time_value; far_price := far_price_value; total_executed_quantity := total_executed_quantity_value; total_hidden_executed_quantity := total_hidden_executed_quantity_value; deleted_order_quantity := deleted_order_quantity_value; side := side_value; best_bid_size := best_bid_size_value; best_bid_price := best_bid_price_value; best_offer_size := best_offer_size_value; best_offer_price := best_offer_price_value |}, bytes)
@@ -1943,7 +1943,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 91.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1953,19 +1953,19 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 bound_12]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
       destruct record. reflexivity.
     Qed.
 
@@ -2020,78 +2020,78 @@ Module TurquoiseReplayV263.
       (vwap_sell record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (instrument record) ++
-      encode_uint 2 (source_venue record) ++
-      encode_uint 8 (start_time record) ++
-      encode_uint 8 (end_time record) ++
-      encode_uint 4 (buy_order_count record) ++
-      encode_uint 4 (sell_order_count record) ++
-      encode_uint 8 (buy_order_size record) ++
-      encode_uint 8 (sell_order_size record) ++
-      encode_uint 4 (buy_order_cancellations record) ++
-      encode_uint 4 (sell_order_cancellations record) ++
-      encode_uint 4 (buy_limit_order_cancellations record) ++
-      encode_uint 4 (buy_market_order_cancellations record) ++
-      encode_uint 4 (sell_limit_order_cancellations record) ++
-      encode_uint 4 (sell_market_order_cancellations record) ++
-      encode_uint 8 (bid_ask_spread record) ++
-      encode_uint 8 (vwap_buy record) ++
-      encode_uint 8 (vwap_sell record).
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (instrument record) ++
+      encode_uint_le 2 (source_venue record) ++
+      encode_uint_le 8 (start_time record) ++
+      encode_uint_le 8 (end_time record) ++
+      encode_uint_le 4 (buy_order_count record) ++
+      encode_uint_le 4 (sell_order_count record) ++
+      encode_uint_le 8 (buy_order_size record) ++
+      encode_uint_le 8 (sell_order_size record) ++
+      encode_uint_le 4 (buy_order_cancellations record) ++
+      encode_uint_le 4 (sell_order_cancellations record) ++
+      encode_uint_le 4 (buy_limit_order_cancellations record) ++
+      encode_uint_le 4 (buy_market_order_cancellations record) ++
+      encode_uint_le 4 (sell_limit_order_cancellations record) ++
+      encode_uint_le 4 (sell_market_order_cancellations record) ++
+      encode_uint_le 8 (bid_ask_spread record) ++
+      encode_uint_le 8 (vwap_buy record) ++
+      encode_uint_le 8 (vwap_sell record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (timestamp_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (instrument_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (source_venue_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (start_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (end_time_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (buy_order_count_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (sell_order_count_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (buy_order_size_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (sell_order_size_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (buy_order_cancellations_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (sell_order_cancellations_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (buy_limit_order_cancellations_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (buy_market_order_cancellations_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (sell_limit_order_cancellations_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (sell_market_order_cancellations_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (bid_ask_spread_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (vwap_buy_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (vwap_sell_value, bytes) =>
                                                                               Some ({| timestamp := timestamp_value; instrument := instrument_value; source_venue := source_venue_value; start_time := start_time_value; end_time := end_time_value; buy_order_count := buy_order_count_value; sell_order_count := sell_order_count_value; buy_order_size := buy_order_size_value; sell_order_size := sell_order_size_value; buy_order_cancellations := buy_order_cancellations_value; sell_order_cancellations := sell_order_cancellations_value; buy_limit_order_cancellations := buy_limit_order_cancellations_value; buy_market_order_cancellations := buy_market_order_cancellations_value; sell_limit_order_cancellations := sell_limit_order_cancellations_value; sell_market_order_cancellations := sell_market_order_cancellations_value; bid_ask_spread := bid_ask_spread_value; vwap_buy := vwap_buy_value; vwap_sell := vwap_sell_value |}, bytes)
@@ -2117,7 +2117,7 @@ Module TurquoiseReplayV263.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 106.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2127,24 +2127,24 @@ Module TurquoiseReplayV263.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_17.
       destruct record. reflexivity.
     Qed.
 

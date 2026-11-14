@@ -49,14 +49,14 @@ Module LmeSelectReferenceDataSnapshotV418.
       (send_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (msg_count record) ++
       encode_bytes 1 (filler record) ++
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (send_time record).
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -65,10 +65,10 @@ Module LmeSelectReferenceDataSnapshotV418.
               match decode_bytes 1 bytes with
               | None => None
               | Some (filler_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (send_time_value, bytes) =>
                           Some ({| pkt_size := pkt_size_value; msg_count := msg_count_value; filler := filler_value; seq_num := seq_num_value; send_time := send_time_value |}, bytes)
@@ -81,7 +81,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -91,11 +91,11 @@ Module LmeSelectReferenceDataSnapshotV418.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -118,14 +118,14 @@ Module LmeSelectReferenceDataSnapshotV418.
       (msg_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_size record) ++
-      encode_uint 2 (msg_type record).
+      encode_uint_le 2 (msg_size record) ++
+      encode_uint_le 2 (msg_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
               Some ({| msg_size := msg_size_value; msg_type := msg_type_value |}, bytes)
@@ -135,7 +135,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,8 +145,8 @@ Module LmeSelectReferenceDataSnapshotV418.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -167,10 +167,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       (new_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record).
+      encode_uint_le 4 (new_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           Some ({| new_seq_no := new_seq_no_value |}, bytes)
@@ -179,7 +179,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,7 +187,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -250,10 +250,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       encode_bytes 1 (settlement_pricing_method record) ++
       encode_uint 1 (exercise_style record) ++
       encode_bytes 20 (lot_unit record) ++
-      encode_uint 8 (lot_size record) ++
+      encode_uint_le 8 (lot_size record) ++
       encode_bytes 1 (lot_size_type record) ++
       encode_bytes 1 (contract_price_type record) ++
-      encode_uint 4 (first_trading_date record).
+      encode_uint_le 4 (first_trading_date record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -292,7 +292,7 @@ Module LmeSelectReferenceDataSnapshotV418.
                                                   match decode_bytes 20 bytes with
                                                   | None => None
                                                   | Some (lot_unit_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (lot_size_value, bytes) =>
                                                           match decode_bytes 1 bytes with
@@ -301,7 +301,7 @@ Module LmeSelectReferenceDataSnapshotV418.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (contract_price_type_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (first_trading_date_value, bytes) =>
                                                                       Some ({| trading_venue := trading_venue_value; contract_code := contract_code_value; name := name_value; contract_type := contract_type_value; product_code := product_code_value; underlying_type := underlying_type_value; underlying_contract_code := underlying_contract_code_value; trading_currency := trading_currency_value; settlement_type := settlement_type_value; settlement_pricing_method := settlement_pricing_method_value; exercise_style := exercise_style_value; lot_unit := lot_unit_value; lot_size := lot_size_value; lot_size_type := lot_size_type_value; contract_price_type := contract_price_type_value; first_trading_date := first_trading_date_value |}, bytes)
@@ -325,7 +325,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 134.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -347,10 +347,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       destruct record. reflexivity.
     Qed.
 
@@ -422,16 +422,16 @@ Module LmeSelectReferenceDataSnapshotV418.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (trading_venue record) ++
-      encode_uint 8 (tradable_instrument_id record) ++
-      encode_uint 8 (merged_tradable_instrument_id record) ++
-      encode_uint 8 (linked_tradable_instrument_id record) ++
+      encode_uint_le 8 (tradable_instrument_id record) ++
+      encode_uint_le 8 (merged_tradable_instrument_id record) ++
+      encode_uint_le 8 (linked_tradable_instrument_id record) ++
       encode_bytes 2 (product_code record) ++
       encode_bytes 1 (contract_type record) ++
       encode_bytes 3 (trading_currency record) ++
       encode_bytes 12 (contract_code record) ++
-      encode_uint 4 (expiry_date record) ++
+      encode_uint_le 4 (expiry_date record) ++
       encode_bytes 1 (prompt_type record) ++
-      encode_uint 8 (strike_price record) ++
+      encode_uint_le 8 (strike_price record) ++
       encode_bytes 1 (option_type record) ++
       encode_uint 1 (exercise_style record) ++
       encode_bytes 6 (prompt_date_label record) ++
@@ -440,10 +440,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       encode_bytes 6 (cfi_code record) ++
       encode_bytes 4 (market_code record) ++
       encode_bytes 12 (market_segment_code record) ++
-      encode_uint 4 (tick_size_id record) ++
-      encode_uint 8 (lot_size record) ++
+      encode_uint_le 4 (tick_size_id record) ++
+      encode_uint_le 8 (lot_size record) ++
       encode_bytes 1 (lot_size_type record) ++
-      encode_uint 4 (last_trading_date record) ++
+      encode_uint_le 4 (last_trading_date record) ++
       encode_bytes 1 (settlement_type record) ++
       encode_bytes 1 (settlement_pricing_method record) ++
       encode_bytes 1 (underlying_type record).
@@ -452,13 +452,13 @@ Module LmeSelectReferenceDataSnapshotV418.
       match decode_bytes 2 bytes with
       | None => None
       | Some (trading_venue_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (tradable_instrument_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (merged_tradable_instrument_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (linked_tradable_instrument_id_value, bytes) =>
                       match decode_bytes 2 bytes with
@@ -473,13 +473,13 @@ Module LmeSelectReferenceDataSnapshotV418.
                                   match decode_bytes 12 bytes with
                                   | None => None
                                   | Some (contract_code_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (expiry_date_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (prompt_type_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (strike_price_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -506,16 +506,16 @@ Module LmeSelectReferenceDataSnapshotV418.
                                                                               match decode_bytes 12 bytes with
                                                                               | None => None
                                                                               | Some (market_segment_code_value, bytes) =>
-                                                                                  match decode_uint 4 bytes with
+                                                                                  match decode_uint_le 4 bytes with
                                                                                   | None => None
                                                                                   | Some (tick_size_id_value, bytes) =>
-                                                                                      match decode_uint 8 bytes with
+                                                                                      match decode_uint_le 8 bytes with
                                                                                       | None => None
                                                                                       | Some (lot_size_value, bytes) =>
                                                                                           match decode_bytes 1 bytes with
                                                                                           | None => None
                                                                                           | Some (lot_size_type_value, bytes) =>
-                                                                                              match decode_uint 4 bytes with
+                                                                                              match decode_uint_le 4 bytes with
                                                                                               | None => None
                                                                                               | Some (last_trading_date_value, bytes) =>
                                                                                                   match decode_bytes 1 bytes with
@@ -558,7 +558,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 121.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -569,16 +569,16 @@ Module LmeSelectReferenceDataSnapshotV418.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
@@ -587,10 +587,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       rewrite decode_encode_bytes by exact bound_16.
       rewrite decode_encode_bytes by exact bound_17.
       rewrite decode_encode_bytes by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_20.
       rewrite decode_encode_bytes by exact bound_21.
-      rewrite decode_encode_uint by exact bound_22.
+      rewrite decode_encode_uint_le by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
       rewrite decode_encode_bytes by exact bound_24.
       rewrite decode_encode_bytes by exact bound_25.
@@ -620,22 +620,22 @@ Module LmeSelectReferenceDataSnapshotV418.
       (transaction_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (tradable_instrument_id record) ++
-      encode_uint 8 (upper_price_limit record) ++
-      encode_uint 8 (lower_price_limit record) ++
-      encode_uint 8 (transaction_time record).
+      encode_uint_le 8 (tradable_instrument_id record) ++
+      encode_uint_le 8 (upper_price_limit record) ++
+      encode_uint_le 8 (lower_price_limit record) ++
+      encode_uint_le 8 (transaction_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (tradable_instrument_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (upper_price_limit_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (lower_price_limit_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (transaction_time_value, bytes) =>
                       Some ({| tradable_instrument_id := tradable_instrument_id_value; upper_price_limit := upper_price_limit_value; lower_price_limit := lower_price_limit_value; transaction_time := transaction_time_value |}, bytes)
@@ -647,7 +647,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -657,10 +657,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -694,33 +694,33 @@ Module LmeSelectReferenceDataSnapshotV418.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (trading_venue record) ++
-      encode_uint 8 (time_of_event record) ++
-      encode_uint 8 (tradable_instrument_id record) ++
-      encode_uint 8 (open_price record) ++
-      encode_uint 8 (trade_high record) ++
-      encode_uint 8 (trade_low record) ++
-      encode_uint 8 (closing_price record).
+      encode_uint_le 8 (time_of_event record) ++
+      encode_uint_le 8 (tradable_instrument_id record) ++
+      encode_uint_le 8 (open_price record) ++
+      encode_uint_le 8 (trade_high record) ++
+      encode_uint_le 8 (trade_low record) ++
+      encode_uint_le 8 (closing_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
       | None => None
       | Some (trading_venue_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (time_of_event_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (tradable_instrument_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (open_price_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (trade_high_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (trade_low_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (closing_price_value, bytes) =>
                                   Some ({| trading_venue := trading_venue_value; time_of_event := time_of_event_value; tradable_instrument_id := tradable_instrument_id_value; open_price := open_price_value; trade_high := trade_high_value; trade_low := trade_low_value; closing_price := closing_price_value |}, bytes)
@@ -735,7 +735,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -746,12 +746,12 @@ Module LmeSelectReferenceDataSnapshotV418.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -772,10 +772,10 @@ Module LmeSelectReferenceDataSnapshotV418.
       (last_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (last_seq_num record).
+      encode_uint_le 4 (last_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (last_seq_num_value, bytes) =>
           Some ({| last_seq_num := last_seq_num_value |}, bytes)
@@ -784,7 +784,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -792,7 +792,7 @@ Module LmeSelectReferenceDataSnapshotV418.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 

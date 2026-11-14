@@ -44,11 +44,11 @@ Module TxseEquitiesFramingV10Client.
       (packet_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_uint 1 (packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_length_value, bytes) =>
           match decode_uint 1 bytes with
@@ -61,7 +61,7 @@ Module TxseEquitiesFramingV10Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -71,7 +71,7 @@ Module TxseEquitiesFramingV10Client.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -99,13 +99,13 @@ Module TxseEquitiesFramingV10Client.
       (next_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (session record) ++
+      encode_uint_le 8 (session record) ++
       encode_bytes 8 (sender_comp record) ++
       encode_bytes 8 (token record) ++
-      encode_uint 8 (next_sequence_number record).
+      encode_uint_le 8 (next_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (session_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -114,7 +114,7 @@ Module TxseEquitiesFramingV10Client.
               match decode_bytes 8 bytes with
               | None => None
               | Some (token_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (next_sequence_number_value, bytes) =>
                       Some ({| session := session_value; sender_comp := sender_comp_value; token := token_value; next_sequence_number := next_sequence_number_value |}, bytes)
@@ -126,7 +126,7 @@ Module TxseEquitiesFramingV10Client.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -136,10 +136,10 @@ Module TxseEquitiesFramingV10Client.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 

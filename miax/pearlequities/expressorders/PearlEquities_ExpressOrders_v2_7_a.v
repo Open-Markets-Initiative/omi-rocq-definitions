@@ -46,11 +46,11 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (esesm_packet_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (esesm_packet_length record) ++
+      encode_uint_le 2 (esesm_packet_length record) ++
       encode_bytes 1 (esesm_packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (esesm_packet_length_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -63,7 +63,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,7 +73,7 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -115,23 +115,23 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_12 record) = 12.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
-      encode_uint 4 (symbol_id record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
+      encode_uint_le 4 (symbol_id record) ++
       encode_bytes 11 (ticker_symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (test_security_indicator record) ++
       encode_uint 1 (future record) ++
-      encode_uint 4 (lot_size record) ++
+      encode_uint_le 4 (lot_size record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
       encode_bytes 1 (primary_market_code record) ++
       encode_bytes 12 (reserved_12 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -146,7 +146,7 @@ Module PearlEquitiesExpressOrdersV27A.
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (future_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (lot_size_value, bytes) =>
                                   match decode_bytes 8 bytes with
@@ -177,7 +177,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,13 +187,13 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -234,18 +234,18 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_19 record) = 19.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record) ++
       encode_bytes 1 (order_status record) ++
       encode_bytes 19 (reserved_19 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -254,16 +254,16 @@ Module PearlEquitiesExpressOrdersV27A.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (size_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -286,7 +286,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -296,13 +296,13 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -343,19 +343,19 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 1 (modify_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -367,16 +367,16 @@ Module PearlEquitiesExpressOrdersV27A.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (original_client_order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (leaves_qty_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -400,7 +400,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 87.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -410,14 +410,14 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       destruct record. reflexivity.
@@ -456,18 +456,18 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (cancel_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -479,13 +479,13 @@ Module PearlEquitiesExpressOrdersV27A.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (original_client_order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (leaves_qty_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -508,7 +508,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 79.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -518,13 +518,13 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       destruct record. reflexivity.
@@ -561,17 +561,17 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (cancel_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -580,13 +580,13 @@ Module PearlEquitiesExpressOrdersV27A.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -608,7 +608,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -618,12 +618,12 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -654,14 +654,14 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 8 (meo_version record) ++
       encode_uint 1 (session_id record) ++
       encode_bytes 1 (system_status record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -686,7 +686,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 26.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -696,7 +696,7 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -743,21 +743,21 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (leaves_qty record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (leaves_qty record) ++
       encode_bytes 1 (cancel_reason record) ++
-      encode_uint 8 (last_price record) ++
-      encode_uint 4 (last_size record) ++
+      encode_uint_le 8 (last_price record) ++
+      encode_uint_le 4 (last_size record) ++
       encode_bytes 1 (pending_cancel_status record) ++
       encode_bytes 1 (pending_reject_reason record) ++
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -766,22 +766,22 @@ Module PearlEquitiesExpressOrdersV27A.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (cancel_reason_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (last_price_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (last_size_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -810,7 +810,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 71.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -820,15 +820,15 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -864,28 +864,28 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_9 record) = 9.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 8 (working_price record) ++
+      encode_uint_le 8 (working_price record) ++
       encode_bytes 1 (nbbo_indicator record) ++
       encode_bytes 9 (reserved_9 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (client_order_id_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (working_price_value, bytes) =>
                           match decode_bytes 1 bytes with
@@ -906,7 +906,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 58.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -916,11 +916,11 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
@@ -953,27 +953,27 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 8 (secondary_order_id record) ++
-      encode_uint 4 (display_qty record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 8 (secondary_order_id record) ++
+      encode_uint_le 4 (display_qty record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (secondary_order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (display_qty_value, bytes) =>
                           match decode_bytes 10 bytes with
@@ -990,7 +990,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1000,11 +1000,11 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -1040,7 +1040,7 @@ Module PearlEquitiesExpressOrdersV27A.
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint 4 (symbol_id record) ++
+      encode_uint_le 4 (symbol_id record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1056,7 +1056,7 @@ Module PearlEquitiesExpressOrdersV27A.
                   match decode_bytes 20 bytes with
                   | None => None
                   | Some (original_client_order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_id_value, bytes) =>
                           match decode_bytes 10 bytes with
@@ -1073,7 +1073,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 66.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1087,7 +1087,7 @@ Module PearlEquitiesExpressOrdersV27A.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -1122,8 +1122,8 @@ Module PearlEquitiesExpressOrdersV27A.
       encode_bytes 8 (reserved_8 record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (symbol_id record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1136,10 +1136,10 @@ Module PearlEquitiesExpressOrdersV27A.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_id_value, bytes) =>
                           match decode_bytes 10 bytes with
@@ -1156,7 +1156,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1169,8 +1169,8 @@ Module PearlEquitiesExpressOrdersV27A.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
     Qed.
@@ -1297,17 +1297,17 @@ Module PearlEquitiesExpressOrdersV27A.
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (matching_engine_time record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 4 (mpid record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint 4 (symbold_id record) ++
+      encode_uint_le 4 (symbold_id record) ++
       encode_bytes 1 (purge_status record) ++
       encode_uint 1 (number_of_orders_cancelled record) ++
       encode_bytes 1 (asp_eligible_orders_cancelled record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 4 bytes with
@@ -1316,7 +1316,7 @@ Module PearlEquitiesExpressOrdersV27A.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbold_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -1344,7 +1344,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 49.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1354,10 +1354,10 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -1425,14 +1425,14 @@ Module PearlEquitiesExpressOrdersV27A.
       (end_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (start_sequence_number record) ++
-      encode_uint 8 (end_sequence_number record).
+      encode_uint_le 8 (start_sequence_number record) ++
+      encode_uint_le 8 (end_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (start_sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (end_sequence_number_value, bytes) =>
               Some ({| start_sequence_number := start_sequence_number_value; end_sequence_number := end_sequence_number_value |}, bytes)
@@ -1442,7 +1442,7 @@ Module PearlEquitiesExpressOrdersV27A.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1452,8 +1452,8 @@ Module PearlEquitiesExpressOrdersV27A.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

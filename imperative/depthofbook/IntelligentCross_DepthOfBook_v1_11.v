@@ -48,8 +48,8 @@ Module IntelligentCrossDepthOfBookV111.
     Definition encode (record : t) : list byte :=
       encode_bytes 9 (market_day_identifier record) ++
       encode_bytes 1 (feed_identifier record) ++
-      encode_uint 8 (sequence record) ++
-      encode_uint 2 (count record).
+      encode_uint_le 8 (sequence record) ++
+      encode_uint_le 2 (count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 9 bytes with
@@ -58,10 +58,10 @@ Module IntelligentCrossDepthOfBookV111.
           match decode_bytes 1 bytes with
           | None => None
           | Some (feed_identifier_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sequence_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (count_value, bytes) =>
                       Some ({| market_day_identifier := market_day_identifier_value; feed_identifier := feed_identifier_value; sequence := sequence_value; count := count_value |}, bytes)
@@ -73,7 +73,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,8 +85,8 @@ Module IntelligentCrossDepthOfBookV111.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -109,11 +109,11 @@ Module IntelligentCrossDepthOfBookV111.
       Datatypes.length (message_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (length_ record) ++
+      encode_uint_le 2 (length_ record) ++
       encode_bytes 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (length__value, bytes) =>
           match decode_bytes 1 bytes with
@@ -126,7 +126,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -136,7 +136,7 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -163,14 +163,14 @@ Module IntelligentCrossDepthOfBookV111.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 1 (event record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
       | None => None
       | Some (reserved_2_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -184,7 +184,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -195,7 +195,7 @@ Module IntelligentCrossDepthOfBookV111.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -227,18 +227,18 @@ Module IntelligentCrossDepthOfBookV111.
       (round_lot_size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (listing_market record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 4 (round_lot_size record).
+      encode_uint_le 4 (round_lot_size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -250,7 +250,7 @@ Module IntelligentCrossDepthOfBookV111.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (round_lot_size_value, bytes) =>
                               Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; symbol := symbol_value; listing_market := listing_market_value; reserved_1 := reserved_1_value; round_lot_size := round_lot_size_value |}, bytes)
@@ -264,7 +264,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -274,12 +274,12 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -310,18 +310,18 @@ Module IntelligentCrossDepthOfBookV111.
       Datatypes.length (info record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (state record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (info record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -347,7 +347,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 27.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -357,8 +357,8 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -397,35 +397,35 @@ Module IntelligentCrossDepthOfBookV111.
       Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side record) ++
-      encode_uint 4 (shares record) ++
+      encode_uint_le 4 (shares record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 8 (price record) ++
+      encode_uint_le 8 (price record) ++
       encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (side_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (shares_value, bytes) =>
                           match decode_bytes 11 bytes with
                           | None => None
                           | Some (symbol_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   match decode_bytes 4 bytes with
@@ -444,7 +444,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -454,13 +454,13 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
@@ -488,22 +488,22 @@ Module IntelligentCrossDepthOfBookV111.
       (shares_canceled record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (shares_canceled record).
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (shares_canceled record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (shares_canceled_value, bytes) =>
                       Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; order_id := order_id_value; shares_canceled := shares_canceled_value |}, bytes)
@@ -515,7 +515,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -525,10 +525,10 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -553,18 +553,18 @@ Module IntelligentCrossDepthOfBookV111.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; order_id := order_id_value |}, bytes)
@@ -575,7 +575,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -585,9 +585,9 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -616,26 +616,26 @@ Module IntelligentCrossDepthOfBookV111.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (shares record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (shares record) ++
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (shares_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; order_id := order_id_value; shares := shares_value; price := price_value |}, bytes)
@@ -648,7 +648,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 30.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -658,11 +658,11 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -695,34 +695,34 @@ Module IntelligentCrossDepthOfBookV111.
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (order_id record) ++
-      encode_uint 4 (shares record) ++
-      encode_uint 8 (execution_id record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (order_id record) ++
+      encode_uint_le 4 (shares record) ++
+      encode_uint_le 8 (execution_id record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 8 (price record).
+      encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (shares_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (execution_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (reserved_1_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; order_id := order_id_value; shares := shares_value; execution_id := execution_id_value; reserved_1 := reserved_1_value; price := price_value |}, bytes)
@@ -737,7 +737,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -747,13 +747,13 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
@@ -788,38 +788,38 @@ Module IntelligentCrossDepthOfBookV111.
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (reserved_8 record) ++
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (reserved_8 record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 4 (shares record) ++
+      encode_uint_le 4 (shares record) ++
       encode_bytes 11 (symbol record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (execution_id record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (reserved_8_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reserved_1_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (shares_value, bytes) =>
                           match decode_bytes 11 bytes with
                           | None => None
                           | Some (symbol_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (execution_id_value, bytes) =>
                                       Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; reserved_8 := reserved_8_value; reserved_1 := reserved_1_value; shares := shares_value; symbol := symbol_value; price := price_value; execution_id := execution_id_value |}, bytes)
@@ -835,7 +835,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 50.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -845,14 +845,14 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -877,18 +877,18 @@ Module IntelligentCrossDepthOfBookV111.
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (symbol_id record) ++
-      encode_uint 8 (timestamp record) ++
-      encode_uint 8 (execution_id record).
+      encode_uint_le 2 (symbol_id record) ++
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (symbol_id_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (timestamp_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (execution_id_value, bytes) =>
                   Some ({| symbol_id := symbol_id_value; timestamp := timestamp_value; execution_id := execution_id_value |}, bytes)
@@ -899,7 +899,7 @@ Module IntelligentCrossDepthOfBookV111.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 18.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -909,9 +909,9 @@ Module IntelligentCrossDepthOfBookV111.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 

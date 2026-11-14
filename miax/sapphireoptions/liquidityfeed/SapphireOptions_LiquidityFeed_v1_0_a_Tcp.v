@@ -45,11 +45,11 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (sesm_packet_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (sesm_packet_length record) ++
+      encode_uint_le 2 (sesm_packet_length record) ++
       encode_bytes 1 (sesm_packet_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (sesm_packet_length_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -62,7 +62,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -72,7 +72,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       destruct record. reflexivity.
     Qed.
@@ -135,10 +135,10 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       (seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record).
+      encode_uint_le 4 (seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
           Some ({| seconds := seconds_value |}, bytes)
@@ -147,7 +147,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -155,7 +155,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -206,12 +206,12 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (reserved_12 record) = 12.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (product_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (product_id record) ++
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 6 (security_symbol record) ++
       encode_bytes 8 (expiration_date record) ++
-      encode_uint 4 (strike_price record) ++
+      encode_uint_le 4 (strike_price record) ++
       encode_bytes 1 (call_or_put record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
@@ -224,10 +224,10 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       encode_bytes 12 (reserved_12 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (product_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -239,7 +239,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (expiration_date_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (strike_price_value, bytes) =>
                               match decode_bytes 1 bytes with
@@ -293,7 +293,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 72.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -303,12 +303,12 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -345,19 +345,19 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (system_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 8 (slf_version record) ++
-      encode_uint 4 (session_id record) ++
+      encode_uint_le 4 (session_id record) ++
       encode_bytes 1 (system_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 8 bytes with
           | None => None
           | Some (slf_version_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (session_id_value, bytes) =>
                   match decode_bytes 1 bytes with
@@ -372,7 +372,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -382,9 +382,9 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       destruct record. reflexivity.
     Qed.
@@ -416,15 +416,15 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       (expected_event_time_nano_seconds_part record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (event_reason record) ++
-      encode_uint 4 (expected_event_time_seconds_part record) ++
-      encode_uint 4 (expected_event_time_nano_seconds_part record).
+      encode_uint_le 4 (expected_event_time_seconds_part record) ++
+      encode_uint_le 4 (expected_event_time_nano_seconds_part record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 11 bytes with
@@ -436,10 +436,10 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (event_reason_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (expected_event_time_seconds_part_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (expected_event_time_nano_seconds_part_value, bytes) =>
                               Some ({| nanoseconds := nanoseconds_value; underlying_symbol := underlying_symbol_value; trading_status := trading_status_value; event_reason := event_reason_value; expected_event_time_seconds_part := expected_event_time_seconds_part_value; expected_event_time_nano_seconds_part := expected_event_time_nano_seconds_part_value |}, bytes)
@@ -453,7 +453,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -463,12 +463,12 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -515,15 +515,15 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (reserved_8 record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 1 (action record) ++
-      encode_uint 4 (product_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (product_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (order_side record) ++
       encode_bytes 1 (order_type record) ++
-      encode_uint 4 (order_price_short record) ++
-      encode_uint 4 (order_original_volume record) ++
-      encode_uint 4 (remaining_volume_open record) ++
+      encode_uint_le 4 (order_price_short record) ++
+      encode_uint_le 4 (order_original_volume record) ++
+      encode_uint_le 4 (remaining_volume_open record) ++
       encode_bytes 1 (time_in_force_tif record) ++
       encode_bytes 1 (origin record) ++
       encode_bytes 1 (openclose_indicator record) ++
@@ -531,16 +531,16 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       encode_bytes 8 (reserved_8 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (action_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (product_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -549,13 +549,13 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (order_type_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (order_price_short_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (order_original_volume_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (remaining_volume_open_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -592,7 +592,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 43.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -602,15 +602,15 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -658,30 +658,30 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       Datatypes.length (reserved_28 record) = 28.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 1 (action record) ++
-      encode_uint 4 (strategy_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (strategy_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (order_side record) ++
       encode_bytes 1 (order_type record) ++
-      encode_uint 8 (order_price_long record) ++
-      encode_uint 4 (order_original_volume record) ++
-      encode_uint 4 (remaining_volume_open record) ++
+      encode_uint_le 8 (order_price_long record) ++
+      encode_uint_le 4 (order_original_volume record) ++
+      encode_uint_le 4 (remaining_volume_open record) ++
       encode_bytes 1 (time_in_force_tif record) ++
       encode_bytes 1 (origin record) ++
       encode_bytes 28 (reserved_28 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (action_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (strategy_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (order_id_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -690,13 +690,13 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (order_type_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (order_price_long_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (order_original_volume_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (remaining_volume_open_value, bytes) =>
                                           match decode_bytes 1 bytes with
@@ -725,7 +725,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 65.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -735,15 +735,15 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -771,18 +771,18 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 1 (simple_or_complex_order record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (simple_or_complex_order_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   Some ({| nanoseconds := nanoseconds_value; simple_or_complex_order := simple_or_complex_order_value; order_id := order_id_value |}, bytes)
@@ -793,7 +793,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 13.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -803,9 +803,9 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -882,7 +882,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       encode_bytes 8 (computer_id record) ++
       encode_bytes 8 (application_protocol record) ++
       encode_uint 1 (requested_trading_session_id record) ++
-      encode_uint 8 (requested_sequence_number record).
+      encode_uint_le 8 (requested_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 5 bytes with
@@ -900,7 +900,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (requested_trading_session_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (requested_sequence_number_value, bytes) =>
                               Some ({| sesm_version := sesm_version_value; username := username_value; computer_id := computer_id_value; application_protocol := application_protocol_value; requested_trading_session_id := requested_trading_session_id_value; requested_sequence_number := requested_sequence_number_value |}, bytes)
@@ -914,7 +914,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 35.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -929,7 +929,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 
@@ -959,7 +959,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       encode_uint 1 (number_of_matching_engines record) ++
       encode_bytes 1 (login_status record) ++
       encode_uint 1 (trading_session_id record) ++
-      encode_uint 8 (highest_sequence_number record).
+      encode_uint_le 8 (highest_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
@@ -971,7 +971,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
               match decode_uint 1 bytes with
               | None => None
               | Some (trading_session_id_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (highest_sequence_number_value, bytes) =>
                       Some ({| number_of_matching_engines := number_of_matching_engines_value; login_status := login_status_value; trading_session_id := trading_session_id_value; highest_sequence_number := highest_sequence_number_value |}, bytes)
@@ -983,7 +983,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -996,7 +996,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -1060,14 +1060,14 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       (end_sequence_number record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (start_sequence_number record) ++
-      encode_uint 8 (end_sequence_number record).
+      encode_uint_le 8 (start_sequence_number record) ++
+      encode_uint_le 8 (end_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (start_sequence_number_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (end_sequence_number_value, bytes) =>
               Some ({| start_sequence_number := start_sequence_number_value; end_sequence_number := end_sequence_number_value |}, bytes)
@@ -1077,7 +1077,7 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1087,8 +1087,8 @@ Module SapphireOptionsLiquidityFeedV10ATcp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 

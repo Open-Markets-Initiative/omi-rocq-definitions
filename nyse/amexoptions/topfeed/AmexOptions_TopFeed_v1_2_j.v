@@ -46,14 +46,14 @@ Module AmexOptionsTopFeedV12J.
       (nanoseconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record) ++
-      encode_uint 4 (nanoseconds record).
+      encode_uint_le 4 (seconds record) ++
+      encode_uint_le 4 (nanoseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (nanoseconds_value, bytes) =>
               Some ({| seconds := seconds_value; nanoseconds := nanoseconds_value |}, bytes)
@@ -63,7 +63,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -73,8 +73,8 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -103,14 +103,14 @@ Module AmexOptionsTopFeedV12J.
       SendTime.bounded (send_time record).
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (delivery_flag record) ++
       encode_uint 1 (number_msgs record) ++
-      encode_uint 4 (seq_num record) ++
+      encode_uint_le 4 (seq_num record) ++
       SendTime.encode (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -119,7 +119,7 @@ Module AmexOptionsTopFeedV12J.
               match decode_uint 1 bytes with
               | None => None
               | Some (number_msgs_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
                       match SendTime.decode bytes with
@@ -135,7 +135,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !SendTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !SendTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,10 +145,10 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite SendTime.decode_encode by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -172,14 +172,14 @@ Module AmexOptionsTopFeedV12J.
       (message_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (message_size record) ++
-      encode_uint 2 (message_type record).
+      encode_uint_le 2 (message_size record) ++
+      encode_uint_le 2 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (message_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_type_value, bytes) =>
               Some ({| message_size := message_size_value; message_type := message_type_value |}, bytes)
@@ -189,7 +189,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -199,8 +199,8 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -227,16 +227,16 @@ Module AmexOptionsTopFeedV12J.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
               match decode_uint 1 bytes with
@@ -254,7 +254,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -264,8 +264,8 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -292,18 +292,18 @@ Module AmexOptionsTopFeedV12J.
       (source_time record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (id record) ++
-      encode_uint 4 (symbol_seq_num record) ++
-      encode_uint 4 (source_time record).
+      encode_uint_le 4 (id record) ++
+      encode_uint_le 4 (symbol_seq_num record) ++
+      encode_uint_le 4 (source_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (source_time_value, bytes) =>
                   Some ({| id := id_value; symbol_seq_num := symbol_seq_num_value; source_time := source_time_value |}, bytes)
@@ -314,7 +314,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -324,9 +324,9 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -377,17 +377,17 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (third_reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 11 (symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 2 (market_id record) ++
+      encode_uint_le 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 1 (exchange_code record) ++
       encode_uint 1 (price_scale_code record) ++
       encode_bytes 1 (security_type record) ++
-      encode_uint 2 (lot_size record) ++
-      encode_uint 4 (prev_close_price record) ++
-      encode_uint 4 (prev_close_volume record) ++
+      encode_uint_le 2 (lot_size record) ++
+      encode_uint_le 4 (prev_close_price record) ++
+      encode_uint_le 4 (prev_close_volume record) ++
       encode_uint 1 (price_resolution record) ++
       encode_bytes 1 (round_lot record) ++
       encode_bytes 2 (reserved_2 record) ++
@@ -395,7 +395,7 @@ Module AmexOptionsTopFeedV12J.
       encode_bytes 2 (third_reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 11 bytes with
@@ -404,7 +404,7 @@ Module AmexOptionsTopFeedV12J.
               match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (market_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -419,13 +419,13 @@ Module AmexOptionsTopFeedV12J.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (security_type_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (lot_size_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (prev_close_price_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (prev_close_volume_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -464,7 +464,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -474,17 +474,17 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 bound_15]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
@@ -516,22 +516,22 @@ Module AmexOptionsTopFeedV12J.
       (next_source_seq_num record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 4 (next_source_seq_num record).
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 4 (next_source_seq_num record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (next_source_seq_num_value, bytes) =>
                       Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; symbol_index := symbol_index_value; next_source_seq_num := next_source_seq_num_value |}, bytes)
@@ -543,7 +543,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -553,10 +553,10 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -605,33 +605,33 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (session_state record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 4 (symbol_seq_num record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_seq_num record) ++
       encode_bytes 1 (security_status record) ++
       encode_bytes 1 (halt_condition record) ++
       encode_bytes 4 (reserved_4 record) ++
-      encode_uint 4 (price_1 record) ++
-      encode_uint 4 (price_2 record) ++
+      encode_uint_le 4 (price_1 record) ++
+      encode_uint_le 4 (price_2 record) ++
       encode_bytes 1 (ssr_triggering_exchange_id record) ++
-      encode_uint 4 (ssr_triggering_volume record) ++
-      encode_uint 4 (time record) ++
+      encode_uint_le 4 (ssr_triggering_volume record) ++
+      encode_uint_le 4 (time record) ++
       encode_bytes 1 (ssr_state record) ++
       encode_bytes 1 (market_state record) ++
       encode_bytes 1 (session_state record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (symbol_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (symbol_seq_num_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -643,19 +643,19 @@ Module AmexOptionsTopFeedV12J.
                               match decode_bytes 4 bytes with
                               | None => None
                               | Some (reserved_4_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (price_1_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (price_2_value, bytes) =>
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (ssr_triggering_exchange_id_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (ssr_triggering_volume_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (time_value, bytes) =>
                                                       match decode_bytes 1 bytes with
@@ -687,7 +687,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 42.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -697,18 +697,18 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 bound_14]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_bytes by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
       rewrite decode_encode_bytes by exact bound_14.
@@ -758,15 +758,15 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (series_index record) ++
+      encode_uint_le 4 (series_index record) ++
       encode_uint 1 (series_type record) ++
-      encode_uint 2 (market_id record) ++
+      encode_uint_le 2 (market_id record) ++
       encode_uint 1 (system_id record) ++
       encode_bytes 6 (option_symbol_root record) ++
       encode_bytes 11 (underlying_symbol record) ++
-      encode_uint 4 (underlying_index record) ++
+      encode_uint_le 4 (underlying_index record) ++
       encode_uint 1 (price_scale_code record) ++
-      encode_uint 2 (contract_multiplier record) ++
+      encode_uint_le 2 (contract_multiplier record) ++
       encode_bytes 6 (maturity_date record) ++
       encode_uint 1 (put_or_call record) ++
       encode_bytes 10 (strike_price record) ++
@@ -774,13 +774,13 @@ Module AmexOptionsTopFeedV12J.
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (series_index_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (series_type_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (market_id_value, bytes) =>
                   match decode_uint 1 bytes with
@@ -792,13 +792,13 @@ Module AmexOptionsTopFeedV12J.
                           match decode_bytes 11 bytes with
                           | None => None
                           | Some (underlying_symbol_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (underlying_index_value, bytes) =>
                                   match decode_uint 1 bytes with
                                   | None => None
                                   | Some (price_scale_code_value, bytes) =>
-                                      match decode_uint 2 bytes with
+                                      match decode_uint_le 2 bytes with
                                       | None => None
                                       | Some (contract_multiplier_value, bytes) =>
                                           match decode_bytes 6 bytes with
@@ -835,7 +835,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 51.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -845,15 +845,15 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
@@ -891,25 +891,25 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (options_status_halt_condition record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
       encode_bytes 1 (series_status record) ++
       encode_bytes 1 (market_state record) ++
       encode_bytes 1 (options_status_halt_condition record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -933,7 +933,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 19.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -943,10 +943,10 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
@@ -978,17 +978,17 @@ Module AmexOptionsTopFeedV12J.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_num_value, bytes) =>
               match decode_bytes 10 bytes with
@@ -1010,7 +1010,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1020,8 +1020,8 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
@@ -1051,13 +1051,13 @@ Module AmexOptionsTopFeedV12J.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -1078,7 +1078,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1088,7 +1088,7 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1120,14 +1120,14 @@ Module AmexOptionsTopFeedV12J.
       (retransmit_method record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record) ++
       encode_uint 1 (retransmit_method record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (symbol_index_value, bytes) =>
           match decode_bytes 10 bytes with
@@ -1152,7 +1152,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 17.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1162,7 +1162,7 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
@@ -1193,16 +1193,16 @@ Module AmexOptionsTopFeedV12J.
       (channel_id record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (begin_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (end_seq_num_value, bytes) =>
               match decode_uint 1 bytes with
@@ -1220,7 +1220,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1230,8 +1230,8 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -1266,22 +1266,22 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (request_seq_num record) ++
-      encode_uint 4 (begin_seq_num record) ++
-      encode_uint 4 (end_seq_num record) ++
+      encode_uint_le 4 (request_seq_num record) ++
+      encode_uint_le 4 (begin_seq_num record) ++
+      encode_uint_le 4 (end_seq_num record) ++
       encode_bytes 10 (source_id record) ++
       encode_uint 1 (product_id record) ++
       encode_uint 1 (channel_id record) ++
       encode_bytes 1 (status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (request_seq_num_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (begin_seq_num_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (end_seq_num_value, bytes) =>
                   match decode_bytes 10 bytes with
@@ -1308,7 +1308,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1318,9 +1318,9 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
@@ -1406,38 +1406,38 @@ Module AmexOptionsTopFeedV12J.
       (bid_customer_volume record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
-      encode_uint 4 (ask_price record) ++
-      encode_uint 4 (ask_volume record) ++
-      encode_uint 4 (bid_price record) ++
-      encode_uint 4 (bid_volume record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
+      encode_uint_le 4 (ask_price record) ++
+      encode_uint_le 4 (ask_volume record) ++
+      encode_uint_le 4 (bid_price record) ++
+      encode_uint_le 4 (bid_volume record) ++
       encode_bytes 1 (quote_condition record) ++
       encode_bytes 1 (reserved_1 record) ++
-      encode_uint 4 (ask_customer_volume record) ++
-      encode_uint 4 (bid_customer_volume record).
+      encode_uint_le 4 (ask_customer_volume record) ++
+      encode_uint_le 4 (bid_customer_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_ns_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (series_index_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_seq_num_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (ask_price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (ask_volume_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (bid_price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (bid_volume_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1446,10 +1446,10 @@ Module AmexOptionsTopFeedV12J.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (reserved_1_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (ask_customer_volume_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_uint_le 4 bytes with
                                               | None => None
                                               | Some (bid_customer_volume_value, bytes) =>
                                                   Some ({| source_time_ns := source_time_ns_value; series_index := series_index_value; series_seq_num := series_seq_num_value; ask_price := ask_price_value; ask_volume := ask_volume_value; bid_price := bid_price_value; bid_volume := bid_volume_value; quote_condition := quote_condition_value; reserved_1 := reserved_1_value; ask_customer_volume := ask_customer_volume_value; bid_customer_volume := bid_customer_volume_value |}, bytes)
@@ -1468,7 +1468,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 38.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1478,17 +1478,17 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -1529,38 +1529,38 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (trade_cond_4 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
-      encode_uint 4 (trade_id record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 4 (volume record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
+      encode_uint_le 4 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 4 (volume record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (trade_cond_2 record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (trade_cond_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (trade_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (volume_value, bytes) =>
                                   match decode_bytes 1 bytes with
@@ -1591,7 +1591,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1601,13 +1601,13 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -1640,26 +1640,26 @@ Module AmexOptionsTopFeedV12J.
       (original_trade_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
-      encode_uint 4 (original_trade_id record).
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
+      encode_uint_le 4 (original_trade_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (original_trade_id_value, bytes) =>
                           Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; series_seq_num := series_seq_num_value; original_trade_id := original_trade_id_value |}, bytes)
@@ -1672,7 +1672,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1682,11 +1682,11 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -1729,42 +1729,42 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (third_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
-      encode_uint 4 (original_trade_id record) ++
-      encode_uint 4 (trade_id record) ++
-      encode_uint 4 (price record) ++
-      encode_uint 4 (volume record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
+      encode_uint_le 4 (original_trade_id record) ++
+      encode_uint_le 4 (trade_id record) ++
+      encode_uint_le 4 (price record) ++
+      encode_uint_le 4 (volume record) ++
       encode_bytes 1 (trade_cond_1 record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (second_reserved_1 record) ++
       encode_bytes 1 (third_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (original_trade_id_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (trade_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (volume_value, bytes) =>
                                       match decode_bytes 1 bytes with
@@ -1796,7 +1796,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1806,14 +1806,14 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
@@ -1872,48 +1872,48 @@ Module AmexOptionsTopFeedV12J.
       (auction_status record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
       encode_bytes 4 (reserved_4 record) ++
-      encode_uint 4 (paired_qty record) ++
-      encode_uint 4 (total_imbalance_qty record) ++
-      encode_uint 4 (market_imbalance_qty record) ++
+      encode_uint_le 4 (paired_qty record) ++
+      encode_uint_le 4 (total_imbalance_qty record) ++
+      encode_uint_le 4 (market_imbalance_qty record) ++
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (imbalance_side record) ++
-      encode_uint 4 (continuous_book_clearing_price record) ++
-      encode_uint 4 (auction_interest_clearing_price record) ++
+      encode_uint_le 4 (continuous_book_clearing_price record) ++
+      encode_uint_le 4 (auction_interest_clearing_price record) ++
       encode_bytes 4 (second_reserved_4 record) ++
-      encode_uint 4 (indicative_match_price record) ++
-      encode_uint 4 (upper_collar record) ++
-      encode_uint 4 (lower_collar record) ++
+      encode_uint_le 4 (indicative_match_price record) ++
+      encode_uint_le 4 (upper_collar record) ++
+      encode_uint_le 4 (lower_collar record) ++
       encode_uint 1 (auction_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (reserved_4_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (paired_qty_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (total_imbalance_qty_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (market_imbalance_qty_value, bytes) =>
                                       match decode_bytes 2 bytes with
@@ -1925,22 +1925,22 @@ Module AmexOptionsTopFeedV12J.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (imbalance_side_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_uint_le 4 bytes with
                                                   | None => None
                                                   | Some (continuous_book_clearing_price_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_uint_le 4 bytes with
                                                       | None => None
                                                       | Some (auction_interest_clearing_price_value, bytes) =>
                                                           match decode_bytes 4 bytes with
                                                           | None => None
                                                           | Some (second_reserved_4_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (indicative_match_price_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (upper_collar_value, bytes) =>
-                                                                      match decode_uint 4 bytes with
+                                                                      match decode_uint_le 4 bytes with
                                                                       | None => None
                                                                       | Some (lower_collar_value, bytes) =>
                                                                           match decode_uint 1 bytes with
@@ -1969,7 +1969,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 61.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1979,23 +1979,23 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 bound_17]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_bytes by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       destruct record. reflexivity.
     Qed.
@@ -2039,30 +2039,30 @@ Module AmexOptionsTopFeedV12J.
       Datatypes.length (rfq_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (series_seq_num record) ++
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (series_seq_num record) ++
       encode_bytes 1 (side record) ++
       encode_bytes 1 (type record) ++
       encode_bytes 1 (capacity record) ++
-      encode_uint 4 (total_quantity record) ++
-      encode_uint 4 (working_price record) ++
-      encode_uint 4 (participant record) ++
-      encode_uint 8 (auction_id record) ++
+      encode_uint_le 4 (total_quantity record) ++
+      encode_uint_le 4 (working_price record) ++
+      encode_uint_le 4 (participant record) ++
+      encode_uint_le 8 (auction_id record) ++
       encode_bytes 1 (rfq_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (series_seq_num_value, bytes) =>
                       match decode_bytes 1 bytes with
@@ -2074,16 +2074,16 @@ Module AmexOptionsTopFeedV12J.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (capacity_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (total_quantity_value, bytes) =>
-                                      match decode_uint 4 bytes with
+                                      match decode_uint_le 4 bytes with
                                       | None => None
                                       | Some (working_price_value, bytes) =>
-                                          match decode_uint 4 bytes with
+                                          match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (participant_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (auction_id_value, bytes) =>
                                                   match decode_bytes 1 bytes with
@@ -2106,7 +2106,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2116,17 +2116,17 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_bytes by exact bound_11.
       destruct record. reflexivity.
     Qed.
@@ -2162,38 +2162,38 @@ Module AmexOptionsTopFeedV12J.
       (total_volume record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (source_time record) ++
-      encode_uint 4 (source_time_ns record) ++
-      encode_uint 4 (series_index record) ++
-      encode_uint 4 (high_price record) ++
-      encode_uint 4 (low_price record) ++
-      encode_uint 4 (open record) ++
-      encode_uint 4 (close record) ++
-      encode_uint 4 (total_volume record).
+      encode_uint_le 4 (source_time record) ++
+      encode_uint_le 4 (source_time_ns record) ++
+      encode_uint_le 4 (series_index record) ++
+      encode_uint_le 4 (high_price record) ++
+      encode_uint_le 4 (low_price record) ++
+      encode_uint_le 4 (open record) ++
+      encode_uint_le 4 (close record) ++
+      encode_uint_le 4 (total_volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (source_time_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (source_time_ns_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (series_index_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (high_price_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (low_price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (open_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (close_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (total_volume_value, bytes) =>
                                       Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; series_index := series_index_value; high_price := high_price_value; low_price := low_price_value; open := open_value; close := close_value; total_volume := total_volume_value |}, bytes)
@@ -2209,7 +2209,7 @@ Module AmexOptionsTopFeedV12J.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -2219,14 +2219,14 @@ Module AmexOptionsTopFeedV12J.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

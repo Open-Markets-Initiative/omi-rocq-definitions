@@ -48,16 +48,16 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       (session_number record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (sequence_number record) ++
-      encode_uint 2 (mach_packet_length record) ++
+      encode_uint_le 8 (sequence_number record) ++
+      encode_uint_le 2 (mach_packet_length record) ++
       encode_uint 1 (mach_packet_type record) ++
       encode_uint 1 (session_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (sequence_number_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (mach_packet_length_value, bytes) =>
               match decode_uint 1 bytes with
@@ -75,7 +75,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -85,8 +85,8 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       destruct record. reflexivity.
@@ -109,10 +109,10 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       (seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (seconds record).
+      encode_uint_le 4 (seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (seconds_value, bytes) =>
           Some ({| seconds := seconds_value |}, bytes)
@@ -121,7 +121,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -129,7 +129,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -168,22 +168,22 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       Datatypes.length (primary_market_code record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record) ++
       encode_bytes 11 (ticker_symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (test_security_indicator record) ++
       encode_bytes 1 (second_reserved_1 record) ++
-      encode_uint 2 (lot_size record) ++
+      encode_uint_le 2 (lot_size record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
       encode_bytes 1 (primary_market_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               match decode_bytes 11 bytes with
@@ -198,7 +198,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
-                              match decode_uint 2 bytes with
+                              match decode_uint_le 2 bytes with
                               | None => None
                               | Some (lot_size_value, bytes) =>
                                   match decode_bytes 8 bytes with
@@ -225,7 +225,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -235,13 +235,13 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_bytes by exact bound_9.
@@ -271,13 +271,13 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       Datatypes.length (system_status record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
+      encode_uint_le 4 (nanoseconds record) ++
       encode_bytes 8 (do_m_version record) ++
       encode_uint 1 (session_id record) ++
       encode_bytes 1 (system_status record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
           match decode_bytes 8 bytes with
@@ -298,7 +298,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 14.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -308,7 +308,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -340,17 +340,17 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       Datatypes.length (short_sale_restriction record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record) ++
       encode_uint 1 (trading_status record) ++
       encode_uint 1 (market_state record) ++
       encode_bytes 1 (short_sale_restriction record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               match decode_uint 1 bytes with
@@ -372,7 +372,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 11.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -382,8 +382,8 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -409,14 +409,14 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       (symbol_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record).
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
               Some ({| nanoseconds := nanoseconds_value; symbol_id := symbol_id_value |}, bytes)
@@ -426,7 +426,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -436,8 +436,8 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -470,31 +470,31 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       Datatypes.length (attributable_id record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (order_side record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record) ++
       encode_bytes 4 (attributable_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (order_side_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (size_value, bytes) =>
                               match decode_bytes 4 bytes with
@@ -512,7 +512,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 33.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -522,12 +522,12 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       destruct record. reflexivity.
     Qed.
@@ -553,18 +553,18 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       (order_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (order_id record).
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
                   Some ({| nanoseconds := nanoseconds_value; symbol_id := symbol_id_value; order_id := order_id_value |}, bytes)
@@ -575,7 +575,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -585,9 +585,9 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 bound_2]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
@@ -618,30 +618,30 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       (size record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (nanoseconds record) ++
-      encode_uint 4 (symbol_id record) ++
-      encode_uint 8 (trade_id record) ++
+      encode_uint_le 4 (nanoseconds record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_uint_le 8 (trade_id record) ++
       encode_uint 1 (correction_number record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 4 (size record).
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (size record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (nanoseconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (symbol_id_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (trade_id_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (correction_number_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (size_value, bytes) =>
                               Some ({| nanoseconds := nanoseconds_value; symbol_id := symbol_id_value; trade_id := trade_id_value; correction_number := correction_number_value; price := price_value; size := size_value |}, bytes)
@@ -655,7 +655,7 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 29.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -665,12 +665,12 @@ Module PearlEquitiesDepthOfMarketV13DUdp.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 bound_5]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       destruct record. reflexivity.
     Qed.
 

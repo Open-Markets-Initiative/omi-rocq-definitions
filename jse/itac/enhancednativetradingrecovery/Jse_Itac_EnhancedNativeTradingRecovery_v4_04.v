@@ -47,14 +47,14 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (start_of_message record) ++
-      encode_uint 2 (message_length record) ++
+      encode_uint_le 2 (message_length record) ++
       encode_bytes 1 (message_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (start_of_message_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (message_length_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -68,7 +68,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -79,7 +79,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
@@ -110,7 +110,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       encode_bytes 6 (comp_id record) ++
       encode_bytes 25 (password record) ++
       encode_bytes 25 (new_password record) ++
-      encode_uint 4 (protocol_version record).
+      encode_uint_le 4 (protocol_version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 6 bytes with
@@ -122,7 +122,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
               match decode_bytes 25 bytes with
               | None => None
               | Some (new_password_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (protocol_version_value, bytes) =>
                       Some ({| comp_id := comp_id_value; password := password_value; new_password := new_password_value; protocol_version := protocol_version_value |}, bytes)
@@ -134,7 +134,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 60.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -147,7 +147,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -170,14 +170,14 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       (password_expiry record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reject_code record) ++
-      encode_uint 4 (password_expiry record).
+      encode_uint_le 4 (reject_code record) ++
+      encode_uint_le 4 (password_expiry record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (reject_code_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (password_expiry_value, bytes) =>
               Some ({| reject_code := reject_code_value; password_expiry := password_expiry_value |}, bytes)
@@ -187,7 +187,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -197,8 +197,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -266,13 +266,13 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       Datatypes.length (client_order_id record) = 20.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_bytes 30 (reject_reason record) ++
       encode_bytes 1 (message_type record) ++
       encode_bytes 20 (client_order_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (reject_code_value, bytes) =>
           match decode_bytes 30 bytes with
@@ -293,7 +293,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 55.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -303,7 +303,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
@@ -330,13 +330,13 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record).
+      encode_uint_le 4 (sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               Some ({| partition_id := partition_id_value; sequence_number := sequence_number_value |}, bytes)
@@ -346,7 +346,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 5.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -357,7 +357,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -513,14 +513,14 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       (transact_time_nanoseconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (transact_time_seconds record) ++
-      encode_uint 4 (transact_time_nanoseconds record).
+      encode_uint_le 4 (transact_time_seconds record) ++
+      encode_uint_le 4 (transact_time_nanoseconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (transact_time_seconds_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (transact_time_nanoseconds_value, bytes) =>
               Some ({| transact_time_seconds := transact_time_seconds_value; transact_time_nanoseconds := transact_time_nanoseconds_value |}, bytes)
@@ -530,7 +530,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -540,8 +540,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -577,11 +577,11 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 12 (order_id record) ++
       TransactTime.encode (transact_time record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_uint 1 (order_book record) ++
       encode_bytes 10 (rfq_id record).
 
@@ -589,7 +589,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -601,7 +601,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
                       match TransactTime.decode bytes with
                       | None => None
                       | Some (transact_time_value, bytes) =>
-                          match decode_uint 4 bytes with
+                          match decode_uint_le 4 bytes with
                           | None => None
                           | Some (reject_code_value, bytes) =>
                               match decode_uint 1 bytes with
@@ -623,7 +623,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 60.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -634,11 +634,11 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite TransactTime.decode_encode by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
@@ -674,10 +674,10 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_uint 1 (mass_cancel_status record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (reject_code record) ++
       TransactTime.encode (transact_time record) ++
       encode_uint 1 (order_book record).
 
@@ -685,7 +685,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 20 bytes with
@@ -694,7 +694,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (mass_cancel_status_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (reject_code_value, bytes) =>
                           match TransactTime.decode bytes with
@@ -715,7 +715,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -726,10 +726,10 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite TransactTime.decode_encode by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.
@@ -762,8 +762,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Definition encode (record : t) : list byte :=
       encode_bytes 10 (security_request_id record) ++
       encode_uint 1 (security_response_type record) ++
-      encode_uint 4 (reject_code record) ++
-      encode_uint 4 (security_id record) ++
+      encode_uint_le 4 (reject_code record) ++
+      encode_uint_le 4 (security_id record) ++
       encode_uint 1 (security_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -773,10 +773,10 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
           match decode_uint 1 bytes with
           | None => None
           | Some (security_response_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (reject_code_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (security_id_value, bytes) =>
                       match decode_uint 1 bytes with
@@ -792,7 +792,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -804,8 +804,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
       destruct record. reflexivity.
     Qed.
@@ -846,7 +846,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
+      encode_uint_le 4 (sequence_number record) ++
       encode_bytes 24 (orig_time record) ++
       encode_bytes 1 (urgency record) ++
       encode_bytes 100 (headline record) ++
@@ -860,7 +860,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
               match decode_bytes 24 bytes with
@@ -902,7 +902,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1188.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -913,7 +913,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
@@ -953,8 +953,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (partition_id record) ++
-      encode_uint 4 (sequence_number record) ++
-      encode_uint 4 (reject_code record) ++
+      encode_uint_le 4 (sequence_number record) ++
+      encode_uint_le 4 (reject_code record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 12 (order_id record) ++
       TransactTime.encode (transact_time record).
@@ -963,10 +963,10 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       match decode_uint 1 bytes with
       | None => None
       | Some (partition_id_value, bytes) =>
-          match decode_uint 4 bytes with
+          match decode_uint_le 4 bytes with
           | None => None
           | Some (sequence_number_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (reject_code_value, bytes) =>
                   match decode_bytes 20 bytes with
@@ -989,7 +989,7 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 49.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_uint_le_length, !encode_bytes_length, !TransactTime.encode_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1000,8 +1000,8 @@ Module JseItacEnhancedNativeTradingRecoveryV404.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite TransactTime.decode_encode by exact bound_5.

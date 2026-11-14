@@ -44,10 +44,10 @@ Module EuronextOptiqDropCopyGatewayV669.
       (frame record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (frame record).
+      encode_uint_le 2 (frame record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (frame_value, bytes) =>
           Some ({| frame := frame_value |}, bytes)
@@ -56,7 +56,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -64,7 +64,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -91,22 +91,22 @@ Module EuronextOptiqDropCopyGatewayV669.
       (version record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (block_length record) ++
-      encode_uint 2 (template_id record) ++
-      encode_uint 2 (schema_id record) ++
-      encode_uint 2 (version record).
+      encode_uint_le 2 (block_length record) ++
+      encode_uint_le 2 (template_id record) ++
+      encode_uint_le 2 (schema_id record) ++
+      encode_uint_le 2 (version record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (block_length_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (template_id_value, bytes) =>
-              match decode_uint 2 bytes with
+              match decode_uint_le 2 bytes with
               | None => None
               | Some (schema_id_value, bytes) =>
-                  match decode_uint 2 bytes with
+                  match decode_uint_le 2 bytes with
                   | None => None
                   | Some (version_value, bytes) =>
                       Some ({| block_length := block_length_value; template_id := template_id_value; schema_id := schema_id_value; version := version_value |}, bytes)
@@ -118,7 +118,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 8.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -128,10 +128,10 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       destruct record. reflexivity.
     Qed.
 
@@ -174,51 +174,51 @@ Module EuronextOptiqDropCopyGatewayV669.
       (imbalance_qty_side record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_id record) ++
-      encode_uint 8 (event_time record) ++
+      encode_uint_le 8 (event_id record) ++
+      encode_uint_le 8 (event_time record) ++
       encode_uint 1 (price_type record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (quantity_optional record) ++
-      encode_uint 8 (imbalance_qty record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (quantity_optional record) ++
+      encode_uint_le 8 (imbalance_qty record) ++
       encode_uint 1 (imbalance_qty_side record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (emm_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (event_id_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (event_time_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (price_type_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (symbol_index_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (price_optional_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (quantity_optional_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (imbalance_qty_value, bytes) =>
                                                   match decode_uint 1 bytes with
@@ -241,7 +241,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -251,17 +251,17 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 bound_11]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       rewrite decode_encode_uint by exact bound_11.
       destruct record. reflexivity.
     Qed.
@@ -354,47 +354,47 @@ Module EuronextOptiqDropCopyGatewayV669.
       Datatypes.length (trade_unique_identifier record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 4 (execution_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 4 (execution_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_id record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (last_traded_px record) ++
-      encode_uint 8 (last_shares record) ++
+      encode_uint_le 8 (event_id record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (last_traded_px record) ++
+      encode_uint_le 8 (last_shares record) ++
       encode_bytes 16 (trade_unique_identifier record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (execution_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (emm_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (event_id_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (symbol_index_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (book_in_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (last_traded_px_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (last_shares_value, bytes) =>
                                               match decode_bytes 16 bytes with
@@ -416,7 +416,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 77.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -426,16 +426,16 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
       destruct record. reflexivity.
     Qed.
@@ -477,41 +477,41 @@ Module EuronextOptiqDropCopyGatewayV669.
       (oe_session_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
       encode_uint 1 (afq_reason record) ++
-      encode_uint 8 (book_out_time record) ++
+      encode_uint_le 8 (book_out_time record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (event_id record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 8 (event_id record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_bytes 8 (firm_id record) ++
       encode_uint 1 (afq_indicator record) ++
-      encode_uint 8 (oe_session_id record).
+      encode_uint_le 8 (oe_session_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (afq_reason_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_out_time_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (emm_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (event_id_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (symbol_index_value, bytes) =>
                                       match decode_bytes 8 bytes with
@@ -520,7 +520,7 @@ Module EuronextOptiqDropCopyGatewayV669.
                                           match decode_uint 1 bytes with
                                           | None => None
                                           | Some (afq_indicator_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (oe_session_id_value, bytes) =>
                                                   Some ({| msg_seq_num := msg_seq_num_value; produce_time := produce_time_value; consume_time := consume_time_value; afq_reason := afq_reason_value; book_out_time := book_out_time_value; emm := emm_value; event_id := event_id_value; symbol_index := symbol_index_value; firm_id := firm_id_value; afq_indicator := afq_indicator_value; oe_session_id := oe_session_id_value |}, bytes)
@@ -539,7 +539,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -549,17 +549,17 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -646,27 +646,27 @@ Module EuronextOptiqDropCopyGatewayV669.
       (transaction_price_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (message_sending_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (book_out_time record) ++
-      encode_uint 8 (oegin_from_member record) ++
-      encode_uint 8 (oegout_time_to_me record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (message_sending_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (book_out_time record) ++
+      encode_uint_le 8 (oegin_from_member record) ++
+      encode_uint_le 8 (oegout_time_to_me record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (declaration_event_type record) ++
       encode_bytes 8 (firm_id record) ++
-      encode_uint 8 (oe_session_id record) ++
+      encode_uint_le 8 (oe_session_id record) ++
       encode_uint 1 (account_type record) ++
-      encode_uint 8 (client_order_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (declaration_id record) ++
+      encode_uint_le 8 (declaration_id record) ++
       encode_uint 1 (declaration_status record) ++
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (quantity_optional record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (quantity_optional record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_uint 1 (operation_type record) ++
       encode_uint 1 (cross_order_indicator record) ++
       encode_bytes 8 (entering_counterparty record) ++
@@ -682,31 +682,31 @@ Module EuronextOptiqDropCopyGatewayV669.
       encode_uint 1 (transaction_price_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (message_sending_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (book_out_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (oegin_from_member_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (oegout_time_to_me_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (event_id_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -715,34 +715,34 @@ Module EuronextOptiqDropCopyGatewayV669.
                                               match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (firm_id_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (oe_session_id_value, bytes) =>
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (account_type_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (client_order_id_value, bytes) =>
                                                               match decode_uint 1 bytes with
                                                               | None => None
                                                               | Some (emm_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (declaration_id_value, bytes) =>
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (declaration_status_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (price_optional_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (quantity_optional_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (side_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (symbol_index_value, bytes) =>
                                                                                           match decode_uint 1 bytes with
@@ -823,7 +823,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 221.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -833,27 +833,27 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 bound_33]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_20.
       rewrite decode_encode_uint by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
@@ -919,50 +919,50 @@ Module EuronextOptiqDropCopyGatewayV669.
       (rejected_message_id record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (message_sending_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (book_out_time record) ++
-      encode_uint 8 (oegin_from_member record) ++
-      encode_uint 8 (oegout_time_to_me record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (message_sending_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (book_out_time record) ++
+      encode_uint_le 8 (oegin_from_member record) ++
+      encode_uint_le 8 (oegout_time_to_me record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (declaration_event_type record) ++
       encode_bytes 8 (firm_id record) ++
-      encode_uint 8 (client_order_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (declaration_id record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 2 (error_code record) ++
-      encode_uint 2 (rejected_message_id record).
+      encode_uint_le 8 (declaration_id record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 2 (error_code record) ++
+      encode_uint_le 2 (rejected_message_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (message_sending_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (book_out_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (oegin_from_member_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (oegout_time_to_me_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (event_id_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -971,22 +971,22 @@ Module EuronextOptiqDropCopyGatewayV669.
                                               match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (firm_id_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (client_order_id_value, bytes) =>
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (emm_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (declaration_id_value, bytes) =>
-                                                              match decode_uint 4 bytes with
+                                                              match decode_uint_le 4 bytes with
                                                               | None => None
                                                               | Some (symbol_index_value, bytes) =>
-                                                                  match decode_uint 2 bytes with
+                                                                  match decode_uint_le 2 bytes with
                                                                   | None => None
                                                                   | Some (error_code_value, bytes) =>
-                                                                      match decode_uint 2 bytes with
+                                                                      match decode_uint_le 2 bytes with
                                                                       | None => None
                                                                       | Some (rejected_message_id_value, bytes) =>
                                                                           Some ({| msg_seq_num := msg_seq_num_value; produce_time := produce_time_value; consume_time := consume_time_value; message_sending_time := message_sending_time_value; book_in := book_in_value; book_out_time := book_out_time_value; oegin_from_member := oegin_from_member_value; oegout_time_to_me := oegout_time_to_me_value; event_id := event_id_value; declaration_event_type := declaration_event_type_value; firm_id := firm_id_value; client_order_id := client_order_id_value; emm := emm_value; declaration_id := declaration_id_value; symbol_index := symbol_index_value; error_code := error_code_value; rejected_message_id := rejected_message_id_value |}, bytes)
@@ -1011,7 +1011,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 102.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1021,23 +1021,23 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       destruct record. reflexivity.
     Qed.
 
@@ -1090,50 +1090,50 @@ Module EuronextOptiqDropCopyGatewayV669.
       (declaration_kill_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (message_sending_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (book_out_time record) ++
-      encode_uint 8 (oegin_from_member record) ++
-      encode_uint 8 (oegout_time_to_me record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (message_sending_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (book_out_time record) ++
+      encode_uint_le 8 (oegin_from_member record) ++
+      encode_uint_le 8 (oegout_time_to_me record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (declaration_event_type record) ++
       encode_bytes 8 (firm_id record) ++
-      encode_uint 8 (oe_session_id record) ++
-      encode_uint 8 (client_order_id record) ++
+      encode_uint_le 8 (oe_session_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (declaration_id record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 8 (declaration_id record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_uint 1 (declaration_kill_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (message_sending_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (book_out_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (oegin_from_member_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (oegout_time_to_me_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (event_id_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -1142,19 +1142,19 @@ Module EuronextOptiqDropCopyGatewayV669.
                                               match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (firm_id_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (oe_session_id_value, bytes) =>
-                                                      match decode_uint 8 bytes with
+                                                      match decode_uint_le 8 bytes with
                                                       | None => None
                                                       | Some (client_order_id_value, bytes) =>
                                                           match decode_uint 1 bytes with
                                                           | None => None
                                                           | Some (emm_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (declaration_id_value, bytes) =>
-                                                                  match decode_uint 4 bytes with
+                                                                  match decode_uint_le 4 bytes with
                                                                   | None => None
                                                                   | Some (symbol_index_value, bytes) =>
                                                                       match decode_uint 1 bytes with
@@ -1182,7 +1182,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 107.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1192,22 +1192,22 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 bound_16]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
       rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
       destruct record. reflexivity.
     Qed.
@@ -1247,46 +1247,46 @@ Module EuronextOptiqDropCopyGatewayV669.
       (quantity record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 4 (execution_id record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (quantity record).
+      encode_uint_le 4 (execution_id record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (book_in_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (event_id_value, bytes) =>
                           match decode_uint 1 bytes with
                           | None => None
                           | Some (emm_value, bytes) =>
-                              match decode_uint 4 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
-                                  match decode_uint 4 bytes with
+                                  match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (symbol_index_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (price_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (quantity_value, bytes) =>
                                               Some ({| msg_seq_num := msg_seq_num_value; produce_time := produce_time_value; consume_time := consume_time_value; book_in := book_in_value; event_id := event_id_value; emm := emm_value; execution_id := execution_id_value; symbol_index := symbol_index_value; price := price_value; quantity := quantity_value |}, bytes)
@@ -1304,7 +1304,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 61.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1314,16 +1314,16 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 bound_9]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
       destruct record. reflexivity.
     Qed.
 
@@ -1398,27 +1398,27 @@ Module EuronextOptiqDropCopyGatewayV669.
       Datatypes.length (clearing_account record) = 16.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (message_sending_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (book_out_time record) ++
-      encode_uint 8 (oegin_from_member record) ++
-      encode_uint 8 (oegout_time_to_me record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (message_sending_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (book_out_time record) ++
+      encode_uint_le 8 (oegin_from_member record) ++
+      encode_uint_le 8 (oegout_time_to_me record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (declaration_event_type record) ++
       encode_bytes 8 (firm_id record) ++
-      encode_uint 8 (oe_session_id record) ++
+      encode_uint_le 8 (oe_session_id record) ++
       encode_uint 1 (account_type record) ++
-      encode_uint 8 (client_order_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 8 (declaration_id record) ++
+      encode_uint_le 8 (declaration_id record) ++
       encode_uint 1 (declaration_status record) ++
-      encode_uint 8 (price_optional record) ++
-      encode_uint 8 (quantity_optional record) ++
+      encode_uint_le 8 (price_optional record) ++
+      encode_uint_le 8 (quantity_optional record) ++
       encode_uint 1 (side record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_uint 1 (operation_type record) ++
       encode_bytes 8 (entering_counterparty record) ++
       encode_bytes 16 (trader_id record) ++
@@ -1428,31 +1428,31 @@ Module EuronextOptiqDropCopyGatewayV669.
       encode_bytes 16 (clearing_account record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (message_sending_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (book_out_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (oegin_from_member_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (oegout_time_to_me_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (event_id_value, bytes) =>
                                           match decode_uint 1 bytes with
@@ -1461,34 +1461,34 @@ Module EuronextOptiqDropCopyGatewayV669.
                                               match decode_bytes 8 bytes with
                                               | None => None
                                               | Some (firm_id_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (oe_session_id_value, bytes) =>
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (account_type_value, bytes) =>
-                                                          match decode_uint 8 bytes with
+                                                          match decode_uint_le 8 bytes with
                                                           | None => None
                                                           | Some (client_order_id_value, bytes) =>
                                                               match decode_uint 1 bytes with
                                                               | None => None
                                                               | Some (emm_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (declaration_id_value, bytes) =>
                                                                       match decode_uint 1 bytes with
                                                                       | None => None
                                                                       | Some (declaration_status_value, bytes) =>
-                                                                          match decode_uint 8 bytes with
+                                                                          match decode_uint_le 8 bytes with
                                                                           | None => None
                                                                           | Some (price_optional_value, bytes) =>
-                                                                              match decode_uint 8 bytes with
+                                                                              match decode_uint_le 8 bytes with
                                                                               | None => None
                                                                               | Some (quantity_optional_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (side_value, bytes) =>
-                                                                                      match decode_uint 4 bytes with
+                                                                                      match decode_uint_le 4 bytes with
                                                                                       | None => None
                                                                                       | Some (symbol_index_value, bytes) =>
                                                                                           match decode_uint 1 bytes with
@@ -1545,7 +1545,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 208.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1555,27 +1555,27 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 bound_27]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_bytes by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_13.
       rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_15.
       rewrite decode_encode_uint by exact bound_16.
-      rewrite decode_encode_uint by exact bound_17.
-      rewrite decode_encode_uint by exact bound_18.
+      rewrite decode_encode_uint_le by exact bound_17.
+      rewrite decode_encode_uint_le by exact bound_18.
       rewrite decode_encode_uint by exact bound_19.
-      rewrite decode_encode_uint by exact bound_20.
+      rewrite decode_encode_uint_le by exact bound_20.
       rewrite decode_encode_uint by exact bound_21.
       rewrite decode_encode_bytes by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
@@ -1675,67 +1675,67 @@ Module EuronextOptiqDropCopyGatewayV669.
       (guarantee_flag_optional record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (msg_seq_num record) ++
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (message_sending_time record) ++
-      encode_uint 8 (book_in record) ++
-      encode_uint 8 (book_out_time record) ++
-      encode_uint 8 (oegin_from_member record) ++
-      encode_uint 8 (oegout_time_to_me record) ++
+      encode_uint_le 4 (msg_seq_num record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (message_sending_time record) ++
+      encode_uint_le 8 (book_in record) ++
+      encode_uint_le 8 (book_out_time record) ++
+      encode_uint_le 8 (oegin_from_member record) ++
+      encode_uint_le 8 (oegout_time_to_me record) ++
       encode_uint 1 (operation_type record) ++
       encode_uint 1 (declaration_event_type record) ++
       encode_uint 1 (declaration_status record) ++
-      encode_uint 8 (event_id record) ++
+      encode_uint_le 8 (event_id record) ++
       encode_uint 1 (emm record) ++
-      encode_uint 4 (symbol_index record) ++
-      encode_uint 8 (declaration_id record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (quantity record) ++
+      encode_uint_le 4 (symbol_index record) ++
+      encode_uint_le 8 (declaration_id record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (quantity record) ++
       encode_uint 1 (side record) ++
       encode_uint 1 (cross_order_indicator record) ++
-      encode_uint 8 (trade_time record) ++
+      encode_uint_le 8 (trade_time record) ++
       encode_bytes 8 (entering_counterparty record) ++
       encode_uint 1 (session_optional record) ++
       encode_uint 1 (trade_type record) ++
       encode_bytes 8 (firm_id record) ++
-      encode_uint 2 (oe_partition_id record) ++
-      encode_uint 4 (logical_access_id record) ++
+      encode_uint_le 2 (oe_partition_id record) ++
+      encode_uint_le 4 (logical_access_id record) ++
       encode_bytes 16 (trader_id record) ++
       encode_bytes 16 (investor_id record) ++
       encode_bytes 8 (principal_code record) ++
       encode_bytes 8 (clearing_firm_id_optional record) ++
       encode_bytes 16 (clearing_account record) ++
       encode_uint 1 (account_type record) ++
-      encode_uint 8 (client_order_id record) ++
+      encode_uint_le 8 (client_order_id record) ++
       encode_bytes 18 (free_text record) ++
       encode_uint 1 (settlement_period_optional record) ++
       encode_uint 1 (settlement_flag_optional record) ++
       encode_uint 1 (guarantee_flag_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (msg_seq_num_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (produce_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (consume_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (message_sending_time_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (book_in_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (book_out_time_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (oegin_from_member_value, bytes) =>
-                                  match decode_uint 8 bytes with
+                                  match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (oegout_time_to_me_value, bytes) =>
                                       match decode_uint 1 bytes with
@@ -1747,22 +1747,22 @@ Module EuronextOptiqDropCopyGatewayV669.
                                               match decode_uint 1 bytes with
                                               | None => None
                                               | Some (declaration_status_value, bytes) =>
-                                                  match decode_uint 8 bytes with
+                                                  match decode_uint_le 8 bytes with
                                                   | None => None
                                                   | Some (event_id_value, bytes) =>
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (emm_value, bytes) =>
-                                                          match decode_uint 4 bytes with
+                                                          match decode_uint_le 4 bytes with
                                                           | None => None
                                                           | Some (symbol_index_value, bytes) =>
-                                                              match decode_uint 8 bytes with
+                                                              match decode_uint_le 8 bytes with
                                                               | None => None
                                                               | Some (declaration_id_value, bytes) =>
-                                                                  match decode_uint 8 bytes with
+                                                                  match decode_uint_le 8 bytes with
                                                                   | None => None
                                                                   | Some (price_value, bytes) =>
-                                                                      match decode_uint 8 bytes with
+                                                                      match decode_uint_le 8 bytes with
                                                                       | None => None
                                                                       | Some (quantity_value, bytes) =>
                                                                           match decode_uint 1 bytes with
@@ -1771,7 +1771,7 @@ Module EuronextOptiqDropCopyGatewayV669.
                                                                               match decode_uint 1 bytes with
                                                                               | None => None
                                                                               | Some (cross_order_indicator_value, bytes) =>
-                                                                                  match decode_uint 8 bytes with
+                                                                                  match decode_uint_le 8 bytes with
                                                                                   | None => None
                                                                                   | Some (trade_time_value, bytes) =>
                                                                                       match decode_bytes 8 bytes with
@@ -1786,10 +1786,10 @@ Module EuronextOptiqDropCopyGatewayV669.
                                                                                                   match decode_bytes 8 bytes with
                                                                                                   | None => None
                                                                                                   | Some (firm_id_value, bytes) =>
-                                                                                                      match decode_uint 2 bytes with
+                                                                                                      match decode_uint_le 2 bytes with
                                                                                                       | None => None
                                                                                                       | Some (oe_partition_id_value, bytes) =>
-                                                                                                          match decode_uint 4 bytes with
+                                                                                                          match decode_uint_le 4 bytes with
                                                                                                           | None => None
                                                                                                           | Some (logical_access_id_value, bytes) =>
                                                                                                               match decode_bytes 16 bytes with
@@ -1810,7 +1810,7 @@ Module EuronextOptiqDropCopyGatewayV669.
                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                   | None => None
                                                                                                                                   | Some (account_type_value, bytes) =>
-                                                                                                                                      match decode_uint 8 bytes with
+                                                                                                                                      match decode_uint_le 8 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (client_order_id_value, bytes) =>
                                                                                                                                           match decode_bytes 18 bytes with
@@ -1867,7 +1867,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 228.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1877,39 +1877,39 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 [bound_13 [bound_14 [bound_15 [bound_16 [bound_17 [bound_18 [bound_19 [bound_20 [bound_21 [bound_22 [bound_23 [bound_24 [bound_25 [bound_26 [bound_27 [bound_28 [bound_29 [bound_30 [bound_31 [bound_32 [bound_33 [bound_34 [bound_35 bound_36]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
-      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
       rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_11.
       rewrite decode_encode_uint by exact bound_12.
-      rewrite decode_encode_uint by exact bound_13.
-      rewrite decode_encode_uint by exact bound_14.
-      rewrite decode_encode_uint by exact bound_15.
-      rewrite decode_encode_uint by exact bound_16.
+      rewrite decode_encode_uint_le by exact bound_13.
+      rewrite decode_encode_uint_le by exact bound_14.
+      rewrite decode_encode_uint_le by exact bound_15.
+      rewrite decode_encode_uint_le by exact bound_16.
       rewrite decode_encode_uint by exact bound_17.
       rewrite decode_encode_uint by exact bound_18.
-      rewrite decode_encode_uint by exact bound_19.
+      rewrite decode_encode_uint_le by exact bound_19.
       rewrite decode_encode_bytes by exact bound_20.
       rewrite decode_encode_uint by exact bound_21.
       rewrite decode_encode_uint by exact bound_22.
       rewrite decode_encode_bytes by exact bound_23.
-      rewrite decode_encode_uint by exact bound_24.
-      rewrite decode_encode_uint by exact bound_25.
+      rewrite decode_encode_uint_le by exact bound_24.
+      rewrite decode_encode_uint_le by exact bound_25.
       rewrite decode_encode_bytes by exact bound_26.
       rewrite decode_encode_bytes by exact bound_27.
       rewrite decode_encode_bytes by exact bound_28.
       rewrite decode_encode_bytes by exact bound_29.
       rewrite decode_encode_bytes by exact bound_30.
       rewrite decode_encode_uint by exact bound_31.
-      rewrite decode_encode_uint by exact bound_32.
+      rewrite decode_encode_uint_le by exact bound_32.
       rewrite decode_encode_bytes by exact bound_33.
       rewrite decode_encode_uint by exact bound_34.
       rewrite decode_encode_uint by exact bound_35.
@@ -1946,28 +1946,28 @@ Module EuronextOptiqDropCopyGatewayV669.
       (clear_book_origin record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (produce_time record) ++
-      encode_uint 8 (consume_time record) ++
-      encode_uint 8 (sequence_time record) ++
-      encode_uint 8 (book_in_time record) ++
-      encode_uint 4 (symbol_index record) ++
+      encode_uint_le 8 (produce_time record) ++
+      encode_uint_le 8 (consume_time record) ++
+      encode_uint_le 8 (sequence_time record) ++
+      encode_uint_le 8 (book_in_time record) ++
+      encode_uint_le 4 (symbol_index record) ++
       encode_uint 1 (emm record) ++
       encode_uint 1 (clear_book_origin record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (produce_time_value, bytes) =>
-          match decode_uint 8 bytes with
+          match decode_uint_le 8 bytes with
           | None => None
           | Some (consume_time_value, bytes) =>
-              match decode_uint 8 bytes with
+              match decode_uint_le 8 bytes with
               | None => None
               | Some (sequence_time_value, bytes) =>
-                  match decode_uint 8 bytes with
+                  match decode_uint_le 8 bytes with
                   | None => None
                   | Some (book_in_time_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (symbol_index_value, bytes) =>
                           match decode_uint 1 bytes with
@@ -1988,7 +1988,7 @@ Module EuronextOptiqDropCopyGatewayV669.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 38.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -1998,11 +1998,11 @@ Module EuronextOptiqDropCopyGatewayV669.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint by exact bound_5.
       rewrite decode_encode_uint by exact bound_6.
       destruct record. reflexivity.

@@ -49,14 +49,14 @@ Module LmeSelectReferencePricesV418.
       (send_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (pkt_size record) ++
+      encode_uint_le 2 (pkt_size record) ++
       encode_uint 1 (msg_count record) ++
       encode_bytes 1 (filler record) ++
-      encode_uint 4 (seq_num record) ++
-      encode_uint 8 (send_time record).
+      encode_uint_le 4 (seq_num record) ++
+      encode_uint_le 8 (send_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (pkt_size_value, bytes) =>
           match decode_uint 1 bytes with
@@ -65,10 +65,10 @@ Module LmeSelectReferencePricesV418.
               match decode_bytes 1 bytes with
               | None => None
               | Some (filler_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (seq_num_value, bytes) =>
-                      match decode_uint 8 bytes with
+                      match decode_uint_le 8 bytes with
                       | None => None
                       | Some (send_time_value, bytes) =>
                           Some ({| pkt_size := pkt_size_value; msg_count := msg_count_value; filler := filler_value; seq_num := seq_num_value; send_time := send_time_value |}, bytes)
@@ -81,7 +81,7 @@ Module LmeSelectReferencePricesV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -91,11 +91,11 @@ Module LmeSelectReferencePricesV418.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
@@ -118,14 +118,14 @@ Module LmeSelectReferencePricesV418.
       (msg_type record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 2 (msg_size record) ++
-      encode_uint 2 (msg_type record).
+      encode_uint_le 2 (msg_size record) ++
+      encode_uint_le 2 (msg_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 2 bytes with
+      match decode_uint_le 2 bytes with
       | None => None
       | Some (msg_size_value, bytes) =>
-          match decode_uint 2 bytes with
+          match decode_uint_le 2 bytes with
           | None => None
           | Some (msg_type_value, bytes) =>
               Some ({| msg_size := msg_size_value; msg_type := msg_type_value |}, bytes)
@@ -135,7 +135,7 @@ Module LmeSelectReferencePricesV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -145,8 +145,8 @@ Module LmeSelectReferencePricesV418.
       destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
       destruct record. reflexivity.
     Qed.
 
@@ -167,10 +167,10 @@ Module LmeSelectReferencePricesV418.
       (new_seq_no record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (new_seq_no record).
+      encode_uint_le 4 (new_seq_no record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 4 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
       | Some (new_seq_no_value, bytes) =>
           Some ({| new_seq_no := new_seq_no_value |}, bytes)
@@ -179,7 +179,7 @@ Module LmeSelectReferencePricesV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.
     Proof.
       intros record. unfold encode.
-      rewrite !encode_uint_length. reflexivity.
+      rewrite !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -187,7 +187,7 @@ Module LmeSelectReferencePricesV418.
     Proof.
       intros record after bound.
       unfold decode, encode.
-      rewrite decode_encode_uint by exact bound.
+      rewrite decode_encode_uint_le by exact bound.
       destruct record. reflexivity.
     Qed.
 
@@ -228,20 +228,20 @@ Module LmeSelectReferencePricesV418.
       (ask record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 8 (time_of_event record) ++
+      encode_uint_le 8 (time_of_event record) ++
       encode_bytes 1 (reference_price_category record) ++
       encode_bytes 32 (reference_price_type record) ++
       encode_bytes 12 (price_status record) ++
-      encode_uint 4 (business_date record) ++
-      encode_uint 8 (instrument_id record) ++
+      encode_uint_le 4 (business_date record) ++
+      encode_uint_le 8 (instrument_id record) ++
       encode_bytes 2 (product_code record) ++
       encode_bytes 3 (currency_code record) ++
-      encode_uint 8 (bid record) ++
-      encode_uint 8 (price record) ++
-      encode_uint 8 (ask record).
+      encode_uint_le 8 (bid record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 8 (ask record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 8 bytes with
+      match decode_uint_le 8 bytes with
       | None => None
       | Some (time_of_event_value, bytes) =>
           match decode_bytes 1 bytes with
@@ -253,10 +253,10 @@ Module LmeSelectReferencePricesV418.
                   match decode_bytes 12 bytes with
                   | None => None
                   | Some (price_status_value, bytes) =>
-                      match decode_uint 4 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
                       | Some (business_date_value, bytes) =>
-                          match decode_uint 8 bytes with
+                          match decode_uint_le 8 bytes with
                           | None => None
                           | Some (instrument_id_value, bytes) =>
                               match decode_bytes 2 bytes with
@@ -265,13 +265,13 @@ Module LmeSelectReferencePricesV418.
                                   match decode_bytes 3 bytes with
                                   | None => None
                                   | Some (currency_code_value, bytes) =>
-                                      match decode_uint 8 bytes with
+                                      match decode_uint_le 8 bytes with
                                       | None => None
                                       | Some (bid_value, bytes) =>
-                                          match decode_uint 8 bytes with
+                                          match decode_uint_le 8 bytes with
                                           | None => None
                                           | Some (price_value, bytes) =>
-                                              match decode_uint 8 bytes with
+                                              match decode_uint_le 8 bytes with
                                               | None => None
                                               | Some (ask_value, bytes) =>
                                                   Some ({| time_of_event := time_of_event_value; reference_price_category := reference_price_category_value; reference_price_type := reference_price_type_value; price_status := price_status_value; business_date := business_date_value; instrument_id := instrument_id_value; product_code := product_code_value; currency_code := currency_code_value; bid := bid_value; price := price_value; ask := ask_value |}, bytes)
@@ -290,7 +290,7 @@ Module LmeSelectReferencePricesV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 94.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -300,17 +300,17 @@ Module LmeSelectReferencePricesV418.
       destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 bound_10]]]]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
-      rewrite decode_encode_uint by exact bound_8.
-      rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
       destruct record. reflexivity.
     Qed.
 
@@ -345,11 +345,11 @@ Module LmeSelectReferencePricesV418.
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (fx_rate_category record) ++
       encode_bytes 2 (fx_rate_type record) ++
-      encode_uint 4 (business_date record) ++
-      encode_uint 4 (maturity_date record) ++
+      encode_uint_le 4 (business_date record) ++
+      encode_uint_le 4 (maturity_date record) ++
       encode_bytes 3 (base_currency_code record) ++
       encode_bytes 3 (target_currency_code record) ++
-      encode_uint 8 (conversion_rate record).
+      encode_uint_le 8 (conversion_rate record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -358,10 +358,10 @@ Module LmeSelectReferencePricesV418.
           match decode_bytes 2 bytes with
           | None => None
           | Some (fx_rate_type_value, bytes) =>
-              match decode_uint 4 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
               | Some (business_date_value, bytes) =>
-                  match decode_uint 4 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
                   | Some (maturity_date_value, bytes) =>
                       match decode_bytes 3 bytes with
@@ -370,7 +370,7 @@ Module LmeSelectReferencePricesV418.
                           match decode_bytes 3 bytes with
                           | None => None
                           | Some (target_currency_code_value, bytes) =>
-                              match decode_uint 8 bytes with
+                              match decode_uint_le 8 bytes with
                               | None => None
                               | Some (conversion_rate_value, bytes) =>
                                   Some ({| fx_rate_category := fx_rate_category_value; fx_rate_type := fx_rate_type_value; business_date := business_date_value; maturity_date := maturity_date_value; base_currency_code := base_currency_code_value; target_currency_code := target_currency_code_value; conversion_rate := conversion_rate_value |}, bytes)
@@ -385,7 +385,7 @@ Module LmeSelectReferencePricesV418.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -397,11 +397,11 @@ Module LmeSelectReferencePricesV418.
       rewrite <- !app_assoc.
       rewrite decode_encode_bytes by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
-      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_6.
       destruct record. reflexivity.
     Qed.
 
