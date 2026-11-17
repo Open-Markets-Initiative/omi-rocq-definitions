@@ -329,7 +329,7 @@ Module PseEquitiesBasicWithLastSaleV23.
     Record t := {
       timestamp : N;
       tick_size_table_id : N;
-      tick_size_integer_4 : N;
+      price_tick_size : N;
       price_start : N;
     }.
 
@@ -337,13 +337,13 @@ Module PseEquitiesBasicWithLastSaleV23.
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 4)%N /\
       (tick_size_table_id record < 256 ^ N.of_nat 4)%N /\
-      (tick_size_integer_4 record < 256 ^ N.of_nat 4)%N /\
+      (price_tick_size record < 256 ^ N.of_nat 4)%N /\
       (price_start record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (timestamp record) ++
       encode_uint 4 (tick_size_table_id record) ++
-      encode_uint 4 (tick_size_integer_4 record) ++
+      encode_uint 4 (price_tick_size record) ++
       encode_uint 4 (price_start record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -355,11 +355,11 @@ Module PseEquitiesBasicWithLastSaleV23.
           | Some (tick_size_table_id_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (tick_size_integer_4_value, bytes) =>
+              | Some (price_tick_size_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (price_start_value, bytes) =>
-                      Some ({| timestamp := timestamp_value; tick_size_table_id := tick_size_table_id_value; tick_size_integer_4 := tick_size_integer_4_value; price_start := price_start_value |}, bytes)
+                      Some ({| timestamp := timestamp_value; tick_size_table_id := tick_size_table_id_value; price_tick_size := price_tick_size_value; price_start := price_start_value |}, bytes)
                   end
               end
           end
@@ -396,7 +396,7 @@ Module PseEquitiesBasicWithLastSaleV23.
     Record t := {
       timestamp : N;
       tick_size_table_id : N;
-      tick_size_integer_8 : N;
+      quantity_tick_size : N;
       quantity_start : N;
     }.
 
@@ -404,13 +404,13 @@ Module PseEquitiesBasicWithLastSaleV23.
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 4)%N /\
       (tick_size_table_id record < 256 ^ N.of_nat 4)%N /\
-      (tick_size_integer_8 record < 256 ^ N.of_nat 8)%N /\
+      (quantity_tick_size record < 256 ^ N.of_nat 8)%N /\
       (quantity_start record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (timestamp record) ++
       encode_uint 4 (tick_size_table_id record) ++
-      encode_uint 8 (tick_size_integer_8 record) ++
+      encode_uint 8 (quantity_tick_size record) ++
       encode_uint 8 (quantity_start record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -422,11 +422,11 @@ Module PseEquitiesBasicWithLastSaleV23.
           | Some (tick_size_table_id_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (tick_size_integer_8_value, bytes) =>
+              | Some (quantity_tick_size_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (quantity_start_value, bytes) =>
-                      Some ({| timestamp := timestamp_value; tick_size_table_id := tick_size_table_id_value; tick_size_integer_8 := tick_size_integer_8_value; quantity_start := quantity_start_value |}, bytes)
+                      Some ({| timestamp := timestamp_value; tick_size_table_id := tick_size_table_id_value; quantity_tick_size := quantity_tick_size_value; quantity_start := quantity_start_value |}, bytes)
                   end
               end
           end

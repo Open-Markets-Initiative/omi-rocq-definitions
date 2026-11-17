@@ -405,7 +405,7 @@ Module BmvMarketDataProduct5V11.
     Record t := {
       instrument_number : N;
       trade_time : N;
-      volume_int_324 : N;
+      volume : N;
       price : N;
       concertation_type : list byte;
       trade_number : N;
@@ -422,7 +422,7 @@ Module BmvMarketDataProduct5V11.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (trade_time record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (concertation_type record) = 1 /\
       (trade_number record < 256 ^ N.of_nat 4)%N /\
@@ -437,7 +437,7 @@ Module BmvMarketDataProduct5V11.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (trade_time record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (concertation_type record) ++
       encode_uint 4 (trade_number record) ++
@@ -458,7 +458,7 @@ Module BmvMarketDataProduct5V11.
           | Some (trade_time_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
+              | Some (volume_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
@@ -489,7 +489,7 @@ Module BmvMarketDataProduct5V11.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (auction_indicator_value, bytes) =>
-                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume_int_324 := volume_int_324_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy := buy_value; sell := sell_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
+                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume := volume_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy := buy_value; sell := sell_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -544,19 +544,19 @@ Module BmvMarketDataProduct5V11.
     Record t := {
       instrument_number : N;
       probable_allocation_price : N;
-      volume_int_324 : N;
+      volume : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (probable_allocation_price record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N.
+      (volume record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (probable_allocation_price record) ++
-      encode_uint 4 (volume_int_324 record).
+      encode_uint 4 (volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -567,8 +567,8 @@ Module BmvMarketDataProduct5V11.
           | Some (probable_allocation_price_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
-                  Some ({| instrument_number := instrument_number_value; probable_allocation_price := probable_allocation_price_value; volume_int_324 := volume_int_324_value |}, bytes)
+              | Some (volume_value, bytes) =>
+                  Some ({| instrument_number := instrument_number_value; probable_allocation_price := probable_allocation_price_value; volume := volume_value |}, bytes)
               end
           end
       end.
@@ -942,7 +942,7 @@ Module BmvMarketDataProduct5V11.
     (** Message sent by instrument when best offer changes in the electronic book. *)
     Record t := {
       instrument_number : N;
-      volume_int_324 : N;
+      volume : N;
       price_rate : N;
       offer_direction : list byte;
       operation_type : list byte;
@@ -951,14 +951,14 @@ Module BmvMarketDataProduct5V11.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price_rate record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (offer_direction record) = 1 /\
       Datatypes.length (operation_type record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price_rate record) ++
       encode_bytes 1 (offer_direction record) ++
       encode_bytes 1 (operation_type record).
@@ -969,7 +969,7 @@ Module BmvMarketDataProduct5V11.
       | Some (instrument_number_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (volume_int_324_value, bytes) =>
+          | Some (volume_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
               | Some (price_rate_value, bytes) =>
@@ -979,7 +979,7 @@ Module BmvMarketDataProduct5V11.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (operation_type_value, bytes) =>
-                          Some ({| instrument_number := instrument_number_value; volume_int_324 := volume_int_324_value; price_rate := price_rate_value; offer_direction := offer_direction_value; operation_type := operation_type_value |}, bytes)
+                          Some ({| instrument_number := instrument_number_value; volume := volume_value; price_rate := price_rate_value; offer_direction := offer_direction_value; operation_type := operation_type_value |}, bytes)
                       end
                   end
               end

@@ -137,21 +137,21 @@ Module CoinbaseDerivativesOrdersApiV16.
 
     (** LogoutMessage *)
     Record t := {
-      reason : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_value, bytes) =>
-          Some ({| reason := reason_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
@@ -178,21 +178,21 @@ Module CoinbaseDerivativesOrdersApiV16.
 
     (** LoggedOutMessage *)
     Record t := {
-      reason : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_value, bytes) =>
-          Some ({| reason := reason_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
@@ -673,6 +673,105 @@ Module CoinbaseDerivativesOrdersApiV16.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End SetAckMessage.
+
+  Module NewOrderMessage.
+
+    (** NewOrderMessage *)
+    Record t := {
+      client_order_id : N;
+      correlation_id : N;
+      limit_price : N;
+      quantity : N;
+      instrument_id : N;
+      side : N;
+      new_order_padding : N;
+      good_til_date : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (client_order_id record < 256 ^ N.of_nat 8)%N /\
+      (correlation_id record < 256 ^ N.of_nat 8)%N /\
+      (limit_price record < 256 ^ N.of_nat 8)%N /\
+      (quantity record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
+      (side record < 256 ^ N.of_nat 1)%N /\
+      (new_order_padding record < 256 ^ N.of_nat 1)%N /\
+      (good_til_date record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint_le 8 (client_order_id record) ++
+      encode_uint_le 8 (correlation_id record) ++
+      encode_uint_le 8 (limit_price record) ++
+      encode_uint_le 4 (quantity record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_uint 1 (side record) ++
+      encode_uint 1 (new_order_padding record) ++
+      encode_uint_le 2 (good_til_date record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint_le 8 bytes with
+      | None => None
+      | Some (client_order_id_value, bytes) =>
+          match decode_uint_le 8 bytes with
+          | None => None
+          | Some (correlation_id_value, bytes) =>
+              match decode_uint_le 8 bytes with
+              | None => None
+              | Some (limit_price_value, bytes) =>
+                  match decode_uint_le 4 bytes with
+                  | None => None
+                  | Some (quantity_value, bytes) =>
+                      match decode_uint_le 4 bytes with
+                      | None => None
+                      | Some (instrument_id_value, bytes) =>
+                          match decode_uint 1 bytes with
+                          | None => None
+                          | Some (side_value, bytes) =>
+                              match decode_uint 1 bytes with
+                              | None => None
+                              | Some (new_order_padding_value, bytes) =>
+                                  match decode_uint_le 2 bytes with
+                                  | None => None
+                                  | Some (good_til_date_value, bytes) =>
+                                      Some ({| client_order_id := client_order_id_value; correlation_id := correlation_id_value; limit_price := limit_price_value; quantity := quantity_value; instrument_id := instrument_id_value; side := side_value; new_order_padding := new_order_padding_value; good_til_date := good_til_date_value |}, bytes)
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End NewOrderMessage.
 
   Module NewIocOrderMessage.
 
@@ -2373,19 +2472,19 @@ Module CoinbaseDerivativesOrdersApiV16.
     Record t := {
       correlation_id : N;
       resend_reject_reason : N;
-      details_string_55 : list byte;
+      event_resend_reject_details : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
       (resend_reject_reason record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (details_string_55 record) = 55.
+      Datatypes.length (event_resend_reject_details record) = 55.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (correlation_id record) ++
       encode_uint 1 (resend_reject_reason record) ++
-      encode_bytes 55 (details_string_55 record).
+      encode_bytes 55 (event_resend_reject_details record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -2396,8 +2495,8 @@ Module CoinbaseDerivativesOrdersApiV16.
           | Some (resend_reject_reason_value, bytes) =>
               match decode_bytes 55 bytes with
               | None => None
-              | Some (details_string_55_value, bytes) =>
-                  Some ({| correlation_id := correlation_id_value; resend_reject_reason := resend_reject_reason_value; details_string_55 := details_string_55_value |}, bytes)
+              | Some (event_resend_reject_details_value, bytes) =>
+                  Some ({| correlation_id := correlation_id_value; resend_reject_reason := resend_reject_reason_value; event_resend_reject_details := event_resend_reject_details_value |}, bytes)
               end
           end
       end.

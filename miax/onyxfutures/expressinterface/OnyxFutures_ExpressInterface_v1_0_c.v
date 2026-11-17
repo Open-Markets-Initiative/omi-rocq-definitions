@@ -87,38 +87,38 @@ Module OnyxFuturesExpressInterfaceV10C.
 
     (** An acknowledgement for a New Order Request accepted by MIAX Futures Onyx *)
     Record t := {
-      matching_engine : N;
+      matching_engine_time : N;
       mp_id : list byte;
       client_order_id : list byte;
-      instrument_id_binary_u_4 : N;
+      instrument_id : N;
       order_id : N;
-      status : list byte;
+      order_status : list byte;
       reserved_10 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (matching_engine record < 256 ^ N.of_nat 8)%N /\
+      (matching_engine_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (mp_id record) = 5 /\
       Datatypes.length (client_order_id record) = 20 /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      Datatypes.length (status record) = 1 /\
+      Datatypes.length (order_status record) = 1 /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
-      encode_uint_le 8 (matching_engine record) ++
+      encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint_le 8 (order_id record) ++
-      encode_bytes 1 (status record) ++
+      encode_bytes 1 (order_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
       | None => None
-      | Some (matching_engine_value, bytes) =>
+      | Some (matching_engine_time_value, bytes) =>
           match decode_bytes 5 bytes with
           | None => None
           | Some (mp_id_value, bytes) =>
@@ -127,17 +127,17 @@ Module OnyxFuturesExpressInterfaceV10C.
               | Some (client_order_id_value, bytes) =>
                   match decode_uint_le 4 bytes with
                   | None => None
-                  | Some (instrument_id_binary_u_4_value, bytes) =>
+                  | Some (instrument_id_value, bytes) =>
                       match decode_uint_le 8 bytes with
                       | None => None
                       | Some (order_id_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
-                          | Some (status_value, bytes) =>
+                          | Some (order_status_value, bytes) =>
                               match decode_bytes 10 bytes with
                               | None => None
                               | Some (reserved_10_value, bytes) =>
-                                  Some ({| matching_engine := matching_engine_value; mp_id := mp_id_value; client_order_id := client_order_id_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; status := status_value; reserved_10 := reserved_10_value |}, bytes)
+                                  Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; instrument_id := instrument_id_value; order_id := order_id_value; order_status := order_status_value; reserved_10 := reserved_10_value |}, bytes)
                               end
                           end
                       end
@@ -182,10 +182,10 @@ Module OnyxFuturesExpressInterfaceV10C.
       mp_id : list byte;
       client_order_id : list byte;
       original_client_order_id : list byte;
-      instrument_id_binary_u_4 : N;
+      instrument_id : N;
       order_id : N;
       leaves_qty : N;
-      status : list byte;
+      modify_status : list byte;
       reserved_10 : list byte;
     }.
 
@@ -195,10 +195,10 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (mp_id record) = 5 /\
       Datatypes.length (client_order_id record) = 20 /\
       Datatypes.length (original_client_order_id record) = 20 /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (status record) = 1 /\
+      Datatypes.length (modify_status record) = 1 /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
@@ -206,10 +206,10 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_uint_le 4 (leaves_qty record) ++
-      encode_bytes 1 (status record) ++
+      encode_bytes 1 (modify_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -227,7 +227,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                   | Some (original_client_order_id_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (instrument_id_binary_u_4_value, bytes) =>
+                      | Some (instrument_id_value, bytes) =>
                           match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
@@ -236,11 +236,11 @@ Module OnyxFuturesExpressInterfaceV10C.
                               | Some (leaves_qty_value, bytes) =>
                                   match decode_bytes 1 bytes with
                                   | None => None
-                                  | Some (status_value, bytes) =>
+                                  | Some (modify_status_value, bytes) =>
                                       match decode_bytes 10 bytes with
                                       | None => None
                                       | Some (reserved_10_value, bytes) =>
-                                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; original_client_order_id := original_client_order_id_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; leaves_qty := leaves_qty_value; status := status_value; reserved_10 := reserved_10_value |}, bytes)
+                                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; original_client_order_id := original_client_order_id_value; instrument_id := instrument_id_value; order_id := order_id_value; leaves_qty := leaves_qty_value; modify_status := modify_status_value; reserved_10 := reserved_10_value |}, bytes)
                                       end
                                   end
                               end
@@ -288,10 +288,11 @@ Module OnyxFuturesExpressInterfaceV10C.
       matching_engine_time : N;
       mp_id : list byte;
       client_order_id : list byte;
-      original_client_order : list byte;
-      instrument_id_binary_u_4 : N;
+      original_client_order_id : list byte;
+      instrument_id : N;
       order_id : N;
-      status : list byte;
+      cancel_status : list byte;
+      reserved_10 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -299,19 +300,21 @@ Module OnyxFuturesExpressInterfaceV10C.
       (matching_engine_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (mp_id record) = 5 /\
       Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (original_client_order record) = 20 /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (original_client_order_id record) = 20 /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      Datatypes.length (status record) = 1.
+      Datatypes.length (cancel_status record) = 1 /\
+      Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_bytes 20 (original_client_order record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_bytes 20 (original_client_order_id record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint_le 8 (order_id record) ++
-      encode_bytes 1 (status record).
+      encode_bytes 1 (cancel_status record) ++
+      encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -325,17 +328,21 @@ Module OnyxFuturesExpressInterfaceV10C.
               | Some (client_order_id_value, bytes) =>
                   match decode_bytes 20 bytes with
                   | None => None
-                  | Some (original_client_order_value, bytes) =>
+                  | Some (original_client_order_id_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (instrument_id_binary_u_4_value, bytes) =>
+                      | Some (instrument_id_value, bytes) =>
                           match decode_uint_le 8 bytes with
                           | None => None
                           | Some (order_id_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
-                              | Some (status_value, bytes) =>
-                                  Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; original_client_order := original_client_order_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; status := status_value |}, bytes)
+                              | Some (cancel_status_value, bytes) =>
+                                  match decode_bytes 10 bytes with
+                                  | None => None
+                                  | Some (reserved_10_value, bytes) =>
+                                      Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; original_client_order_id := original_client_order_id_value; instrument_id := instrument_id_value; order_id := order_id_value; cancel_status := cancel_status_value; reserved_10 := reserved_10_value |}, bytes)
+                                  end
                               end
                           end
                       end
@@ -344,7 +351,7 @@ Module OnyxFuturesExpressInterfaceV10C.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 66.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -354,7 +361,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint_le by exact bound_0.
@@ -364,6 +371,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
       destruct record. reflexivity.
     Qed.
 
@@ -379,7 +387,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       matching_engine_time : N;
       mp_id : list byte;
       client_order_id : list byte;
-      status : list byte;
+      mass_cancel_status : list byte;
       reserved_10 : list byte;
     }.
 
@@ -388,14 +396,14 @@ Module OnyxFuturesExpressInterfaceV10C.
       (matching_engine_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (mp_id record) = 5 /\
       Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (status record) = 1 /\
+      Datatypes.length (mass_cancel_status record) = 1 /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_bytes 1 (status record) ++
+      encode_bytes 1 (mass_cancel_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -410,11 +418,11 @@ Module OnyxFuturesExpressInterfaceV10C.
               | Some (client_order_id_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
-                  | Some (status_value, bytes) =>
+                  | Some (mass_cancel_status_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (reserved_10_value, bytes) =>
-                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; status := status_value; reserved_10 := reserved_10_value |}, bytes)
+                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; mass_cancel_status := mass_cancel_status_value; reserved_10 := reserved_10_value |}, bytes)
                       end
                   end
               end
@@ -454,8 +462,8 @@ Module OnyxFuturesExpressInterfaceV10C.
       matching_engine_time : N;
       mp_id : list byte;
       client_order_id : list byte;
-      instrument_id_string_20 : list byte;
-      status : list byte;
+      instrument_id : N;
+      strategy_creation_status : list byte;
       reserved_16 : list byte;
     }.
 
@@ -464,16 +472,16 @@ Module OnyxFuturesExpressInterfaceV10C.
       (matching_engine_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (mp_id record) = 5 /\
       Datatypes.length (client_order_id record) = 20 /\
-      Datatypes.length (instrument_id_string_20 record) = 20 /\
-      Datatypes.length (status record) = 1 /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (strategy_creation_status record) = 1 /\
       Datatypes.length (reserved_16 record) = 16.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
       encode_bytes 5 (mp_id record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_bytes 20 (instrument_id_string_20 record) ++
-      encode_bytes 1 (status record) ++
+      encode_uint_le 4 (instrument_id record) ++
+      encode_bytes 1 (strategy_creation_status record) ++
       encode_bytes 16 (reserved_16 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -486,16 +494,16 @@ Module OnyxFuturesExpressInterfaceV10C.
               match decode_bytes 20 bytes with
               | None => None
               | Some (client_order_id_value, bytes) =>
-                  match decode_bytes 20 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
-                  | Some (instrument_id_string_20_value, bytes) =>
+                  | Some (instrument_id_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
-                      | Some (status_value, bytes) =>
+                      | Some (strategy_creation_status_value, bytes) =>
                           match decode_bytes 16 bytes with
                           | None => None
                           | Some (reserved_16_value, bytes) =>
-                              Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; instrument_id_string_20 := instrument_id_string_20_value; status := status_value; reserved_16 := reserved_16_value |}, bytes)
+                              Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; client_order_id := client_order_id_value; instrument_id := instrument_id_value; strategy_creation_status := strategy_creation_status_value; reserved_16 := reserved_16_value |}, bytes)
                           end
                       end
                   end
@@ -503,7 +511,7 @@ Module OnyxFuturesExpressInterfaceV10C.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 70.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 54.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -519,7 +527,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_bytes by exact bound_2.
-      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
       rewrite decode_encode_bytes by exact bound_5.
       destruct record. reflexivity.
@@ -614,7 +622,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       operator_id : list byte;
       operator_location : list byte;
       client_order_id : list byte;
-      instrument_id_binary_u_4 : N;
+      instrument_id : N;
       order_id : N;
       client_send_time : N;
       leaves_qty : N;
@@ -631,7 +639,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       Datatypes.length (operator_id record) = 18 /\
       Datatypes.length (operator_location record) = 6 /\
       Datatypes.length (client_order_id record) = 20 /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (client_send_time record < 256 ^ N.of_nat 8)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
@@ -646,7 +654,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_bytes 18 (operator_id record) ++
       encode_bytes 6 (operator_location record) ++
       encode_bytes 20 (client_order_id record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_uint_le 8 (client_send_time record) ++
       encode_uint_le 4 (leaves_qty record) ++
@@ -673,7 +681,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                       | Some (client_order_id_value, bytes) =>
                           match decode_uint_le 4 bytes with
                           | None => None
-                          | Some (instrument_id_binary_u_4_value, bytes) =>
+                          | Some (instrument_id_value, bytes) =>
                               match decode_uint_le 8 bytes with
                               | None => None
                               | Some (order_id_value, bytes) =>
@@ -695,7 +703,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                                                       match decode_bytes 8 bytes with
                                                       | None => None
                                                       | Some (reserved_8_value, bytes) =>
-                                                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; operator_id := operator_id_value; operator_location := operator_location_value; client_order_id := client_order_id_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; client_send_time := client_send_time_value; leaves_qty := leaves_qty_value; cancel_reason := cancel_reason_value; last_price := last_price_value; last_size := last_size_value; reserved_8 := reserved_8_value |}, bytes)
+                                                          Some ({| matching_engine_time := matching_engine_time_value; mp_id := mp_id_value; operator_id := operator_id_value; operator_location := operator_location_value; client_order_id := client_order_id_value; instrument_id := instrument_id_value; order_id := order_id_value; client_send_time := client_send_time_value; leaves_qty := leaves_qty_value; cancel_reason := cancel_reason_value; last_price := last_price_value; last_size := last_size_value; reserved_8 := reserved_8_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -749,7 +757,7 @@ Module OnyxFuturesExpressInterfaceV10C.
     (** used to notify the firms about order status updates *)
     Record t := {
       matching_engine_time : N;
-      instrument_id_binary_u_4 : N;
+      instrument_id : N;
       order_id : N;
       update_status : list byte;
       reserved_32 : list byte;
@@ -758,14 +766,14 @@ Module OnyxFuturesExpressInterfaceV10C.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (matching_engine_time record < 256 ^ N.of_nat 8)%N /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (update_status record) = 1 /\
       Datatypes.length (reserved_32 record) = 32.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (update_status record) ++
       encode_bytes 32 (reserved_32 record).
@@ -776,7 +784,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       | Some (matching_engine_time_value, bytes) =>
           match decode_uint_le 4 bytes with
           | None => None
-          | Some (instrument_id_binary_u_4_value, bytes) =>
+          | Some (instrument_id_value, bytes) =>
               match decode_uint_le 8 bytes with
               | None => None
               | Some (order_id_value, bytes) =>
@@ -786,7 +794,7 @@ Module OnyxFuturesExpressInterfaceV10C.
                       match decode_bytes 32 bytes with
                       | None => None
                       | Some (reserved_32_value, bytes) =>
-                          Some ({| matching_engine_time := matching_engine_time_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; order_id := order_id_value; update_status := update_status_value; reserved_32 := reserved_32_value |}, bytes)
+                          Some ({| matching_engine_time := matching_engine_time_value; instrument_id := instrument_id_value; order_id := order_id_value; update_status := update_status_value; reserved_32 := reserved_32_value |}, bytes)
                       end
                   end
               end
@@ -830,7 +838,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       order_id : N;
       client_order_id : list byte;
       original_client_order_id : list byte;
-      instrument_id_binary_u_4 : N;
+      instrument_id : N;
       reserved_10 : list byte;
     }.
 
@@ -843,7 +851,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (client_order_id record) = 20 /\
       Datatypes.length (original_client_order_id record) = 20 /\
-      (instrument_id_binary_u_4 record < 256 ^ N.of_nat 4)%N /\
+      (instrument_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
@@ -854,7 +862,7 @@ Module OnyxFuturesExpressInterfaceV10C.
       encode_uint_le 8 (order_id record) ++
       encode_bytes 20 (client_order_id record) ++
       encode_bytes 20 (original_client_order_id record) ++
-      encode_uint_le 4 (instrument_id_binary_u_4 record) ++
+      encode_uint_le 4 (instrument_id record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -881,11 +889,11 @@ Module OnyxFuturesExpressInterfaceV10C.
                               | Some (original_client_order_id_value, bytes) =>
                                   match decode_uint_le 4 bytes with
                                   | None => None
-                                  | Some (instrument_id_binary_u_4_value, bytes) =>
+                                  | Some (instrument_id_value, bytes) =>
                                       match decode_bytes 10 bytes with
                                       | None => None
                                       | Some (reserved_10_value, bytes) =>
-                                          Some ({| client_send_time := client_send_time_value; mp_id := mp_id_value; operator_id := operator_id_value; operator_location := operator_location_value; order_id := order_id_value; client_order_id := client_order_id_value; original_client_order_id := original_client_order_id_value; instrument_id_binary_u_4 := instrument_id_binary_u_4_value; reserved_10 := reserved_10_value |}, bytes)
+                                          Some ({| client_send_time := client_send_time_value; mp_id := mp_id_value; operator_id := operator_id_value; operator_location := operator_location_value; order_id := order_id_value; client_order_id := client_order_id_value; original_client_order_id := original_client_order_id_value; instrument_id := instrument_id_value; reserved_10 := reserved_10_value |}, bytes)
                                       end
                                   end
                               end
@@ -1201,7 +1209,7 @@ Module OnyxFuturesExpressInterfaceV10C.
 
   Module RetransmissionRequest.
 
-    (** The SesM server sends a Login response packet in response a Login request packet from the client *)
+    (** The SesM client uses this packet to request the server to retransmit a range of packets *)
     Record t := {
       start_sequence_number : N;
       end_sequence_number : N;

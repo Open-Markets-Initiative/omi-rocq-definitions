@@ -632,15 +632,15 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       trade_time : N;
-      volume_int_324 : N;
+      volume : N;
       price : N;
       concertation_type : list byte;
       trade_number : N;
       price_setter : list byte;
       operation_type : list byte;
       amount : N;
-      buy_alpha_5 : list byte;
-      sell_alpha_5 : list byte;
+      buy_broker : list byte;
+      sell_broker : list byte;
       settlement : list byte;
       auction_indicator : list byte;
     }.
@@ -649,30 +649,30 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (trade_time record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (concertation_type record) = 1 /\
       (trade_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (price_setter record) = 1 /\
       Datatypes.length (operation_type record) = 1 /\
       (amount record < 256 ^ N.of_nat 8)%N /\
-      Datatypes.length (buy_alpha_5 record) = 5 /\
-      Datatypes.length (sell_alpha_5 record) = 5 /\
+      Datatypes.length (buy_broker record) = 5 /\
+      Datatypes.length (sell_broker record) = 5 /\
       Datatypes.length (settlement record) = 1 /\
       Datatypes.length (auction_indicator record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (trade_time record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (concertation_type record) ++
       encode_uint 4 (trade_number record) ++
       encode_bytes 1 (price_setter record) ++
       encode_bytes 1 (operation_type record) ++
       encode_uint 8 (amount record) ++
-      encode_bytes 5 (buy_alpha_5 record) ++
-      encode_bytes 5 (sell_alpha_5 record) ++
+      encode_bytes 5 (buy_broker record) ++
+      encode_bytes 5 (sell_broker record) ++
       encode_bytes 1 (settlement record) ++
       encode_bytes 1 (auction_indicator record).
 
@@ -685,7 +685,7 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (trade_time_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
+              | Some (volume_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
@@ -706,17 +706,17 @@ Module BmvMarketDataSnapshotV11Tcp.
                                       | Some (amount_value, bytes) =>
                                           match decode_bytes 5 bytes with
                                           | None => None
-                                          | Some (buy_alpha_5_value, bytes) =>
+                                          | Some (buy_broker_value, bytes) =>
                                               match decode_bytes 5 bytes with
                                               | None => None
-                                              | Some (sell_alpha_5_value, bytes) =>
+                                              | Some (sell_broker_value, bytes) =>
                                                   match decode_bytes 1 bytes with
                                                   | None => None
                                                   | Some (settlement_value, bytes) =>
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (auction_indicator_value, bytes) =>
-                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume_int_324 := volume_int_324_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy_alpha_5 := buy_alpha_5_value; sell_alpha_5 := sell_alpha_5_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
+                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume := volume_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy_broker := buy_broker_value; sell_broker := sell_broker_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -771,19 +771,19 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       probable_allocation_price : N;
-      volume_int_324 : N;
+      volume : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (probable_allocation_price record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N.
+      (volume record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (probable_allocation_price record) ++
-      encode_uint 4 (volume_int_324 record).
+      encode_uint 4 (volume record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -794,8 +794,8 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (probable_allocation_price_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
-                  Some ({| instrument_number := instrument_number_value; probable_allocation_price := probable_allocation_price_value; volume_int_324 := volume_int_324_value |}, bytes)
+              | Some (volume_value, bytes) =>
+                  Some ({| instrument_number := instrument_number_value; probable_allocation_price := probable_allocation_price_value; volume := volume_value |}, bytes)
               end
           end
       end.
@@ -1170,7 +1170,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       number_of_operations : N;
-      volume_int_648 : N;
+      volume_long : N;
       amount : N;
       opening_price : N;
       maximum : N;
@@ -1183,7 +1183,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (number_of_operations record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (amount record < 256 ^ N.of_nat 8)%N /\
       (opening_price record < 256 ^ N.of_nat 8)%N /\
       (maximum record < 256 ^ N.of_nat 8)%N /\
@@ -1194,7 +1194,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 4 (number_of_operations record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (amount record) ++
       encode_uint 8 (opening_price record) ++
       encode_uint 8 (maximum record) ++
@@ -1211,7 +1211,7 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (number_of_operations_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (volume_int_648_value, bytes) =>
+              | Some (volume_long_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (amount_value, bytes) =>
@@ -1230,7 +1230,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                       match decode_uint 8 bytes with
                                       | None => None
                                       | Some (last_value, bytes) =>
-                                          Some ({| instrument_number := instrument_number_value; number_of_operations := number_of_operations_value; volume_int_648 := volume_int_648_value; amount := amount_value; opening_price := opening_price_value; maximum := maximum_value; minimum := minimum_value; average := average_value; last := last_value |}, bytes)
+                                          Some ({| instrument_number := instrument_number_value; number_of_operations := number_of_operations_value; volume_long := volume_long_value; amount := amount_value; opening_price := opening_price_value; maximum := maximum_value; minimum := minimum_value; average := average_value; last := last_value |}, bytes)
                                       end
                                   end
                               end
@@ -1279,10 +1279,10 @@ Module BmvMarketDataSnapshotV11Tcp.
       virtual_trades_status : list byte;
       operation_type : list byte;
       number : N;
-      volume_int_324 : N;
+      volume : N;
       concertation : list byte;
-      buy_alpha_5 : list byte;
-      sell_alpha_5 : list byte;
+      buy_broker : list byte;
+      sell_broker : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1291,20 +1291,20 @@ Module BmvMarketDataSnapshotV11Tcp.
       Datatypes.length (virtual_trades_status record) = 1 /\
       Datatypes.length (operation_type record) = 1 /\
       (number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (concertation record) = 1 /\
-      Datatypes.length (buy_alpha_5 record) = 5 /\
-      Datatypes.length (sell_alpha_5 record) = 5.
+      Datatypes.length (buy_broker record) = 5 /\
+      Datatypes.length (sell_broker record) = 5.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_bytes 1 (virtual_trades_status record) ++
       encode_bytes 1 (operation_type record) ++
       encode_uint 4 (number record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_bytes 1 (concertation record) ++
-      encode_bytes 5 (buy_alpha_5 record) ++
-      encode_bytes 5 (sell_alpha_5 record).
+      encode_bytes 5 (buy_broker record) ++
+      encode_bytes 5 (sell_broker record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1321,17 +1321,17 @@ Module BmvMarketDataSnapshotV11Tcp.
                   | Some (number_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
-                      | Some (volume_int_324_value, bytes) =>
+                      | Some (volume_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (concertation_value, bytes) =>
                               match decode_bytes 5 bytes with
                               | None => None
-                              | Some (buy_alpha_5_value, bytes) =>
+                              | Some (buy_broker_value, bytes) =>
                                   match decode_bytes 5 bytes with
                                   | None => None
-                                  | Some (sell_alpha_5_value, bytes) =>
-                                      Some ({| instrument_number := instrument_number_value; virtual_trades_status := virtual_trades_status_value; operation_type := operation_type_value; number := number_value; volume_int_324 := volume_int_324_value; concertation := concertation_value; buy_alpha_5 := buy_alpha_5_value; sell_alpha_5 := sell_alpha_5_value |}, bytes)
+                                  | Some (sell_broker_value, bytes) =>
+                                      Some ({| instrument_number := instrument_number_value; virtual_trades_status := virtual_trades_status_value; operation_type := operation_type_value; number := number_value; volume := volume_value; concertation := concertation_value; buy_broker := buy_broker_value; sell_broker := sell_broker_value |}, bytes)
                                   end
                               end
                           end
@@ -1378,7 +1378,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       date_and_time : N;
       number : N;
       direction : list byte;
-      volume_int_324 : N;
+      volume : N;
       price : N;
       participant : list byte;
     }.
@@ -1389,7 +1389,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (date_and_time record < 256 ^ N.of_nat 8)%N /\
       (number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (direction record) = 1 /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (participant record) = 5.
 
@@ -1398,7 +1398,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 8 (date_and_time record) ++
       encode_uint 4 (number record) ++
       encode_bytes 1 (direction record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price record) ++
       encode_bytes 5 (participant record).
 
@@ -1417,14 +1417,14 @@ Module BmvMarketDataSnapshotV11Tcp.
                   | Some (direction_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
-                      | Some (volume_int_324_value, bytes) =>
+                      | Some (volume_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
                               match decode_bytes 5 bytes with
                               | None => None
                               | Some (participant_value, bytes) =>
-                                  Some ({| instrument_number := instrument_number_value; date_and_time := date_and_time_value; number := number_value; direction := direction_value; volume_int_324 := volume_int_324_value; price := price_value; participant := participant_value |}, bytes)
+                                  Some ({| instrument_number := instrument_number_value; date_and_time := date_and_time_value; number := number_value; direction := direction_value; volume := volume_value; price := price_value; participant := participant_value |}, bytes)
                               end
                           end
                       end
@@ -1468,7 +1468,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       instrument_number : N;
       date : N;
       number : N;
-      volume_int_324 : N;
+      volume : N;
       trade_number : N;
       execution_price : N;
     }.
@@ -1478,7 +1478,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (date record < 256 ^ N.of_nat 8)%N /\
       (number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (trade_number record < 256 ^ N.of_nat 4)%N /\
       (execution_price record < 256 ^ N.of_nat 8)%N.
 
@@ -1486,7 +1486,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (date record) ++
       encode_uint 4 (number record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 4 (trade_number record) ++
       encode_uint 8 (execution_price record).
 
@@ -1502,14 +1502,14 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (number_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (volume_int_324_value, bytes) =>
+                  | Some (volume_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (trade_number_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (execution_price_value, bytes) =>
-                              Some ({| instrument_number := instrument_number_value; date := date_value; number := number_value; volume_int_324 := volume_int_324_value; trade_number := trade_number_value; execution_price := execution_price_value |}, bytes)
+                              Some ({| instrument_number := instrument_number_value; date := date_value; number := number_value; volume := volume_value; trade_number := trade_number_value; execution_price := execution_price_value |}, bytes)
                           end
                       end
                   end
@@ -1613,7 +1613,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       new_date : N;
       new_number : N;
       direction : list byte;
-      volume_int_324 : N;
+      volume : N;
       price : N;
     }.
 
@@ -1625,7 +1625,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (new_date record < 256 ^ N.of_nat 8)%N /\
       (new_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (direction record) = 1 /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
@@ -1635,7 +1635,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 8 (new_date record) ++
       encode_uint 4 (new_number record) ++
       encode_bytes 1 (direction record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1659,11 +1659,11 @@ Module BmvMarketDataSnapshotV11Tcp.
                           | Some (direction_value, bytes) =>
                               match decode_uint 4 bytes with
                               | None => None
-                              | Some (volume_int_324_value, bytes) =>
+                              | Some (volume_value, bytes) =>
                                   match decode_uint 8 bytes with
                                   | None => None
                                   | Some (price_value, bytes) =>
-                                      Some ({| instrument_number := instrument_number_value; original_date := original_date_value; original_number := original_number_value; new_date := new_date_value; new_number := new_number_value; direction := direction_value; volume_int_324 := volume_int_324_value; price := price_value |}, bytes)
+                                      Some ({| instrument_number := instrument_number_value; original_date := original_date_value; original_number := original_number_value; new_date := new_date_value; new_number := new_number_value; direction := direction_value; volume := volume_value; price := price_value |}, bytes)
                                   end
                               end
                           end
@@ -1707,7 +1707,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     (** Message sent by instrument when best offer changes in the electronic book. *)
     Record t := {
       instrument_number : N;
-      volume_int_324 : N;
+      volume : N;
       price_rate : N;
       offer_direction : list byte;
       operation_type : list byte;
@@ -1716,14 +1716,14 @@ Module BmvMarketDataSnapshotV11Tcp.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price_rate record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (offer_direction record) = 1 /\
       Datatypes.length (operation_type record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price_rate record) ++
       encode_bytes 1 (offer_direction record) ++
       encode_bytes 1 (operation_type record).
@@ -1734,7 +1734,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       | Some (instrument_number_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (volume_int_324_value, bytes) =>
+          | Some (volume_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
               | Some (price_rate_value, bytes) =>
@@ -1744,7 +1744,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (operation_type_value, bytes) =>
-                          Some ({| instrument_number := instrument_number_value; volume_int_324 := volume_int_324_value; price_rate := price_rate_value; offer_direction := offer_direction_value; operation_type := operation_type_value |}, bytes)
+                          Some ({| instrument_number := instrument_number_value; volume := volume_value; price_rate := price_rate_value; offer_direction := offer_direction_value; operation_type := operation_type_value |}, bytes)
                       end
                   end
               end
@@ -1783,14 +1783,14 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       number : N;
-      volume_int_648 : N;
+      volume_long : N;
       discount_rate_or_price : N;
       rate_of_return : N;
       term_days : N;
       currency_type : list byte;
       settlement : list byte;
-      buy_alpha_5 : list byte;
-      sell_alpha_5 : list byte;
+      buy_broker : list byte;
+      sell_broker : list byte;
       placement_date : N;
       issue_date : N;
       maturity_date : N;
@@ -1800,14 +1800,14 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (discount_rate_or_price record < 256 ^ N.of_nat 8)%N /\
       (rate_of_return record < 256 ^ N.of_nat 4)%N /\
       (term_days record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (currency_type record) = 1 /\
       Datatypes.length (settlement record) = 1 /\
-      Datatypes.length (buy_alpha_5 record) = 5 /\
-      Datatypes.length (sell_alpha_5 record) = 5 /\
+      Datatypes.length (buy_broker record) = 5 /\
+      Datatypes.length (sell_broker record) = 5 /\
       (placement_date record < 256 ^ N.of_nat 8)%N /\
       (issue_date record < 256 ^ N.of_nat 8)%N /\
       (maturity_date record < 256 ^ N.of_nat 8)%N.
@@ -1815,14 +1815,14 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 4 (number record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (discount_rate_or_price record) ++
       encode_uint 4 (rate_of_return record) ++
       encode_uint 2 (term_days record) ++
       encode_bytes 1 (currency_type record) ++
       encode_bytes 1 (settlement record) ++
-      encode_bytes 5 (buy_alpha_5 record) ++
-      encode_bytes 5 (sell_alpha_5 record) ++
+      encode_bytes 5 (buy_broker record) ++
+      encode_bytes 5 (sell_broker record) ++
       encode_uint 8 (placement_date record) ++
       encode_uint 8 (issue_date record) ++
       encode_uint 8 (maturity_date record).
@@ -1836,7 +1836,7 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (number_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (volume_int_648_value, bytes) =>
+              | Some (volume_long_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (discount_rate_or_price_value, bytes) =>
@@ -1854,10 +1854,10 @@ Module BmvMarketDataSnapshotV11Tcp.
                                   | Some (settlement_value, bytes) =>
                                       match decode_bytes 5 bytes with
                                       | None => None
-                                      | Some (buy_alpha_5_value, bytes) =>
+                                      | Some (buy_broker_value, bytes) =>
                                           match decode_bytes 5 bytes with
                                           | None => None
-                                          | Some (sell_alpha_5_value, bytes) =>
+                                          | Some (sell_broker_value, bytes) =>
                                               match decode_uint 8 bytes with
                                               | None => None
                                               | Some (placement_date_value, bytes) =>
@@ -1867,7 +1867,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                                       match decode_uint 8 bytes with
                                                       | None => None
                                                       | Some (maturity_date_value, bytes) =>
-                                                          Some ({| instrument_number := instrument_number_value; number := number_value; volume_int_648 := volume_int_648_value; discount_rate_or_price := discount_rate_or_price_value; rate_of_return := rate_of_return_value; term_days := term_days_value; currency_type := currency_type_value; settlement := settlement_value; buy_alpha_5 := buy_alpha_5_value; sell_alpha_5 := sell_alpha_5_value; placement_date := placement_date_value; issue_date := issue_date_value; maturity_date := maturity_date_value |}, bytes)
+                                                          Some ({| instrument_number := instrument_number_value; number := number_value; volume_long := volume_long_value; discount_rate_or_price := discount_rate_or_price_value; rate_of_return := rate_of_return_value; term_days := term_days_value; currency_type := currency_type_value; settlement := settlement_value; buy_broker := buy_broker_value; sell_broker := sell_broker_value; placement_date := placement_date_value; issue_date := issue_date_value; maturity_date := maturity_date_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -1973,7 +1973,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       trade_time : N;
-      volume_int_324 : N;
+      volume : N;
       price_rate : N;
       concertation_type : list byte;
       trade_number : N;
@@ -1987,7 +1987,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (trade_time record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price_rate record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (concertation_type record) = 1 /\
       (trade_number record < 256 ^ N.of_nat 4)%N /\
@@ -1999,7 +1999,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (trade_time record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price_rate record) ++
       encode_bytes 1 (concertation_type record) ++
       encode_uint 4 (trade_number record) ++
@@ -2017,7 +2017,7 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (trade_time_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
+              | Some (volume_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_rate_value, bytes) =>
@@ -2039,7 +2039,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                           match decode_bytes 1 bytes with
                                           | None => None
                                           | Some (leg_type_value, bytes) =>
-                                              Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume_int_324 := volume_int_324_value; price_rate := price_rate_value; concertation_type := concertation_type_value; trade_number := trade_number_value; operation_type := operation_type_value; amount := amount_value; parent_trade_number := parent_trade_number_value; leg_type := leg_type_value |}, bytes)
+                                              Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume := volume_value; price_rate := price_rate_value; concertation_type := concertation_type_value; trade_number := trade_number_value; operation_type := operation_type_value; amount := amount_value; parent_trade_number := parent_trade_number_value; leg_type := leg_type_value |}, bytes)
                                           end
                                       end
                                   end
@@ -2172,8 +2172,8 @@ Module BmvMarketDataSnapshotV11Tcp.
       component : list byte;
       sector : N;
       indices_hour : N;
-      volume_int_648 : N;
-      indices_price_44 : N;
+      volume_long : N;
+      indices_value : N;
       variation : N;
       percentage : N;
       trend : list byte;
@@ -2185,8 +2185,8 @@ Module BmvMarketDataSnapshotV11Tcp.
       Datatypes.length (component record) = 2 /\
       (sector record < 256 ^ N.of_nat 1)%N /\
       (indices_hour record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
-      (indices_price_44 record < 256 ^ N.of_nat 4)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
+      (indices_value record < 256 ^ N.of_nat 4)%N /\
       (variation record < 256 ^ N.of_nat 4)%N /\
       (percentage record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (trend record) = 1 /\
@@ -2196,8 +2196,8 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_bytes 2 (component record) ++
       encode_uint 1 (sector record) ++
       encode_uint 8 (indices_hour record) ++
-      encode_uint 8 (volume_int_648 record) ++
-      encode_uint 4 (indices_price_44 record) ++
+      encode_uint 8 (volume_long record) ++
+      encode_uint 4 (indices_value record) ++
       encode_uint 4 (variation record) ++
       encode_uint 4 (percentage record) ++
       encode_bytes 1 (trend record) ++
@@ -2215,10 +2215,10 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (indices_hour_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (volume_int_648_value, bytes) =>
+                  | Some (volume_long_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
-                      | Some (indices_price_44_value, bytes) =>
+                      | Some (indices_value_value, bytes) =>
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (variation_value, bytes) =>
@@ -2231,7 +2231,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (indices_status_value, bytes) =>
-                                          Some ({| component := component_value; sector := sector_value; indices_hour := indices_hour_value; volume_int_648 := volume_int_648_value; indices_price_44 := indices_price_44_value; variation := variation_value; percentage := percentage_value; trend := trend_value; indices_status := indices_status_value |}, bytes)
+                                          Some ({| component := component_value; sector := sector_value; indices_hour := indices_hour_value; volume_long := volume_long_value; indices_value := indices_value_value; variation := variation_value; percentage := percentage_value; trend := trend_value; indices_status := indices_status_value |}, bytes)
                                       end
                                   end
                               end
@@ -2445,8 +2445,8 @@ Module BmvMarketDataSnapshotV11Tcp.
       posture_date : N;
       currency : list byte;
       dollar_side : list byte;
-      buy_precio_88 : N;
-      sell_precio_88 : N;
+      dollar_buy : N;
+      dollar_sell : N;
       last_deal : N;
     }.
 
@@ -2455,16 +2455,16 @@ Module BmvMarketDataSnapshotV11Tcp.
       (posture_date record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (currency record) = 5 /\
       Datatypes.length (dollar_side record) = 1 /\
-      (buy_precio_88 record < 256 ^ N.of_nat 8)%N /\
-      (sell_precio_88 record < 256 ^ N.of_nat 8)%N /\
+      (dollar_buy record < 256 ^ N.of_nat 8)%N /\
+      (dollar_sell record < 256 ^ N.of_nat 8)%N /\
       (last_deal record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 8 (posture_date record) ++
       encode_bytes 5 (currency record) ++
       encode_bytes 1 (dollar_side record) ++
-      encode_uint 8 (buy_precio_88 record) ++
-      encode_uint 8 (sell_precio_88 record) ++
+      encode_uint 8 (dollar_buy record) ++
+      encode_uint 8 (dollar_sell record) ++
       encode_uint 8 (last_deal record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2479,14 +2479,14 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (dollar_side_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (buy_precio_88_value, bytes) =>
+                  | Some (dollar_buy_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
-                      | Some (sell_precio_88_value, bytes) =>
+                      | Some (dollar_sell_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (last_deal_value, bytes) =>
-                              Some ({| posture_date := posture_date_value; currency := currency_value; dollar_side := dollar_side_value; buy_precio_88 := buy_precio_88_value; sell_precio_88 := sell_precio_88_value; last_deal := last_deal_value |}, bytes)
+                              Some ({| posture_date := posture_date_value; currency := currency_value; dollar_side := dollar_side_value; dollar_buy := dollar_buy_value; dollar_sell := dollar_sell_value; last_deal := last_deal_value |}, bytes)
                           end
                       end
                   end
@@ -2824,7 +2824,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       outstanding : N;
       integer_amount : N;
       decimal_amount : N;
-      indices_precio_88 : N;
+      benchmark_value : N;
       indices_24 : N;
       rebalance : list byte;
       daily_performance : N;
@@ -2844,7 +2844,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (outstanding record < 256 ^ N.of_nat 8)%N /\
       (integer_amount record < 256 ^ N.of_nat 8)%N /\
       (decimal_amount record < 256 ^ N.of_nat 4)%N /\
-      (indices_precio_88 record < 256 ^ N.of_nat 8)%N /\
+      (benchmark_value record < 256 ^ N.of_nat 8)%N /\
       (indices_24 record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (rebalance record) = 1 /\
       (daily_performance record < 256 ^ N.of_nat 8)%N /\
@@ -2862,7 +2862,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 8 (outstanding record) ++
       encode_uint 8 (integer_amount record) ++
       encode_uint 4 (decimal_amount record) ++
-      encode_uint 8 (indices_precio_88 record) ++
+      encode_uint 8 (benchmark_value record) ++
       encode_uint 8 (indices_24 record) ++
       encode_bytes 1 (rebalance record) ++
       encode_uint 8 (daily_performance record) ++
@@ -2892,7 +2892,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                       | Some (decimal_amount_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
-                          | Some (indices_precio_88_value, bytes) =>
+                          | Some (benchmark_value_value, bytes) =>
                               match decode_uint 8 bytes with
                               | None => None
                               | Some (indices_24_value, bytes) =>
@@ -2923,7 +2923,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                                                   match decode_uint 8 bytes with
                                                                   | None => None
                                                                   | Some (last_12_months_24_hours_performance_value, bytes) =>
-                                                                      Some ({| benchmark_name := benchmark_name_value; benchmark_date := benchmark_date_value; outstanding := outstanding_value; integer_amount := integer_amount_value; decimal_amount := decimal_amount_value; indices_precio_88 := indices_precio_88_value; indices_24 := indices_24_value; rebalance := rebalance_value; daily_performance := daily_performance_value; annual_performance := annual_performance_value; monthly_performance := monthly_performance_value; last_12_months_performance := last_12_months_performance_value; v24_hours_daily_performance := v24_hours_daily_performance_value; v24_hours_annual_performance := v24_hours_annual_performance_value; v24_hours_monthly_performance := v24_hours_monthly_performance_value; last_12_months_24_hours_performance := last_12_months_24_hours_performance_value |}, bytes)
+                                                                      Some ({| benchmark_name := benchmark_name_value; benchmark_date := benchmark_date_value; outstanding := outstanding_value; integer_amount := integer_amount_value; decimal_amount := decimal_amount_value; benchmark_value := benchmark_value_value; indices_24 := indices_24_value; rebalance := rebalance_value; daily_performance := daily_performance_value; annual_performance := annual_performance_value; monthly_performance := monthly_performance_value; last_12_months_performance := last_12_months_performance_value; v24_hours_daily_performance := v24_hours_daily_performance_value; v24_hours_annual_performance := v24_hours_annual_performance_value; v24_hours_monthly_performance := v24_hours_monthly_performance_value; last_12_months_24_hours_performance := last_12_months_24_hours_performance_value |}, bytes)
                                                                   end
                                                               end
                                                           end
@@ -4494,7 +4494,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       instrument_number : N;
       origin : list byte;
       probable_price_of_allocation : N;
-      volume_int_648 : N;
+      volume_long : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -4502,13 +4502,13 @@ Module BmvMarketDataSnapshotV11Tcp.
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (origin record) = 1 /\
       (probable_price_of_allocation record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N.
+      (volume_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_bytes 1 (origin record) ++
       encode_uint 8 (probable_price_of_allocation record) ++
-      encode_uint 8 (volume_int_648 record).
+      encode_uint 8 (volume_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -4522,8 +4522,8 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (probable_price_of_allocation_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (volume_int_648_value, bytes) =>
-                      Some ({| instrument_number := instrument_number_value; origin := origin_value; probable_price_of_allocation := probable_price_of_allocation_value; volume_int_648 := volume_int_648_value |}, bytes)
+                  | Some (volume_long_value, bytes) =>
+                      Some ({| instrument_number := instrument_number_value; origin := origin_value; probable_price_of_allocation := probable_price_of_allocation_value; volume_long := volume_long_value |}, bytes)
                   end
               end
           end
@@ -4620,7 +4620,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       instrument_number : N;
       origin : list byte;
       time_of_the_trade : N;
-      volume_int_648 : N;
+      volume_long : N;
       price : N;
       type_of_agreement : list byte;
       consecutive_number_of_the_trade : N;
@@ -4639,7 +4639,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (origin record) = 1 /\
       (time_of_the_trade record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (type_of_agreement record) = 1 /\
       (consecutive_number_of_the_trade record < 256 ^ N.of_nat 8)%N /\
@@ -4656,7 +4656,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 4 (instrument_number record) ++
       encode_bytes 1 (origin record) ++
       encode_uint 8 (time_of_the_trade record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (type_of_agreement record) ++
       encode_uint 8 (consecutive_number_of_the_trade record) ++
@@ -4681,7 +4681,7 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (time_of_the_trade_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (volume_int_648_value, bytes) =>
+                  | Some (volume_long_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
@@ -4715,7 +4715,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                                               match decode_bytes 1 bytes with
                                                               | None => None
                                                               | Some (indicator_value, bytes) =>
-                                                                  Some ({| instrument_number := instrument_number_value; origin := origin_value; time_of_the_trade := time_of_the_trade_value; volume_int_648 := volume_int_648_value; price := price_value; type_of_agreement := type_of_agreement_value; consecutive_number_of_the_trade := consecutive_number_of_the_trade_value; sets_price := sets_price_value; type_of_trading := type_of_trading_value; amount := amount_value; purchases := purchases_value; sells := sells_value; settlement := settlement_value; auction_indicator := auction_indicator_value; indicator := indicator_value |}, bytes)
+                                                                  Some ({| instrument_number := instrument_number_value; origin := origin_value; time_of_the_trade := time_of_the_trade_value; volume_long := volume_long_value; price := price_value; type_of_agreement := type_of_agreement_value; consecutive_number_of_the_trade := consecutive_number_of_the_trade_value; sets_price := sets_price_value; type_of_trading := type_of_trading_value; amount := amount_value; purchases := purchases_value; sells := sells_value; settlement := settlement_value; auction_indicator := auction_indicator_value; indicator := indicator_value |}, bytes)
                                                               end
                                                           end
                                                       end
@@ -4834,7 +4834,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       instrument_number : N;
       origin : list byte;
       probable_price_of_allotment : N;
-      volume_int_648 : N;
+      volume_long : N;
       best_selling_price : N;
       best_purchasing_price : N;
       type_of_cross_trading : list byte;
@@ -4845,7 +4845,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (origin record) = 1 /\
       (probable_price_of_allotment record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (best_selling_price record < 256 ^ N.of_nat 8)%N /\
       (best_purchasing_price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (type_of_cross_trading record) = 1.
@@ -4854,7 +4854,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 4 (instrument_number record) ++
       encode_bytes 1 (origin record) ++
       encode_uint 8 (probable_price_of_allotment record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (best_selling_price record) ++
       encode_uint 8 (best_purchasing_price record) ++
       encode_bytes 1 (type_of_cross_trading record).
@@ -4871,7 +4871,7 @@ Module BmvMarketDataSnapshotV11Tcp.
               | Some (probable_price_of_allotment_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
-                  | Some (volume_int_648_value, bytes) =>
+                  | Some (volume_long_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (best_selling_price_value, bytes) =>
@@ -4881,7 +4881,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (type_of_cross_trading_value, bytes) =>
-                                  Some ({| instrument_number := instrument_number_value; origin := origin_value; probable_price_of_allotment := probable_price_of_allotment_value; volume_int_648 := volume_int_648_value; best_selling_price := best_selling_price_value; best_purchasing_price := best_purchasing_price_value; type_of_cross_trading := type_of_cross_trading_value |}, bytes)
+                                  Some ({| instrument_number := instrument_number_value; origin := origin_value; probable_price_of_allotment := probable_price_of_allotment_value; volume_long := volume_long_value; best_selling_price := best_selling_price_value; best_purchasing_price := best_purchasing_price_value; type_of_cross_trading := type_of_cross_trading_value |}, bytes)
                               end
                           end
                       end
@@ -4926,7 +4926,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       origin : list byte;
       date : N;
       consecutive_number : N;
-      volume_int_648 : N;
+      volume_long : N;
       consecutive_number_of_the_trade : N;
       execution_price : N;
       indicator : list byte;
@@ -4940,7 +4940,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       Datatypes.length (origin record) = 1 /\
       (date record < 256 ^ N.of_nat 8)%N /\
       (consecutive_number record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (consecutive_number_of_the_trade record < 256 ^ N.of_nat 8)%N /\
       (execution_price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (indicator record) = 1 /\
@@ -4952,7 +4952,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_bytes 1 (origin record) ++
       encode_uint 8 (date record) ++
       encode_uint 8 (consecutive_number record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (consecutive_number_of_the_trade record) ++
       encode_uint 8 (execution_price record) ++
       encode_bytes 1 (indicator record) ++
@@ -4974,7 +4974,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                   | Some (consecutive_number_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
-                      | Some (volume_int_648_value, bytes) =>
+                      | Some (volume_long_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
                           | Some (consecutive_number_of_the_trade_value, bytes) =>
@@ -4990,7 +4990,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                                           match decode_bytes 5 bytes with
                                           | None => None
                                           | Some (participant_value, bytes) =>
-                                              Some ({| instrument_number := instrument_number_value; origin := origin_value; date := date_value; consecutive_number := consecutive_number_value; volume_int_648 := volume_int_648_value; consecutive_number_of_the_trade := consecutive_number_of_the_trade_value; execution_price := execution_price_value; indicator := indicator_value; sets_price := sets_price_value; participant := participant_value |}, bytes)
+                                              Some ({| instrument_number := instrument_number_value; origin := origin_value; date := date_value; consecutive_number := consecutive_number_value; volume_long := volume_long_value; consecutive_number_of_the_trade := consecutive_number_of_the_trade_value; execution_price := execution_price_value; indicator := indicator_value; sets_price := sets_price_value; participant := participant_value |}, bytes)
                                           end
                                       end
                                   end
@@ -5042,7 +5042,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       date_and_time : N;
       consecutive_number : N;
       direction : list byte;
-      volume_int_648 : N;
+      volume_long : N;
       price : N;
       participant : list byte;
     }.
@@ -5054,7 +5054,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       (date_and_time record < 256 ^ N.of_nat 8)%N /\
       (consecutive_number record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (direction record) = 1 /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (participant record) = 5.
 
@@ -5064,7 +5064,7 @@ Module BmvMarketDataSnapshotV11Tcp.
       encode_uint 8 (date_and_time record) ++
       encode_uint 8 (consecutive_number record) ++
       encode_bytes 1 (direction record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (price record) ++
       encode_bytes 5 (participant record).
 
@@ -5086,14 +5086,14 @@ Module BmvMarketDataSnapshotV11Tcp.
                       | Some (direction_value, bytes) =>
                           match decode_uint 8 bytes with
                           | None => None
-                          | Some (volume_int_648_value, bytes) =>
+                          | Some (volume_long_value, bytes) =>
                               match decode_uint 8 bytes with
                               | None => None
                               | Some (price_value, bytes) =>
                                   match decode_bytes 5 bytes with
                                   | None => None
                                   | Some (participant_value, bytes) =>
-                                      Some ({| instrument_number := instrument_number_value; origin := origin_value; date_and_time := date_and_time_value; consecutive_number := consecutive_number_value; direction := direction_value; volume_int_648 := volume_int_648_value; price := price_value; participant := participant_value |}, bytes)
+                                      Some ({| instrument_number := instrument_number_value; origin := origin_value; date_and_time := date_and_time_value; consecutive_number := consecutive_number_value; direction := direction_value; volume_long := volume_long_value; price := price_value; participant := participant_value |}, bytes)
                                   end
                               end
                           end
@@ -5205,7 +5205,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Record t := {
       instrument_number : N;
       origin : list byte;
-      volume_int_648 : N;
+      volume_long : N;
       price_rate : N;
       direction_of_the_bid : list byte;
       type_of_trading : list byte;
@@ -5215,7 +5215,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (origin record) = 1 /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (price_rate record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (direction_of_the_bid record) = 1 /\
       Datatypes.length (type_of_trading record) = 1.
@@ -5223,7 +5223,7 @@ Module BmvMarketDataSnapshotV11Tcp.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_bytes 1 (origin record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (price_rate record) ++
       encode_bytes 1 (direction_of_the_bid record) ++
       encode_bytes 1 (type_of_trading record).
@@ -5237,7 +5237,7 @@ Module BmvMarketDataSnapshotV11Tcp.
           | Some (origin_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (volume_int_648_value, bytes) =>
+              | Some (volume_long_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_rate_value, bytes) =>
@@ -5247,7 +5247,7 @@ Module BmvMarketDataSnapshotV11Tcp.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (type_of_trading_value, bytes) =>
-                              Some ({| instrument_number := instrument_number_value; origin := origin_value; volume_int_648 := volume_int_648_value; price_rate := price_rate_value; direction_of_the_bid := direction_of_the_bid_value; type_of_trading := type_of_trading_value |}, bytes)
+                              Some ({| instrument_number := instrument_number_value; origin := origin_value; volume_long := volume_long_value; price_rate := price_rate_value; direction_of_the_bid := direction_of_the_bid_value; type_of_trading := type_of_trading_value |}, bytes)
                           end
                       end
                   end

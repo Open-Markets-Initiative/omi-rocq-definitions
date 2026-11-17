@@ -37,17 +37,17 @@ Module SpectraOrdersLogIncrementalV990.
     (** MarketDataDummyMessage *)
     Record t := {
       transact_time : N;
-      exchange_trading_session_id : N;
+      exchange_trading_session_id_optional : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (transact_time record < 256 ^ N.of_nat 8)%N /\
-      (exchange_trading_session_id record < 256 ^ N.of_nat 4)%N.
+      (exchange_trading_session_id_optional record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (transact_time record) ++
-      encode_uint_le 4 (exchange_trading_session_id record).
+      encode_uint_le 4 (exchange_trading_session_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -55,8 +55,8 @@ Module SpectraOrdersLogIncrementalV990.
       | Some (transact_time_value, bytes) =>
           match decode_uint_le 4 bytes with
           | None => None
-          | Some (exchange_trading_session_id_value, bytes) =>
-              Some ({| transact_time := transact_time_value; exchange_trading_session_id := exchange_trading_session_id_value |}, bytes)
+          | Some (exchange_trading_session_id_optional_value, bytes) =>
+              Some ({| transact_time := transact_time_value; exchange_trading_session_id_optional := exchange_trading_session_id_optional_value |}, bytes)
           end
       end.
 
@@ -246,21 +246,21 @@ Module SpectraOrdersLogIncrementalV990.
 
     (** EmptyBookMessage *)
     Record t := {
-      last_msg_seq_num_processed_u_int_32_null_optional : N;
+      last_msg_seq_num_processed_optional : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (last_msg_seq_num_processed_u_int_32_null_optional record < 256 ^ N.of_nat 4)%N.
+      (last_msg_seq_num_processed_optional record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint_le 4 (last_msg_seq_num_processed_u_int_32_null_optional record).
+      encode_uint_le 4 (last_msg_seq_num_processed_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
       | None => None
-      | Some (last_msg_seq_num_processed_u_int_32_null_optional_value, bytes) =>
-          Some ({| last_msg_seq_num_processed_u_int_32_null_optional := last_msg_seq_num_processed_u_int_32_null_optional_value |}, bytes)
+      | Some (last_msg_seq_num_processed_optional_value, bytes) =>
+          Some ({| last_msg_seq_num_processed_optional := last_msg_seq_num_processed_optional_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 4.

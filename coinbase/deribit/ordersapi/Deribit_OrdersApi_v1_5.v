@@ -33,81 +33,6 @@ Import ListNotations.
 
 Module DeribitOrdersApiV15.
 
-  Module LogonMessage.
-
-    (** LogonMessage *)
-    Record t := {
-      client_id : list byte;
-      secret : list byte;
-      reset_seq_num : N;
-      schema_version : N;
-      session_cancel_on_disconnect : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      Datatypes.length (client_id record) = 16 /\
-      Datatypes.length (secret record) = 48 /\
-      (reset_seq_num record < 256 ^ N.of_nat 1)%N /\
-      (schema_version record < 256 ^ N.of_nat 2)%N /\
-      (session_cancel_on_disconnect record < 256 ^ N.of_nat 1)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_bytes 16 (client_id record) ++
-      encode_bytes 48 (secret record) ++
-      encode_uint 1 (reset_seq_num record) ++
-      encode_uint_le 2 (schema_version record) ++
-      encode_uint 1 (session_cancel_on_disconnect record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 16 bytes with
-      | None => None
-      | Some (client_id_value, bytes) =>
-          match decode_bytes 48 bytes with
-          | None => None
-          | Some (secret_value, bytes) =>
-              match decode_uint 1 bytes with
-              | None => None
-              | Some (reset_seq_num_value, bytes) =>
-                  match decode_uint_le 2 bytes with
-                  | None => None
-                  | Some (schema_version_value, bytes) =>
-                      match decode_uint 1 bytes with
-                      | None => None
-                      | Some (session_cancel_on_disconnect_value, bytes) =>
-                          Some ({| client_id := client_id_value; secret := secret_value; reset_seq_num := reset_seq_num_value; schema_version := schema_version_value; session_cancel_on_disconnect := session_cancel_on_disconnect_value |}, bytes)
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 68.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
-      rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint_le by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
-
-  End LogonMessage.
-
   Module LogonConfMessage.
 
     (** LogonConfMessage *)
@@ -388,27 +313,27 @@ Module DeribitOrdersApiV15.
 
     (** NewOrderRequestMessage *)
     Record t := {
-      mantissa : N;
+      mantissa_optional : N;
       exponent : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (mantissa_optional record < 256 ^ N.of_nat 8)%N /\
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint_le 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa_optional record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
       | None => None
-      | Some (mantissa_value, bytes) =>
+      | Some (mantissa_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (exponent_value, bytes) =>
-              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+              Some ({| mantissa_optional := mantissa_optional_value; exponent := exponent_value |}, bytes)
           end
       end.
 
@@ -1095,113 +1020,6 @@ Module DeribitOrdersApiV15.
 
   End FillQty.
 
-  Module CancelOrderResponseMessage.
-
-    (** CancelOrderResponseMessage *)
-    Record t := {
-      timestamp : N;
-      exec_id : N;
-      client_order_id : N;
-      correlation_id : N;
-      order_id : N;
-      instrument_id : N;
-      receive_time : N;
-      quantity : Quantity.t;
-      total_filled : TotalFilled.t;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (timestamp record < 256 ^ N.of_nat 8)%N /\
-      (exec_id record < 256 ^ N.of_nat 8)%N /\
-      (client_order_id record < 256 ^ N.of_nat 8)%N /\
-      (correlation_id record < 256 ^ N.of_nat 8)%N /\
-      (order_id record < 256 ^ N.of_nat 8)%N /\
-      (instrument_id record < 256 ^ N.of_nat 8)%N /\
-      (receive_time record < 256 ^ N.of_nat 8)%N /\
-      Quantity.bounded (quantity record) /\
-      TotalFilled.bounded (total_filled record).
-
-    Definition encode (record : t) : list byte :=
-      encode_uint_le 8 (timestamp record) ++
-      encode_uint_le 8 (exec_id record) ++
-      encode_uint_le 8 (client_order_id record) ++
-      encode_uint_le 8 (correlation_id record) ++
-      encode_uint_le 8 (order_id record) ++
-      encode_uint_le 8 (instrument_id record) ++
-      encode_uint_le 8 (receive_time record) ++
-      Quantity.encode (quantity record) ++
-      TotalFilled.encode (total_filled record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint_le 8 bytes with
-      | None => None
-      | Some (timestamp_value, bytes) =>
-          match decode_uint_le 8 bytes with
-          | None => None
-          | Some (exec_id_value, bytes) =>
-              match decode_uint_le 8 bytes with
-              | None => None
-              | Some (client_order_id_value, bytes) =>
-                  match decode_uint_le 8 bytes with
-                  | None => None
-                  | Some (correlation_id_value, bytes) =>
-                      match decode_uint_le 8 bytes with
-                      | None => None
-                      | Some (order_id_value, bytes) =>
-                          match decode_uint_le 8 bytes with
-                          | None => None
-                          | Some (instrument_id_value, bytes) =>
-                              match decode_uint_le 8 bytes with
-                              | None => None
-                              | Some (receive_time_value, bytes) =>
-                                  match Quantity.decode bytes with
-                                  | None => None
-                                  | Some (quantity_value, bytes) =>
-                                      match TotalFilled.decode bytes with
-                                      | None => None
-                                      | Some (total_filled_value, bytes) =>
-                                          Some ({| timestamp := timestamp_value; exec_id := exec_id_value; client_order_id := client_order_id_value; correlation_id := correlation_id_value; order_id := order_id_value; instrument_id := instrument_id_value; receive_time := receive_time_value; quantity := quantity_value; total_filled := total_filled_value |}, bytes)
-                                      end
-                                  end
-                              end
-                          end
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 74.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_le_length, !Quantity.encode_length, !TotalFilled.encode_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint_le by exact bound_0.
-      rewrite decode_encode_uint_le by exact bound_1.
-      rewrite decode_encode_uint_le by exact bound_2.
-      rewrite decode_encode_uint_le by exact bound_3.
-      rewrite decode_encode_uint_le by exact bound_4.
-      rewrite decode_encode_uint_le by exact bound_5.
-      rewrite decode_encode_uint_le by exact bound_6.
-      rewrite Quantity.decode_encode by exact bound_7.
-      rewrite TotalFilled.decode_encode by exact bound_8.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply Quantity.eq_dec | apply TotalFilled.eq_dec]. Defined.
-
-  End CancelOrderResponseMessage.
-
   Module BidFilledQty.
 
     (** quotes *)
@@ -1452,19 +1270,19 @@ Module DeribitOrdersApiV15.
     Record t := {
       timestamp : N;
       correlation_id : N;
-      reason_mmp_status_reject_reason : N;
+      mmp_status_reject_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
-      (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
+      (mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (timestamp record) ++
       encode_uint_le 8 (correlation_id record) ++
-      encode_uint 1 (reason_mmp_status_reject_reason record).
+      encode_uint 1 (mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -1475,8 +1293,8 @@ Module DeribitOrdersApiV15.
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
-              | Some (reason_mmp_status_reject_reason_value, bytes) =>
-                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; reason_mmp_status_reject_reason := reason_mmp_status_reject_reason_value |}, bytes)
+              | Some (mmp_status_reject_reason_value, bytes) =>
+                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; mmp_status_reject_reason := mmp_status_reject_reason_value |}, bytes)
               end
           end
       end.
@@ -1578,19 +1396,19 @@ Module DeribitOrdersApiV15.
     Record t := {
       timestamp : N;
       correlation_id : N;
-      reason_mmp_status_reject_reason : N;
+      mmp_status_reject_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
-      (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
+      (mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (timestamp record) ++
       encode_uint_le 8 (correlation_id record) ++
-      encode_uint 1 (reason_mmp_status_reject_reason record).
+      encode_uint 1 (mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -1601,8 +1419,8 @@ Module DeribitOrdersApiV15.
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
-              | Some (reason_mmp_status_reject_reason_value, bytes) =>
-                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; reason_mmp_status_reject_reason := reason_mmp_status_reject_reason_value |}, bytes)
+              | Some (mmp_status_reject_reason_value, bytes) =>
+                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; mmp_status_reject_reason := mmp_status_reject_reason_value |}, bytes)
               end
           end
       end.
@@ -1962,5 +1780,112 @@ Module DeribitOrdersApiV15.
     Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End OrdersMmpUnfrozenMessage.
+
+  Module PositionMovedMessage.
+
+    (** PositionMovedMessage *)
+    Record t := {
+      timestamp : N;
+      exec_id : N;
+      instrument_id : N;
+      match_id : N;
+      price : N;
+      quantity : Quantity.t;
+      side : N;
+      role : N;
+      position_move_reason : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (timestamp record < 256 ^ N.of_nat 8)%N /\
+      (exec_id record < 256 ^ N.of_nat 8)%N /\
+      (instrument_id record < 256 ^ N.of_nat 8)%N /\
+      (match_id record < 256 ^ N.of_nat 8)%N /\
+      (price record < 256 ^ N.of_nat 8)%N /\
+      Quantity.bounded (quantity record) /\
+      (side record < 256 ^ N.of_nat 1)%N /\
+      (role record < 256 ^ N.of_nat 1)%N /\
+      (position_move_reason record < 256 ^ N.of_nat 1)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint_le 8 (timestamp record) ++
+      encode_uint_le 8 (exec_id record) ++
+      encode_uint_le 8 (instrument_id record) ++
+      encode_uint_le 8 (match_id record) ++
+      encode_uint_le 8 (price record) ++
+      Quantity.encode (quantity record) ++
+      encode_uint 1 (side record) ++
+      encode_uint 1 (role record) ++
+      encode_uint 1 (position_move_reason record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint_le 8 bytes with
+      | None => None
+      | Some (timestamp_value, bytes) =>
+          match decode_uint_le 8 bytes with
+          | None => None
+          | Some (exec_id_value, bytes) =>
+              match decode_uint_le 8 bytes with
+              | None => None
+              | Some (instrument_id_value, bytes) =>
+                  match decode_uint_le 8 bytes with
+                  | None => None
+                  | Some (match_id_value, bytes) =>
+                      match decode_uint_le 8 bytes with
+                      | None => None
+                      | Some (price_value, bytes) =>
+                          match Quantity.decode bytes with
+                          | None => None
+                          | Some (quantity_value, bytes) =>
+                              match decode_uint 1 bytes with
+                              | None => None
+                              | Some (side_value, bytes) =>
+                                  match decode_uint 1 bytes with
+                                  | None => None
+                                  | Some (role_value, bytes) =>
+                                      match decode_uint 1 bytes with
+                                      | None => None
+                                      | Some (position_move_reason_value, bytes) =>
+                                          Some ({| timestamp := timestamp_value; exec_id := exec_id_value; instrument_id := instrument_id_value; match_id := match_id_value; price := price_value; quantity := quantity_value; side := side_value; role := role_value; position_move_reason := position_move_reason_value |}, bytes)
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 52.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_le_length, !Quantity.encode_length, !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint_le by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_uint_le by exact bound_3.
+      rewrite decode_encode_uint_le by exact bound_4.
+      rewrite Quantity.decode_encode by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint by exact bound_7.
+      rewrite decode_encode_uint by exact bound_8.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply Quantity.eq_dec]. Defined.
+
+  End PositionMovedMessage.
 
 End DeribitOrdersApiV15.

@@ -137,21 +137,21 @@ Module CoinbaseDerivativesOrdersApiV15.
 
     (** LogoutMessage *)
     Record t := {
-      reason : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_value, bytes) =>
-          Some ({| reason := reason_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
@@ -178,21 +178,21 @@ Module CoinbaseDerivativesOrdersApiV15.
 
     (** LoggedOutMessage *)
     Record t := {
-      reason : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_value, bytes) =>
-          Some ({| reason := reason_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.

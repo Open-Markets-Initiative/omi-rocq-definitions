@@ -295,7 +295,7 @@ Module BmvMarketDataProduct11V11.
     Record t := {
       instrument_number : N;
       trade_time : N;
-      volume_int_324 : N;
+      volume : N;
       price : N;
       concertation_type : list byte;
       trade_number : N;
@@ -312,7 +312,7 @@ Module BmvMarketDataProduct11V11.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (trade_time record < 256 ^ N.of_nat 8)%N /\
-      (volume_int_324 record < 256 ^ N.of_nat 4)%N /\
+      (volume record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (concertation_type record) = 1 /\
       (trade_number record < 256 ^ N.of_nat 4)%N /\
@@ -327,7 +327,7 @@ Module BmvMarketDataProduct11V11.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 8 (trade_time record) ++
-      encode_uint 4 (volume_int_324 record) ++
+      encode_uint 4 (volume record) ++
       encode_uint 8 (price record) ++
       encode_bytes 1 (concertation_type record) ++
       encode_uint 4 (trade_number record) ++
@@ -348,7 +348,7 @@ Module BmvMarketDataProduct11V11.
           | Some (trade_time_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
-              | Some (volume_int_324_value, bytes) =>
+              | Some (volume_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
@@ -379,7 +379,7 @@ Module BmvMarketDataProduct11V11.
                                                       match decode_bytes 1 bytes with
                                                       | None => None
                                                       | Some (auction_indicator_value, bytes) =>
-                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume_int_324 := volume_int_324_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy := buy_value; sell := sell_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
+                                                          Some ({| instrument_number := instrument_number_value; trade_time := trade_time_value; volume := volume_value; price := price_value; concertation_type := concertation_type_value; trade_number := trade_number_value; price_setter := price_setter_value; operation_type := operation_type_value; amount := amount_value; buy := buy_value; sell := sell_value; settlement := settlement_value; auction_indicator := auction_indicator_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -565,7 +565,7 @@ Module BmvMarketDataProduct11V11.
     Record t := {
       instrument_number : N;
       number : N;
-      volume_int_648 : N;
+      volume_long : N;
       discount_rate_or_price : N;
       rate_of_return : N;
       term_days : N;
@@ -582,7 +582,7 @@ Module BmvMarketDataProduct11V11.
     Definition bounded (record : t) : Prop :=
       (instrument_number record < 256 ^ N.of_nat 4)%N /\
       (number record < 256 ^ N.of_nat 4)%N /\
-      (volume_int_648 record < 256 ^ N.of_nat 8)%N /\
+      (volume_long record < 256 ^ N.of_nat 8)%N /\
       (discount_rate_or_price record < 256 ^ N.of_nat 8)%N /\
       (rate_of_return record < 256 ^ N.of_nat 4)%N /\
       (term_days record < 256 ^ N.of_nat 2)%N /\
@@ -597,7 +597,7 @@ Module BmvMarketDataProduct11V11.
     Definition encode (record : t) : list byte :=
       encode_uint 4 (instrument_number record) ++
       encode_uint 4 (number record) ++
-      encode_uint 8 (volume_int_648 record) ++
+      encode_uint 8 (volume_long record) ++
       encode_uint 8 (discount_rate_or_price record) ++
       encode_uint 4 (rate_of_return record) ++
       encode_uint 2 (term_days record) ++
@@ -618,7 +618,7 @@ Module BmvMarketDataProduct11V11.
           | Some (number_value, bytes) =>
               match decode_uint 8 bytes with
               | None => None
-              | Some (volume_int_648_value, bytes) =>
+              | Some (volume_long_value, bytes) =>
                   match decode_uint 8 bytes with
                   | None => None
                   | Some (discount_rate_or_price_value, bytes) =>
@@ -649,7 +649,7 @@ Module BmvMarketDataProduct11V11.
                                                       match decode_uint 8 bytes with
                                                       | None => None
                                                       | Some (maturity_date_value, bytes) =>
-                                                          Some ({| instrument_number := instrument_number_value; number := number_value; volume_int_648 := volume_int_648_value; discount_rate_or_price := discount_rate_or_price_value; rate_of_return := rate_of_return_value; term_days := term_days_value; currency_type := currency_type_value; settlement := settlement_value; buy := buy_value; sell := sell_value; placement_date := placement_date_value; issue_date := issue_date_value; maturity_date := maturity_date_value |}, bytes)
+                                                          Some ({| instrument_number := instrument_number_value; number := number_value; volume_long := volume_long_value; discount_rate_or_price := discount_rate_or_price_value; rate_of_return := rate_of_return_value; term_days := term_days_value; currency_type := currency_type_value; settlement := settlement_value; buy := buy_value; sell := sell_value; placement_date := placement_date_value; issue_date := issue_date_value; maturity_date := maturity_date_value |}, bytes)
                                                       end
                                                   end
                                               end

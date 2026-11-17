@@ -1094,7 +1094,7 @@ Module OnyxFuturesTopOfMarketRetransmissionV13A.
 
   Module RetransmissionRequest.
 
-    (** The SesM server sends a Login response packet in response a Login request packet from the client *)
+    (** The SesM client uses this packet to request the server to retransmit a range of packets *)
     Record t := {
       start_sequence_number : N;
       end_sequence_number : N;

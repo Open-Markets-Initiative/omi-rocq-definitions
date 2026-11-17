@@ -335,7 +335,7 @@ Module NtxEquitiesTotalViewV32Server.
       order_reference_number : list byte;
       buy_sell_indicator : list byte;
       shares : list byte;
-      stock_alpha_8 : list byte;
+      stock : list byte;
       price : list byte;
     }.
 
@@ -344,14 +344,14 @@ Module NtxEquitiesTotalViewV32Server.
       Datatypes.length (order_reference_number record) = 12 /\
       Datatypes.length (buy_sell_indicator record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (price record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (order_reference_number record) ++
       encode_bytes 1 (buy_sell_indicator record) ++
       encode_bytes 6 (shares record) ++
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 10 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -366,11 +366,11 @@ Module NtxEquitiesTotalViewV32Server.
               | Some (shares_value, bytes) =>
                   match decode_bytes 8 bytes with
                   | None => None
-                  | Some (stock_alpha_8_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          Some ({| order_reference_number := order_reference_number_value; buy_sell_indicator := buy_sell_indicator_value; shares := shares_value; stock_alpha_8 := stock_alpha_8_value; price := price_value |}, bytes)
+                          Some ({| order_reference_number := order_reference_number_value; buy_sell_indicator := buy_sell_indicator_value; shares := shares_value; stock := stock_value; price := price_value |}, bytes)
                       end
                   end
               end
@@ -410,7 +410,7 @@ Module NtxEquitiesTotalViewV32Server.
       order_reference_number : list byte;
       buy_sell_indicator : list byte;
       shares : list byte;
-      stock_alpha_8 : list byte;
+      stock : list byte;
       price : list byte;
       attribution : list byte;
     }.
@@ -420,7 +420,7 @@ Module NtxEquitiesTotalViewV32Server.
       Datatypes.length (order_reference_number record) = 12 /\
       Datatypes.length (buy_sell_indicator record) = 1 /\
       Datatypes.length (shares record) = 6 /\
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (price record) = 10 /\
       Datatypes.length (attribution record) = 4.
 
@@ -428,7 +428,7 @@ Module NtxEquitiesTotalViewV32Server.
       encode_bytes 12 (order_reference_number record) ++
       encode_bytes 1 (buy_sell_indicator record) ++
       encode_bytes 6 (shares record) ++
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 10 (price record) ++
       encode_bytes 4 (attribution record).
 
@@ -444,14 +444,14 @@ Module NtxEquitiesTotalViewV32Server.
               | Some (shares_value, bytes) =>
                   match decode_bytes 8 bytes with
                   | None => None
-                  | Some (stock_alpha_8_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           match decode_bytes 4 bytes with
                           | None => None
                           | Some (attribution_value, bytes) =>
-                              Some ({| order_reference_number := order_reference_number_value; buy_sell_indicator := buy_sell_indicator_value; shares := shares_value; stock_alpha_8 := stock_alpha_8_value; price := price_value; attribution := attribution_value |}, bytes)
+                              Some ({| order_reference_number := order_reference_number_value; buy_sell_indicator := buy_sell_indicator_value; shares := shares_value; stock := stock_value; price := price_value; attribution := attribution_value |}, bytes)
                           end
                       end
                   end
@@ -490,7 +490,7 @@ Module NtxEquitiesTotalViewV32Server.
 
     (** At the start of each trading day, NASDAQ OMX BX disseminates stock directory messages for all active symbols in the system for the current trading day. Please note that the Symbol Directory spin may include halted issues. *)
     Record t := {
-      stock_alphabetic_8 : list byte;
+      stock : list byte;
       market_category : list byte;
       financial_status_indicator : list byte;
       round_lot_size : list byte;
@@ -499,14 +499,14 @@ Module NtxEquitiesTotalViewV32Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (stock_alphabetic_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (market_category record) = 1 /\
       Datatypes.length (financial_status_indicator record) = 1 /\
       Datatypes.length (round_lot_size record) = 6 /\
       Datatypes.length (round_lots_only record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (stock_alphabetic_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (market_category record) ++
       encode_bytes 1 (financial_status_indicator record) ++
       encode_bytes 6 (round_lot_size record) ++
@@ -515,7 +515,7 @@ Module NtxEquitiesTotalViewV32Server.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (stock_alphabetic_8_value, bytes) =>
+      | Some (stock_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (market_category_value, bytes) =>
@@ -528,7 +528,7 @@ Module NtxEquitiesTotalViewV32Server.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (round_lots_only_value, bytes) =>
-                          Some ({| stock_alphabetic_8 := stock_alphabetic_8_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value |}, bytes)
+                          Some ({| stock := stock_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value |}, bytes)
                       end
                   end
               end
@@ -565,7 +565,7 @@ Module NtxEquitiesTotalViewV32Server.
 
     (** In the GLIMPSE transmission, BX will send out a Stock Trading Action message for only those NASDAQ, NYSE, NYSE Amex, NYSE Arca and BATS issues that were eligible for trading during the current trading session. *)
     Record t := {
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       trading_state : list byte;
       reserved_1 : list byte;
       reason : list byte;
@@ -573,13 +573,13 @@ Module NtxEquitiesTotalViewV32Server.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (trading_state record) = 1 /\
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (reason record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (trading_state record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (reason record).
@@ -587,7 +587,7 @@ Module NtxEquitiesTotalViewV32Server.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (stock_alphanumeric_8_value, bytes) =>
+      | Some (stock_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (trading_state_value, bytes) =>
@@ -597,7 +597,7 @@ Module NtxEquitiesTotalViewV32Server.
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (reason_value, bytes) =>
-                      Some ({| stock_alphanumeric_8 := stock_alphanumeric_8_value; trading_state := trading_state_value; reserved_1 := reserved_1_value; reason := reason_value |}, bytes)
+                      Some ({| stock := stock_value; trading_state := trading_state_value; reserved_1 := reserved_1_value; reason := reason_value |}, bytes)
                   end
               end
           end
@@ -632,27 +632,27 @@ Module NtxEquitiesTotalViewV32Server.
 
     (** Reg SHO Short Sale Price Test Restricted Indicator *)
     Record t := {
-      stock_alpha_8 : list byte;
+      stock : list byte;
       reg_sho_action : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (reg_sho_action record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (reg_sho_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (stock_alpha_8_value, bytes) =>
+      | Some (stock_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (reg_sho_action_value, bytes) =>
-              Some ({| stock_alpha_8 := stock_alpha_8_value; reg_sho_action := reg_sho_action_value |}, bytes)
+              Some ({| stock := stock_value; reg_sho_action := reg_sho_action_value |}, bytes)
           end
       end.
 

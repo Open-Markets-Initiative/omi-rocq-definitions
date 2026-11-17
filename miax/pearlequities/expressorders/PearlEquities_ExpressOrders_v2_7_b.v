@@ -218,7 +218,7 @@ Module PearlEquitiesExpressOrdersV27B.
       price : N;
       size : N;
       order_status : list byte;
-      reserved_19 : list byte;
+      reserved_10 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -231,7 +231,7 @@ Module PearlEquitiesExpressOrdersV27B.
       (price record < 256 ^ N.of_nat 8)%N /\
       (size record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (order_status record) = 1 /\
-      Datatypes.length (reserved_19 record) = 19.
+      Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
@@ -242,7 +242,7 @@ Module PearlEquitiesExpressOrdersV27B.
       encode_uint_le 8 (price record) ++
       encode_uint_le 4 (size record) ++
       encode_bytes 1 (order_status record) ++
-      encode_bytes 19 (reserved_19 record).
+      encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -269,10 +269,10 @@ Module PearlEquitiesExpressOrdersV27B.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (order_status_value, bytes) =>
-                                      match decode_bytes 19 bytes with
+                                      match decode_bytes 10 bytes with
                                       | None => None
-                                      | Some (reserved_19_value, bytes) =>
-                                          Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; price := price_value; size := size_value; order_status := order_status_value; reserved_19 := reserved_19_value |}, bytes)
+                                      | Some (reserved_10_value, bytes) =>
+                                          Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; price := price_value; size := size_value; order_status := order_status_value; reserved_10 := reserved_10_value |}, bytes)
                                       end
                                   end
                               end
@@ -283,7 +283,7 @@ Module PearlEquitiesExpressOrdersV27B.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -545,7 +545,7 @@ Module PearlEquitiesExpressOrdersV27B.
       symbol_id : N;
       order_id : N;
       leaves_qty : N;
-      cancel_status : list byte;
+      cancel_by_exchange_order_id_status : list byte;
       reserved_10 : list byte;
     }.
 
@@ -557,7 +557,7 @@ Module PearlEquitiesExpressOrdersV27B.
       (symbol_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (cancel_status record) = 1 /\
+      Datatypes.length (cancel_by_exchange_order_id_status record) = 1 /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
@@ -567,7 +567,7 @@ Module PearlEquitiesExpressOrdersV27B.
       encode_uint_le 4 (symbol_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_uint_le 4 (leaves_qty record) ++
-      encode_bytes 1 (cancel_status record) ++
+      encode_bytes 1 (cancel_by_exchange_order_id_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -591,11 +591,11 @@ Module PearlEquitiesExpressOrdersV27B.
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
-                              | Some (cancel_status_value, bytes) =>
+                              | Some (cancel_by_exchange_order_id_status_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (reserved_10_value, bytes) =>
-                                      Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; leaves_qty := leaves_qty_value; cancel_status := cancel_status_value; reserved_10 := reserved_10_value |}, bytes)
+                                      Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; leaves_qty := leaves_qty_value; cancel_by_exchange_order_id_status := cancel_by_exchange_order_id_status_value; reserved_10 := reserved_10_value |}, bytes)
                                   end
                               end
                           end

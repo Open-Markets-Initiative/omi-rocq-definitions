@@ -37,17 +37,17 @@ Module SpectraOptInfoIncrementalV990.
     (** MarketDataDummyMessage *)
     Record t := {
       transact_time : N;
-      exchange_trading_session_id : N;
+      exchange_trading_session_id_optional : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (transact_time record < 256 ^ N.of_nat 8)%N /\
-      (exchange_trading_session_id record < 256 ^ N.of_nat 4)%N.
+      (exchange_trading_session_id_optional record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (transact_time record) ++
-      encode_uint_le 4 (exchange_trading_session_id record).
+      encode_uint_le 4 (exchange_trading_session_id_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -55,8 +55,8 @@ Module SpectraOptInfoIncrementalV990.
       | Some (transact_time_value, bytes) =>
           match decode_uint_le 4 bytes with
           | None => None
-          | Some (exchange_trading_session_id_value, bytes) =>
-              Some ({| transact_time := transact_time_value; exchange_trading_session_id := exchange_trading_session_id_value |}, bytes)
+          | Some (exchange_trading_session_id_optional_value, bytes) =>
+              Some ({| transact_time := transact_time_value; exchange_trading_session_id_optional := exchange_trading_session_id_optional_value |}, bytes)
           end
       end.
 
@@ -546,9 +546,9 @@ Module SpectraOptInfoIncrementalV990.
       security_group_id : N;
       halt_type : N;
       trade_mode_mask : N;
-      group_mask_int_64_null_optional : N;
-      section_id_int_32_null_optional : N;
-      base_contract_id_int_32_null_optional : N;
+      group_mask_optional : N;
+      section_id_optional : N;
+      base_contract_id_optional : N;
       security_trading_status : N;
       status_change_time : N;
     }.
@@ -558,9 +558,9 @@ Module SpectraOptInfoIncrementalV990.
       (security_group_id record < 256 ^ N.of_nat 8)%N /\
       (halt_type record < 256 ^ N.of_nat 1)%N /\
       (trade_mode_mask record < 256 ^ N.of_nat 4)%N /\
-      (group_mask_int_64_null_optional record < 256 ^ N.of_nat 8)%N /\
-      (section_id_int_32_null_optional record < 256 ^ N.of_nat 4)%N /\
-      (base_contract_id_int_32_null_optional record < 256 ^ N.of_nat 4)%N /\
+      (group_mask_optional record < 256 ^ N.of_nat 8)%N /\
+      (section_id_optional record < 256 ^ N.of_nat 4)%N /\
+      (base_contract_id_optional record < 256 ^ N.of_nat 4)%N /\
       (security_trading_status record < 256 ^ N.of_nat 1)%N /\
       (status_change_time record < 256 ^ N.of_nat 8)%N.
 
@@ -568,9 +568,9 @@ Module SpectraOptInfoIncrementalV990.
       encode_uint_le 8 (security_group_id record) ++
       encode_uint 1 (halt_type record) ++
       encode_uint_le 4 (trade_mode_mask record) ++
-      encode_uint_le 8 (group_mask_int_64_null_optional record) ++
-      encode_uint_le 4 (section_id_int_32_null_optional record) ++
-      encode_uint_le 4 (base_contract_id_int_32_null_optional record) ++
+      encode_uint_le 8 (group_mask_optional record) ++
+      encode_uint_le 4 (section_id_optional record) ++
+      encode_uint_le 4 (base_contract_id_optional record) ++
       encode_uint 1 (security_trading_status record) ++
       encode_uint_le 8 (status_change_time record).
 
@@ -586,20 +586,20 @@ Module SpectraOptInfoIncrementalV990.
               | Some (trade_mode_mask_value, bytes) =>
                   match decode_uint_le 8 bytes with
                   | None => None
-                  | Some (group_mask_int_64_null_optional_value, bytes) =>
+                  | Some (group_mask_optional_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (section_id_int_32_null_optional_value, bytes) =>
+                      | Some (section_id_optional_value, bytes) =>
                           match decode_uint_le 4 bytes with
                           | None => None
-                          | Some (base_contract_id_int_32_null_optional_value, bytes) =>
+                          | Some (base_contract_id_optional_value, bytes) =>
                               match decode_uint 1 bytes with
                               | None => None
                               | Some (security_trading_status_value, bytes) =>
                                   match decode_uint_le 8 bytes with
                                   | None => None
                                   | Some (status_change_time_value, bytes) =>
-                                      Some ({| security_group_id := security_group_id_value; halt_type := halt_type_value; trade_mode_mask := trade_mode_mask_value; group_mask_int_64_null_optional := group_mask_int_64_null_optional_value; section_id_int_32_null_optional := section_id_int_32_null_optional_value; base_contract_id_int_32_null_optional := base_contract_id_int_32_null_optional_value; security_trading_status := security_trading_status_value; status_change_time := status_change_time_value |}, bytes)
+                                      Some ({| security_group_id := security_group_id_value; halt_type := halt_type_value; trade_mode_mask := trade_mode_mask_value; group_mask_optional := group_mask_optional_value; section_id_optional := section_id_optional_value; base_contract_id_optional := base_contract_id_optional_value; security_trading_status := security_trading_status_value; status_change_time := status_change_time_value |}, bytes)
                                   end
                               end
                           end

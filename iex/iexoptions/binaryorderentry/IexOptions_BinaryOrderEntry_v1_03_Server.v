@@ -431,7 +431,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       aiq : list byte;
       side : N;
       price_price_8_optional : N;
-      order_qty_quantity_non_zero : N;
+      order_qty : N;
       leaves_qty : N;
       effective_limit_price : N;
       display_price : N;
@@ -466,7 +466,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       Datatypes.length (aiq record) = 3 /\
       (side record < 256 ^ N.of_nat 1)%N /\
       (price_price_8_optional record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_quantity_non_zero record < 256 ^ N.of_nat 4)%N /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
       (effective_limit_price record < 256 ^ N.of_nat 8)%N /\
       (display_price record < 256 ^ N.of_nat 8)%N /\
@@ -499,7 +499,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       encode_bytes 3 (aiq record) ++
       encode_uint 1 (side record) ++
       encode_uint_le 8 (price_price_8_optional record) ++
-      encode_uint_le 4 (order_qty_quantity_non_zero record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_uint_le 4 (leaves_qty record) ++
       encode_uint_le 8 (effective_limit_price record) ++
       encode_uint_le 8 (display_price record) ++
@@ -582,7 +582,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
                                                                                                   | Some (price_price_8_optional_value, bytes) =>
                                                                                                       match decode_uint_le 4 bytes with
                                                                                                       | None => None
-                                                                                                      | Some (order_qty_quantity_non_zero_value, bytes) =>
+                                                                                                      | Some (order_qty_value, bytes) =>
                                                                                                           match decode_uint_le 4 bytes with
                                                                                                           | None => None
                                                                                                           | Some (leaves_qty_value, bytes) =>
@@ -601,7 +601,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
                                                                                                                               match decode_uint 1 bytes with
                                                                                                                               | None => None
                                                                                                                               | Some (throttle_indicator_value, bytes) =>
-                                                                                                                                  Some ({| account_account_optional := account_account_optional_value; transact_time := transact_time_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account_optional := clearing_account_optional_value; orig_cl_ord_id_optional := orig_cl_ord_id_optional_value; order_id := order_id_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide := cancel_instead_of_slide_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8_optional := price_price_8_optional_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value; leaves_qty := leaves_qty_value; effective_limit_price := effective_limit_price_value; display_price := display_price_value; reason_code_optional := reason_code_optional_value; ack_type := ack_type_value; throttle_indicator := throttle_indicator_value |}, bytes)
+                                                                                                                                  Some ({| account_account_optional := account_account_optional_value; transact_time := transact_time_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account_optional := clearing_account_optional_value; orig_cl_ord_id_optional := orig_cl_ord_id_optional_value; order_id := order_id_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide := cancel_instead_of_slide_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8_optional := price_price_8_optional_value; order_qty := order_qty_value; leaves_qty := leaves_qty_value; effective_limit_price := effective_limit_price_value; display_price := display_price_value; reason_code_optional := reason_code_optional_value; ack_type := ack_type_value; throttle_indicator := throttle_indicator_value |}, bytes)
                                                                                                                               end
                                                                                                                           end
                                                                                                                       end
@@ -696,7 +696,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       orig_cl_ord_id : N;
       order_id : N;
       price_price_8 : N;
-      order_qty_quantity_non_zero : N;
+      order_qty : N;
       leaves_qty : N;
       effective_limit_price : N;
       display_price : N;
@@ -713,7 +713,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (price_price_8 record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_quantity_non_zero record < 256 ^ N.of_nat 4)%N /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
       (effective_limit_price record < 256 ^ N.of_nat 8)%N /\
       (display_price record < 256 ^ N.of_nat 8)%N /\
@@ -728,7 +728,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       encode_uint_le 8 (orig_cl_ord_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_uint_le 8 (price_price_8 record) ++
-      encode_uint_le 4 (order_qty_quantity_non_zero record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_uint_le 4 (leaves_qty record) ++
       encode_uint_le 8 (effective_limit_price record) ++
       encode_uint_le 8 (display_price record) ++
@@ -757,7 +757,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
                           | Some (price_price_8_value, bytes) =>
                               match decode_uint_le 4 bytes with
                               | None => None
-                              | Some (order_qty_quantity_non_zero_value, bytes) =>
+                              | Some (order_qty_value, bytes) =>
                                   match decode_uint_le 4 bytes with
                                   | None => None
                                   | Some (leaves_qty_value, bytes) =>
@@ -776,7 +776,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (ack_type_value, bytes) =>
-                                                          Some ({| transact_time := transact_time_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; orig_cl_ord_id := orig_cl_ord_id_value; order_id := order_id_value; price_price_8 := price_price_8_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value; leaves_qty := leaves_qty_value; effective_limit_price := effective_limit_price_value; display_price := display_price_value; restatement_reason := restatement_reason_value; reason_code_optional := reason_code_optional_value; ack_type := ack_type_value |}, bytes)
+                                                          Some ({| transact_time := transact_time_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; orig_cl_ord_id := orig_cl_ord_id_value; order_id := order_id_value; price_price_8 := price_price_8_value; order_qty := order_qty_value; leaves_qty := leaves_qty_value; effective_limit_price := effective_limit_price_value; display_price := display_price_value; restatement_reason := restatement_reason_value; reason_code_optional := reason_code_optional_value; ack_type := ack_type_value |}, bytes)
                                                       end
                                                   end
                                               end
@@ -1128,7 +1128,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       order_id : N;
       ack_type : N;
       price_price_4_optional : N;
-      order_qty_quantity_non_zero : N;
+      order_qty : N;
       reason_code_optional : N;
       throttle_indicator : N;
     }.
@@ -1145,7 +1145,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (ack_type record < 256 ^ N.of_nat 1)%N /\
       (price_price_4_optional record < 256 ^ N.of_nat 4)%N /\
-      (order_qty_quantity_non_zero record < 256 ^ N.of_nat 4)%N /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
       (reason_code_optional record < 256 ^ N.of_nat 1)%N /\
       (throttle_indicator record < 256 ^ N.of_nat 1)%N.
 
@@ -1160,7 +1160,7 @@ Module IexOptionsBinaryOrderEntryV103Server.
       encode_uint_le 8 (order_id record) ++
       encode_uint 1 (ack_type record) ++
       encode_uint_le 4 (price_price_4_optional record) ++
-      encode_uint_le 4 (order_qty_quantity_non_zero record) ++
+      encode_uint_le 4 (order_qty record) ++
       encode_uint 1 (reason_code_optional record) ++
       encode_uint 1 (throttle_indicator record).
 
@@ -1197,14 +1197,14 @@ Module IexOptionsBinaryOrderEntryV103Server.
                                           | Some (price_price_4_optional_value, bytes) =>
                                               match decode_uint_le 4 bytes with
                                               | None => None
-                                              | Some (order_qty_quantity_non_zero_value, bytes) =>
+                                              | Some (order_qty_value, bytes) =>
                                                   match decode_uint 1 bytes with
                                                   | None => None
                                                   | Some (reason_code_optional_value, bytes) =>
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (throttle_indicator_value, bytes) =>
-                                                          Some ({| transact_time := transact_time_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; aiq := aiq_value; instrument_id := instrument_id_value; side := side_value; order_id := order_id_value; ack_type := ack_type_value; price_price_4_optional := price_price_4_optional_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value; reason_code_optional := reason_code_optional_value; throttle_indicator := throttle_indicator_value |}, bytes)
+                                                          Some ({| transact_time := transact_time_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; aiq := aiq_value; instrument_id := instrument_id_value; side := side_value; order_id := order_id_value; ack_type := ack_type_value; price_price_4_optional := price_price_4_optional_value; order_qty := order_qty_value; reason_code_optional := reason_code_optional_value; throttle_indicator := throttle_indicator_value |}, bytes)
                                                       end
                                                   end
                                               end

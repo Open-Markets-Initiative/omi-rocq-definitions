@@ -362,27 +362,27 @@ Module DeribitOrdersApiV10.
 
     (** NewOrderRequestMessage *)
     Record t := {
-      mantissa : N;
+      mantissa_optional : N;
       exponent : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (mantissa_optional record < 256 ^ N.of_nat 8)%N /\
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint_le 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa_optional record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
       | None => None
-      | Some (mantissa_value, bytes) =>
+      | Some (mantissa_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (exponent_value, bytes) =>
-              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+              Some ({| mantissa_optional := mantissa_optional_value; exponent := exponent_value |}, bytes)
           end
       end.
 

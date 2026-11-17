@@ -682,6 +682,113 @@ Module NseFoOrderEntryV950Server.
 
   End InnerHeader.
 
+  Module DownloadHeader.
+
+    (** MESSAGE_HEADER of the downloaded message *)
+    Record t := {
+      inner_transaction_code : N;
+      inner_log_time : N;
+      inner_alpha_char : list byte;
+      inner_trader_id : N;
+      inner_error_code : N;
+      inner_timestamp : N;
+      inner_time_stamp_1 : list byte;
+      inner_time_stamp_2 : list byte;
+      inner_message_length : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (inner_transaction_code record < 256 ^ N.of_nat 2)%N /\
+      (inner_log_time record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (inner_alpha_char record) = 2 /\
+      (inner_trader_id record < 256 ^ N.of_nat 4)%N /\
+      (inner_error_code record < 256 ^ N.of_nat 2)%N /\
+      (inner_timestamp record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (inner_time_stamp_1 record) = 8 /\
+      Datatypes.length (inner_time_stamp_2 record) = 8 /\
+      (inner_message_length record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (inner_transaction_code record) ++
+      encode_uint 4 (inner_log_time record) ++
+      encode_bytes 2 (inner_alpha_char record) ++
+      encode_uint 4 (inner_trader_id record) ++
+      encode_uint 2 (inner_error_code record) ++
+      encode_uint 8 (inner_timestamp record) ++
+      encode_bytes 8 (inner_time_stamp_1 record) ++
+      encode_bytes 8 (inner_time_stamp_2 record) ++
+      encode_uint 2 (inner_message_length record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (inner_transaction_code_value, bytes) =>
+          match decode_uint 4 bytes with
+          | None => None
+          | Some (inner_log_time_value, bytes) =>
+              match decode_bytes 2 bytes with
+              | None => None
+              | Some (inner_alpha_char_value, bytes) =>
+                  match decode_uint 4 bytes with
+                  | None => None
+                  | Some (inner_trader_id_value, bytes) =>
+                      match decode_uint 2 bytes with
+                      | None => None
+                      | Some (inner_error_code_value, bytes) =>
+                          match decode_uint 8 bytes with
+                          | None => None
+                          | Some (inner_timestamp_value, bytes) =>
+                              match decode_bytes 8 bytes with
+                              | None => None
+                              | Some (inner_time_stamp_1_value, bytes) =>
+                                  match decode_bytes 8 bytes with
+                                  | None => None
+                                  | Some (inner_time_stamp_2_value, bytes) =>
+                                      match decode_uint 2 bytes with
+                                      | None => None
+                                      | Some (inner_message_length_value, bytes) =>
+                                          Some ({| inner_transaction_code := inner_transaction_code_value; inner_log_time := inner_log_time_value; inner_alpha_char := inner_alpha_char_value; inner_trader_id := inner_trader_id_value; inner_error_code := inner_error_code_value; inner_timestamp := inner_timestamp_value; inner_time_stamp_1 := inner_time_stamp_1_value; inner_time_stamp_2 := inner_time_stamp_2_value; inner_message_length := inner_message_length_value |}, bytes)
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 40.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 bound_8]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_uint by exact bound_0.
+      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_uint by exact bound_4.
+      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_uint by exact bound_8.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+
+  End DownloadHeader.
+
   Module ContractDesc.
 
     (** CONTRACT_DESC *)

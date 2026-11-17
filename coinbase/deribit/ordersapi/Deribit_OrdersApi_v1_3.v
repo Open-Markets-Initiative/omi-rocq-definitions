@@ -362,27 +362,27 @@ Module DeribitOrdersApiV13.
 
     (** NewOrderRequestMessage *)
     Record t := {
-      mantissa : N;
+      mantissa_optional : N;
       exponent : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (mantissa record < 256 ^ N.of_nat 8)%N /\
+      (mantissa_optional record < 256 ^ N.of_nat 8)%N /\
       (exponent record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint_le 8 (mantissa record) ++
+      encode_uint_le 8 (mantissa_optional record) ++
       encode_uint 1 (exponent record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
       | None => None
-      | Some (mantissa_value, bytes) =>
+      | Some (mantissa_optional_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (exponent_value, bytes) =>
-              Some ({| mantissa := mantissa_value; exponent := exponent_value |}, bytes)
+              Some ({| mantissa_optional := mantissa_optional_value; exponent := exponent_value |}, bytes)
           end
       end.
 
@@ -1410,19 +1410,19 @@ Module DeribitOrdersApiV13.
     Record t := {
       timestamp : N;
       correlation_id : N;
-      reason_mmp_status_reject_reason : N;
+      mmp_status_reject_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
-      (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
+      (mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (timestamp record) ++
       encode_uint_le 8 (correlation_id record) ++
-      encode_uint 1 (reason_mmp_status_reject_reason record).
+      encode_uint 1 (mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -1433,8 +1433,8 @@ Module DeribitOrdersApiV13.
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
-              | Some (reason_mmp_status_reject_reason_value, bytes) =>
-                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; reason_mmp_status_reject_reason := reason_mmp_status_reject_reason_value |}, bytes)
+              | Some (mmp_status_reject_reason_value, bytes) =>
+                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; mmp_status_reject_reason := mmp_status_reject_reason_value |}, bytes)
               end
           end
       end.
@@ -1536,19 +1536,19 @@ Module DeribitOrdersApiV13.
     Record t := {
       timestamp : N;
       correlation_id : N;
-      reason_mmp_status_reject_reason : N;
+      mmp_status_reject_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (timestamp record < 256 ^ N.of_nat 8)%N /\
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
-      (reason_mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
+      (mmp_status_reject_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (timestamp record) ++
       encode_uint_le 8 (correlation_id record) ++
-      encode_uint 1 (reason_mmp_status_reject_reason record).
+      encode_uint 1 (mmp_status_reject_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -1559,8 +1559,8 @@ Module DeribitOrdersApiV13.
           | Some (correlation_id_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
-              | Some (reason_mmp_status_reject_reason_value, bytes) =>
-                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; reason_mmp_status_reject_reason := reason_mmp_status_reject_reason_value |}, bytes)
+              | Some (mmp_status_reject_reason_value, bytes) =>
+                  Some ({| timestamp := timestamp_value; correlation_id := correlation_id_value; mmp_status_reject_reason := mmp_status_reject_reason_value |}, bytes)
               end
           end
       end.

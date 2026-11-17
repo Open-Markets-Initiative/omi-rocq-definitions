@@ -137,21 +137,21 @@ Module CoinbaseDerivativesOrdersApiV18.
 
     (** LogoutMessage *)
     Record t := {
-      reason_string_64 : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason_string_64 record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason_string_64 record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_string_64_value, bytes) =>
-          Some ({| reason_string_64 := reason_string_64_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
@@ -178,21 +178,21 @@ Module CoinbaseDerivativesOrdersApiV18.
 
     (** LoggedOutMessage *)
     Record t := {
-      reason_string_64 : list byte;
+      logout_reason : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (reason_string_64 record) = 64.
+      Datatypes.length (logout_reason record) = 64.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 64 (reason_string_64 record).
+      encode_bytes 64 (logout_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 64 bytes with
       | None => None
-      | Some (reason_string_64_value, bytes) =>
-          Some ({| reason_string_64 := reason_string_64_value |}, bytes)
+      | Some (logout_reason_value, bytes) =>
+          Some ({| logout_reason := logout_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 64.
@@ -2432,19 +2432,19 @@ Module CoinbaseDerivativesOrdersApiV18.
     Record t := {
       correlation_id : N;
       resend_reject_reason : N;
-      details_string_55 : list byte;
+      event_resend_reject_details : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (correlation_id record < 256 ^ N.of_nat 8)%N /\
       (resend_reject_reason record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (details_string_55 record) = 55.
+      Datatypes.length (event_resend_reject_details record) = 55.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (correlation_id record) ++
       encode_uint 1 (resend_reject_reason record) ++
-      encode_bytes 55 (details_string_55 record).
+      encode_bytes 55 (event_resend_reject_details record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -2455,8 +2455,8 @@ Module CoinbaseDerivativesOrdersApiV18.
           | Some (resend_reject_reason_value, bytes) =>
               match decode_bytes 55 bytes with
               | None => None
-              | Some (details_string_55_value, bytes) =>
-                  Some ({| correlation_id := correlation_id_value; resend_reject_reason := resend_reject_reason_value; details_string_55 := details_string_55_value |}, bytes)
+              | Some (event_resend_reject_details_value, bytes) =>
+                  Some ({| correlation_id := correlation_id_value; resend_reject_reason := resend_reject_reason_value; event_resend_reject_details := event_resend_reject_details_value |}, bytes)
               end
           end
       end.

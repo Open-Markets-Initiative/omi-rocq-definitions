@@ -83,7 +83,7 @@ Module PearlEquitiesExpressOrdersV26.
 
   End EsesmPacketHeader.
 
-  Module SymbolUpdate.
+  Module SymbolUpdateMessage.
 
     (** used to disseminate all security symbols traded on MIAX Pearl Equities for the current session *)
     Record t := {
@@ -92,7 +92,7 @@ Module PearlEquitiesExpressOrdersV26.
       ticker_symbol : list byte;
       reserved_1 : list byte;
       test_security_indicator : list byte;
-      future : N;
+      second_reserved_1 : list byte;
       lot_size : N;
       opening_time : list byte;
       closing_time : list byte;
@@ -107,7 +107,7 @@ Module PearlEquitiesExpressOrdersV26.
       Datatypes.length (ticker_symbol record) = 11 /\
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (test_security_indicator record) = 1 /\
-      (future record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (second_reserved_1 record) = 1 /\
       (lot_size record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (opening_time record) = 8 /\
       Datatypes.length (closing_time record) = 8 /\
@@ -120,7 +120,7 @@ Module PearlEquitiesExpressOrdersV26.
       encode_bytes 11 (ticker_symbol record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (test_security_indicator record) ++
-      encode_uint 1 (future record) ++
+      encode_bytes 1 (second_reserved_1 record) ++
       encode_uint_le 4 (lot_size record) ++
       encode_bytes 8 (opening_time record) ++
       encode_bytes 8 (closing_time record) ++
@@ -143,9 +143,9 @@ Module PearlEquitiesExpressOrdersV26.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (test_security_indicator_value, bytes) =>
-                          match decode_uint 1 bytes with
+                          match decode_bytes 1 bytes with
                           | None => None
-                          | Some (future_value, bytes) =>
+                          | Some (second_reserved_1_value, bytes) =>
                               match decode_uint_le 4 bytes with
                               | None => None
                               | Some (lot_size_value, bytes) =>
@@ -161,7 +161,7 @@ Module PearlEquitiesExpressOrdersV26.
                                               match decode_bytes 12 bytes with
                                               | None => None
                                               | Some (reserved_12_value, bytes) =>
-                                                  Some ({| matching_engine_time := matching_engine_time_value; symbol_id := symbol_id_value; ticker_symbol := ticker_symbol_value; reserved_1 := reserved_1_value; test_security_indicator := test_security_indicator_value; future := future_value; lot_size := lot_size_value; opening_time := opening_time_value; closing_time := closing_time_value; primary_market_code := primary_market_code_value; reserved_12 := reserved_12_value |}, bytes)
+                                                  Some ({| matching_engine_time := matching_engine_time_value; symbol_id := symbol_id_value; ticker_symbol := ticker_symbol_value; reserved_1 := reserved_1_value; test_security_indicator := test_security_indicator_value; second_reserved_1 := second_reserved_1_value; lot_size := lot_size_value; opening_time := opening_time_value; closing_time := closing_time_value; primary_market_code := primary_market_code_value; reserved_12 := reserved_12_value |}, bytes)
                                               end
                                           end
                                       end
@@ -177,7 +177,7 @@ Module PearlEquitiesExpressOrdersV26.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 59.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -192,7 +192,7 @@ Module PearlEquitiesExpressOrdersV26.
       rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_bytes by exact bound_3.
       rewrite decode_encode_bytes by exact bound_4.
-      rewrite decode_encode_uint by exact bound_5.
+      rewrite decode_encode_bytes by exact bound_5.
       rewrite decode_encode_uint_le by exact bound_6.
       rewrite decode_encode_bytes by exact bound_7.
       rewrite decode_encode_bytes by exact bound_8.
@@ -204,7 +204,7 @@ Module PearlEquitiesExpressOrdersV26.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End SymbolUpdate.
+  End SymbolUpdateMessage.
 
   Module NewOrderResponseMessage.
 
@@ -218,7 +218,7 @@ Module PearlEquitiesExpressOrdersV26.
       price : N;
       size : N;
       order_status : list byte;
-      reserved_19 : list byte;
+      reserved_10 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -231,7 +231,7 @@ Module PearlEquitiesExpressOrdersV26.
       (price record < 256 ^ N.of_nat 8)%N /\
       (size record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (order_status record) = 1 /\
-      Datatypes.length (reserved_19 record) = 19.
+      Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (matching_engine_time record) ++
@@ -242,7 +242,7 @@ Module PearlEquitiesExpressOrdersV26.
       encode_uint_le 8 (price record) ++
       encode_uint_le 4 (size record) ++
       encode_bytes 1 (order_status record) ++
-      encode_bytes 19 (reserved_19 record).
+      encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -269,10 +269,10 @@ Module PearlEquitiesExpressOrdersV26.
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (order_status_value, bytes) =>
-                                      match decode_bytes 19 bytes with
+                                      match decode_bytes 10 bytes with
                                       | None => None
-                                      | Some (reserved_19_value, bytes) =>
-                                          Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; price := price_value; size := size_value; order_status := order_status_value; reserved_19 := reserved_19_value |}, bytes)
+                                      | Some (reserved_10_value, bytes) =>
+                                          Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; price := price_value; size := size_value; order_status := order_status_value; reserved_10 := reserved_10_value |}, bytes)
                                       end
                                   end
                               end
@@ -283,7 +283,7 @@ Module PearlEquitiesExpressOrdersV26.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 76.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 67.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -545,7 +545,7 @@ Module PearlEquitiesExpressOrdersV26.
       symbol_id : N;
       order_id : N;
       leaves_qty : N;
-      cancel_status : list byte;
+      cancel_by_exchange_order_id_status : list byte;
       reserved_10 : list byte;
     }.
 
@@ -557,7 +557,7 @@ Module PearlEquitiesExpressOrdersV26.
       (symbol_id record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       (leaves_qty record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (cancel_status record) = 1 /\
+      Datatypes.length (cancel_by_exchange_order_id_status record) = 1 /\
       Datatypes.length (reserved_10 record) = 10.
 
     Definition encode (record : t) : list byte :=
@@ -567,7 +567,7 @@ Module PearlEquitiesExpressOrdersV26.
       encode_uint_le 4 (symbol_id record) ++
       encode_uint_le 8 (order_id record) ++
       encode_uint_le 4 (leaves_qty record) ++
-      encode_bytes 1 (cancel_status record) ++
+      encode_bytes 1 (cancel_by_exchange_order_id_status record) ++
       encode_bytes 10 (reserved_10 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -591,11 +591,11 @@ Module PearlEquitiesExpressOrdersV26.
                           | Some (leaves_qty_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
-                              | Some (cancel_status_value, bytes) =>
+                              | Some (cancel_by_exchange_order_id_status_value, bytes) =>
                                   match decode_bytes 10 bytes with
                                   | None => None
                                   | Some (reserved_10_value, bytes) =>
-                                      Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; leaves_qty := leaves_qty_value; cancel_status := cancel_status_value; reserved_10 := reserved_10_value |}, bytes)
+                                      Some ({| matching_engine_time := matching_engine_time_value; mpid := mpid_value; client_order_id := client_order_id_value; symbol_id := symbol_id_value; order_id := order_id_value; leaves_qty := leaves_qty_value; cancel_by_exchange_order_id_status := cancel_by_exchange_order_id_status_value; reserved_10 := reserved_10_value |}, bytes)
                                   end
                               end
                           end

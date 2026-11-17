@@ -334,7 +334,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       aiq : list byte;
       side : N;
       price_price_8 : N;
-      order_qty_quantity_non_zero : N;
+      order_qty : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -360,7 +360,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       Datatypes.length (aiq record) = 3 /\
       (side record < 256 ^ N.of_nat 1)%N /\
       (price_price_8 record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_quantity_non_zero record < 256 ^ N.of_nat 4)%N.
+      (order_qty record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account_account record) ++
@@ -384,7 +384,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       encode_bytes 3 (aiq record) ++
       encode_uint 1 (side record) ++
       encode_uint_le 8 (price_price_8 record) ++
-      encode_uint_le 4 (order_qty_quantity_non_zero record).
+      encode_uint_le 4 (order_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -452,8 +452,8 @@ Module IexOptionsBinaryOrderEntryV102Client.
                                                                                       | Some (price_price_8_value, bytes) =>
                                                                                           match decode_uint_le 4 bytes with
                                                                                           | None => None
-                                                                                          | Some (order_qty_quantity_non_zero_value, bytes) =>
-                                                                                              Some ({| account_account := account_account_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide := cancel_instead_of_slide_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8 := price_price_8_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value |}, bytes)
+                                                                                          | Some (order_qty_value, bytes) =>
+                                                                                              Some ({| account_account := account_account_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide := cancel_instead_of_slide_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8 := price_price_8_value; order_qty := order_qty_value |}, bytes)
                                                                                           end
                                                                                       end
                                                                                   end
@@ -546,7 +546,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       aiq : list byte;
       side : N;
       price_price_8 : N;
-      order_qty_quantity_non_zero : N;
+      order_qty : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -573,7 +573,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       Datatypes.length (aiq record) = 3 /\
       (side record < 256 ^ N.of_nat 1)%N /\
       (price_price_8 record < 256 ^ N.of_nat 8)%N /\
-      (order_qty_quantity_non_zero record < 256 ^ N.of_nat 4)%N.
+      (order_qty record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 16 (account_account record) ++
@@ -598,7 +598,7 @@ Module IexOptionsBinaryOrderEntryV102Client.
       encode_bytes 3 (aiq record) ++
       encode_uint 1 (side record) ++
       encode_uint_le 8 (price_price_8 record) ++
-      encode_uint_le 4 (order_qty_quantity_non_zero record).
+      encode_uint_le 4 (order_qty record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 16 bytes with
@@ -669,8 +669,8 @@ Module IexOptionsBinaryOrderEntryV102Client.
                                                                                           | Some (price_price_8_value, bytes) =>
                                                                                               match decode_uint_le 4 bytes with
                                                                                               | None => None
-                                                                                              | Some (order_qty_quantity_non_zero_value, bytes) =>
-                                                                                                  Some ({| account_account := account_account_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; orig_cl_ord_id := orig_cl_ord_id_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide_optional := cancel_instead_of_slide_optional_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8 := price_price_8_value; order_qty_quantity_non_zero := order_qty_quantity_non_zero_value |}, bytes)
+                                                                                              | Some (order_qty_value, bytes) =>
+                                                                                                  Some ({| account_account := account_account_value; instrument_id := instrument_id_value; market_participant_id := market_participant_id_value; cl_ord_id := cl_ord_id_value; clearing_account := clearing_account_value; orig_cl_ord_id := orig_cl_ord_id_value; customer_or_firm := customer_or_firm_value; open_close := open_close_value; attributed_quote := attributed_quote_value; time_in_force := time_in_force_value; cancel_instead_of_slide_optional := cancel_instead_of_slide_optional_value; display_inst := display_inst_value; exec_inst := exec_inst_value; ord_type := ord_type_value; target_party_id := target_party_id_value; auction_id := auction_id_value; clearing_firm := clearing_firm_value; optional_data := optional_data_value; routing_firm_id := routing_firm_id_value; aiq := aiq_value; side := side_value; price_price_8 := price_price_8_value; order_qty := order_qty_value |}, bytes)
                                                                                               end
                                                                                           end
                                                                                       end

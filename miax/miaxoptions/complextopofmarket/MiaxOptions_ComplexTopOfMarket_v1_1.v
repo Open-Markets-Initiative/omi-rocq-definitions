@@ -1201,7 +1201,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       underlying_symbol : list byte;
       trading_status : list byte;
       event_reason : list byte;
-      seconds_part : N;
+      expected_event_time_seconds_part : N;
       expected_event_time_nano_seconds_part : N;
     }.
 
@@ -1211,7 +1211,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       Datatypes.length (underlying_symbol record) = 11 /\
       Datatypes.length (trading_status record) = 1 /\
       Datatypes.length (event_reason record) = 1 /\
-      (seconds_part record < 256 ^ N.of_nat 4)%N /\
+      (expected_event_time_seconds_part record < 256 ^ N.of_nat 4)%N /\
       (expected_event_time_nano_seconds_part record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
@@ -1219,7 +1219,7 @@ Module MiaxOptionsComplexTopOfMarketV11.
       encode_bytes 11 (underlying_symbol record) ++
       encode_bytes 1 (trading_status record) ++
       encode_bytes 1 (event_reason record) ++
-      encode_uint_le 4 (seconds_part record) ++
+      encode_uint_le 4 (expected_event_time_seconds_part record) ++
       encode_uint_le 4 (expected_event_time_nano_seconds_part record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1237,11 +1237,11 @@ Module MiaxOptionsComplexTopOfMarketV11.
                   | Some (event_reason_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (seconds_part_value, bytes) =>
+                      | Some (expected_event_time_seconds_part_value, bytes) =>
                           match decode_uint_le 4 bytes with
                           | None => None
                           | Some (expected_event_time_nano_seconds_part_value, bytes) =>
-                              Some ({| nanoseconds := nanoseconds_value; underlying_symbol := underlying_symbol_value; trading_status := trading_status_value; event_reason := event_reason_value; seconds_part := seconds_part_value; expected_event_time_nano_seconds_part := expected_event_time_nano_seconds_part_value |}, bytes)
+                              Some ({| nanoseconds := nanoseconds_value; underlying_symbol := underlying_symbol_value; trading_status := trading_status_value; event_reason := event_reason_value; expected_event_time_seconds_part := expected_event_time_seconds_part_value; expected_event_time_nano_seconds_part := expected_event_time_nano_seconds_part_value |}, bytes)
                           end
                       end
                   end
