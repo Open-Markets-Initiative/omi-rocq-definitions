@@ -1387,9 +1387,9 @@ Module NseFoOrderEntryV950Server.
       prev_close : N;
       life_high : N;
       life_low : N;
-      filler_4 : N;
-      filler_2 : N;
-      filler_3 : N;
+      filler_4 : list byte;
+      filler_2 : list byte;
+      filler_3 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1404,9 +1404,9 @@ Module NseFoOrderEntryV950Server.
       (prev_close record < 256 ^ N.of_nat 4)%N /\
       (life_high record < 256 ^ N.of_nat 4)%N /\
       (life_low record < 256 ^ N.of_nat 4)%N /\
-      (filler_4 record < 256 ^ N.of_nat 4)%N /\
-      (filler_2 record < 256 ^ N.of_nat 4)%N /\
-      (filler_3 record < 256 ^ N.of_nat 4)%N.
+      Datatypes.length (filler_4 record) = 4 /\
+      Datatypes.length (filler_2 record) = 4 /\
+      Datatypes.length (filler_3 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 4 (token record) ++
@@ -1419,9 +1419,9 @@ Module NseFoOrderEntryV950Server.
       encode_uint 4 (prev_close record) ++
       encode_uint 4 (life_high record) ++
       encode_uint 4 (life_low record) ++
-      encode_uint 4 (filler_4 record) ++
-      encode_uint 4 (filler_2 record) ++
-      encode_uint 4 (filler_3 record).
+      encode_bytes 4 (filler_4 record) ++
+      encode_bytes 4 (filler_2 record) ++
+      encode_bytes 4 (filler_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
@@ -1454,13 +1454,13 @@ Module NseFoOrderEntryV950Server.
                                           match decode_uint 4 bytes with
                                           | None => None
                                           | Some (life_low_value, bytes) =>
-                                              match decode_uint 4 bytes with
+                                              match decode_bytes 4 bytes with
                                               | None => None
                                               | Some (filler_4_value, bytes) =>
-                                                  match decode_uint 4 bytes with
+                                                  match decode_bytes 4 bytes with
                                                   | None => None
                                                   | Some (filler_2_value, bytes) =>
-                                                      match decode_uint 4 bytes with
+                                                      match decode_bytes 4 bytes with
                                                       | None => None
                                                       | Some (filler_3_value, bytes) =>
                                                           Some ({| token := token_value; name := name_value; open := open_value; high := high_value; low := low_value; last := last_value; close := close_value; prev_close := prev_close_value; life_high := life_high_value; life_low := life_low_value; filler_4 := filler_4_value; filler_2 := filler_2_value; filler_3 := filler_3_value |}, bytes)
@@ -1501,9 +1501,9 @@ Module NseFoOrderEntryV950Server.
       rewrite decode_encode_uint by exact bound_7.
       rewrite decode_encode_uint by exact bound_8.
       rewrite decode_encode_uint by exact bound_9.
-      rewrite decode_encode_uint by exact bound_10.
-      rewrite decode_encode_uint by exact bound_11.
-      rewrite decode_encode_uint by exact bound_12.
+      rewrite decode_encode_bytes by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_bytes by exact bound_12.
       destruct record. reflexivity.
     Qed.
 

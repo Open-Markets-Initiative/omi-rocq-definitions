@@ -365,7 +365,7 @@ Module SseEquitiesStandardV195.
       reserved_2 : list byte;
       change_flag : list byte;
       status_information : StatusInformation.t;
-      time_c_12 : list byte;
+      precise_time : list byte;
       reserved_4 : list byte;
     }.
 
@@ -374,14 +374,14 @@ Module SseEquitiesStandardV195.
       Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (change_flag record) = 1 /\
       StatusInformation.bounded (status_information record) /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       Datatypes.length (reserved_4 record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (change_flag record) ++
       StatusInformation.encode (status_information record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       encode_bytes 4 (reserved_4 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -396,11 +396,11 @@ Module SseEquitiesStandardV195.
               | Some (status_information_value, bytes) =>
                   match decode_bytes 12 bytes with
                   | None => None
-                  | Some (time_c_12_value, bytes) =>
+                  | Some (precise_time_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (reserved_4_value, bytes) =>
-                          Some ({| reserved_2 := reserved_2_value; change_flag := change_flag_value; status_information := status_information_value; time_c_12 := time_c_12_value; reserved_4 := reserved_4_value |}, bytes)
+                          Some ({| reserved_2 := reserved_2_value; change_flag := change_flag_value; status_information := status_information_value; precise_time := precise_time_value; reserved_4 := reserved_4_value |}, bytes)
                       end
                   end
               end
@@ -438,19 +438,19 @@ Module SseEquitiesStandardV195.
     (** Price *)
     Record t := {
       unit_flag : list byte;
-      price_c_14 : list byte;
+      price_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (price_c_14 record) = 14 /\
+      Datatypes.length (price_value record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (price_c_14 record) ++
+      encode_bytes 14 (price_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -459,11 +459,11 @@ Module SseEquitiesStandardV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (price_c_14_value, bytes) =>
+          | Some (price_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; price_c_14 := price_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; price_value := price_value_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -497,19 +497,19 @@ Module SseEquitiesStandardV195.
     (** Open *)
     Record t := {
       price : Price.t;
-      time_c_6 : list byte;
+      time : list byte;
       change_flag : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Price.bounded (price record) /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (change_flag record) = 1.
 
     Definition encode (record : t) : list byte :=
       Price.encode (price record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (change_flag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -518,11 +518,11 @@ Module SseEquitiesStandardV195.
       | Some (price_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (time_c_6_value, bytes) =>
+          | Some (time_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (change_flag_value, bytes) =>
-                  Some ({| price := price_value; time_c_6 := time_c_6_value; change_flag := change_flag_value |}, bytes)
+                  Some ({| price := price_value; time := time_value; change_flag := change_flag_value |}, bytes)
               end
           end
       end.
@@ -557,7 +557,7 @@ Module SseEquitiesStandardV195.
     Record t := {
       limit_up_flag : list byte;
       price : Price.t;
-      time_c_6 : list byte;
+      time : list byte;
       change_flag : list byte;
     }.
 
@@ -565,13 +565,13 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (limit_up_flag record) = 1 /\
       Price.bounded (price record) /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (change_flag record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (limit_up_flag record) ++
       Price.encode (price record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (change_flag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -583,11 +583,11 @@ Module SseEquitiesStandardV195.
           | Some (price_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
-              | Some (time_c_6_value, bytes) =>
+              | Some (time_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (change_flag_value, bytes) =>
-                      Some ({| limit_up_flag := limit_up_flag_value; price := price_value; time_c_6 := time_c_6_value; change_flag := change_flag_value |}, bytes)
+                      Some ({| limit_up_flag := limit_up_flag_value; price := price_value; time := time_value; change_flag := change_flag_value |}, bytes)
                   end
               end
           end
@@ -624,7 +624,7 @@ Module SseEquitiesStandardV195.
     Record t := {
       limit_down_flag : list byte;
       price : Price.t;
-      time_c_6 : list byte;
+      time : list byte;
       change_flag : list byte;
     }.
 
@@ -632,13 +632,13 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (limit_down_flag record) = 1 /\
       Price.bounded (price record) /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (change_flag record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (limit_down_flag record) ++
       Price.encode (price record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (change_flag record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -650,11 +650,11 @@ Module SseEquitiesStandardV195.
           | Some (price_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
-              | Some (time_c_6_value, bytes) =>
+              | Some (time_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (change_flag_value, bytes) =>
-                      Some ({| limit_down_flag := limit_down_flag_value; price := price_value; time_c_6 := time_c_6_value; change_flag := change_flag_value |}, bytes)
+                      Some ({| limit_down_flag := limit_down_flag_value; price := price_value; time := time_value; change_flag := change_flag_value |}, bytes)
                   end
               end
           end
@@ -690,7 +690,7 @@ Module SseEquitiesStandardV195.
     (** Current *)
     Record t := {
       price : Price.t;
-      time_c_12 : list byte;
+      precise_time : list byte;
       current_change_flag : list byte;
       stq_reference_point_flag : list byte;
       reserved_1 : list byte;
@@ -700,7 +700,7 @@ Module SseEquitiesStandardV195.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Price.bounded (price record) /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       Datatypes.length (current_change_flag record) = 1 /\
       Datatypes.length (stq_reference_point_flag record) = 1 /\
       Datatypes.length (reserved_1 record) = 1 /\
@@ -708,7 +708,7 @@ Module SseEquitiesStandardV195.
 
     Definition encode (record : t) : list byte :=
       Price.encode (price record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       encode_bytes 1 (current_change_flag record) ++
       encode_bytes 1 (stq_reference_point_flag record) ++
       encode_bytes 1 (reserved_1 record) ++
@@ -720,7 +720,7 @@ Module SseEquitiesStandardV195.
       | Some (price_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
-          | Some (time_c_12_value, bytes) =>
+          | Some (precise_time_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (current_change_flag_value, bytes) =>
@@ -733,7 +733,7 @@ Module SseEquitiesStandardV195.
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (closing_price_input_flag_value, bytes) =>
-                              Some ({| price := price_value; time_c_12 := time_c_12_value; current_change_flag := current_change_flag_value; stq_reference_point_flag := stq_reference_point_flag_value; reserved_1 := reserved_1_value; closing_price_input_flag := closing_price_input_flag_value |}, bytes)
+                              Some ({| price := price_value; precise_time := precise_time_value; current_change_flag := current_change_flag_value; stq_reference_point_flag := stq_reference_point_flag_value; reserved_1 := reserved_1_value; closing_price_input_flag := closing_price_input_flag_value |}, bytes)
                           end
                       end
                   end
@@ -908,7 +908,7 @@ Module SseEquitiesStandardV195.
     Record t := {
       change_flag : list byte;
       price : Price.t;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_flag : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
@@ -917,14 +917,14 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
       Price.bounded (price record) /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       Datatypes.length (quote_flag record) = 1 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
       Price.encode (price record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       encode_bytes 1 (quote_flag record) ++
       QuoteQuantity.encode (quote_quantity record).
 
@@ -937,14 +937,14 @@ Module SseEquitiesStandardV195.
           | Some (price_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
-              | Some (time_c_12_value, bytes) =>
+              | Some (precise_time_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (quote_flag_value, bytes) =>
                       match QuoteQuantity.decode bytes with
                       | None => None
                       | Some (quote_quantity_value, bytes) =>
-                          Some ({| change_flag := change_flag_value; price := price_value; time_c_12 := time_c_12_value; quote_flag := quote_flag_value; quote_quantity := quote_quantity_value |}, bytes)
+                          Some ({| change_flag := change_flag_value; price := price_value; precise_time := precise_time_value; quote_flag := quote_flag_value; quote_quantity := quote_quantity_value |}, bytes)
                       end
                   end
               end
@@ -983,7 +983,7 @@ Module SseEquitiesStandardV195.
     Record t := {
       change_flag : list byte;
       price : Price.t;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_flag : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
@@ -992,14 +992,14 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
       Price.bounded (price record) /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       Datatypes.length (quote_flag record) = 1 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
       Price.encode (price record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       encode_bytes 1 (quote_flag record) ++
       QuoteQuantity.encode (quote_quantity record).
 
@@ -1012,14 +1012,14 @@ Module SseEquitiesStandardV195.
           | Some (price_value, bytes) =>
               match decode_bytes 12 bytes with
               | None => None
-              | Some (time_c_12_value, bytes) =>
+              | Some (precise_time_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (quote_flag_value, bytes) =>
                       match QuoteQuantity.decode bytes with
                       | None => None
                       | Some (quote_quantity_value, bytes) =>
-                          Some ({| change_flag := change_flag_value; price := price_value; time_c_12 := time_c_12_value; quote_flag := quote_flag_value; quote_quantity := quote_quantity_value |}, bytes)
+                          Some ({| change_flag := change_flag_value; price := price_value; precise_time := precise_time_value; quote_flag := quote_flag_value; quote_quantity := quote_quantity_value |}, bytes)
                       end
                   end
               end
@@ -1647,19 +1647,19 @@ Module SseEquitiesStandardV195.
     (** Sell Order *)
     Record t := {
       change_flag : list byte;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       QuoteQuantity.encode (quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1668,11 +1668,11 @@ Module SseEquitiesStandardV195.
       | Some (change_flag_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
-          | Some (time_c_12_value, bytes) =>
+          | Some (precise_time_value, bytes) =>
               match QuoteQuantity.decode bytes with
               | None => None
               | Some (quote_quantity_value, bytes) =>
-                  Some ({| change_flag := change_flag_value; time_c_12 := time_c_12_value; quote_quantity := quote_quantity_value |}, bytes)
+                  Some ({| change_flag := change_flag_value; precise_time := precise_time_value; quote_quantity := quote_quantity_value |}, bytes)
               end
           end
       end.
@@ -1706,19 +1706,19 @@ Module SseEquitiesStandardV195.
     (** Buy Order *)
     Record t := {
       change_flag : list byte;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       QuoteQuantity.encode (quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1727,11 +1727,11 @@ Module SseEquitiesStandardV195.
       | Some (change_flag_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
-          | Some (time_c_12_value, bytes) =>
+          | Some (precise_time_value, bytes) =>
               match QuoteQuantity.decode bytes with
               | None => None
               | Some (quote_quantity_value, bytes) =>
-                  Some ({| change_flag := change_flag_value; time_c_12 := time_c_12_value; quote_quantity := quote_quantity_value |}, bytes)
+                  Some ({| change_flag := change_flag_value; precise_time := precise_time_value; quote_quantity := quote_quantity_value |}, bytes)
               end
           end
       end.
@@ -1824,19 +1824,19 @@ Module SseEquitiesStandardV195.
     (** OVER Quote *)
     Record t := {
       change_flag : list byte;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       QuoteQuantity.encode (quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1845,11 +1845,11 @@ Module SseEquitiesStandardV195.
       | Some (change_flag_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
-          | Some (time_c_12_value, bytes) =>
+          | Some (precise_time_value, bytes) =>
               match QuoteQuantity.decode bytes with
               | None => None
               | Some (quote_quantity_value, bytes) =>
-                  Some ({| change_flag := change_flag_value; time_c_12 := time_c_12_value; quote_quantity := quote_quantity_value |}, bytes)
+                  Some ({| change_flag := change_flag_value; precise_time := precise_time_value; quote_quantity := quote_quantity_value |}, bytes)
               end
           end
       end.
@@ -1883,19 +1883,19 @@ Module SseEquitiesStandardV195.
     (** UNDER Quote *)
     Record t := {
       change_flag : list byte;
-      time_c_12 : list byte;
+      precise_time : list byte;
       quote_quantity : QuoteQuantity.t;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (change_flag record) = 1 /\
-      Datatypes.length (time_c_12 record) = 12 /\
+      Datatypes.length (precise_time record) = 12 /\
       QuoteQuantity.bounded (quote_quantity record).
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (change_flag record) ++
-      encode_bytes 12 (time_c_12 record) ++
+      encode_bytes 12 (precise_time record) ++
       QuoteQuantity.encode (quote_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1904,11 +1904,11 @@ Module SseEquitiesStandardV195.
       | Some (change_flag_value, bytes) =>
           match decode_bytes 12 bytes with
           | None => None
-          | Some (time_c_12_value, bytes) =>
+          | Some (precise_time_value, bytes) =>
               match QuoteQuantity.decode bytes with
               | None => None
               | Some (quote_quantity_value, bytes) =>
-                  Some ({| change_flag := change_flag_value; time_c_12 := time_c_12_value; quote_quantity := quote_quantity_value |}, bytes)
+                  Some ({| change_flag := change_flag_value; precise_time := precise_time_value; quote_quantity := quote_quantity_value |}, bytes)
               end
           end
       end.
@@ -2002,8 +2002,8 @@ Module SseEquitiesStandardV195.
     Record t := {
       reserved_1 : list byte;
       trading_volume_turnover_unit_flag : list byte;
-      trading_volume_c_14 : list byte;
-      time_c_6 : list byte;
+      trading_volume_value : list byte;
+      time : list byte;
       second_reserved_1 : list byte;
     }.
 
@@ -2011,15 +2011,15 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (trading_volume_c_14 record) = 14 /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (trading_volume_value record) = 14 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (trading_volume_c_14 record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 14 (trading_volume_value record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2031,14 +2031,14 @@ Module SseEquitiesStandardV195.
           | Some (trading_volume_turnover_unit_flag_value, bytes) =>
               match decode_bytes 14 bytes with
               | None => None
-              | Some (trading_volume_c_14_value, bytes) =>
+              | Some (trading_volume_value_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
+                  | Some (time_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (second_reserved_1_value, bytes) =>
-                          Some ({| reserved_1 := reserved_1_value; trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; trading_volume_c_14 := trading_volume_c_14_value; time_c_6 := time_c_6_value; second_reserved_1 := second_reserved_1_value |}, bytes)
+                          Some ({| reserved_1 := reserved_1_value; trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; trading_volume_value := trading_volume_value_value; time := time_value; second_reserved_1 := second_reserved_1_value |}, bytes)
                       end
                   end
               end
@@ -2129,7 +2129,7 @@ Module SseEquitiesStandardV195.
       reserved_1 : list byte;
       trading_volume_turnover_unit_flag : list byte;
       turnover_value : list byte;
-      time_c_6 : list byte;
+      time : list byte;
       second_reserved_1 : list byte;
     }.
 
@@ -2138,14 +2138,14 @@ Module SseEquitiesStandardV195.
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
       Datatypes.length (turnover_value record) = 14 /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
       encode_bytes 14 (turnover_value record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2160,11 +2160,11 @@ Module SseEquitiesStandardV195.
               | Some (turnover_value_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
+                  | Some (time_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (second_reserved_1_value, bytes) =>
-                          Some ({| reserved_1 := reserved_1_value; trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; turnover_value := turnover_value_value; time_c_6 := time_c_6_value; second_reserved_1 := second_reserved_1_value |}, bytes)
+                          Some ({| reserved_1 := reserved_1_value; trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; turnover_value := turnover_value_value; time := time_value; second_reserved_1 := second_reserved_1_value |}, bytes)
                       end
                   end
               end
@@ -2254,9 +2254,9 @@ Module SseEquitiesStandardV195.
     Record t := {
       reserved_1 : list byte;
       lot_size_unit_flag : list byte;
-      all_day_vwap_c_14 : list byte;
+      all_day_vwap_value : list byte;
       sign : list byte;
-      time_c_6 : list byte;
+      time : list byte;
       second_reserved_1 : list byte;
     }.
 
@@ -2264,17 +2264,17 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (lot_size_unit_flag record) = 1 /\
-      Datatypes.length (all_day_vwap_c_14 record) = 14 /\
+      Datatypes.length (all_day_vwap_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (lot_size_unit_flag record) ++
-      encode_bytes 14 (all_day_vwap_c_14 record) ++
+      encode_bytes 14 (all_day_vwap_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2286,17 +2286,17 @@ Module SseEquitiesStandardV195.
           | Some (lot_size_unit_flag_value, bytes) =>
               match decode_bytes 14 bytes with
               | None => None
-              | Some (all_day_vwap_c_14_value, bytes) =>
+              | Some (all_day_vwap_value_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (sign_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
-                      | Some (time_c_6_value, bytes) =>
+                      | Some (time_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
-                              Some ({| reserved_1 := reserved_1_value; lot_size_unit_flag := lot_size_unit_flag_value; all_day_vwap_c_14 := all_day_vwap_c_14_value; sign := sign_value; time_c_6 := time_c_6_value; second_reserved_1 := second_reserved_1_value |}, bytes)
+                              Some ({| reserved_1 := reserved_1_value; lot_size_unit_flag := lot_size_unit_flag_value; all_day_vwap_value := all_day_vwap_value_value; sign := sign_value; time := time_value; second_reserved_1 := second_reserved_1_value |}, bytes)
                           end
                       end
                   end
@@ -2337,9 +2337,9 @@ Module SseEquitiesStandardV195.
     Record t := {
       reserved_1 : list byte;
       lot_size_unit_flag : list byte;
-      current_session_vwap_c_14 : list byte;
+      current_session_vwap_value : list byte;
       sign : list byte;
-      time_c_6 : list byte;
+      time : list byte;
       second_reserved_1 : list byte;
     }.
 
@@ -2347,17 +2347,17 @@ Module SseEquitiesStandardV195.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (lot_size_unit_flag record) = 1 /\
-      Datatypes.length (current_session_vwap_c_14 record) = 14 /\
+      Datatypes.length (current_session_vwap_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (second_reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (lot_size_unit_flag record) ++
-      encode_bytes 14 (current_session_vwap_c_14 record) ++
+      encode_bytes 14 (current_session_vwap_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (second_reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2369,17 +2369,17 @@ Module SseEquitiesStandardV195.
           | Some (lot_size_unit_flag_value, bytes) =>
               match decode_bytes 14 bytes with
               | None => None
-              | Some (current_session_vwap_c_14_value, bytes) =>
+              | Some (current_session_vwap_value_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (sign_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
-                      | Some (time_c_6_value, bytes) =>
+                      | Some (time_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_reserved_1_value, bytes) =>
-                              Some ({| reserved_1 := reserved_1_value; lot_size_unit_flag := lot_size_unit_flag_value; current_session_vwap_c_14 := current_session_vwap_c_14_value; sign := sign_value; time_c_6 := time_c_6_value; second_reserved_1 := second_reserved_1_value |}, bytes)
+                              Some ({| reserved_1 := reserved_1_value; lot_size_unit_flag := lot_size_unit_flag_value; current_session_vwap_value := current_session_vwap_value_value; sign := sign_value; time := time_value; second_reserved_1 := second_reserved_1_value |}, bytes)
                           end
                       end
                   end
@@ -2478,25 +2478,25 @@ Module SseEquitiesStandardV195.
     (** Parity/Estimated Price *)
     Record t := {
       unit_flag : list byte;
-      parity_estimated_price_c_14 : list byte;
+      parity_estimated_price_value : list byte;
       sign : list byte;
-      time_c_6 : list byte;
+      time : list byte;
       reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (parity_estimated_price_c_14 record) = 14 /\
+      Datatypes.length (parity_estimated_price_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (parity_estimated_price_c_14 record) ++
+      encode_bytes 14 (parity_estimated_price_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2505,17 +2505,17 @@ Module SseEquitiesStandardV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (parity_estimated_price_c_14_value, bytes) =>
+          | Some (parity_estimated_price_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
+                  | Some (time_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          Some ({| unit_flag := unit_flag_value; parity_estimated_price_c_14 := parity_estimated_price_c_14_value; sign := sign_value; time_c_6 := time_c_6_value; reserved_1 := reserved_1_value |}, bytes)
+                          Some ({| unit_flag := unit_flag_value; parity_estimated_price_value := parity_estimated_price_value_value; sign := sign_value; time := time_value; reserved_1 := reserved_1_value |}, bytes)
                       end
                   end
               end
@@ -2603,27 +2603,27 @@ Module SseEquitiesStandardV195.
 
     (** Direct Yield *)
     Record t := {
-      direct_yield_c_8 : list byte;
+      direct_yield_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (direct_yield_c_8 record) = 8 /\
+      Datatypes.length (direct_yield_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (direct_yield_c_8 record) ++
+      encode_bytes 8 (direct_yield_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (direct_yield_c_8_value, bytes) =>
+      | Some (direct_yield_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| direct_yield_c_8 := direct_yield_c_8_value; sign := sign_value |}, bytes)
+              Some ({| direct_yield_value := direct_yield_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -2654,27 +2654,27 @@ Module SseEquitiesStandardV195.
 
     (** Final Yield *)
     Record t := {
-      final_yield_c_8 : list byte;
+      final_yield_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (final_yield_c_8 record) = 8 /\
+      Datatypes.length (final_yield_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (final_yield_c_8 record) ++
+      encode_bytes 8 (final_yield_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (final_yield_c_8_value, bytes) =>
+      | Some (final_yield_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| final_yield_c_8 := final_yield_c_8_value; sign := sign_value |}, bytes)
+              Some ({| final_yield_value := final_yield_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -2708,7 +2708,7 @@ Module SseEquitiesStandardV195.
       reserved_2 : list byte;
       direct_yield : DirectYield.t;
       final_yield : FinalYield.t;
-      time_c_6 : list byte;
+      time : list byte;
       reserved_1 : list byte;
     }.
 
@@ -2717,14 +2717,14 @@ Module SseEquitiesStandardV195.
       Datatypes.length (reserved_2 record) = 2 /\
       DirectYield.bounded (direct_yield record) /\
       FinalYield.bounded (final_yield record) /\
-      Datatypes.length (time_c_6 record) = 6 /\
+      Datatypes.length (time record) = 6 /\
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       DirectYield.encode (direct_yield record) ++
       FinalYield.encode (final_yield record) ++
-      encode_bytes 6 (time_c_6 record) ++
+      encode_bytes 6 (time record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2739,11 +2739,11 @@ Module SseEquitiesStandardV195.
               | Some (final_yield_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
+                  | Some (time_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (reserved_1_value, bytes) =>
-                          Some ({| reserved_2 := reserved_2_value; direct_yield := direct_yield_value; final_yield := final_yield_value; time_c_6 := time_c_6_value; reserved_1 := reserved_1_value |}, bytes)
+                          Some ({| reserved_2 := reserved_2_value; direct_yield := direct_yield_value; final_yield := final_yield_value; time := time_value; reserved_1 := reserved_1_value |}, bytes)
                       end
                   end
               end
@@ -2783,7 +2783,7 @@ Module SseEquitiesStandardV195.
       reserved_2 : list byte;
       test_mode_flag : list byte;
       start_end_flag : list byte;
-      time_c_6 : list byte;
+      time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -2791,13 +2791,13 @@ Module SseEquitiesStandardV195.
       Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (test_mode_flag record) = 1 /\
       Datatypes.length (start_end_flag record) = 1 /\
-      Datatypes.length (time_c_6 record) = 6.
+      Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (test_mode_flag record) ++
       encode_bytes 1 (start_end_flag record) ++
-      encode_bytes 6 (time_c_6 record).
+      encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -2811,8 +2811,8 @@ Module SseEquitiesStandardV195.
               | Some (start_end_flag_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
-                      Some ({| reserved_2 := reserved_2_value; test_mode_flag := test_mode_flag_value; start_end_flag := start_end_flag_value; time_c_6 := time_c_6_value |}, bytes)
+                  | Some (time_value, bytes) =>
+                      Some ({| reserved_2 := reserved_2_value; test_mode_flag := test_mode_flag_value; start_end_flag := start_end_flag_value; time := time_value |}, bytes)
                   end
               end
           end

@@ -200,7 +200,7 @@ Module BondSpotPricesAndTradesV68.
       publication_date_time : list byte;
       instrument_id_code_type : list byte;
       instrument_id_code : list byte;
-      price_ascii_ch_20 : list byte;
+      traded_price : list byte;
       quantity : list byte;
       notional_amount : list byte;
       notional_currency : list byte;
@@ -243,7 +243,7 @@ Module BondSpotPricesAndTradesV68.
       Datatypes.length (publication_date_time record) = 27 /\
       Datatypes.length (instrument_id_code_type record) = 4 /\
       Datatypes.length (instrument_id_code record) = 12 /\
-      Datatypes.length (price_ascii_ch_20 record) = 20 /\
+      Datatypes.length (traded_price record) = 20 /\
       Datatypes.length (quantity record) = 20 /\
       Datatypes.length (notional_amount record) = 20 /\
       Datatypes.length (notional_currency record) = 3 /\
@@ -284,7 +284,7 @@ Module BondSpotPricesAndTradesV68.
       encode_bytes 27 (publication_date_time record) ++
       encode_bytes 4 (instrument_id_code_type record) ++
       encode_bytes 12 (instrument_id_code record) ++
-      encode_bytes 20 (price_ascii_ch_20 record) ++
+      encode_bytes 20 (traded_price record) ++
       encode_bytes 20 (quantity record) ++
       encode_bytes 20 (notional_amount record) ++
       encode_bytes 3 (notional_currency record) ++
@@ -377,7 +377,7 @@ Module BondSpotPricesAndTradesV68.
                                                                                                       | Some (instrument_id_code_value, bytes) =>
                                                                                                           match decode_bytes 20 bytes with
                                                                                                           | None => None
-                                                                                                          | Some (price_ascii_ch_20_value, bytes) =>
+                                                                                                          | Some (traded_price_value, bytes) =>
                                                                                                               match decode_bytes 20 bytes with
                                                                                                               | None => None
                                                                                                               | Some (quantity_value, bytes) =>
@@ -417,7 +417,7 @@ Module BondSpotPricesAndTradesV68.
                                                                                                                                                               match decode_bytes 4 bytes with
                                                                                                                                                               | None => None
                                                                                                                                                               | Some (mmt_benchmark_indicator_value, bytes) =>
-                                                                                                                                                                  Some ({| symbol_index := symbol_index_value; source_time := source_time_value; trade_id_number := trade_id_number_value; venue_of_execution := venue_of_execution_value; source_seq_num := source_seq_num_value; price_notation := price_notation_value; transaction_to_be_cleared := transaction_to_be_cleared_value; cumulative_quantity := cumulative_quantity_value; highest_price := highest_price_value; lowest_price := lowest_price_value; variation_last_price := variation_last_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; price_currency := price_currency_value; last_trade_indicator := last_trade_indicator_value; type_of_trade := type_of_trade_value; trade_origin := trade_origin_value; tick_direction := tick_direction_value; opening_trade_indicator := opening_trade_indicator_value; variation_scale_code := variation_scale_code_value; price_scale_code := price_scale_code_value; trading_date_time := trading_date_time_value; publication_date_time := publication_date_time_value; instrument_id_code_type := instrument_id_code_type_value; instrument_id_code := instrument_id_code_value; price_ascii_ch_20 := price_ascii_ch_20_value; quantity := quantity_value; notional_amount := notional_amount_value; notional_currency := notional_currency_value; reserved_1 := reserved_1_value; transaction_id_code := transaction_id_code_value; mmt_market_mechanism := mmt_market_mechanism_value; mmt_trading_mode := mmt_trading_mode_value; mmt_algorithmic_indicator := mmt_algorithmic_indicator_value; mmt_modification_indicator := mmt_modification_indicator_value; mmt_negotiation_indicator := mmt_negotiation_indicator_value; mmt_special_dividend_indicator := mmt_special_dividend_indicator_value; mmt_contribution_to_price := mmt_contribution_to_price_value; mmt_benchmark_indicator := mmt_benchmark_indicator_value |}, bytes)
+                                                                                                                                                                  Some ({| symbol_index := symbol_index_value; source_time := source_time_value; trade_id_number := trade_id_number_value; venue_of_execution := venue_of_execution_value; source_seq_num := source_seq_num_value; price_notation := price_notation_value; transaction_to_be_cleared := transaction_to_be_cleared_value; cumulative_quantity := cumulative_quantity_value; highest_price := highest_price_value; lowest_price := lowest_price_value; variation_last_price := variation_last_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; price_currency := price_currency_value; last_trade_indicator := last_trade_indicator_value; type_of_trade := type_of_trade_value; trade_origin := trade_origin_value; tick_direction := tick_direction_value; opening_trade_indicator := opening_trade_indicator_value; variation_scale_code := variation_scale_code_value; price_scale_code := price_scale_code_value; trading_date_time := trading_date_time_value; publication_date_time := publication_date_time_value; instrument_id_code_type := instrument_id_code_type_value; instrument_id_code := instrument_id_code_value; traded_price := traded_price_value; quantity := quantity_value; notional_amount := notional_amount_value; notional_currency := notional_currency_value; reserved_1 := reserved_1_value; transaction_id_code := transaction_id_code_value; mmt_market_mechanism := mmt_market_mechanism_value; mmt_trading_mode := mmt_trading_mode_value; mmt_algorithmic_indicator := mmt_algorithmic_indicator_value; mmt_modification_indicator := mmt_modification_indicator_value; mmt_negotiation_indicator := mmt_negotiation_indicator_value; mmt_special_dividend_indicator := mmt_special_dividend_indicator_value; mmt_contribution_to_price := mmt_contribution_to_price_value; mmt_benchmark_indicator := mmt_benchmark_indicator_value |}, bytes)
                                                                                                                                                               end
                                                                                                                                                           end
                                                                                                                                                       end
@@ -525,7 +525,7 @@ Module BondSpotPricesAndTradesV68.
       symbol_index : N;
       source_time : N;
       source_seq_num : N;
-      price_binary_int_4 : N;
+      price : N;
       highest_price : N;
       lowest_price : N;
       variation_last_price : N;
@@ -542,7 +542,7 @@ Module BondSpotPricesAndTradesV68.
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       (source_time record < 256 ^ N.of_nat 4)%N /\
       (source_seq_num record < 256 ^ N.of_nat 4)%N /\
-      (price_binary_int_4 record < 256 ^ N.of_nat 4)%N /\
+      (price record < 256 ^ N.of_nat 4)%N /\
       (highest_price record < 256 ^ N.of_nat 4)%N /\
       (lowest_price record < 256 ^ N.of_nat 4)%N /\
       (variation_last_price record < 256 ^ N.of_nat 4)%N /\
@@ -557,7 +557,7 @@ Module BondSpotPricesAndTradesV68.
       encode_uint 4 (symbol_index record) ++
       encode_uint 4 (source_time record) ++
       encode_uint 4 (source_seq_num record) ++
-      encode_uint 4 (price_binary_int_4 record) ++
+      encode_uint 4 (price record) ++
       encode_uint 4 (highest_price record) ++
       encode_uint 4 (lowest_price record) ++
       encode_uint 4 (variation_last_price record) ++
@@ -580,7 +580,7 @@ Module BondSpotPricesAndTradesV68.
               | Some (source_seq_num_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (price_binary_int_4_value, bytes) =>
+                  | Some (price_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (highest_price_value, bytes) =>
@@ -608,7 +608,7 @@ Module BondSpotPricesAndTradesV68.
                                                       match decode_uint 1 bytes with
                                                       | None => None
                                                       | Some (variation_scale_code_value, bytes) =>
-                                                          Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; price_binary_int_4 := price_binary_int_4_value; highest_price := highest_price_value; lowest_price := lowest_price_value; variation_last_price := variation_last_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; type_of_price := type_of_price_value; reserved_2 := reserved_2_value; price_scale_code := price_scale_code_value; variation_scale_code := variation_scale_code_value |}, bytes)
+                                                          Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; price := price_value; highest_price := highest_price_value; lowest_price := lowest_price_value; variation_last_price := variation_last_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; type_of_price := type_of_price_value; reserved_2 := reserved_2_value; price_scale_code := price_scale_code_value; variation_scale_code := variation_scale_code_value |}, bytes)
                                                       end
                                                   end
                                               end

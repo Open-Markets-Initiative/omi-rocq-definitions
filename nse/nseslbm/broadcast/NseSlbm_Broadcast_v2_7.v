@@ -493,7 +493,7 @@ Module NseSlbmBroadcastV27.
 
     (** ST_AUCTION_INQ_INFO *)
     Record t := {
-      token_long_4 : N;
+      token : N;
       auction_number : N;
       auction_status : N;
       initiator_type : N;
@@ -508,7 +508,7 @@ Module NseSlbmBroadcastV27.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (token_long_4 record < 256 ^ N.of_nat 4)%N /\
+      (token record < 256 ^ N.of_nat 4)%N /\
       (auction_number record < 256 ^ N.of_nat 2)%N /\
       (auction_status record < 256 ^ N.of_nat 2)%N /\
       (initiator_type record < 256 ^ N.of_nat 2)%N /\
@@ -521,7 +521,7 @@ Module NseSlbmBroadcastV27.
       (settlement_period record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (token_long_4 record) ++
+      encode_uint 4 (token record) ++
       encode_uint 2 (auction_number record) ++
       encode_uint 2 (auction_status record) ++
       encode_uint 2 (initiator_type record) ++
@@ -536,7 +536,7 @@ Module NseSlbmBroadcastV27.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (token_long_4_value, bytes) =>
+      | Some (token_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (auction_number_value, bytes) =>
@@ -567,7 +567,7 @@ Module NseSlbmBroadcastV27.
                                               match decode_uint 2 bytes with
                                               | None => None
                                               | Some (settlement_period_value, bytes) =>
-                                                  Some ({| token_long_4 := token_long_4_value; auction_number := auction_number_value; auction_status := auction_status_value; initiator_type := initiator_type_value; total_buy_qty := total_buy_qty_value; best_buy_price := best_buy_price_value; total_sell_qty := total_sell_qty_value; best_sell_price := best_sell_price_value; auction_price := auction_price_value; auction_qty := auction_qty_value; settlement_period := settlement_period_value |}, bytes)
+                                                  Some ({| token := token_value; auction_number := auction_number_value; auction_status := auction_status_value; initiator_type := initiator_type_value; total_buy_qty := total_buy_qty_value; best_buy_price := best_buy_price_value; total_sell_qty := total_sell_qty_value; best_sell_price := best_sell_price_value; auction_price := auction_price_value; auction_qty := auction_qty_value; settlement_period := settlement_period_value |}, bytes)
                                               end
                                           end
                                       end
@@ -658,19 +658,19 @@ Module NseSlbmBroadcastV27.
     (** Sent as SECURITY_OPEN_PRICE with the open price of a security when the market opens *)
     Record t := {
       sec_info : SecInfo.t;
-      token_long_4 : N;
+      token : N;
       opening_price : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       SecInfo.bounded (sec_info record) /\
-      (token_long_4 record < 256 ^ N.of_nat 4)%N /\
+      (token record < 256 ^ N.of_nat 4)%N /\
       (opening_price record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       SecInfo.encode (sec_info record) ++
-      encode_uint 4 (token_long_4 record) ++
+      encode_uint 4 (token record) ++
       encode_uint 4 (opening_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -679,11 +679,11 @@ Module NseSlbmBroadcastV27.
       | Some (sec_info_value, bytes) =>
           match decode_uint 4 bytes with
           | None => None
-          | Some (token_long_4_value, bytes) =>
+          | Some (token_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
               | Some (opening_price_value, bytes) =>
-                  Some ({| sec_info := sec_info_value; token_long_4 := token_long_4_value; opening_price := opening_price_value |}, bytes)
+                  Some ({| sec_info := sec_info_value; token := token_value; opening_price := opening_price_value |}, bytes)
               end
           end
       end.
@@ -807,27 +807,27 @@ Module NseSlbmBroadcastV27.
 
     (** Report Trailer Body *)
     Record t := {
-      number_of_records_long_4 : N;
+      number_of_records_long : N;
       reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (number_of_records_long_4 record < 256 ^ N.of_nat 4)%N /\
+      (number_of_records_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (number_of_records_long_4 record) ++
+      encode_uint 4 (number_of_records_long record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (number_of_records_long_4_value, bytes) =>
+      | Some (number_of_records_long_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (reserved_1_value, bytes) =>
-              Some ({| number_of_records_long_4 := number_of_records_long_4_value; reserved_1 := reserved_1_value |}, bytes)
+              Some ({| number_of_records_long := number_of_records_long_value; reserved_1 := reserved_1_value |}, bytes)
           end
       end.
 

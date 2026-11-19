@@ -665,7 +665,7 @@ Module WseStreamFullDepthV17620.
     (** The message contains a list of underlyings not traded in WATS. It concerns underlyings for derivatives and structured products *)
     Record t := {
       external_underlying_id : N;
-      product_identification_product_identification : list byte;
+      product_identification : list byte;
       product_identification_type : N;
       product_code : list byte;
       product_name : list byte;
@@ -677,7 +677,7 @@ Module WseStreamFullDepthV17620.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (external_underlying_id record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (product_identification_product_identification record) = 30 /\
+      Datatypes.length (product_identification record) = 30 /\
       (product_identification_type record < 256 ^ N.of_nat 1)%N /\
       Datatypes.length (product_code record) = 20 /\
       Datatypes.length (product_name record) = 50 /\
@@ -687,7 +687,7 @@ Module WseStreamFullDepthV17620.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (external_underlying_id record) ++
-      encode_bytes 30 (product_identification_product_identification record) ++
+      encode_bytes 30 (product_identification record) ++
       encode_uint 1 (product_identification_type record) ++
       encode_bytes 20 (product_code record) ++
       encode_bytes 50 (product_name record) ++
@@ -701,7 +701,7 @@ Module WseStreamFullDepthV17620.
       | Some (external_underlying_id_value, bytes) =>
           match decode_bytes 30 bytes with
           | None => None
-          | Some (product_identification_product_identification_value, bytes) =>
+          | Some (product_identification_value, bytes) =>
               match decode_uint 1 bytes with
               | None => None
               | Some (product_identification_type_value, bytes) =>
@@ -720,7 +720,7 @@ Module WseStreamFullDepthV17620.
                                   match decode_uint_le 2 bytes with
                                   | None => None
                                   | Some (trading_currency_value, bytes) =>
-                                      Some ({| external_underlying_id := external_underlying_id_value; product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value; product_code := product_code_value; product_name := product_name_value; mic := mic_value; nominal_currency := nominal_currency_value; trading_currency := trading_currency_value |}, bytes)
+                                      Some ({| external_underlying_id := external_underlying_id_value; product_identification := product_identification_value; product_identification_type := product_identification_type_value; product_code := product_code_value; product_name := product_name_value; mic := mic_value; nominal_currency := nominal_currency_value; trading_currency := trading_currency_value |}, bytes)
                                   end
                               end
                           end
@@ -781,12 +781,12 @@ Module WseStreamFullDepthV17620.
       trading_schedule_id : N;
       description : list byte;
       mic : list byte;
-      nominal_value_price : N;
+      nominal_value : N;
       nominal_value_type : N;
-      multiplier_multiplier : N;
+      multiplier : N;
       strike_price : N;
       strike_price_currency : N;
-      product_identification_product_identification : list byte;
+      product_identification : list byte;
       product_identification_type : N;
       settlement_calendar_id : N;
       bond_coupon_type : N;
@@ -846,12 +846,12 @@ Module WseStreamFullDepthV17620.
       (trading_schedule_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (description record) = 64 /\
       Datatypes.length (mic record) = 4 /\
-      (nominal_value_price record < 256 ^ N.of_nat 8)%N /\
+      (nominal_value record < 256 ^ N.of_nat 8)%N /\
       (nominal_value_type record < 256 ^ N.of_nat 1)%N /\
-      (multiplier_multiplier record < 256 ^ N.of_nat 8)%N /\
+      (multiplier record < 256 ^ N.of_nat 8)%N /\
       (strike_price record < 256 ^ N.of_nat 8)%N /\
       (strike_price_currency record < 256 ^ N.of_nat 2)%N /\
-      Datatypes.length (product_identification_product_identification record) = 30 /\
+      Datatypes.length (product_identification record) = 30 /\
       (product_identification_type record < 256 ^ N.of_nat 1)%N /\
       (settlement_calendar_id record < 256 ^ N.of_nat 4)%N /\
       (bond_coupon_type record < 256 ^ N.of_nat 1)%N /\
@@ -909,12 +909,12 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 4 (trading_schedule_id record) ++
       encode_bytes 64 (description record) ++
       encode_bytes 4 (mic record) ++
-      encode_uint_le 8 (nominal_value_price record) ++
+      encode_uint_le 8 (nominal_value record) ++
       encode_uint 1 (nominal_value_type record) ++
-      encode_uint_le 8 (multiplier_multiplier record) ++
+      encode_uint_le 8 (multiplier record) ++
       encode_uint_le 8 (strike_price record) ++
       encode_uint_le 2 (strike_price_currency record) ++
-      encode_bytes 30 (product_identification_product_identification record) ++
+      encode_bytes 30 (product_identification record) ++
       encode_uint 1 (product_identification_type record) ++
       encode_uint_le 4 (settlement_calendar_id record) ++
       encode_uint 1 (bond_coupon_type record) ++
@@ -1010,13 +1010,13 @@ Module WseStreamFullDepthV17620.
                                                                           | Some (mic_value, bytes) =>
                                                                               match decode_uint_le 8 bytes with
                                                                               | None => None
-                                                                              | Some (nominal_value_price_value, bytes) =>
+                                                                              | Some (nominal_value_value, bytes) =>
                                                                                   match decode_uint 1 bytes with
                                                                                   | None => None
                                                                                   | Some (nominal_value_type_value, bytes) =>
                                                                                       match decode_uint_le 8 bytes with
                                                                                       | None => None
-                                                                                      | Some (multiplier_multiplier_value, bytes) =>
+                                                                                      | Some (multiplier_value, bytes) =>
                                                                                           match decode_uint_le 8 bytes with
                                                                                           | None => None
                                                                                           | Some (strike_price_value, bytes) =>
@@ -1025,7 +1025,7 @@ Module WseStreamFullDepthV17620.
                                                                                               | Some (strike_price_currency_value, bytes) =>
                                                                                                   match decode_bytes 30 bytes with
                                                                                                   | None => None
-                                                                                                  | Some (product_identification_product_identification_value, bytes) =>
+                                                                                                  | Some (product_identification_value, bytes) =>
                                                                                                       match decode_uint 1 bytes with
                                                                                                       | None => None
                                                                                                       | Some (product_identification_type_value, bytes) =>
@@ -1137,7 +1137,7 @@ Module WseStreamFullDepthV17620.
                                                                                                                                                                                                                                                       match decode_uint_le 4 bytes with
                                                                                                                                                                                                                                                       | None => None
                                                                                                                                                                                                                                                       | Some (external_underlying_id_value, bytes) =>
-                                                                                                                                                                                                                                                          Some ({| instrument_id := instrument_id_value; product_type := product_type_value; product_subtype := product_subtype_value; first_trading_date := first_trading_date_value; last_trading_date := last_trading_date_value; product_id := product_id_value; currency := currency_value; iceberg_min_value := iceberg_min_value_value; lot_size := lot_size_value; price_expression_type := price_expression_type_value; calendar_id := calendar_id_value; market_structure_id := market_structure_id_value; tick_table_id := tick_table_id_value; reference_instrument_id := reference_instrument_id_value; collar_group_id := collar_group_id_value; trading_schedule_id := trading_schedule_id_value; description := description_value; mic := mic_value; nominal_value_price := nominal_value_price_value; nominal_value_type := nominal_value_type_value; multiplier_multiplier := multiplier_multiplier_value; strike_price := strike_price_value; strike_price_currency := strike_price_currency_value; product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value; settlement_calendar_id := settlement_calendar_id_value; bond_coupon_type := bond_coupon_type_value; pre_trade_check_min_price := pre_trade_check_min_price_value; pre_trade_check_max_price := pre_trade_check_max_price_value; pre_trade_check_min_quantity := pre_trade_check_min_quantity_value; pre_trade_check_max_quantity := pre_trade_check_max_quantity_value; pre_trade_check_max_value := pre_trade_check_max_value_value; pre_trade_check_min_value := pre_trade_check_min_value_value; liquidity := liquidity_value; market_model_type := market_model_type_value; issuer := issuer_value; issuer_reg_country := issuer_reg_country_value; underlying_instrument_id := underlying_instrument_id_value; product_code := product_code_value; cfi := cfi_value; fisn := fisn_value; issue_size := issue_size_value; nominal_currency := nominal_currency_value; us_indicator := us_indicator_value; expiry_date := expiry_date_value; version_number := version_number_value; settlement_type := settlement_type_value; option_type := option_type_value; exercise_type := exercise_type_value; product_name := product_name_value; reference_price := reference_price_value; status := status_value; initial_phase_id := initial_phase_id_value; threshold_max := threshold_max_value; threshold_min := threshold_min_value; is_leverage := is_leverage_value; accrued_interest_value := accrued_interest_value_value; kid := kid_value; kid_issue_date := kid_issue_date_value; value_at_risk := value_at_risk_value; external_underlying_id := external_underlying_id_value |}, bytes)
+                                                                                                                                                                                                                                                          Some ({| instrument_id := instrument_id_value; product_type := product_type_value; product_subtype := product_subtype_value; first_trading_date := first_trading_date_value; last_trading_date := last_trading_date_value; product_id := product_id_value; currency := currency_value; iceberg_min_value := iceberg_min_value_value; lot_size := lot_size_value; price_expression_type := price_expression_type_value; calendar_id := calendar_id_value; market_structure_id := market_structure_id_value; tick_table_id := tick_table_id_value; reference_instrument_id := reference_instrument_id_value; collar_group_id := collar_group_id_value; trading_schedule_id := trading_schedule_id_value; description := description_value; mic := mic_value; nominal_value := nominal_value_value; nominal_value_type := nominal_value_type_value; multiplier := multiplier_value; strike_price := strike_price_value; strike_price_currency := strike_price_currency_value; product_identification := product_identification_value; product_identification_type := product_identification_type_value; settlement_calendar_id := settlement_calendar_id_value; bond_coupon_type := bond_coupon_type_value; pre_trade_check_min_price := pre_trade_check_min_price_value; pre_trade_check_max_price := pre_trade_check_max_price_value; pre_trade_check_min_quantity := pre_trade_check_min_quantity_value; pre_trade_check_max_quantity := pre_trade_check_max_quantity_value; pre_trade_check_max_value := pre_trade_check_max_value_value; pre_trade_check_min_value := pre_trade_check_min_value_value; liquidity := liquidity_value; market_model_type := market_model_type_value; issuer := issuer_value; issuer_reg_country := issuer_reg_country_value; underlying_instrument_id := underlying_instrument_id_value; product_code := product_code_value; cfi := cfi_value; fisn := fisn_value; issue_size := issue_size_value; nominal_currency := nominal_currency_value; us_indicator := us_indicator_value; expiry_date := expiry_date_value; version_number := version_number_value; settlement_type := settlement_type_value; option_type := option_type_value; exercise_type := exercise_type_value; product_name := product_name_value; reference_price := reference_price_value; status := status_value; initial_phase_id := initial_phase_id_value; threshold_max := threshold_max_value; threshold_min := threshold_min_value; is_leverage := is_leverage_value; accrued_interest_value := accrued_interest_value_value; kid := kid_value; kid_issue_date := kid_issue_date_value; value_at_risk := value_at_risk_value; external_underlying_id := external_underlying_id_value |}, bytes)
                                                                                                                                                                                                                                                       end
                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                               end
@@ -1404,27 +1404,27 @@ Module WseStreamFullDepthV17620.
 
     (** PublicProductIdentification *)
     Record t := {
-      product_identification_product_identification : list byte;
+      product_identification : list byte;
       product_identification_type : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (product_identification_product_identification record) = 30 /\
+      Datatypes.length (product_identification record) = 30 /\
       (product_identification_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 30 (product_identification_product_identification record) ++
+      encode_bytes 30 (product_identification record) ++
       encode_uint 1 (product_identification_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 30 bytes with
       | None => None
-      | Some (product_identification_product_identification_value, bytes) =>
+      | Some (product_identification_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (product_identification_type_value, bytes) =>
-              Some ({| product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
+              Some ({| product_identification := product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
           end
       end.
 
@@ -1506,27 +1506,27 @@ Module WseStreamFullDepthV17620.
 
     (** PublicProductIdentification *)
     Record t := {
-      product_identification_product_identification : list byte;
+      product_identification : list byte;
       product_identification_type : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (product_identification_product_identification record) = 30 /\
+      Datatypes.length (product_identification record) = 30 /\
       (product_identification_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 30 (product_identification_product_identification record) ++
+      encode_bytes 30 (product_identification record) ++
       encode_uint 1 (product_identification_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 30 bytes with
       | None => None
-      | Some (product_identification_product_identification_value, bytes) =>
+      | Some (product_identification_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
           | Some (product_identification_type_value, bytes) =>
-              Some ({| product_identification_product_identification := product_identification_product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
+              Some ({| product_identification := product_identification_value; product_identification_type := product_identification_type_value |}, bytes)
           end
       end.
 
@@ -1890,7 +1890,7 @@ Module WseStreamFullDepthV17620.
     (** Enriched trade report *)
     Record t := {
       instrument_id : N;
-      settlement_value_value : N;
+      trade_settlement_value : N;
       settlement_date : N;
       trading_timestamp : N;
       public_product_identification : PublicProductIdentification.t;
@@ -1898,7 +1898,7 @@ Module WseStreamFullDepthV17620.
       price_currency : N;
       price_notation : N;
       quantity : N;
-      nominal_value_value : N;
+      trade_nominal_value : N;
       nominal_currency : N;
       mic : list byte;
       publication_timestamp : N;
@@ -1930,7 +1930,7 @@ Module WseStreamFullDepthV17620.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (settlement_value_value record < 256 ^ N.of_nat 8)%N /\
+      (trade_settlement_value record < 256 ^ N.of_nat 8)%N /\
       (settlement_date record < 256 ^ N.of_nat 4)%N /\
       (trading_timestamp record < 256 ^ N.of_nat 8)%N /\
       PublicProductIdentification.bounded (public_product_identification record) /\
@@ -1938,7 +1938,7 @@ Module WseStreamFullDepthV17620.
       (price_currency record < 256 ^ N.of_nat 2)%N /\
       (price_notation record < 256 ^ N.of_nat 1)%N /\
       (quantity record < 256 ^ N.of_nat 8)%N /\
-      (nominal_value_value record < 256 ^ N.of_nat 8)%N /\
+      (trade_nominal_value record < 256 ^ N.of_nat 8)%N /\
       (nominal_currency record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (mic record) = 4 /\
       (publication_timestamp record < 256 ^ N.of_nat 8)%N /\
@@ -1968,7 +1968,7 @@ Module WseStreamFullDepthV17620.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (instrument_id record) ++
-      encode_uint_le 8 (settlement_value_value record) ++
+      encode_uint_le 8 (trade_settlement_value record) ++
       encode_uint_le 4 (settlement_date record) ++
       encode_uint_le 8 (trading_timestamp record) ++
       PublicProductIdentification.encode (public_product_identification record) ++
@@ -1976,7 +1976,7 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 2 (price_currency record) ++
       encode_uint 1 (price_notation record) ++
       encode_uint_le 8 (quantity record) ++
-      encode_uint_le 8 (nominal_value_value record) ++
+      encode_uint_le 8 (trade_nominal_value record) ++
       encode_uint_le 2 (nominal_currency record) ++
       encode_bytes 4 (mic record) ++
       encode_uint_le 8 (publication_timestamp record) ++
@@ -2010,7 +2010,7 @@ Module WseStreamFullDepthV17620.
       | Some (instrument_id_value, bytes) =>
           match decode_uint_le 8 bytes with
           | None => None
-          | Some (settlement_value_value_value, bytes) =>
+          | Some (trade_settlement_value_value, bytes) =>
               match decode_uint_le 4 bytes with
               | None => None
               | Some (settlement_date_value, bytes) =>
@@ -2034,7 +2034,7 @@ Module WseStreamFullDepthV17620.
                                       | Some (quantity_value, bytes) =>
                                           match decode_uint_le 8 bytes with
                                           | None => None
-                                          | Some (nominal_value_value_value, bytes) =>
+                                          | Some (trade_nominal_value_value, bytes) =>
                                               match decode_uint_le 2 bytes with
                                               | None => None
                                               | Some (nominal_currency_value, bytes) =>
@@ -2113,7 +2113,7 @@ Module WseStreamFullDepthV17620.
                                                                                                                                                   match decode_uint 1 bytes with
                                                                                                                                                   | None => None
                                                                                                                                                   | Some (mmt_post_trade_deferral_type_value, bytes) =>
-                                                                                                                                                      Some ({| instrument_id := instrument_id_value; settlement_value_value := settlement_value_value_value; settlement_date := settlement_date_value; trading_timestamp := trading_timestamp_value; public_product_identification := public_product_identification_value; price := price_value; price_currency := price_currency_value; price_notation := price_notation_value; quantity := quantity_value; nominal_value_value := nominal_value_value_value; nominal_currency := nominal_currency_value; mic := mic_value; publication_timestamp := publication_timestamp_value; trade_id := trade_id_value; trade_to_be_cleared := trade_to_be_cleared_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; mmt_market_mechanism := mmt_market_mechanism_value; mmt_trading_mode := mmt_trading_mode_value; mmt_transaction_category := mmt_transaction_category_value; mmt_negotiation_indicator := mmt_negotiation_indicator_value; mmt_agency_cross_trade_indicator := mmt_agency_cross_trade_indicator_value; mmt_modification_indicator := mmt_modification_indicator_value; mmt_benchmark_reference_price_indicator := mmt_benchmark_reference_price_indicator_value; mmt_special_dividend_indicator := mmt_special_dividend_indicator_value; mmt_off_book_automated_indicator := mmt_off_book_automated_indicator_value; mmt_ordinary_trade_indicator := mmt_ordinary_trade_indicator_value; mmt_algorithmic_indicator := mmt_algorithmic_indicator_value; mmt_post_trade_deferral_reason := mmt_post_trade_deferral_reason_value; mmt_post_trade_deferral_type := mmt_post_trade_deferral_type_value |}, bytes)
+                                                                                                                                                      Some ({| instrument_id := instrument_id_value; trade_settlement_value := trade_settlement_value_value; settlement_date := settlement_date_value; trading_timestamp := trading_timestamp_value; public_product_identification := public_product_identification_value; price := price_value; price_currency := price_currency_value; price_notation := price_notation_value; quantity := quantity_value; trade_nominal_value := trade_nominal_value_value; nominal_currency := nominal_currency_value; mic := mic_value; publication_timestamp := publication_timestamp_value; trade_id := trade_id_value; trade_to_be_cleared := trade_to_be_cleared_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; mmt_market_mechanism := mmt_market_mechanism_value; mmt_trading_mode := mmt_trading_mode_value; mmt_transaction_category := mmt_transaction_category_value; mmt_negotiation_indicator := mmt_negotiation_indicator_value; mmt_agency_cross_trade_indicator := mmt_agency_cross_trade_indicator_value; mmt_modification_indicator := mmt_modification_indicator_value; mmt_benchmark_reference_price_indicator := mmt_benchmark_reference_price_indicator_value; mmt_special_dividend_indicator := mmt_special_dividend_indicator_value; mmt_off_book_automated_indicator := mmt_off_book_automated_indicator_value; mmt_ordinary_trade_indicator := mmt_ordinary_trade_indicator_value; mmt_algorithmic_indicator := mmt_algorithmic_indicator_value; mmt_post_trade_deferral_reason := mmt_post_trade_deferral_reason_value; mmt_post_trade_deferral_type := mmt_post_trade_deferral_type_value |}, bytes)
                                                                                                                                                   end
                                                                                                                                               end
                                                                                                                                           end
@@ -2691,7 +2691,7 @@ Module WseStreamFullDepthV17620.
       max_price : N;
       min_price : N;
       settlement_price : N;
-      settlement_value_price : N;
+      settlement_value : N;
       end_trading_date : N;
       last_trade_date : N;
     }.
@@ -2714,7 +2714,7 @@ Module WseStreamFullDepthV17620.
       (max_price record < 256 ^ N.of_nat 8)%N /\
       (min_price record < 256 ^ N.of_nat 8)%N /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
-      (settlement_value_price record < 256 ^ N.of_nat 8)%N /\
+      (settlement_value record < 256 ^ N.of_nat 8)%N /\
       (end_trading_date record < 256 ^ N.of_nat 4)%N /\
       (last_trade_date record < 256 ^ N.of_nat 4)%N.
 
@@ -2735,7 +2735,7 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 8 (max_price record) ++
       encode_uint_le 8 (min_price record) ++
       encode_uint_le 8 (settlement_price record) ++
-      encode_uint_le 8 (settlement_value_price record) ++
+      encode_uint_le 8 (settlement_value record) ++
       encode_uint_le 4 (end_trading_date record) ++
       encode_uint_le 4 (last_trade_date record).
 
@@ -2790,14 +2790,14 @@ Module WseStreamFullDepthV17620.
                                                                   | Some (settlement_price_value, bytes) =>
                                                                       match decode_uint_le 8 bytes with
                                                                       | None => None
-                                                                      | Some (settlement_value_price_value, bytes) =>
+                                                                      | Some (settlement_value_value, bytes) =>
                                                                           match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (end_trading_date_value, bytes) =>
                                                                               match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (last_trade_date_value, bytes) =>
-                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value_price := settlement_value_price_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
+                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
                                                                               end
                                                                           end
                                                                       end
@@ -2878,7 +2878,7 @@ Module WseStreamFullDepthV17620.
       max_price : N;
       min_price : N;
       settlement_price : N;
-      settlement_value_price : N;
+      settlement_value : N;
       end_trading_date : N;
       last_trade_date : N;
     }.
@@ -2901,7 +2901,7 @@ Module WseStreamFullDepthV17620.
       (max_price record < 256 ^ N.of_nat 8)%N /\
       (min_price record < 256 ^ N.of_nat 8)%N /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
-      (settlement_value_price record < 256 ^ N.of_nat 8)%N /\
+      (settlement_value record < 256 ^ N.of_nat 8)%N /\
       (end_trading_date record < 256 ^ N.of_nat 4)%N /\
       (last_trade_date record < 256 ^ N.of_nat 4)%N.
 
@@ -2922,7 +2922,7 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 8 (max_price record) ++
       encode_uint_le 8 (min_price record) ++
       encode_uint_le 8 (settlement_price record) ++
-      encode_uint_le 8 (settlement_value_price record) ++
+      encode_uint_le 8 (settlement_value record) ++
       encode_uint_le 4 (end_trading_date record) ++
       encode_uint_le 4 (last_trade_date record).
 
@@ -2977,14 +2977,14 @@ Module WseStreamFullDepthV17620.
                                                                   | Some (settlement_price_value, bytes) =>
                                                                       match decode_uint_le 8 bytes with
                                                                       | None => None
-                                                                      | Some (settlement_value_price_value, bytes) =>
+                                                                      | Some (settlement_value_value, bytes) =>
                                                                           match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (end_trading_date_value, bytes) =>
                                                                               match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (last_trade_date_value, bytes) =>
-                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value_price := settlement_value_price_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
+                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
                                                                               end
                                                                           end
                                                                       end
@@ -3065,7 +3065,7 @@ Module WseStreamFullDepthV17620.
       max_price : N;
       min_price : N;
       settlement_price : N;
-      settlement_value_price : N;
+      settlement_value : N;
       end_trading_date : N;
       last_trade_date : N;
     }.
@@ -3088,7 +3088,7 @@ Module WseStreamFullDepthV17620.
       (max_price record < 256 ^ N.of_nat 8)%N /\
       (min_price record < 256 ^ N.of_nat 8)%N /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
-      (settlement_value_price record < 256 ^ N.of_nat 8)%N /\
+      (settlement_value record < 256 ^ N.of_nat 8)%N /\
       (end_trading_date record < 256 ^ N.of_nat 4)%N /\
       (last_trade_date record < 256 ^ N.of_nat 4)%N.
 
@@ -3109,7 +3109,7 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 8 (max_price record) ++
       encode_uint_le 8 (min_price record) ++
       encode_uint_le 8 (settlement_price record) ++
-      encode_uint_le 8 (settlement_value_price record) ++
+      encode_uint_le 8 (settlement_value record) ++
       encode_uint_le 4 (end_trading_date record) ++
       encode_uint_le 4 (last_trade_date record).
 
@@ -3164,14 +3164,14 @@ Module WseStreamFullDepthV17620.
                                                                   | Some (settlement_price_value, bytes) =>
                                                                       match decode_uint_le 8 bytes with
                                                                       | None => None
-                                                                      | Some (settlement_value_price_value, bytes) =>
+                                                                      | Some (settlement_value_value, bytes) =>
                                                                           match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (end_trading_date_value, bytes) =>
                                                                               match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (last_trade_date_value, bytes) =>
-                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value_price := settlement_value_price_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
+                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
                                                                               end
                                                                           end
                                                                       end
@@ -3252,7 +3252,7 @@ Module WseStreamFullDepthV17620.
       max_price : N;
       min_price : N;
       settlement_price : N;
-      settlement_value_price : N;
+      settlement_value : N;
       end_trading_date : N;
       last_trade_date : N;
     }.
@@ -3275,7 +3275,7 @@ Module WseStreamFullDepthV17620.
       (max_price record < 256 ^ N.of_nat 8)%N /\
       (min_price record < 256 ^ N.of_nat 8)%N /\
       (settlement_price record < 256 ^ N.of_nat 8)%N /\
-      (settlement_value_price record < 256 ^ N.of_nat 8)%N /\
+      (settlement_value record < 256 ^ N.of_nat 8)%N /\
       (end_trading_date record < 256 ^ N.of_nat 4)%N /\
       (last_trade_date record < 256 ^ N.of_nat 4)%N.
 
@@ -3296,7 +3296,7 @@ Module WseStreamFullDepthV17620.
       encode_uint_le 8 (max_price record) ++
       encode_uint_le 8 (min_price record) ++
       encode_uint_le 8 (settlement_price record) ++
-      encode_uint_le 8 (settlement_value_price record) ++
+      encode_uint_le 8 (settlement_value record) ++
       encode_uint_le 4 (end_trading_date record) ++
       encode_uint_le 4 (last_trade_date record).
 
@@ -3351,14 +3351,14 @@ Module WseStreamFullDepthV17620.
                                                                   | Some (settlement_price_value, bytes) =>
                                                                       match decode_uint_le 8 bytes with
                                                                       | None => None
-                                                                      | Some (settlement_value_price_value, bytes) =>
+                                                                      | Some (settlement_value_value, bytes) =>
                                                                           match decode_uint_le 4 bytes with
                                                                           | None => None
                                                                           | Some (end_trading_date_value, bytes) =>
                                                                               match decode_uint_le 4 bytes with
                                                                               | None => None
                                                                               | Some (last_trade_date_value, bytes) =>
-                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value_price := settlement_value_price_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
+                                                                                  Some ({| instrument_id := instrument_id_value; market_model_type := market_model_type_value; last_traded_price := last_traded_price_value; closing_price := closing_price_value; closing_price_type := closing_price_type_value; adjusted_closing_price := adjusted_closing_price_value; adjusted_closing_price_reason := adjusted_closing_price_reason_value; pct_change := pct_change_value; vwap := vwap_value; no_trades := no_trades_value; total_volume := total_volume_value; total_value := total_value_value; opening_price := opening_price_value; max_price := max_price_value; min_price := min_price_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; end_trading_date := end_trading_date_value; last_trade_date := last_trade_date_value |}, bytes)
                                                                               end
                                                                           end
                                                                       end
@@ -3428,7 +3428,7 @@ Module WseStreamFullDepthV17620.
       block_instrument : BlockInstrument.t;
       hybrid_instrument : HybridInstrument.t;
       product_identification_type : N;
-      product_identification_product_identification : list byte;
+      product_identification : list byte;
       product_id : N;
       mic : list byte;
       accumulated_interest : N;
@@ -3441,7 +3441,7 @@ Module WseStreamFullDepthV17620.
       market : N;
       marker_price_change : N;
       lower_liquidity : N;
-      multiplier_number : N;
+      product_summary_multiplier : N;
       dividend_rate : N;
       delta : N;
       gamma : N;
@@ -3465,7 +3465,7 @@ Module WseStreamFullDepthV17620.
       BlockInstrument.bounded (block_instrument record) /\
       HybridInstrument.bounded (hybrid_instrument record) /\
       (product_identification_type record < 256 ^ N.of_nat 1)%N /\
-      Datatypes.length (product_identification_product_identification record) = 30 /\
+      Datatypes.length (product_identification record) = 30 /\
       (product_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (mic record) = 4 /\
       (accumulated_interest record < 256 ^ N.of_nat 8)%N /\
@@ -3478,7 +3478,7 @@ Module WseStreamFullDepthV17620.
       (market record < 256 ^ N.of_nat 1)%N /\
       (marker_price_change record < 256 ^ N.of_nat 1)%N /\
       (lower_liquidity record < 256 ^ N.of_nat 1)%N /\
-      (multiplier_number record < 256 ^ N.of_nat 8)%N /\
+      (product_summary_multiplier record < 256 ^ N.of_nat 8)%N /\
       (dividend_rate record < 256 ^ N.of_nat 8)%N /\
       (delta record < 256 ^ N.of_nat 8)%N /\
       (gamma record < 256 ^ N.of_nat 8)%N /\
@@ -3500,7 +3500,7 @@ Module WseStreamFullDepthV17620.
       BlockInstrument.encode (block_instrument record) ++
       HybridInstrument.encode (hybrid_instrument record) ++
       encode_uint 1 (product_identification_type record) ++
-      encode_bytes 30 (product_identification_product_identification record) ++
+      encode_bytes 30 (product_identification record) ++
       encode_uint_le 4 (product_id record) ++
       encode_bytes 4 (mic record) ++
       encode_uint_le 8 (accumulated_interest record) ++
@@ -3513,7 +3513,7 @@ Module WseStreamFullDepthV17620.
       encode_uint 1 (market record) ++
       encode_uint 1 (marker_price_change record) ++
       encode_uint 1 (lower_liquidity record) ++
-      encode_uint_le 8 (multiplier_number record) ++
+      encode_uint_le 8 (product_summary_multiplier record) ++
       encode_uint_le 8 (dividend_rate record) ++
       encode_uint_le 8 (delta record) ++
       encode_uint_le 8 (gamma record) ++
@@ -3547,7 +3547,7 @@ Module WseStreamFullDepthV17620.
                       | Some (product_identification_type_value, bytes) =>
                           match decode_bytes 30 bytes with
                           | None => None
-                          | Some (product_identification_product_identification_value, bytes) =>
+                          | Some (product_identification_value, bytes) =>
                               match decode_uint_le 4 bytes with
                               | None => None
                               | Some (product_id_value, bytes) =>
@@ -3586,7 +3586,7 @@ Module WseStreamFullDepthV17620.
                                                                           | Some (lower_liquidity_value, bytes) =>
                                                                               match decode_uint_le 8 bytes with
                                                                               | None => None
-                                                                              | Some (multiplier_number_value, bytes) =>
+                                                                              | Some (product_summary_multiplier_value, bytes) =>
                                                                                   match decode_uint_le 8 bytes with
                                                                                   | None => None
                                                                                   | Some (dividend_rate_value, bytes) =>
@@ -3629,7 +3629,7 @@ Module WseStreamFullDepthV17620.
                                                                                                                                       match decode_uint 1 bytes with
                                                                                                                                       | None => None
                                                                                                                                       | Some (liquidity_support_pge_value, bytes) =>
-                                                                                                                                          Some ({| clob_instrument := clob_instrument_value; cross_instrument := cross_instrument_value; block_instrument := block_instrument_value; hybrid_instrument := hybrid_instrument_value; product_identification_type := product_identification_type_value; product_identification_product_identification := product_identification_product_identification_value; product_id := product_id_value; mic := mic_value; accumulated_interest := accumulated_interest_value; interest_rate := interest_rate_value; currency := currency_value; session_date := session_date_value; trading_value_currency := trading_value_currency_value; status := status_value; sector := sector_value; market := market_value; marker_price_change := marker_price_change_value; lower_liquidity := lower_liquidity_value; multiplier_number := multiplier_number_value; dividend_rate := dividend_rate_value; delta := delta_value; gamma := gamma_value; rho := rho_value; theta := theta_value; vega := vega_value; volatility := volatility_value; options_strike_price := options_strike_price_value; dividend := dividend_value; subscription_right := subscription_right_value; interim_dividend_right := interim_dividend_right_value; split := split_value; quotation_system := quotation_system_value; liquidity_support_pge := liquidity_support_pge_value |}, bytes)
+                                                                                                                                          Some ({| clob_instrument := clob_instrument_value; cross_instrument := cross_instrument_value; block_instrument := block_instrument_value; hybrid_instrument := hybrid_instrument_value; product_identification_type := product_identification_type_value; product_identification := product_identification_value; product_id := product_id_value; mic := mic_value; accumulated_interest := accumulated_interest_value; interest_rate := interest_rate_value; currency := currency_value; session_date := session_date_value; trading_value_currency := trading_value_currency_value; status := status_value; sector := sector_value; market := market_value; marker_price_change := marker_price_change_value; lower_liquidity := lower_liquidity_value; product_summary_multiplier := product_summary_multiplier_value; dividend_rate := dividend_rate_value; delta := delta_value; gamma := gamma_value; rho := rho_value; theta := theta_value; vega := vega_value; volatility := volatility_value; options_strike_price := options_strike_price_value; dividend := dividend_value; subscription_right := subscription_right_value; interim_dividend_right := interim_dividend_right_value; split := split_value; quotation_system := quotation_system_value; liquidity_support_pge := liquidity_support_pge_value |}, bytes)
                                                                                                                                       end
                                                                                                                                   end
                                                                                                                               end
@@ -3873,17 +3873,17 @@ Module WseStreamFullDepthV17620.
     (** Test event *)
     Record t := {
       scenario_name : list byte;
-      event_type_event_type : N;
+      event_type : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (scenario_name record) = 200 /\
-      (event_type_event_type record < 256 ^ N.of_nat 1)%N.
+      (event_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 200 (scenario_name record) ++
-      encode_uint 1 (event_type_event_type record).
+      encode_uint 1 (event_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 200 bytes with
@@ -3891,8 +3891,8 @@ Module WseStreamFullDepthV17620.
       | Some (scenario_name_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (event_type_event_type_value, bytes) =>
-              Some ({| scenario_name := scenario_name_value; event_type_event_type := event_type_event_type_value |}, bytes)
+          | Some (event_type_value, bytes) =>
+              Some ({| scenario_name := scenario_name_value; event_type := event_type_value |}, bytes)
           end
       end.
 
@@ -4240,17 +4240,17 @@ Module WseStreamFullDepthV17620.
     (** Order book event for given instrument *)
     Record t := {
       instrument_id : N;
-      event_type_order_book_event_type : N;
+      order_book_event_type : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (event_type_order_book_event_type record < 256 ^ N.of_nat 1)%N.
+      (order_book_event_type record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (instrument_id record) ++
-      encode_uint 1 (event_type_order_book_event_type record).
+      encode_uint 1 (order_book_event_type record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -4258,8 +4258,8 @@ Module WseStreamFullDepthV17620.
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (event_type_order_book_event_type_value, bytes) =>
-              Some ({| instrument_id := instrument_id_value; event_type_order_book_event_type := event_type_order_book_event_type_value |}, bytes)
+          | Some (order_book_event_type_value, bytes) =>
+              Some ({| instrument_id := instrument_id_value; order_book_event_type := order_book_event_type_value |}, bytes)
           end
       end.
 

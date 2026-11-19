@@ -263,17 +263,17 @@ Module TseEquitiesToSTNeTV195.
     (** Trading Halt *)
     Record t := {
       state_flag : list byte;
-      time_c_6 : list byte;
+      time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (state_flag record) = 2 /\
-      Datatypes.length (time_c_6 record) = 6.
+      Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (state_flag record) ++
-      encode_bytes 6 (time_c_6 record).
+      encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -281,8 +281,8 @@ Module TseEquitiesToSTNeTV195.
       | Some (state_flag_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (time_c_6_value, bytes) =>
-              Some ({| state_flag := state_flag_value; time_c_6 := time_c_6_value |}, bytes)
+          | Some (time_value, bytes) =>
+              Some ({| state_flag := state_flag_value; time := time_value |}, bytes)
           end
       end.
 
@@ -315,25 +315,25 @@ Module TseEquitiesToSTNeTV195.
     Record t := {
       price_code : list byte;
       lot_size_unit_flag : list byte;
-      price_c_14 : list byte;
+      price_value : list byte;
       sign : list byte;
-      time_c_12 : list byte;
+      precise_time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (price_code record) = 2 /\
       Datatypes.length (lot_size_unit_flag record) = 1 /\
-      Datatypes.length (price_c_14 record) = 14 /\
+      Datatypes.length (price_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (time_c_12 record) = 12.
+      Datatypes.length (precise_time record) = 12.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (price_code record) ++
       encode_bytes 1 (lot_size_unit_flag record) ++
-      encode_bytes 14 (price_c_14 record) ++
+      encode_bytes 14 (price_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 12 (time_c_12 record).
+      encode_bytes 12 (precise_time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -344,14 +344,14 @@ Module TseEquitiesToSTNeTV195.
           | Some (lot_size_unit_flag_value, bytes) =>
               match decode_bytes 14 bytes with
               | None => None
-              | Some (price_c_14_value, bytes) =>
+              | Some (price_value_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (sign_value, bytes) =>
                       match decode_bytes 12 bytes with
                       | None => None
-                      | Some (time_c_12_value, bytes) =>
-                          Some ({| price_code := price_code_value; lot_size_unit_flag := lot_size_unit_flag_value; price_c_14 := price_c_14_value; sign := sign_value; time_c_12 := time_c_12_value |}, bytes)
+                      | Some (precise_time_value, bytes) =>
+                          Some ({| price_code := price_code_value; lot_size_unit_flag := lot_size_unit_flag_value; price_value := price_value_value; sign := sign_value; precise_time := precise_time_value |}, bytes)
                       end
                   end
               end
@@ -389,17 +389,17 @@ Module TseEquitiesToSTNeTV195.
     (** Trading Volume *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      trading_volume_c_14 : list byte;
+      trading_volume_value : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (trading_volume_c_14 record) = 14.
+      Datatypes.length (trading_volume_value record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (trading_volume_c_14 record).
+      encode_bytes 14 (trading_volume_value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -407,8 +407,8 @@ Module TseEquitiesToSTNeTV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (trading_volume_c_14_value, bytes) =>
-              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; trading_volume_c_14 := trading_volume_c_14_value |}, bytes)
+          | Some (trading_volume_value_value, bytes) =>
+              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; trading_volume_value := trading_volume_value_value |}, bytes)
           end
       end.
 
@@ -440,17 +440,17 @@ Module TseEquitiesToSTNeTV195.
     (** Turnover *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      turnover_c_14 : list byte;
+      turnover_value : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (turnover_c_14 record) = 14.
+      Datatypes.length (turnover_value record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (turnover_c_14 record).
+      encode_bytes 14 (turnover_value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -458,8 +458,8 @@ Module TseEquitiesToSTNeTV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (turnover_c_14_value, bytes) =>
-              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; turnover_c_14 := turnover_c_14_value |}, bytes)
+          | Some (turnover_value_value, bytes) =>
+              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; turnover_value := turnover_value_value |}, bytes)
           end
       end.
 
@@ -582,17 +582,17 @@ Module TseEquitiesToSTNeTV195.
     (** State *)
     Record t := {
       market_state_flag : list byte;
-      time_c_6 : list byte;
+      time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (market_state_flag record) = 2 /\
-      Datatypes.length (time_c_6 record) = 6.
+      Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (market_state_flag record) ++
-      encode_bytes 6 (time_c_6 record).
+      encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -600,8 +600,8 @@ Module TseEquitiesToSTNeTV195.
       | Some (market_state_flag_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (time_c_6_value, bytes) =>
-              Some ({| market_state_flag := market_state_flag_value; time_c_6 := time_c_6_value |}, bytes)
+          | Some (time_value, bytes) =>
+              Some ({| market_state_flag := market_state_flag_value; time := time_value |}, bytes)
           end
       end.
 
@@ -694,7 +694,7 @@ Module TseEquitiesToSTNeTV195.
       reserved_2 : list byte;
       test_mode_flag : list byte;
       start_end_flag : list byte;
-      time_c_6 : list byte;
+      time : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -702,13 +702,13 @@ Module TseEquitiesToSTNeTV195.
       Datatypes.length (reserved_2 record) = 2 /\
       Datatypes.length (test_mode_flag record) = 1 /\
       Datatypes.length (start_end_flag record) = 1 /\
-      Datatypes.length (time_c_6 record) = 6.
+      Datatypes.length (time record) = 6.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 2 (reserved_2 record) ++
       encode_bytes 1 (test_mode_flag record) ++
       encode_bytes 1 (start_end_flag record) ++
-      encode_bytes 6 (time_c_6 record).
+      encode_bytes 6 (time record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 2 bytes with
@@ -722,8 +722,8 @@ Module TseEquitiesToSTNeTV195.
               | Some (start_end_flag_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (time_c_6_value, bytes) =>
-                      Some ({| reserved_2 := reserved_2_value; test_mode_flag := test_mode_flag_value; start_end_flag := start_end_flag_value; time_c_6 := time_c_6_value |}, bytes)
+                  | Some (time_value, bytes) =>
+                      Some ({| reserved_2 := reserved_2_value; test_mode_flag := test_mode_flag_value; start_end_flag := start_end_flag_value; time := time_value |}, bytes)
                   end
               end
           end

@@ -1630,7 +1630,7 @@ Module NeoEquitiesOrderEntryV1019Exchange.
       transaction_time : N;
       cl_ord_id : list byte;
       broker_id : N;
-      symbol_8 : list byte;
+      symbol_short : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1638,13 +1638,13 @@ Module NeoEquitiesOrderEntryV1019Exchange.
       (transaction_time record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (cl_ord_id record) = 20 /\
       (broker_id record < 256 ^ N.of_nat 2)%N /\
-      Datatypes.length (symbol_8 record) = 8.
+      Datatypes.length (symbol_short record) = 8.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 8 (transaction_time record) ++
       encode_bytes 20 (cl_ord_id record) ++
       encode_uint_le 2 (broker_id record) ++
-      encode_bytes 8 (symbol_8 record).
+      encode_bytes 8 (symbol_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 8 bytes with
@@ -1658,8 +1658,8 @@ Module NeoEquitiesOrderEntryV1019Exchange.
               | Some (broker_id_value, bytes) =>
                   match decode_bytes 8 bytes with
                   | None => None
-                  | Some (symbol_8_value, bytes) =>
-                      Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; broker_id := broker_id_value; symbol_8 := symbol_8_value |}, bytes)
+                  | Some (symbol_short_value, bytes) =>
+                      Some ({| transaction_time := transaction_time_value; cl_ord_id := cl_ord_id_value; broker_id := broker_id_value; symbol_short := symbol_short_value |}, bytes)
                   end
               end
           end

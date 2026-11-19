@@ -305,7 +305,7 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       executed_quantity : N;
       remaining_quantity : N;
       execution_id : N;
-      price_binary_long_price_8 : N;
+      price_long : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -315,7 +315,7 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       (executed_quantity record < 256 ^ N.of_nat 4)%N /\
       (remaining_quantity record < 256 ^ N.of_nat 4)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
-      (price_binary_long_price_8 record < 256 ^ N.of_nat 8)%N.
+      (price_long record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
@@ -323,7 +323,7 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       encode_uint_le 4 (executed_quantity record) ++
       encode_uint_le 4 (remaining_quantity record) ++
       encode_uint_le 8 (execution_id record) ++
-      encode_uint_le 8 (price_binary_long_price_8 record).
+      encode_uint_le 8 (price_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -343,8 +343,8 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
                       | Some (execution_id_value, bytes) =>
                           match decode_uint_le 8 bytes with
                           | None => None
-                          | Some (price_binary_long_price_8_value, bytes) =>
-                              Some ({| time_offset := time_offset_value; order_id := order_id_value; executed_quantity := executed_quantity_value; remaining_quantity := remaining_quantity_value; execution_id := execution_id_value; price_binary_long_price_8 := price_binary_long_price_8_value |}, bytes)
+                          | Some (price_long_value, bytes) =>
+                              Some ({| time_offset := time_offset_value; order_id := order_id_value; executed_quantity := executed_quantity_value; remaining_quantity := remaining_quantity_value; execution_id := execution_id_value; price_long := price_long_value |}, bytes)
                           end
                       end
                   end
@@ -385,19 +385,19 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
     Record t := {
       time_offset : N;
       order_id : N;
-      canceled_quantity_binary_4 : N;
+      canceled_quantity_long : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      (canceled_quantity_binary_4 record < 256 ^ N.of_nat 4)%N.
+      (canceled_quantity_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
-      encode_uint_le 4 (canceled_quantity_binary_4 record).
+      encode_uint_le 4 (canceled_quantity_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -408,8 +408,8 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
           | Some (order_id_value, bytes) =>
               match decode_uint_le 4 bytes with
               | None => None
-              | Some (canceled_quantity_binary_4_value, bytes) =>
-                  Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_binary_4 := canceled_quantity_binary_4_value |}, bytes)
+              | Some (canceled_quantity_long_value, bytes) =>
+                  Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_long := canceled_quantity_long_value |}, bytes)
               end
           end
       end.
@@ -444,19 +444,19 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
     Record t := {
       time_offset : N;
       order_id : N;
-      canceled_quantity_binary_2 : N;
+      canceled_quantity_short : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      (canceled_quantity_binary_2 record < 256 ^ N.of_nat 2)%N.
+      (canceled_quantity_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
-      encode_uint_le 2 (canceled_quantity_binary_2 record).
+      encode_uint_le 2 (canceled_quantity_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -467,8 +467,8 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
           | Some (order_id_value, bytes) =>
               match decode_uint_le 2 bytes with
               | None => None
-              | Some (canceled_quantity_binary_2_value, bytes) =>
-                  Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_binary_2 := canceled_quantity_binary_2_value |}, bytes)
+              | Some (canceled_quantity_short_value, bytes) =>
+                  Some ({| time_offset := time_offset_value; order_id := order_id_value; canceled_quantity_short := canceled_quantity_short_value |}, bytes)
               end
           end
       end.
@@ -555,9 +555,9 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       time_offset : N;
       order_id : N;
       side_indicator : list byte;
-      quantity_binary_4 : N;
+      quantity_long : N;
       symbol_short : list byte;
-      price_binary_long_price_8 : N;
+      price_long : N;
       execution_id : N;
     }.
 
@@ -566,18 +566,18 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (side_indicator record) = 1 /\
-      (quantity_binary_4 record < 256 ^ N.of_nat 4)%N /\
+      (quantity_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol_short record) = 6 /\
-      (price_binary_long_price_8 record < 256 ^ N.of_nat 8)%N /\
+      (price_long record < 256 ^ N.of_nat 8)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint_le 4 (quantity_binary_4 record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint_le 8 (price_binary_long_price_8 record) ++
+      encode_uint_le 8 (price_long record) ++
       encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -592,17 +592,17 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
               | Some (side_indicator_value, bytes) =>
                   match decode_uint_le 4 bytes with
                   | None => None
-                  | Some (quantity_binary_4_value, bytes) =>
+                  | Some (quantity_long_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_short_value, bytes) =>
                           match decode_uint_le 8 bytes with
                           | None => None
-                          | Some (price_binary_long_price_8_value, bytes) =>
+                          | Some (price_long_value, bytes) =>
                               match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
-                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_binary_4 := quantity_binary_4_value; symbol_short := symbol_short_value; price_binary_long_price_8 := price_binary_long_price_8_value; execution_id := execution_id_value |}, bytes)
+                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_long := quantity_long_value; symbol_short := symbol_short_value; price_long := price_long_value; execution_id := execution_id_value |}, bytes)
                               end
                           end
                       end
@@ -646,9 +646,9 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       time_offset : N;
       order_id : N;
       side_indicator : list byte;
-      quantity_binary_2 : N;
+      quantity_short : N;
       symbol_short : list byte;
-      price_binary_short_price_2 : N;
+      price_short : N;
       execution_id : N;
     }.
 
@@ -657,18 +657,18 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (side_indicator record) = 1 /\
-      (quantity_binary_2 record < 256 ^ N.of_nat 2)%N /\
+      (quantity_short record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (symbol_short record) = 6 /\
-      (price_binary_short_price_2 record < 256 ^ N.of_nat 2)%N /\
+      (price_short record < 256 ^ N.of_nat 2)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint_le 2 (quantity_binary_2 record) ++
+      encode_uint_le 2 (quantity_short record) ++
       encode_bytes 6 (symbol_short record) ++
-      encode_uint_le 2 (price_binary_short_price_2 record) ++
+      encode_uint_le 2 (price_short record) ++
       encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -683,17 +683,17 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
               | Some (side_indicator_value, bytes) =>
                   match decode_uint_le 2 bytes with
                   | None => None
-                  | Some (quantity_binary_2_value, bytes) =>
+                  | Some (quantity_short_value, bytes) =>
                       match decode_bytes 6 bytes with
                       | None => None
                       | Some (symbol_short_value, bytes) =>
                           match decode_uint_le 2 bytes with
                           | None => None
-                          | Some (price_binary_short_price_2_value, bytes) =>
+                          | Some (price_short_value, bytes) =>
                               match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
-                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_binary_2 := quantity_binary_2_value; symbol_short := symbol_short_value; price_binary_short_price_2 := price_binary_short_price_2_value; execution_id := execution_id_value |}, bytes)
+                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_short := quantity_short_value; symbol_short := symbol_short_value; price_short := price_short_value; execution_id := execution_id_value |}, bytes)
                               end
                           end
                       end
@@ -737,9 +737,9 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       time_offset : N;
       order_id : N;
       side_indicator : list byte;
-      quantity_binary_4 : N;
+      quantity_long : N;
       symbol_long : list byte;
-      price_binary_long_price_8 : N;
+      price_long : N;
       execution_id : N;
     }.
 
@@ -748,18 +748,18 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (side_indicator record) = 1 /\
-      (quantity_binary_4 record < 256 ^ N.of_nat 4)%N /\
+      (quantity_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol_long record) = 8 /\
-      (price_binary_long_price_8 record < 256 ^ N.of_nat 8)%N /\
+      (price_long record < 256 ^ N.of_nat 8)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint_le 4 (quantity_binary_4 record) ++
+      encode_uint_le 4 (quantity_long record) ++
       encode_bytes 8 (symbol_long record) ++
-      encode_uint_le 8 (price_binary_long_price_8 record) ++
+      encode_uint_le 8 (price_long record) ++
       encode_uint_le 8 (execution_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -774,17 +774,17 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
               | Some (side_indicator_value, bytes) =>
                   match decode_uint_le 4 bytes with
                   | None => None
-                  | Some (quantity_binary_4_value, bytes) =>
+                  | Some (quantity_long_value, bytes) =>
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (symbol_long_value, bytes) =>
                           match decode_uint_le 8 bytes with
                           | None => None
-                          | Some (price_binary_long_price_8_value, bytes) =>
+                          | Some (price_long_value, bytes) =>
                               match decode_uint_le 8 bytes with
                               | None => None
                               | Some (execution_id_value, bytes) =>
-                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_binary_4 := quantity_binary_4_value; symbol_long := symbol_long_value; price_binary_long_price_8 := price_binary_long_price_8_value; execution_id := execution_id_value |}, bytes)
+                                  Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; quantity_long := quantity_long_value; symbol_long := symbol_long_value; price_long := price_long_value; execution_id := execution_id_value |}, bytes)
                               end
                           end
                       end
@@ -1161,7 +1161,7 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       time_offset : N;
       stock_symbol : list byte;
       auction_type : list byte;
-      price_binary_8 : N;
+      price_long : N;
       shares : N;
     }.
 
@@ -1170,14 +1170,14 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (stock_symbol record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
-      (price_binary_8 record < 256 ^ N.of_nat 8)%N /\
+      (price_long record < 256 ^ N.of_nat 8)%N /\
       (shares record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (stock_symbol record) ++
       encode_bytes 1 (auction_type record) ++
-      encode_uint_le 8 (price_binary_8 record) ++
+      encode_uint_le 8 (price_long record) ++
       encode_uint_le 4 (shares record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1192,11 +1192,11 @@ Module BzxEquitiesMulticastDepthOfBookV2204.
               | Some (auction_type_value, bytes) =>
                   match decode_uint_le 8 bytes with
                   | None => None
-                  | Some (price_binary_8_value, bytes) =>
+                  | Some (price_long_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
                       | Some (shares_value, bytes) =>
-                          Some ({| time_offset := time_offset_value; stock_symbol := stock_symbol_value; auction_type := auction_type_value; price_binary_8 := price_binary_8_value; shares := shares_value |}, bytes)
+                          Some ({| time_offset := time_offset_value; stock_symbol := stock_symbol_value; auction_type := auction_type_value; price_long := price_long_value; shares := shares_value |}, bytes)
                       end
                   end
               end

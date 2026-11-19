@@ -1409,7 +1409,7 @@ Module NsmEquitiesNlsPlusV40.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alpha_8 : list byte;
+      stock : list byte;
       market_code : list byte;
       operational_halt_action : list byte;
     }.
@@ -1418,14 +1418,14 @@ Module NsmEquitiesNlsPlusV40.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (market_code record) = 1 /\
       Datatypes.length (operational_halt_action record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (market_code record) ++
       encode_bytes 1 (operational_halt_action record).
 
@@ -1438,14 +1438,14 @@ Module NsmEquitiesNlsPlusV40.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alpha_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (market_code_value, bytes) =>
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (operational_halt_action_value, bytes) =>
-                          Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alpha_8 := stock_alpha_8_value; market_code := market_code_value; operational_halt_action := operational_halt_action_value |}, bytes)
+                          Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; market_code := market_code_value; operational_halt_action := operational_halt_action_value |}, bytes)
                       end
                   end
               end

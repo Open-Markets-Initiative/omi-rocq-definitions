@@ -500,9 +500,9 @@ Module NseCmBroadcastV66.
 
     (** ST_AUCTION_INQ_INFO *)
     Record t := {
-      token_long_4 : N;
+      token : N;
       auction_number : N;
-      auction_status_short_2 : N;
+      auction_status : N;
       initiator_type : N;
       total_buy_qty : N;
       best_buy_price : N;
@@ -515,9 +515,9 @@ Module NseCmBroadcastV66.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (token_long_4 record < 256 ^ N.of_nat 4)%N /\
+      (token record < 256 ^ N.of_nat 4)%N /\
       (auction_number record < 256 ^ N.of_nat 2)%N /\
-      (auction_status_short_2 record < 256 ^ N.of_nat 2)%N /\
+      (auction_status record < 256 ^ N.of_nat 2)%N /\
       (initiator_type record < 256 ^ N.of_nat 2)%N /\
       (total_buy_qty record < 256 ^ N.of_nat 4)%N /\
       (best_buy_price record < 256 ^ N.of_nat 4)%N /\
@@ -528,9 +528,9 @@ Module NseCmBroadcastV66.
       (settlement_period record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 4 (token_long_4 record) ++
+      encode_uint 4 (token record) ++
       encode_uint 2 (auction_number record) ++
-      encode_uint 2 (auction_status_short_2 record) ++
+      encode_uint 2 (auction_status record) ++
       encode_uint 2 (initiator_type record) ++
       encode_uint 4 (total_buy_qty record) ++
       encode_uint 4 (best_buy_price record) ++
@@ -543,13 +543,13 @@ Module NseCmBroadcastV66.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 4 bytes with
       | None => None
-      | Some (token_long_4_value, bytes) =>
+      | Some (token_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
           | Some (auction_number_value, bytes) =>
               match decode_uint 2 bytes with
               | None => None
-              | Some (auction_status_short_2_value, bytes) =>
+              | Some (auction_status_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (initiator_type_value, bytes) =>
@@ -574,7 +574,7 @@ Module NseCmBroadcastV66.
                                               match decode_uint 2 bytes with
                                               | None => None
                                               | Some (settlement_period_value, bytes) =>
-                                                  Some ({| token_long_4 := token_long_4_value; auction_number := auction_number_value; auction_status_short_2 := auction_status_short_2_value; initiator_type := initiator_type_value; total_buy_qty := total_buy_qty_value; best_buy_price := best_buy_price_value; total_sell_qty := total_sell_qty_value; best_sell_price := best_sell_price_value; auction_price := auction_price_value; auction_qty := auction_qty_value; settlement_period := settlement_period_value |}, bytes)
+                                                  Some ({| token := token_value; auction_number := auction_number_value; auction_status := auction_status_value; initiator_type := initiator_type_value; total_buy_qty := total_buy_qty_value; best_buy_price := best_buy_price_value; total_sell_qty := total_sell_qty_value; best_sell_price := best_sell_price_value; auction_price := auction_price_value; auction_qty := auction_qty_value; settlement_period := settlement_period_value |}, bytes)
                                               end
                                           end
                                       end
@@ -667,7 +667,7 @@ Module NseCmBroadcastV66.
       sec_info : SecInfo.t;
       market_type : N;
       reserved_2 : list byte;
-      action_code_short_2 : N;
+      action_code_short : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -675,13 +675,13 @@ Module NseCmBroadcastV66.
       SecInfo.bounded (sec_info record) /\
       (market_type record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (reserved_2 record) = 2 /\
-      (action_code_short_2 record < 256 ^ N.of_nat 2)%N.
+      (action_code_short record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
       SecInfo.encode (sec_info record) ++
       encode_uint 2 (market_type record) ++
       encode_bytes 2 (reserved_2 record) ++
-      encode_uint 2 (action_code_short_2 record).
+      encode_uint 2 (action_code_short record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match SecInfo.decode bytes with
@@ -695,8 +695,8 @@ Module NseCmBroadcastV66.
               | Some (reserved_2_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
-                  | Some (action_code_short_2_value, bytes) =>
-                      Some ({| sec_info := sec_info_value; market_type := market_type_value; reserved_2 := reserved_2_value; action_code_short_2 := action_code_short_2_value |}, bytes)
+                  | Some (action_code_short_value, bytes) =>
+                      Some ({| sec_info := sec_info_value; market_type := market_type_value; reserved_2 := reserved_2_value; action_code_short := action_code_short_value |}, bytes)
                   end
               end
           end
@@ -732,19 +732,19 @@ Module NseCmBroadcastV66.
     (** Carries the open price of a security when the market opens. The document states this transaction code is not sent by the exchange *)
     Record t := {
       sec_info : SecInfo.t;
-      token_short_2 : N;
+      token_short : N;
       opening_price : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       SecInfo.bounded (sec_info record) /\
-      (token_short_2 record < 256 ^ N.of_nat 2)%N /\
+      (token_short record < 256 ^ N.of_nat 2)%N /\
       (opening_price record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       SecInfo.encode (sec_info record) ++
-      encode_uint 2 (token_short_2 record) ++
+      encode_uint 2 (token_short record) ++
       encode_uint 4 (opening_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -753,11 +753,11 @@ Module NseCmBroadcastV66.
       | Some (sec_info_value, bytes) =>
           match decode_uint 2 bytes with
           | None => None
-          | Some (token_short_2_value, bytes) =>
+          | Some (token_short_value, bytes) =>
               match decode_uint 4 bytes with
               | None => None
               | Some (opening_price_value, bytes) =>
-                  Some ({| sec_info := sec_info_value; token_short_2 := token_short_2_value; opening_price := opening_price_value |}, bytes)
+                  Some ({| sec_info := sec_info_value; token_short := token_short_value; opening_price := opening_price_value |}, bytes)
               end
           end
       end.

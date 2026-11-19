@@ -255,7 +255,7 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** At the start of each trading day, NASDAQ disseminates stock directory messages for all active symbols in Single Book. *)
     Record t := {
-      stock_alphabetic_6 : list byte;
+      stock : list byte;
       market_category : list byte;
       financial_status_indicator : list byte;
       round_lot_size : list byte;
@@ -264,14 +264,14 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (stock_alphabetic_6 record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (market_category record) = 1 /\
       Datatypes.length (financial_status_indicator record) = 1 /\
       Datatypes.length (round_lot_size record) = 6 /\
       Datatypes.length (round_lots_only record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 6 (stock_alphabetic_6 record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 1 (market_category record) ++
       encode_bytes 1 (financial_status_indicator record) ++
       encode_bytes 6 (round_lot_size record) ++
@@ -280,7 +280,7 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 6 bytes with
       | None => None
-      | Some (stock_alphabetic_6_value, bytes) =>
+      | Some (stock_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (market_category_value, bytes) =>
@@ -293,7 +293,7 @@ Module NsmEquitiesTotalViewV30Udp.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (round_lots_only_value, bytes) =>
-                          Some ({| stock_alphabetic_6 := stock_alphabetic_6_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value |}, bytes)
+                          Some ({| stock := stock_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value |}, bytes)
                       end
                   end
               end
@@ -330,7 +330,7 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** NASDAQ uses this administrative message to indicate the current trading status of a security to the trading community. *)
     Record t := {
-      stock_alphanumeric_6 : list byte;
+      stock : list byte;
       trading_state : list byte;
       reserved_1 : list byte;
       reason : list byte;
@@ -338,13 +338,13 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (trading_state record) = 1 /\
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (reason record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 1 (trading_state record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 4 (reason record).
@@ -352,7 +352,7 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 6 bytes with
       | None => None
-      | Some (stock_alphanumeric_6_value, bytes) =>
+      | Some (stock_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (trading_state_value, bytes) =>
@@ -362,7 +362,7 @@ Module NsmEquitiesTotalViewV30Udp.
                   match decode_bytes 4 bytes with
                   | None => None
                   | Some (reason_value, bytes) =>
-                      Some ({| stock_alphanumeric_6 := stock_alphanumeric_6_value; trading_state := trading_state_value; reserved_1 := reserved_1_value; reason := reason_value |}, bytes)
+                      Some ({| stock := stock_value; trading_state := trading_state_value; reserved_1 := reserved_1_value; reason := reason_value |}, bytes)
                   end
               end
           end
@@ -398,7 +398,7 @@ Module NsmEquitiesTotalViewV30Udp.
     (** At the start of each trading day, NASDAQ disseminates a spin of market participant position messages. Throughout the day, NASDAQ will send out this message only if NASDAQ Operations changes the status of a market participant firm in an issue. *)
     Record t := {
       mpid : list byte;
-      stock_alphanumeric_6 : list byte;
+      stock : list byte;
       primary_market_maker : list byte;
       market_maker_mode : list byte;
       market_participant_state : list byte;
@@ -407,14 +407,14 @@ Module NsmEquitiesTotalViewV30Udp.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (mpid record) = 4 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (primary_market_maker record) = 1 /\
       Datatypes.length (market_maker_mode record) = 1 /\
       Datatypes.length (market_participant_state record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 4 (mpid record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 1 (primary_market_maker record) ++
       encode_bytes 1 (market_maker_mode record) ++
       encode_bytes 1 (market_participant_state record).
@@ -425,7 +425,7 @@ Module NsmEquitiesTotalViewV30Udp.
       | Some (mpid_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (stock_alphanumeric_6_value, bytes) =>
+          | Some (stock_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (primary_market_maker_value, bytes) =>
@@ -435,7 +435,7 @@ Module NsmEquitiesTotalViewV30Udp.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (market_participant_state_value, bytes) =>
-                          Some ({| mpid := mpid_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; primary_market_maker := primary_market_maker_value; market_maker_mode := market_maker_mode_value; market_participant_state := market_participant_state_value |}, bytes)
+                          Some ({| mpid := mpid_value; stock := stock_value; primary_market_maker := primary_market_maker_value; market_maker_mode := market_maker_mode_value; market_participant_state := market_participant_state_value |}, bytes)
                       end
                   end
               end
@@ -474,8 +474,8 @@ Module NsmEquitiesTotalViewV30Udp.
     Record t := {
       order_reference_number : list byte;
       side : list byte;
-      shares_numeric_6 : list byte;
-      stock_alphanumeric_6 : list byte;
+      shares : list byte;
+      stock : list byte;
       price : list byte;
     }.
 
@@ -483,15 +483,15 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (order_reference_number record) = 9 /\
       Datatypes.length (side record) = 1 /\
-      Datatypes.length (shares_numeric_6 record) = 6 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (shares record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (price record) = 10.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 9 (order_reference_number record) ++
       encode_bytes 1 (side record) ++
-      encode_bytes 6 (shares_numeric_6 record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (shares record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 10 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -503,14 +503,14 @@ Module NsmEquitiesTotalViewV30Udp.
           | Some (side_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
-              | Some (shares_numeric_6_value, bytes) =>
+              | Some (shares_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (stock_alphanumeric_6_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
-                          Some ({| order_reference_number := order_reference_number_value; side := side_value; shares_numeric_6 := shares_numeric_6_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; price := price_value |}, bytes)
+                          Some ({| order_reference_number := order_reference_number_value; side := side_value; shares := shares_value; stock := stock_value; price := price_value |}, bytes)
                       end
                   end
               end
@@ -549,8 +549,8 @@ Module NsmEquitiesTotalViewV30Udp.
     Record t := {
       order_reference_number : list byte;
       side : list byte;
-      shares_numeric_6 : list byte;
-      stock_alphanumeric_6 : list byte;
+      shares : list byte;
+      stock : list byte;
       price : list byte;
       attribution : list byte;
     }.
@@ -559,16 +559,16 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (order_reference_number record) = 9 /\
       Datatypes.length (side record) = 1 /\
-      Datatypes.length (shares_numeric_6 record) = 6 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (shares record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (price record) = 10 /\
       Datatypes.length (attribution record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 9 (order_reference_number record) ++
       encode_bytes 1 (side record) ++
-      encode_bytes 6 (shares_numeric_6 record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (shares record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 10 (price record) ++
       encode_bytes 4 (attribution record).
 
@@ -581,17 +581,17 @@ Module NsmEquitiesTotalViewV30Udp.
           | Some (side_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
-              | Some (shares_numeric_6_value, bytes) =>
+              | Some (shares_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (stock_alphanumeric_6_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           match decode_bytes 4 bytes with
                           | None => None
                           | Some (attribution_value, bytes) =>
-                              Some ({| order_reference_number := order_reference_number_value; side := side_value; shares_numeric_6 := shares_numeric_6_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; price := price_value; attribution := attribution_value |}, bytes)
+                              Some ({| order_reference_number := order_reference_number_value; side := side_value; shares := shares_value; stock := stock_value; price := price_value; attribution := attribution_value |}, bytes)
                           end
                       end
                   end
@@ -858,8 +858,8 @@ Module NsmEquitiesTotalViewV30Udp.
     Record t := {
       order_reference_number : list byte;
       side : list byte;
-      shares_numeric_6 : list byte;
-      stock_alphanumeric_6 : list byte;
+      shares : list byte;
+      stock : list byte;
       price : list byte;
       match_number : list byte;
     }.
@@ -868,16 +868,16 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition bounded (record : t) : Prop :=
       Datatypes.length (order_reference_number record) = 9 /\
       Datatypes.length (side record) = 1 /\
-      Datatypes.length (shares_numeric_6 record) = 6 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (shares record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (price record) = 10 /\
       Datatypes.length (match_number record) = 9.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 9 (order_reference_number record) ++
       encode_bytes 1 (side record) ++
-      encode_bytes 6 (shares_numeric_6 record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (shares record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 10 (price record) ++
       encode_bytes 9 (match_number record).
 
@@ -890,17 +890,17 @@ Module NsmEquitiesTotalViewV30Udp.
           | Some (side_value, bytes) =>
               match decode_bytes 6 bytes with
               | None => None
-              | Some (shares_numeric_6_value, bytes) =>
+              | Some (shares_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (stock_alphanumeric_6_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (price_value, bytes) =>
                           match decode_bytes 9 bytes with
                           | None => None
                           | Some (match_number_value, bytes) =>
-                              Some ({| order_reference_number := order_reference_number_value; side := side_value; shares_numeric_6 := shares_numeric_6_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; price := price_value; match_number := match_number_value |}, bytes)
+                              Some ({| order_reference_number := order_reference_number_value; side := side_value; shares := shares_value; stock := stock_value; price := price_value; match_number := match_number_value |}, bytes)
                           end
                       end
                   end
@@ -939,8 +939,8 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** Cross Trade message indicates that NASDAQ has completed its cross process for a specific security. *)
     Record t := {
-      shares_numeric_9 : list byte;
-      stock_alphanumeric_6 : list byte;
+      cross_shares : list byte;
+      stock : list byte;
       cross_price : list byte;
       match_number : list byte;
       cross_type : list byte;
@@ -948,15 +948,15 @@ Module NsmEquitiesTotalViewV30Udp.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (shares_numeric_9 record) = 9 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (cross_shares record) = 9 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (cross_price record) = 10 /\
       Datatypes.length (match_number record) = 9 /\
       Datatypes.length (cross_type record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 9 (shares_numeric_9 record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 9 (cross_shares record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 10 (cross_price record) ++
       encode_bytes 9 (match_number record) ++
       encode_bytes 1 (cross_type record).
@@ -964,10 +964,10 @@ Module NsmEquitiesTotalViewV30Udp.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 9 bytes with
       | None => None
-      | Some (shares_numeric_9_value, bytes) =>
+      | Some (cross_shares_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (stock_alphanumeric_6_value, bytes) =>
+          | Some (stock_value, bytes) =>
               match decode_bytes 10 bytes with
               | None => None
               | Some (cross_price_value, bytes) =>
@@ -977,7 +977,7 @@ Module NsmEquitiesTotalViewV30Udp.
                       match decode_bytes 1 bytes with
                       | None => None
                       | Some (cross_type_value, bytes) =>
-                          Some ({| shares_numeric_9 := shares_numeric_9_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; cross_price := cross_price_value; match_number := match_number_value; cross_type := cross_type_value |}, bytes)
+                          Some ({| cross_shares := cross_shares_value; stock := stock_value; cross_price := cross_price_value; match_number := match_number_value; cross_type := cross_type_value |}, bytes)
                       end
                   end
               end
@@ -1058,7 +1058,7 @@ Module NsmEquitiesTotalViewV30Udp.
       paired_shares : list byte;
       imbalance_shares : list byte;
       imbalance_direction : list byte;
-      stock_alphanumeric_6 : list byte;
+      stock : list byte;
       far_price : list byte;
       near_price : list byte;
       current_reference_price : list byte;
@@ -1071,7 +1071,7 @@ Module NsmEquitiesTotalViewV30Udp.
       Datatypes.length (paired_shares record) = 9 /\
       Datatypes.length (imbalance_shares record) = 9 /\
       Datatypes.length (imbalance_direction record) = 1 /\
-      Datatypes.length (stock_alphanumeric_6 record) = 6 /\
+      Datatypes.length (stock record) = 6 /\
       Datatypes.length (far_price record) = 10 /\
       Datatypes.length (near_price record) = 10 /\
       Datatypes.length (current_reference_price record) = 10 /\
@@ -1082,7 +1082,7 @@ Module NsmEquitiesTotalViewV30Udp.
       encode_bytes 9 (paired_shares record) ++
       encode_bytes 9 (imbalance_shares record) ++
       encode_bytes 1 (imbalance_direction record) ++
-      encode_bytes 6 (stock_alphanumeric_6 record) ++
+      encode_bytes 6 (stock record) ++
       encode_bytes 10 (far_price record) ++
       encode_bytes 10 (near_price record) ++
       encode_bytes 10 (current_reference_price record) ++
@@ -1101,7 +1101,7 @@ Module NsmEquitiesTotalViewV30Udp.
               | Some (imbalance_direction_value, bytes) =>
                   match decode_bytes 6 bytes with
                   | None => None
-                  | Some (stock_alphanumeric_6_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_bytes 10 bytes with
                       | None => None
                       | Some (far_price_value, bytes) =>
@@ -1117,7 +1117,7 @@ Module NsmEquitiesTotalViewV30Udp.
                                       match decode_bytes 1 bytes with
                                       | None => None
                                       | Some (price_variation_indicator_value, bytes) =>
-                                          Some ({| paired_shares := paired_shares_value; imbalance_shares := imbalance_shares_value; imbalance_direction := imbalance_direction_value; stock_alphanumeric_6 := stock_alphanumeric_6_value; far_price := far_price_value; near_price := near_price_value; current_reference_price := current_reference_price_value; cross_type := cross_type_value; price_variation_indicator := price_variation_indicator_value |}, bytes)
+                                          Some ({| paired_shares := paired_shares_value; imbalance_shares := imbalance_shares_value; imbalance_direction := imbalance_direction_value; stock := stock_value; far_price := far_price_value; near_price := near_price_value; current_reference_price := current_reference_price_value; cross_type := cross_type_value; price_variation_indicator := price_variation_indicator_value |}, bytes)
                                       end
                                   end
                               end

@@ -1505,6 +1505,10 @@ moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v6_0_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v8_0_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v9_12_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v9_9_0.v
+nairobi/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Client.v
+nairobi/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Server.v
+nairobi/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Client.v
+nairobi/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Server.v
 nairobi/nairobiequities/realtime/NairobiEquities_RealTime_v1_22.v
 nairobi/nairobiequities/replay/NairobiEquities_Replay_v1_22.v
 nairobi/nairobiequities/snapshot/NairobiEquities_Snapshot_v1_22.v
@@ -2122,6 +2126,21 @@ nse/nsefo/snapshot/NseFo_Snapshot_v7_0_Tcp.v
 nse/nsefo/snapshot/NseFo_Snapshot_v7_1_Client.v
 nse/nsefo/snapshot/NseFo_Snapshot_v7_1_Response.v
 nse/nsefo/snapshot/NseFo_Snapshot_v7_1_Tcp.v
+nse/nseix/broadcast/NseIx_Broadcast_v1_12.v
+nse/nseix/dropcopy/NseIx_DropCopy_v1_6_Client.v
+nse/nseix/dropcopy/NseIx_DropCopy_v1_6_Server.v
+nse/nseix/mtbt/NseIx_Mtbt_v1_4.v
+nse/nseix/mtbtndal/NseIx_MtbtNdal_v1_5.v
+nse/nseix/orderentry/NseIx_OrderEntry_NnfDirect_v1_12_Client.v
+nse/nseix/orderentry/NseIx_OrderEntry_NnfDirect_v1_12_Server.v
+nse/nseix/orderentry/NseIx_OrderEntry_NnfTrimmed_v1_12.v
+nse/nseix/orderentry/NseIx_OrderEntry_Nnf_v1_12_Client.v
+nse/nseix/orderentry/NseIx_OrderEntry_Nnf_v1_12_Server.v
+nse/nseix/recovery/NseIx_Recovery_v1_4_Client.v
+nse/nseix/recovery/NseIx_Recovery_v1_4_Tcp.v
+nse/nseix/snapshot/NseIx_Snapshot_v1_4_Client.v
+nse/nseix/snapshot/NseIx_Snapshot_v1_4_Response.v
+nse/nseix/snapshot/NseIx_Snapshot_v1_4_Tcp.v
 nse/nseslbm/broadcast/NseSlbm_Broadcast_v2_7.v
 nse/nseslbm/orderentry/NseSlbm_OrderEntry_v2_7_Client.v
 nse/nseslbm/orderentry/NseSlbm_OrderEntry_v2_7_Server.v
@@ -2171,6 +2190,7 @@ nyse/amexequities/openbook/AmexEquities_OpenBook_v1_9_a.v
 nyse/amexequities/openbook/AmexEquities_OpenBook_v2_1_b.v
 nyse/amexequities/openbook/AmexEquities_OpenBook_v2_1_k.v
 nyse/amexequities/openbook/aggregated/AmexEquities_OpenBook_Aggregated_v2_1_d.v
+nyse/amexequities/trades/AmexEquities_Trades_v2_5_e.v
 nyse/amexequities/trades/AmexEquities_Trades_v2_6.v
 nyse/amexequities/trades/AmexEquities_Trades_v2_6_a.v
 nyse/amexoptions/binarygateway/AmexOptions_BinaryGateway_v3_25_ClientPillarMessage.v
@@ -2232,6 +2252,7 @@ nyse/arcaequities/integratedfeedretransmission/ArcaEquities_IntegratedFeedRetran
 nyse/arcaequities/integratedfeedretransmission/ArcaEquities_IntegratedFeedRetransmission_v2_5_h.v
 nyse/arcaequities/integratedfeedstocksummary/ArcaEquities_IntegratedFeedStockSummary_v2_5_g.v
 nyse/arcaequities/integratedfeedstocksummary/ArcaEquities_IntegratedFeedStockSummary_v2_5_h.v
+nyse/arcaequities/trades/ArcaEquities_Trades_v2_5_e.v
 nyse/arcaequities/trades/ArcaEquities_Trades_v2_6.v
 nyse/arcaequities/trades/ArcaEquities_Trades_v2_6_a.v
 nyse/arcaoptions/binarygateway/ArcaOptions_BinaryGateway_v3_25_ClientPillarMessage.v
@@ -2290,6 +2311,7 @@ nyse/nationalequities/integratedfeedretransmission/NationalEquities_IntegratedFe
 nyse/nationalequities/integratedfeedretransmission/NationalEquities_IntegratedFeedRetransmission_v2_5_h.v
 nyse/nationalequities/integratedfeedstocksummary/NationalEquities_IntegratedFeedStockSummary_v2_5_g.v
 nyse/nationalequities/integratedfeedstocksummary/NationalEquities_IntegratedFeedStockSummary_v2_5_h.v
+nyse/nationalequities/trades/NationalEquities_Trades_v2_5_e.v
 nyse/nationalequities/trades/NationalEquities_Trades_v2_6.v
 nyse/nationalequities/trades/NationalEquities_Trades_v2_6_a.v
 nyse/nysebonds/depthofbook/NyseBonds_DepthOfBook_v4_01_b_Client.v
@@ -2355,6 +2377,7 @@ nyse/nyseequities/openbook/NyseEquities_OpenBook_v1_9_a.v
 nyse/nyseequities/openbook/NyseEquities_OpenBook_v2_1_b.v
 nyse/nyseequities/openbook/NyseEquities_OpenBook_v2_1_k.v
 nyse/nyseequities/openbook/aggregated/NyseEquities_OpenBook_Aggregated_v2_1_d.v
+nyse/nyseequities/trades/NyseEquities_Trades_v2_5_e.v
 nyse/nyseequities/trades/NyseEquities_Trades_v2_6.v
 nyse/nyseequities/trades/NyseEquities_Trades_v2_6_a.v
 nyse/nyseoptions/commonclient/NyseOptions_CommonClient_v2_6.v
@@ -2403,6 +2426,7 @@ nyse/texasequities/integratedfeedretransmission/TexasEquities_IntegratedFeedRetr
 nyse/texasequities/integratedfeedretransmission/TexasEquities_IntegratedFeedRetransmission_v2_5_h.v
 nyse/texasequities/integratedfeedstocksummary/TexasEquities_IntegratedFeedStockSummary_v2_5_g.v
 nyse/texasequities/integratedfeedstocksummary/TexasEquities_IntegratedFeedStockSummary_v2_5_h.v
+nyse/texasequities/trades/TexasEquities_Trades_v2_5_e.v
 nyse/texasequities/trades/TexasEquities_Trades_v2_6.v
 nyse/texasequities/trades/TexasEquities_Trades_v2_6_a.v
 odx/odxequities/pts/OdxEquities_Pts_Glimpse_v1_0_Client.v
@@ -2468,6 +2492,9 @@ siac/opra/output/Siac_Opra_Output_v4_0.v
 siac/opra/output/Siac_Opra_Output_v6_1.v
 siac/opra/output/Siac_Opra_Output_v6_2.v
 siac/opra/output/Siac_Opra_Output_v6_3_a.v
+six/sixswissexchange/snapshot/SixSwissExchange_Snapshot_v1_24_0_Client.v
+six/sixswissexchange/snapshot/SixSwissExchange_Snapshot_v1_24_0_Server.v
+six/sixswissexchange/totalview/SixSwissExchange_TotalView_v1_24_0.v
 smallx/orderbookfeed/SmallFutures_OrderBookFeed_v2_2.v
 sse/ssesecurities/mdgw/SseSecurities_Mdgw_v0_63.v
 szse/szsesecurities/multicastmarketdata/SzseSecurities_MulticastMarketData_v1_17.v

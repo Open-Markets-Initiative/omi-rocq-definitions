@@ -753,7 +753,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
     Record t := {
       time_offset : N;
       order_id : N;
-      contracts_short : N;
+      contracts_long : N;
       price : N;
     }.
 
@@ -761,13 +761,13 @@ Module CedxDerivativesMulticastDepthOfBookV111.
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
-      (contracts_short record < 256 ^ N.of_nat 2)%N /\
+      (contracts_long record < 256 ^ N.of_nat 4)%N /\
       (price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
-      encode_uint_le 2 (contracts_short record) ++
+      encode_uint_le 4 (contracts_long record) ++
       encode_uint_le 8 (price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -777,19 +777,19 @@ Module CedxDerivativesMulticastDepthOfBookV111.
           match decode_uint_le 8 bytes with
           | None => None
           | Some (order_id_value, bytes) =>
-              match decode_uint_le 2 bytes with
+              match decode_uint_le 4 bytes with
               | None => None
-              | Some (contracts_short_value, bytes) =>
+              | Some (contracts_long_value, bytes) =>
                   match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      Some ({| time_offset := time_offset_value; order_id := order_id_value; contracts_short := contracts_short_value; price := price_value |}, bytes)
+                      Some ({| time_offset := time_offset_value; order_id := order_id_value; contracts_long := contracts_long_value; price := price_value |}, bytes)
                   end
               end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 24.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length. reflexivity.
@@ -1014,7 +1014,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       time_offset : N;
       order_id : N;
       side_indicator : list byte;
-      contracts_short : N;
+      contracts_long : N;
       symbol_long : list byte;
       price : N;
       execution_id : N;
@@ -1026,7 +1026,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       (time_offset record < 256 ^ N.of_nat 4)%N /\
       (order_id record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (side_indicator record) = 1 /\
-      (contracts_short record < 256 ^ N.of_nat 2)%N /\
+      (contracts_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (symbol_long record) = 8 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
@@ -1036,7 +1036,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       encode_uint_le 4 (time_offset record) ++
       encode_uint_le 8 (order_id record) ++
       encode_bytes 1 (side_indicator record) ++
-      encode_uint_le 2 (contracts_short record) ++
+      encode_uint_le 4 (contracts_long record) ++
       encode_bytes 8 (symbol_long record) ++
       encode_uint_le 8 (price record) ++
       encode_uint_le 8 (execution_id record) ++
@@ -1052,9 +1052,9 @@ Module CedxDerivativesMulticastDepthOfBookV111.
               match decode_bytes 1 bytes with
               | None => None
               | Some (side_indicator_value, bytes) =>
-                  match decode_uint_le 2 bytes with
+                  match decode_uint_le 4 bytes with
                   | None => None
-                  | Some (contracts_short_value, bytes) =>
+                  | Some (contracts_long_value, bytes) =>
                       match decode_bytes 8 bytes with
                       | None => None
                       | Some (symbol_long_value, bytes) =>
@@ -1067,7 +1067,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                                   match TradeFlags.decode bytes with
                                   | None => None
                                   | Some (trade_flags_value, bytes) =>
-                                      Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; contracts_short := contracts_short_value; symbol_long := symbol_long_value; price := price_value; execution_id := execution_id_value; trade_flags := trade_flags_value |}, bytes)
+                                      Some ({| time_offset := time_offset_value; order_id := order_id_value; side_indicator := side_indicator_value; contracts_long := contracts_long_value; symbol_long := symbol_long_value; price := price_value; execution_id := execution_id_value; trade_flags := trade_flags_value |}, bytes)
                                   end
                               end
                           end
@@ -1077,7 +1077,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 44.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 46.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length, !TradeFlags.encode_length. reflexivity.
@@ -1357,7 +1357,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
     (** The Trade message provides information about executions of complex order auctions on the Cboe complex book. *)
     Record t := {
       time_offset : N;
-      contracts_long : N;
+      contracts_extended : N;
       symbol_long : list byte;
       price : N;
       trade_id : N;
@@ -1371,7 +1371,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (time_offset record < 256 ^ N.of_nat 4)%N /\
-      (contracts_long record < 256 ^ N.of_nat 8)%N /\
+      (contracts_extended record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (symbol_long record) = 8 /\
       (price record < 256 ^ N.of_nat 8)%N /\
       (trade_id record < 256 ^ N.of_nat 8)%N /\
@@ -1383,7 +1383,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
-      encode_uint_le 8 (contracts_long record) ++
+      encode_uint_le 8 (contracts_extended record) ++
       encode_bytes 8 (symbol_long record) ++
       encode_uint_le 8 (price record) ++
       encode_uint_le 8 (trade_id record) ++
@@ -1399,7 +1399,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       | Some (time_offset_value, bytes) =>
           match decode_uint_le 8 bytes with
           | None => None
-          | Some (contracts_long_value, bytes) =>
+          | Some (contracts_extended_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
               | Some (symbol_long_value, bytes) =>
@@ -1424,7 +1424,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                                           match ExtendedTradeFlags.decode bytes with
                                           | None => None
                                           | Some (extended_trade_flags_value, bytes) =>
-                                              Some ({| time_offset := time_offset_value; contracts_long := contracts_long_value; symbol_long := symbol_long_value; price := price_value; trade_id := trade_id_value; trade_timestamp := trade_timestamp_value; execution_venue := execution_venue_value; currency := currency_value; cboe_trade_flags := cboe_trade_flags_value; extended_trade_flags := extended_trade_flags_value |}, bytes)
+                                              Some ({| time_offset := time_offset_value; contracts_extended := contracts_extended_value; symbol_long := symbol_long_value; price := price_value; trade_id := trade_id_value; trade_timestamp := trade_timestamp_value; execution_venue := execution_venue_value; currency := currency_value; cboe_trade_flags := cboe_trade_flags_value; extended_trade_flags := extended_trade_flags_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1724,7 +1724,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       symbol_long : list byte;
       auction_opening_type : list byte;
       price : N;
-      contracts_short : N;
+      contracts_long : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1733,14 +1733,14 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       Datatypes.length (symbol_long record) = 8 /\
       Datatypes.length (auction_opening_type record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (contracts_short record < 256 ^ N.of_nat 2)%N.
+      (contracts_long record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (symbol_long record) ++
       encode_bytes 1 (auction_opening_type record) ++
       encode_uint_le 8 (price record) ++
-      encode_uint_le 2 (contracts_short record).
+      encode_uint_le 4 (contracts_long record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -1755,17 +1755,17 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                   match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint_le 2 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (contracts_short_value, bytes) =>
-                          Some ({| time_offset := time_offset_value; symbol_long := symbol_long_value; auction_opening_type := auction_opening_type_value; price := price_value; contracts_short := contracts_short_value |}, bytes)
+                      | Some (contracts_long_value, bytes) =>
+                          Some ({| time_offset := time_offset_value; symbol_long := symbol_long_value; auction_opening_type := auction_opening_type_value; price := price_value; contracts_long := contracts_long_value |}, bytes)
                       end
                   end
               end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 23.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 25.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -1924,7 +1924,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       auction_type : list byte;
       side : list byte;
       price : N;
-      contracts_short : N;
+      contracts_long : N;
       customer_indicator : list byte;
       participant_id : list byte;
       auction_end_offset : N;
@@ -1938,7 +1938,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       Datatypes.length (auction_type record) = 1 /\
       Datatypes.length (side record) = 1 /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (contracts_short record < 256 ^ N.of_nat 2)%N /\
+      (contracts_long record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (customer_indicator record) = 1 /\
       Datatypes.length (participant_id record) = 4 /\
       (auction_end_offset record < 256 ^ N.of_nat 4)%N.
@@ -1950,7 +1950,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       encode_bytes 1 (auction_type record) ++
       encode_bytes 1 (side record) ++
       encode_uint_le 8 (price record) ++
-      encode_uint_le 2 (contracts_short record) ++
+      encode_uint_le 4 (contracts_long record) ++
       encode_bytes 1 (customer_indicator record) ++
       encode_bytes 4 (participant_id record) ++
       encode_uint_le 4 (auction_end_offset record).
@@ -1974,9 +1974,9 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                           match decode_uint_le 8 bytes with
                           | None => None
                           | Some (price_value, bytes) =>
-                              match decode_uint_le 2 bytes with
+                              match decode_uint_le 4 bytes with
                               | None => None
-                              | Some (contracts_short_value, bytes) =>
+                              | Some (contracts_long_value, bytes) =>
                                   match decode_bytes 1 bytes with
                                   | None => None
                                   | Some (customer_indicator_value, bytes) =>
@@ -1986,7 +1986,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                                           match decode_uint_le 4 bytes with
                                           | None => None
                                           | Some (auction_end_offset_value, bytes) =>
-                                              Some ({| time_offset := time_offset_value; symbol := symbol_value; auction_id := auction_id_value; auction_type := auction_type_value; side := side_value; price := price_value; contracts_short := contracts_short_value; customer_indicator := customer_indicator_value; participant_id := participant_id_value; auction_end_offset := auction_end_offset_value |}, bytes)
+                                              Some ({| time_offset := time_offset_value; symbol := symbol_value; auction_id := auction_id_value; auction_type := auction_type_value; side := side_value; price := price_value; contracts_long := contracts_long_value; customer_indicator := customer_indicator_value; participant_id := participant_id_value; auction_end_offset := auction_end_offset_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1998,7 +1998,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 39.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
@@ -2088,7 +2088,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       auction_id : N;
       execution_id : N;
       price : N;
-      contracts_short : N;
+      contracts_long : N;
       execution_flags : ExecutionFlags.t;
     }.
 
@@ -2098,7 +2098,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       (auction_id record < 256 ^ N.of_nat 8)%N /\
       (execution_id record < 256 ^ N.of_nat 8)%N /\
       (price record < 256 ^ N.of_nat 8)%N /\
-      (contracts_short record < 256 ^ N.of_nat 2)%N /\
+      (contracts_long record < 256 ^ N.of_nat 4)%N /\
       ExecutionFlags.bounded (execution_flags record).
 
     Definition encode (record : t) : list byte :=
@@ -2106,7 +2106,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
       encode_uint_le 8 (auction_id record) ++
       encode_uint_le 8 (execution_id record) ++
       encode_uint_le 8 (price record) ++
-      encode_uint_le 2 (contracts_short record) ++
+      encode_uint_le 4 (contracts_long record) ++
       ExecutionFlags.encode (execution_flags record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2122,13 +2122,13 @@ Module CedxDerivativesMulticastDepthOfBookV111.
                   match decode_uint_le 8 bytes with
                   | None => None
                   | Some (price_value, bytes) =>
-                      match decode_uint_le 2 bytes with
+                      match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (contracts_short_value, bytes) =>
+                      | Some (contracts_long_value, bytes) =>
                           match ExecutionFlags.decode bytes with
                           | None => None
                           | Some (execution_flags_value, bytes) =>
-                              Some ({| time_offset := time_offset_value; auction_id := auction_id_value; execution_id := execution_id_value; price := price_value; contracts_short := contracts_short_value; execution_flags := execution_flags_value |}, bytes)
+                              Some ({| time_offset := time_offset_value; auction_id := auction_id_value; execution_id := execution_id_value; price := price_value; contracts_long := contracts_long_value; execution_flags := execution_flags_value |}, bytes)
                           end
                       end
                   end
@@ -2136,7 +2136,7 @@ Module CedxDerivativesMulticastDepthOfBookV111.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 34.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 36.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_le_length, !ExecutionFlags.encode_length. reflexivity.

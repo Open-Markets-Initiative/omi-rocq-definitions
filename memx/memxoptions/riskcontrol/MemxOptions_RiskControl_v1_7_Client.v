@@ -396,39 +396,39 @@ Module MemxOptionsRiskControlV17Client.
 
     (** ActiveRiskThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_active_risk_threshold_change_request_cl_ord_id : list byte;
-      underlier_active_risk_threshold_change_request_underlier_optional : list byte;
-      efid_active_risk_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       threshold_quantity : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_active_risk_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_active_risk_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_active_risk_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (threshold_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_active_risk_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_active_risk_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_active_risk_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 4 (threshold_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_active_risk_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_active_risk_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_active_risk_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (threshold_quantity_value, bytes) =>
-                      Some ({| cl_ord_id_active_risk_threshold_change_request_cl_ord_id := cl_ord_id_active_risk_threshold_change_request_cl_ord_id_value; underlier_active_risk_threshold_change_request_underlier_optional := underlier_active_risk_threshold_change_request_underlier_optional_value; efid_active_risk_threshold_change_request_efid_optional := efid_active_risk_threshold_change_request_efid_optional_value; threshold_quantity := threshold_quantity_value |}, bytes)
+                      Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; threshold_quantity := threshold_quantity_value |}, bytes)
                   end
               end
           end
@@ -463,39 +463,39 @@ Module MemxOptionsRiskControlV17Client.
 
     (** ActiveRiskAcknowledgementRequestMessage *)
     Record t := {
-      cl_ord_id_active_risk_acknowledgement_request_cl_ord_id : list byte;
-      underlier_active_risk_acknowledgement_request_underlier : list byte;
-      efid_active_risk_acknowledgement_request_efid : list byte;
+      cl_ord_id : list byte;
+      underlier : list byte;
+      efid : list byte;
       quantity : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_active_risk_acknowledgement_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_active_risk_acknowledgement_request_underlier record) = 6 /\
-      Datatypes.length (efid_active_risk_acknowledgement_request_efid record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier record) = 6 /\
+      Datatypes.length (efid record) = 4 /\
       (quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_active_risk_acknowledgement_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_active_risk_acknowledgement_request_underlier record) ++
-      encode_bytes 4 (efid_active_risk_acknowledgement_request_efid record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier record) ++
+      encode_bytes 4 (efid record) ++
       encode_uint 4 (quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_active_risk_acknowledgement_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_active_risk_acknowledgement_request_underlier_value, bytes) =>
+          | Some (underlier_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_active_risk_acknowledgement_request_efid_value, bytes) =>
+              | Some (efid_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (quantity_value, bytes) =>
-                      Some ({| cl_ord_id_active_risk_acknowledgement_request_cl_ord_id := cl_ord_id_active_risk_acknowledgement_request_cl_ord_id_value; underlier_active_risk_acknowledgement_request_underlier := underlier_active_risk_acknowledgement_request_underlier_value; efid_active_risk_acknowledgement_request_efid := efid_active_risk_acknowledgement_request_efid_value; quantity := quantity_value |}, bytes)
+                      Some ({| cl_ord_id := cl_ord_id_value; underlier := underlier_value; efid := efid_value; quantity := quantity_value |}, bytes)
                   end
               end
           end
@@ -530,9 +530,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPVolumeThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_volume_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_volume_threshold_change_request_underlier_optional : list byte;
-      efid_cp_volume_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       volume : N;
       period_in_milli_seconds : N;
@@ -540,17 +540,17 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_volume_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_volume_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_volume_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (volume record < 256 ^ N.of_nat 8)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_volume_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_volume_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_volume_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (volume record) ++
       encode_uint 4 (period_in_milli_seconds record).
@@ -558,13 +558,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_volume_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_volume_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_volume_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -574,7 +574,7 @@ Module MemxOptionsRiskControlV17Client.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (period_in_milli_seconds_value, bytes) =>
-                              Some ({| cl_ord_id_cp_volume_threshold_change_request_cl_ord_id := cl_ord_id_cp_volume_threshold_change_request_cl_ord_id_value; underlier_cp_volume_threshold_change_request_underlier_optional := underlier_cp_volume_threshold_change_request_underlier_optional_value; efid_cp_volume_threshold_change_request_efid_optional := efid_cp_volume_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; volume := volume_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                              Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; volume := volume_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                           end
                       end
                   end
@@ -613,9 +613,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPExecutedNotionalThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_executed_notional_threshold_change_request_underlier_optional : list byte;
-      efid_cp_executed_notional_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       price_in_dollars : N;
       period_in_milli_seconds : N;
@@ -623,17 +623,17 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_executed_notional_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_executed_notional_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (price_in_dollars record < 256 ^ N.of_nat 8)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_executed_notional_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_executed_notional_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (price_in_dollars record) ++
       encode_uint 4 (period_in_milli_seconds record).
@@ -641,13 +641,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_executed_notional_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_executed_notional_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -657,7 +657,7 @@ Module MemxOptionsRiskControlV17Client.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (period_in_milli_seconds_value, bytes) =>
-                              Some ({| cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id := cl_ord_id_cp_executed_notional_threshold_change_request_cl_ord_id_value; underlier_cp_executed_notional_threshold_change_request_underlier_optional := underlier_cp_executed_notional_threshold_change_request_underlier_optional_value; efid_cp_executed_notional_threshold_change_request_efid_optional := efid_cp_executed_notional_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                              Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                           end
                       end
                   end
@@ -696,9 +696,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPTotalExecutionsThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_total_executions_threshold_change_request_underlier_optional : list byte;
-      efid_cp_total_executions_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       total_executions : N;
       period_in_milli_seconds : N;
@@ -706,17 +706,17 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_total_executions_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_total_executions_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (total_executions record < 256 ^ N.of_nat 4)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_total_executions_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_total_executions_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 4 (total_executions record) ++
       encode_uint 4 (period_in_milli_seconds record).
@@ -724,13 +724,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_total_executions_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_total_executions_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -740,7 +740,7 @@ Module MemxOptionsRiskControlV17Client.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (period_in_milli_seconds_value, bytes) =>
-                              Some ({| cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id := cl_ord_id_cp_total_executions_threshold_change_request_cl_ord_id_value; underlier_cp_total_executions_threshold_change_request_underlier_optional := underlier_cp_total_executions_threshold_change_request_underlier_optional_value; efid_cp_total_executions_threshold_change_request_efid_optional := efid_cp_total_executions_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; total_executions := total_executions_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                              Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; total_executions := total_executions_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                           end
                       end
                   end
@@ -779,45 +779,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPPercentOutstandingContractsThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional : list byte;
-      efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       percent : N;
       period_in_milli_seconds : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (percent record < 256 ^ N.of_nat 4)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 4 (percent record) ++
       encode_uint 4 (period_in_milli_seconds record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (percent_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (period_in_milli_seconds_value, bytes) =>
-                          Some ({| cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id := cl_ord_id_cp_percent_outstanding_contracts_threshold_change_request_cl_ord_id_value; underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional := underlier_cp_percent_outstanding_contracts_threshold_change_request_underlier_optional_value; efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional := efid_cp_percent_outstanding_contracts_threshold_change_request_efid_optional_value; percent := percent_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; percent := percent_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                       end
                   end
               end
@@ -854,9 +854,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPBreachCountThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_breach_count_threshold_change_request_underlier_optional : list byte;
-      efid_cp_breach_count_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       count : N;
       period_in_milli_seconds : N;
@@ -864,17 +864,17 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_breach_count_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_breach_count_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (count record < 256 ^ N.of_nat 4)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_breach_count_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_breach_count_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 4 (count record) ++
       encode_uint 4 (period_in_milli_seconds record).
@@ -882,13 +882,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_breach_count_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_breach_count_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -898,7 +898,7 @@ Module MemxOptionsRiskControlV17Client.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (period_in_milli_seconds_value, bytes) =>
-                              Some ({| cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id := cl_ord_id_cp_breach_count_threshold_change_request_cl_ord_id_value; underlier_cp_breach_count_threshold_change_request_underlier_optional := underlier_cp_breach_count_threshold_change_request_underlier_optional_value; efid_cp_breach_count_threshold_change_request_efid_optional := efid_cp_breach_count_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; count := count_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                              Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; count := count_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                           end
                       end
                   end
@@ -937,45 +937,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** ManualCPBreachTriggerRequestMessage *)
     Record t := {
-      cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id : list byte;
-      underlier_manual_cp_breach_trigger_request_underlier_optional : list byte;
-      efid_manual_cp_breach_trigger_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       send_cancels : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_manual_cp_breach_trigger_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_manual_cp_breach_trigger_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (send_cancels record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_manual_cp_breach_trigger_request_underlier_optional record) ++
-      encode_bytes 4 (efid_manual_cp_breach_trigger_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 1 (send_cancels record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_manual_cp_breach_trigger_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_manual_cp_breach_trigger_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (send_cancels_value, bytes) =>
-                          Some ({| cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id := cl_ord_id_manual_cp_breach_trigger_request_cl_ord_id_value; underlier_manual_cp_breach_trigger_request_underlier_optional := underlier_manual_cp_breach_trigger_request_underlier_optional_value; efid_manual_cp_breach_trigger_request_efid_optional := efid_manual_cp_breach_trigger_request_efid_optional_value; risk_group_id := risk_group_id_value; send_cancels := send_cancels_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; send_cancels := send_cancels_value |}, bytes)
                       end
                   end
               end
@@ -1012,27 +1012,27 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPClearBreachRequestMessage *)
     Record t := {
-      cl_ord_id_cp_clear_breach_request_cl_ord_id : list byte;
+      cl_ord_id : list byte;
       breach_id : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_clear_breach_request_cl_ord_id record) = 20 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
       (breach_id record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_clear_breach_request_cl_ord_id record) ++
+      encode_bytes 20 (cl_ord_id record) ++
       encode_uint 8 (breach_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_clear_breach_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_uint 8 bytes with
           | None => None
           | Some (breach_id_value, bytes) =>
-              Some ({| cl_ord_id_cp_clear_breach_request_cl_ord_id := cl_ord_id_cp_clear_breach_request_cl_ord_id_value; breach_id := breach_id_value |}, bytes)
+              Some ({| cl_ord_id := cl_ord_id_value; breach_id := breach_id_value |}, bytes)
           end
       end.
 
@@ -1063,45 +1063,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderAllowISOOrdersChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id : list byte;
-      underlier_single_order_allow_iso_orders_change_request_underlier_optional : list byte;
-      efid_single_order_allow_iso_orders_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       allow_iso_orders : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_allow_iso_orders_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_single_order_allow_iso_orders_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (allow_iso_orders record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_allow_iso_orders_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_single_order_allow_iso_orders_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 1 (allow_iso_orders record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_allow_iso_orders_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_allow_iso_orders_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (allow_iso_orders_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id := cl_ord_id_single_order_allow_iso_orders_change_request_cl_ord_id_value; underlier_single_order_allow_iso_orders_change_request_underlier_optional := underlier_single_order_allow_iso_orders_change_request_underlier_optional_value; efid_single_order_allow_iso_orders_change_request_efid_optional := efid_single_order_allow_iso_orders_change_request_efid_optional_value; risk_group_id := risk_group_id_value; allow_iso_orders := allow_iso_orders_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; allow_iso_orders := allow_iso_orders_value |}, bytes)
                       end
                   end
               end
@@ -1138,45 +1138,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderAllowOrdersInCrossedMarketChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id : list byte;
-      underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional : list byte;
-      efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       allow_orders : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (allow_orders record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 1 (allow_orders record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (allow_orders_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id := cl_ord_id_single_order_allow_orders_in_crossed_market_change_request_cl_ord_id_value; underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional := underlier_single_order_allow_orders_in_crossed_market_change_request_underlier_optional_value; efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional := efid_single_order_allow_orders_in_crossed_market_change_request_efid_optional_value; risk_group_id := risk_group_id_value; allow_orders := allow_orders_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; allow_orders := allow_orders_value |}, bytes)
                       end
                   end
               end
@@ -1213,45 +1213,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderMaxNotionalChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_max_notional_change_request_cl_ord_id : list byte;
-      underlier_single_order_max_notional_change_request_underlier_optional : list byte;
-      efid_single_order_max_notional_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       max_notional_in_dollars : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_max_notional_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_max_notional_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_single_order_max_notional_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (max_notional_in_dollars record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_max_notional_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_max_notional_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_single_order_max_notional_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (max_notional_in_dollars record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_max_notional_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_max_notional_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_max_notional_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (max_notional_in_dollars_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_max_notional_change_request_cl_ord_id := cl_ord_id_single_order_max_notional_change_request_cl_ord_id_value; underlier_single_order_max_notional_change_request_underlier_optional := underlier_single_order_max_notional_change_request_underlier_optional_value; efid_single_order_max_notional_change_request_efid_optional := efid_single_order_max_notional_change_request_efid_optional_value; risk_group_id := risk_group_id_value; max_notional_in_dollars := max_notional_in_dollars_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; max_notional_in_dollars := max_notional_in_dollars_value |}, bytes)
                       end
                   end
               end
@@ -1288,45 +1288,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderMaxContractsChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_max_contracts_change_request_cl_ord_id : list byte;
-      underlier_single_order_max_contracts_change_request_underlier_optional : list byte;
-      efid_single_order_max_contracts_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       max_contracts : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_max_contracts_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_max_contracts_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_single_order_max_contracts_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (max_contracts record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_max_contracts_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_max_contracts_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_single_order_max_contracts_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 4 (max_contracts record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_max_contracts_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_max_contracts_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_max_contracts_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (max_contracts_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_max_contracts_change_request_cl_ord_id := cl_ord_id_single_order_max_contracts_change_request_cl_ord_id_value; underlier_single_order_max_contracts_change_request_underlier_optional := underlier_single_order_max_contracts_change_request_underlier_optional_value; efid_single_order_max_contracts_change_request_efid_optional := efid_single_order_max_contracts_change_request_efid_optional_value; risk_group_id := risk_group_id_value; max_contracts := max_contracts_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; max_contracts := max_contracts_value |}, bytes)
                       end
                   end
               end
@@ -1363,45 +1363,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderAllowMarketOrdersChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id : list byte;
-      underlier_single_order_allow_market_orders_change_request_underlier_optional : list byte;
-      efid_single_order_allow_market_orders_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       allow_market_orders : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_allow_market_orders_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_single_order_allow_market_orders_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (allow_market_orders record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_allow_market_orders_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_single_order_allow_market_orders_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 1 (allow_market_orders record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_allow_market_orders_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_allow_market_orders_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (allow_market_orders_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id := cl_ord_id_single_order_allow_market_orders_change_request_cl_ord_id_value; underlier_single_order_allow_market_orders_change_request_underlier_optional := underlier_single_order_allow_market_orders_change_request_underlier_optional_value; efid_single_order_allow_market_orders_change_request_efid_optional := efid_single_order_allow_market_orders_change_request_efid_optional_value; risk_group_id := risk_group_id_value; allow_market_orders := allow_market_orders_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; allow_market_orders := allow_market_orders_value |}, bytes)
                       end
                   end
               end
@@ -1438,45 +1438,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** SingleOrderRestrictedUnderlierChangeRequestMessage *)
     Record t := {
-      cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id : list byte;
-      underlier_single_order_restricted_underlier_change_request_underlier : list byte;
-      efid_single_order_restricted_underlier_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       restricted : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_single_order_restricted_underlier_change_request_underlier record) = 6 /\
-      Datatypes.length (efid_single_order_restricted_underlier_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (restricted record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_single_order_restricted_underlier_change_request_underlier record) ++
-      encode_bytes 4 (efid_single_order_restricted_underlier_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 1 (restricted record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_single_order_restricted_underlier_change_request_underlier_value, bytes) =>
+          | Some (underlier_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_single_order_restricted_underlier_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 1 bytes with
                       | None => None
                       | Some (restricted_value, bytes) =>
-                          Some ({| cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id := cl_ord_id_single_order_restricted_underlier_change_request_cl_ord_id_value; underlier_single_order_restricted_underlier_change_request_underlier := underlier_single_order_restricted_underlier_change_request_underlier_value; efid_single_order_restricted_underlier_change_request_efid_optional := efid_single_order_restricted_underlier_change_request_efid_optional_value; risk_group_id := risk_group_id_value; restricted := restricted_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier := underlier_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; restricted := restricted_value |}, bytes)
                       end
                   end
               end
@@ -1513,45 +1513,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPGrossNotionalThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_gross_notional_threshold_change_request_underlier_optional : list byte;
-      efid_cp_gross_notional_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       price_in_dollars : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_gross_notional_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_gross_notional_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (price_in_dollars record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_gross_notional_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_gross_notional_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (price_in_dollars record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_gross_notional_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_gross_notional_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_in_dollars_value, bytes) =>
-                          Some ({| cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id := cl_ord_id_cp_gross_notional_threshold_change_request_cl_ord_id_value; underlier_cp_gross_notional_threshold_change_request_underlier_optional := underlier_cp_gross_notional_threshold_change_request_underlier_optional_value; efid_cp_gross_notional_threshold_change_request_efid_optional := efid_cp_gross_notional_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
                       end
                   end
               end
@@ -1588,45 +1588,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPMarketOrderGrossNotionalThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional : list byte;
-      efid_cp_market_order_gross_notional_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       price_in_dollars : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_market_order_gross_notional_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (price_in_dollars record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_market_order_gross_notional_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (price_in_dollars record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_market_order_gross_notional_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_in_dollars_value, bytes) =>
-                          Some ({| cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id := cl_ord_id_cp_market_order_gross_notional_threshold_change_request_cl_ord_id_value; underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional := underlier_cp_market_order_gross_notional_threshold_change_request_underlier_optional_value; efid_cp_market_order_gross_notional_threshold_change_request_efid_optional := efid_cp_market_order_gross_notional_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
                       end
                   end
               end
@@ -1663,45 +1663,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPNetNotionalThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_net_notional_threshold_change_request_underlier_optional : list byte;
-      efid_cp_net_notional_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       price_in_dollars : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_net_notional_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_net_notional_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (price_in_dollars record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_net_notional_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_net_notional_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (price_in_dollars record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_net_notional_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_net_notional_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_in_dollars_value, bytes) =>
-                          Some ({| cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id := cl_ord_id_cp_net_notional_threshold_change_request_cl_ord_id_value; underlier_cp_net_notional_threshold_change_request_underlier_optional := underlier_cp_net_notional_threshold_change_request_underlier_optional_value; efid_cp_net_notional_threshold_change_request_efid_optional := efid_cp_net_notional_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
                       end
                   end
               end
@@ -1738,45 +1738,45 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPMarketOrderNetNotionalThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional : list byte;
-      efid_cp_market_order_net_notional_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       price_in_dollars : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_market_order_net_notional_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (price_in_dollars record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_market_order_net_notional_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 8 (price_in_dollars record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_market_order_net_notional_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
                       match decode_uint 8 bytes with
                       | None => None
                       | Some (price_in_dollars_value, bytes) =>
-                          Some ({| cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id := cl_ord_id_cp_market_order_net_notional_threshold_change_request_cl_ord_id_value; underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional := underlier_cp_market_order_net_notional_threshold_change_request_underlier_optional_value; efid_cp_market_order_net_notional_threshold_change_request_efid_optional := efid_cp_market_order_net_notional_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
+                          Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; price_in_dollars := price_in_dollars_value |}, bytes)
                       end
                   end
               end
@@ -1813,9 +1813,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPDuplicateOrderThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_duplicate_order_threshold_change_request_underlier_optional : list byte;
-      efid_cp_duplicate_order_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       max_dup_orders : N;
       use_order_price_in_dup_check_optional : N;
@@ -1824,18 +1824,18 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_duplicate_order_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_duplicate_order_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (max_dup_orders record < 256 ^ N.of_nat 4)%N /\
       (use_order_price_in_dup_check_optional record < 256 ^ N.of_nat 1)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_duplicate_order_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_duplicate_order_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 4 (max_dup_orders record) ++
       encode_uint 1 (use_order_price_in_dup_check_optional record) ++
@@ -1844,13 +1844,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_duplicate_order_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_duplicate_order_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -1863,7 +1863,7 @@ Module MemxOptionsRiskControlV17Client.
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (period_in_milli_seconds_value, bytes) =>
-                                  Some ({| cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id := cl_ord_id_cp_duplicate_order_threshold_change_request_cl_ord_id_value; underlier_cp_duplicate_order_threshold_change_request_underlier_optional := underlier_cp_duplicate_order_threshold_change_request_underlier_optional_value; efid_cp_duplicate_order_threshold_change_request_efid_optional := efid_cp_duplicate_order_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; max_dup_orders := max_dup_orders_value; use_order_price_in_dup_check_optional := use_order_price_in_dup_check_optional_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                                  Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; max_dup_orders := max_dup_orders_value; use_order_price_in_dup_check_optional := use_order_price_in_dup_check_optional_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                               end
                           end
                       end
@@ -1904,9 +1904,9 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPOrderRateThresholdChangeRequestMessage *)
     Record t := {
-      cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id : list byte;
-      underlier_cp_order_rate_threshold_change_request_underlier_optional : list byte;
-      efid_cp_order_rate_threshold_change_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
       risk_group_id : N;
       max_order_msgs : N;
       period_in_milli_seconds : N;
@@ -1914,17 +1914,17 @@ Module MemxOptionsRiskControlV17Client.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_order_rate_threshold_change_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_order_rate_threshold_change_request_efid_optional record) = 4 /\
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4 /\
       (risk_group_id record < 256 ^ N.of_nat 2)%N /\
       (max_order_msgs record < 256 ^ N.of_nat 4)%N /\
       (period_in_milli_seconds record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_order_rate_threshold_change_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_order_rate_threshold_change_request_efid_optional record) ++
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record) ++
       encode_uint 2 (risk_group_id record) ++
       encode_uint 4 (max_order_msgs record) ++
       encode_uint 4 (period_in_milli_seconds record).
@@ -1932,13 +1932,13 @@ Module MemxOptionsRiskControlV17Client.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_order_rate_threshold_change_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_order_rate_threshold_change_request_efid_optional_value, bytes) =>
+              | Some (efid_optional_value, bytes) =>
                   match decode_uint 2 bytes with
                   | None => None
                   | Some (risk_group_id_value, bytes) =>
@@ -1948,7 +1948,7 @@ Module MemxOptionsRiskControlV17Client.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (period_in_milli_seconds_value, bytes) =>
-                              Some ({| cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id := cl_ord_id_cp_order_rate_threshold_change_request_cl_ord_id_value; underlier_cp_order_rate_threshold_change_request_underlier_optional := underlier_cp_order_rate_threshold_change_request_underlier_optional_value; efid_cp_order_rate_threshold_change_request_efid_optional := efid_cp_order_rate_threshold_change_request_efid_optional_value; risk_group_id := risk_group_id_value; max_order_msgs := max_order_msgs_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
+                              Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value; risk_group_id := risk_group_id_value; max_order_msgs := max_order_msgs_value; period_in_milli_seconds := period_in_milli_seconds_value |}, bytes)
                           end
                       end
                   end
@@ -1987,21 +1987,21 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPClearAllBreachesRequestMessage *)
     Record t := {
-      cl_ord_id_cp_clear_all_breaches_request_cl_ord_id : list byte;
+      cl_ord_id : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_clear_all_breaches_request_cl_ord_id record) = 20.
+      Datatypes.length (cl_ord_id record) = 20.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_clear_all_breaches_request_cl_ord_id record).
+      encode_bytes 20 (cl_ord_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_clear_all_breaches_request_cl_ord_id_value, bytes) =>
-          Some ({| cl_ord_id_cp_clear_all_breaches_request_cl_ord_id := cl_ord_id_cp_clear_all_breaches_request_cl_ord_id_value |}, bytes)
+      | Some (cl_ord_id_value, bytes) =>
+          Some ({| cl_ord_id := cl_ord_id_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 20.
@@ -2028,33 +2028,33 @@ Module MemxOptionsRiskControlV17Client.
 
     (** CPClearAllBreachesByEFIDOrUnderlierRequestMessage *)
     Record t := {
-      cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id : list byte;
-      underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional : list byte;
-      efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional : list byte;
+      cl_ord_id : list byte;
+      underlier_optional : list byte;
+      efid_optional : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional record) = 6 /\
-      Datatypes.length (efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional record) = 4.
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier_optional record) = 6 /\
+      Datatypes.length (efid_optional record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional record) ++
-      encode_bytes 4 (efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional record).
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier_optional record) ++
+      encode_bytes 4 (efid_optional record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional_value, bytes) =>
+          | Some (underlier_optional_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional_value, bytes) =>
-                  Some ({| cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id := cl_ord_id_cp_clear_all_breaches_by_efid_or_underlier_request_cl_ord_id_value; underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional := underlier_cp_clear_all_breaches_by_efid_or_underlier_request_underlier_optional_value; efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional := efid_cp_clear_all_breaches_by_efid_or_underlier_request_efid_optional_value |}, bytes)
+              | Some (efid_optional_value, bytes) =>
+                  Some ({| cl_ord_id := cl_ord_id_value; underlier_optional := underlier_optional_value; efid_optional := efid_optional_value |}, bytes)
               end
           end
       end.
@@ -2087,33 +2087,33 @@ Module MemxOptionsRiskControlV17Client.
 
     (** ActiveRiskAcknowledgeAllRequestMessage *)
     Record t := {
-      cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id : list byte;
-      underlier_active_risk_acknowledge_all_request_underlier : list byte;
-      efid_active_risk_acknowledge_all_request_efid : list byte;
+      cl_ord_id : list byte;
+      underlier : list byte;
+      efid : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_active_risk_acknowledge_all_request_underlier record) = 6 /\
-      Datatypes.length (efid_active_risk_acknowledge_all_request_efid record) = 4.
+      Datatypes.length (cl_ord_id record) = 20 /\
+      Datatypes.length (underlier record) = 6 /\
+      Datatypes.length (efid record) = 4.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 20 (cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id record) ++
-      encode_bytes 6 (underlier_active_risk_acknowledge_all_request_underlier record) ++
-      encode_bytes 4 (efid_active_risk_acknowledge_all_request_efid record).
+      encode_bytes 20 (cl_ord_id record) ++
+      encode_bytes 6 (underlier record) ++
+      encode_bytes 4 (efid record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 20 bytes with
       | None => None
-      | Some (cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id_value, bytes) =>
+      | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_active_risk_acknowledge_all_request_underlier_value, bytes) =>
+          | Some (underlier_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_active_risk_acknowledge_all_request_efid_value, bytes) =>
-                  Some ({| cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id := cl_ord_id_active_risk_acknowledge_all_request_cl_ord_id_value; underlier_active_risk_acknowledge_all_request_underlier := underlier_active_risk_acknowledge_all_request_underlier_value; efid_active_risk_acknowledge_all_request_efid := efid_active_risk_acknowledge_all_request_efid_value |}, bytes)
+              | Some (efid_value, bytes) =>
+                  Some ({| cl_ord_id := cl_ord_id_value; underlier := underlier_value; efid := efid_value |}, bytes)
               end
           end
       end.

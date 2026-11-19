@@ -205,7 +205,7 @@ Module NsmEquitiesNoiViewV302023.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alpha_8 : list byte;
+      stock : list byte;
       market_category : list byte;
       financial_status_indicator : list byte;
       round_lot_size : N;
@@ -225,7 +225,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (market_category record) = 1 /\
       Datatypes.length (financial_status_indicator record) = 1 /\
       (round_lot_size record < 256 ^ N.of_nat 4)%N /\
@@ -243,7 +243,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (market_category record) ++
       encode_bytes 1 (financial_status_indicator record) ++
       encode_uint 4 (round_lot_size record) ++
@@ -267,7 +267,7 @@ Module NsmEquitiesNoiViewV302023.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alpha_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (market_category_value, bytes) =>
@@ -307,7 +307,7 @@ Module NsmEquitiesNoiViewV302023.
                                                                   match decode_bytes 1 bytes with
                                                                   | None => None
                                                                   | Some (inverse_indicator_value, bytes) =>
-                                                                      Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alpha_8 := stock_alpha_8_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value; issue_classification := issue_classification_value; issue_sub_type := issue_sub_type_value; authenticity := authenticity_value; short_sale_threshold_indicator := short_sale_threshold_indicator_value; ipo_flag := ipo_flag_value; luld_reference_price_tier := luld_reference_price_tier_value; etp_flag := etp_flag_value; etp_leverage_factor := etp_leverage_factor_value; inverse_indicator := inverse_indicator_value |}, bytes)
+                                                                      Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; market_category := market_category_value; financial_status_indicator := financial_status_indicator_value; round_lot_size := round_lot_size_value; round_lots_only := round_lots_only_value; issue_classification := issue_classification_value; issue_sub_type := issue_sub_type_value; authenticity := authenticity_value; short_sale_threshold_indicator := short_sale_threshold_indicator_value; ipo_flag := ipo_flag_value; luld_reference_price_tier := luld_reference_price_tier_value; etp_flag := etp_flag_value; etp_leverage_factor := etp_leverage_factor_value; inverse_indicator := inverse_indicator_value |}, bytes)
                                                                   end
                                                               end
                                                           end
@@ -368,7 +368,7 @@ Module NsmEquitiesNoiViewV302023.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       current_trading_state : list byte;
       reason : list byte;
     }.
@@ -377,14 +377,14 @@ Module NsmEquitiesNoiViewV302023.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (current_trading_state record) = 1 /\
       Datatypes.length (reason record) = 4.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (current_trading_state record) ++
       encode_bytes 4 (reason record).
 
@@ -397,14 +397,14 @@ Module NsmEquitiesNoiViewV302023.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alphanumeric_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (current_trading_state_value, bytes) =>
                       match decode_bytes 4 bytes with
                       | None => None
                       | Some (reason_value, bytes) =>
-                          Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alphanumeric_8 := stock_alphanumeric_8_value; current_trading_state := current_trading_state_value; reason := reason_value |}, bytes)
+                          Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; current_trading_state := current_trading_state_value; reason := reason_value |}, bytes)
                       end
                   end
               end
@@ -443,7 +443,7 @@ Module NsmEquitiesNoiViewV302023.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       reg_sho_action : list byte;
     }.
 
@@ -451,13 +451,13 @@ Module NsmEquitiesNoiViewV302023.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (reg_sho_action record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (reg_sho_action record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -469,11 +469,11 @@ Module NsmEquitiesNoiViewV302023.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alphanumeric_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (reg_sho_action_value, bytes) =>
-                      Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alphanumeric_8 := stock_alphanumeric_8_value; reg_sho_action := reg_sho_action_value |}, bytes)
+                      Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; reg_sho_action := reg_sho_action_value |}, bytes)
                   end
               end
           end
@@ -513,7 +513,7 @@ Module NsmEquitiesNoiViewV302023.
       paired_shares : N;
       imbalance_shares : N;
       imbalance_direction : list byte;
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       far_price : N;
       near_price : N;
       current_reference_price : N;
@@ -528,7 +528,7 @@ Module NsmEquitiesNoiViewV302023.
       (paired_shares record < 256 ^ N.of_nat 8)%N /\
       (imbalance_shares record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (imbalance_direction record) = 1 /\
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       (far_price record < 256 ^ N.of_nat 4)%N /\
       (near_price record < 256 ^ N.of_nat 4)%N /\
       (current_reference_price record < 256 ^ N.of_nat 4)%N /\
@@ -541,7 +541,7 @@ Module NsmEquitiesNoiViewV302023.
       encode_uint 8 (paired_shares record) ++
       encode_uint 8 (imbalance_shares record) ++
       encode_bytes 1 (imbalance_direction record) ++
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_uint 4 (far_price record) ++
       encode_uint 4 (near_price record) ++
       encode_uint 4 (current_reference_price record) ++
@@ -566,7 +566,7 @@ Module NsmEquitiesNoiViewV302023.
                       | Some (imbalance_direction_value, bytes) =>
                           match decode_bytes 8 bytes with
                           | None => None
-                          | Some (stock_alphanumeric_8_value, bytes) =>
+                          | Some (stock_value, bytes) =>
                               match decode_uint 4 bytes with
                               | None => None
                               | Some (far_price_value, bytes) =>
@@ -582,7 +582,7 @@ Module NsmEquitiesNoiViewV302023.
                                               match decode_bytes 1 bytes with
                                               | None => None
                                               | Some (price_variation_indicator_value, bytes) =>
-                                                  Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; paired_shares := paired_shares_value; imbalance_shares := imbalance_shares_value; imbalance_direction := imbalance_direction_value; stock_alphanumeric_8 := stock_alphanumeric_8_value; far_price := far_price_value; near_price := near_price_value; current_reference_price := current_reference_price_value; cross_type := cross_type_value; price_variation_indicator := price_variation_indicator_value |}, bytes)
+                                                  Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; paired_shares := paired_shares_value; imbalance_shares := imbalance_shares_value; imbalance_direction := imbalance_direction_value; stock := stock_value; far_price := far_price_value; near_price := near_price_value; current_reference_price := current_reference_price_value; cross_type := cross_type_value; price_variation_indicator := price_variation_indicator_value |}, bytes)
                                               end
                                           end
                                       end
@@ -634,7 +634,7 @@ Module NsmEquitiesNoiViewV302023.
       tracking_number : N;
       timestamp : N;
       shares : N;
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       cross_price : N;
       match_number : N;
       cross_type : list byte;
@@ -645,7 +645,7 @@ Module NsmEquitiesNoiViewV302023.
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
       (shares record < 256 ^ N.of_nat 8)%N /\
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       (cross_price record < 256 ^ N.of_nat 4)%N /\
       (match_number record < 256 ^ N.of_nat 8)%N /\
       Datatypes.length (cross_type record) = 1.
@@ -654,7 +654,7 @@ Module NsmEquitiesNoiViewV302023.
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
       encode_uint 8 (shares record) ++
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_uint 4 (cross_price record) ++
       encode_uint 8 (match_number record) ++
       encode_bytes 1 (cross_type record).
@@ -671,7 +671,7 @@ Module NsmEquitiesNoiViewV302023.
               | Some (shares_value, bytes) =>
                   match decode_bytes 8 bytes with
                   | None => None
-                  | Some (stock_alphanumeric_8_value, bytes) =>
+                  | Some (stock_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (cross_price_value, bytes) =>
@@ -681,7 +681,7 @@ Module NsmEquitiesNoiViewV302023.
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (cross_type_value, bytes) =>
-                                  Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; shares := shares_value; stock_alphanumeric_8 := stock_alphanumeric_8_value; cross_price := cross_price_value; match_number := match_number_value; cross_type := cross_type_value |}, bytes)
+                                  Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; shares := shares_value; stock := stock_value; cross_price := cross_price_value; match_number := match_number_value; cross_type := cross_type_value |}, bytes)
                               end
                           end
                       end
@@ -724,7 +724,7 @@ Module NsmEquitiesNoiViewV302023.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alphanumeric_8 : list byte;
+      stock : list byte;
       ipo_quotation_release_time : N;
       ipo_quotation_release_qualifier : list byte;
       ipo_price : N;
@@ -734,7 +734,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alphanumeric_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       (ipo_quotation_release_time record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (ipo_quotation_release_qualifier record) = 1 /\
       (ipo_price record < 256 ^ N.of_nat 4)%N.
@@ -742,7 +742,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alphanumeric_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_uint 4 (ipo_quotation_release_time record) ++
       encode_bytes 1 (ipo_quotation_release_qualifier record) ++
       encode_uint 4 (ipo_price record).
@@ -756,7 +756,7 @@ Module NsmEquitiesNoiViewV302023.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alphanumeric_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (ipo_quotation_release_time_value, bytes) =>
@@ -766,7 +766,7 @@ Module NsmEquitiesNoiViewV302023.
                           match decode_uint 4 bytes with
                           | None => None
                           | Some (ipo_price_value, bytes) =>
-                              Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alphanumeric_8 := stock_alphanumeric_8_value; ipo_quotation_release_time := ipo_quotation_release_time_value; ipo_quotation_release_qualifier := ipo_quotation_release_qualifier_value; ipo_price := ipo_price_value |}, bytes)
+                              Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; ipo_quotation_release_time := ipo_quotation_release_time_value; ipo_quotation_release_qualifier := ipo_quotation_release_qualifier_value; ipo_price := ipo_price_value |}, bytes)
                           end
                       end
                   end
@@ -807,7 +807,7 @@ Module NsmEquitiesNoiViewV302023.
     Record t := {
       tracking_number : N;
       timestamp : N;
-      stock_alpha_8 : list byte;
+      stock : list byte;
       open_eligibility_status : list byte;
       minimum_allowable_price : N;
       maximum_allowable_price : N;
@@ -821,7 +821,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition bounded (record : t) : Prop :=
       (tracking_number record < 256 ^ N.of_nat 2)%N /\
       (timestamp record < 256 ^ N.of_nat 6)%N /\
-      Datatypes.length (stock_alpha_8 record) = 8 /\
+      Datatypes.length (stock record) = 8 /\
       Datatypes.length (open_eligibility_status record) = 1 /\
       (minimum_allowable_price record < 256 ^ N.of_nat 4)%N /\
       (maximum_allowable_price record < 256 ^ N.of_nat 4)%N /\
@@ -833,7 +833,7 @@ Module NsmEquitiesNoiViewV302023.
     Definition encode (record : t) : list byte :=
       encode_uint 2 (tracking_number record) ++
       encode_uint 6 (timestamp record) ++
-      encode_bytes 8 (stock_alpha_8 record) ++
+      encode_bytes 8 (stock record) ++
       encode_bytes 1 (open_eligibility_status record) ++
       encode_uint 4 (minimum_allowable_price record) ++
       encode_uint 4 (maximum_allowable_price record) ++
@@ -851,7 +851,7 @@ Module NsmEquitiesNoiViewV302023.
           | Some (timestamp_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (stock_alpha_8_value, bytes) =>
+              | Some (stock_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (open_eligibility_status_value, bytes) =>
@@ -873,7 +873,7 @@ Module NsmEquitiesNoiViewV302023.
                                           match decode_uint 4 bytes with
                                           | None => None
                                           | Some (upper_price_range_collar_value, bytes) =>
-                                              Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock_alpha_8 := stock_alpha_8_value; open_eligibility_status := open_eligibility_status_value; minimum_allowable_price := minimum_allowable_price_value; maximum_allowable_price := maximum_allowable_price_value; near_execution_price := near_execution_price_value; near_execution_time := near_execution_time_value; lower_price_range_collar := lower_price_range_collar_value; upper_price_range_collar := upper_price_range_collar_value |}, bytes)
+                                              Some ({| tracking_number := tracking_number_value; timestamp := timestamp_value; stock := stock_value; open_eligibility_status := open_eligibility_status_value; minimum_allowable_price := minimum_allowable_price_value; maximum_allowable_price := maximum_allowable_price_value; near_execution_price := near_execution_price_value; near_execution_time := near_execution_time_value; lower_price_range_collar := lower_price_range_collar_value; upper_price_range_collar := upper_price_range_collar_value |}, bytes)
                                           end
                                       end
                                   end

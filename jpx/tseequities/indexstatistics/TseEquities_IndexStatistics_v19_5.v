@@ -264,17 +264,17 @@ Module TseEquitiesIndexStatisticsV195.
     (** Total market value *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      total_market_value_c_14 : list byte;
+      total_market_value_amount : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (total_market_value_c_14 record) = 14.
+      Datatypes.length (total_market_value_amount record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (total_market_value_c_14 record).
+      encode_bytes 14 (total_market_value_amount record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -282,8 +282,8 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (total_market_value_c_14_value, bytes) =>
-              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; total_market_value_c_14 := total_market_value_c_14_value |}, bytes)
+          | Some (total_market_value_amount_value, bytes) =>
+              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; total_market_value_amount := total_market_value_amount_value |}, bytes)
           end
       end.
 
@@ -315,19 +315,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Market value Day-on-day comparison *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
+      day_on_day_comparison : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
+      Datatypes.length (day_on_day_comparison record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
+      encode_bytes 14 (day_on_day_comparison record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -336,11 +336,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (day_on_day_comparison_c_14_value, bytes) =>
+          | Some (day_on_day_comparison_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; day_on_day_comparison := day_on_day_comparison_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -448,27 +448,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Simple yield *)
     Record t := {
-      simple_yield_c_8 : list byte;
+      simple_yield_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (simple_yield_c_8 record) = 8 /\
+      Datatypes.length (simple_yield_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (simple_yield_c_8 record) ++
+      encode_bytes 8 (simple_yield_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (simple_yield_c_8_value, bytes) =>
+      | Some (simple_yield_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| simple_yield_c_8 := simple_yield_c_8_value; sign := sign_value |}, bytes)
+              Some ({| simple_yield_value := simple_yield_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -499,27 +499,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Yield Day-on-day comparison *)
     Record t := {
-      day_on_day_comparison_c_8 : list byte;
+      day_on_day_comparison_rate : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (day_on_day_comparison_c_8 record) = 8 /\
+      Datatypes.length (day_on_day_comparison_rate record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (day_on_day_comparison_c_8 record) ++
+      encode_bytes 8 (day_on_day_comparison_rate record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (day_on_day_comparison_c_8_value, bytes) =>
+      | Some (day_on_day_comparison_rate_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| day_on_day_comparison_c_8 := day_on_day_comparison_c_8_value; sign := sign_value |}, bytes)
+              Some ({| day_on_day_comparison_rate := day_on_day_comparison_rate_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -625,27 +625,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Weighted yield *)
     Record t := {
-      weighted_yield_c_8 : list byte;
+      weighted_yield_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (weighted_yield_c_8 record) = 8 /\
+      Datatypes.length (weighted_yield_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (weighted_yield_c_8 record) ++
+      encode_bytes 8 (weighted_yield_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (weighted_yield_c_8_value, bytes) =>
+      | Some (weighted_yield_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| weighted_yield_c_8 := weighted_yield_c_8_value; sign := sign_value |}, bytes)
+              Some ({| weighted_yield_value := weighted_yield_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -752,19 +752,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Simple stock price average *)
     Record t := {
       unit_flag : list byte;
-      simple_stock_price_average_c_14 : list byte;
+      simple_stock_price_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (simple_stock_price_average_c_14 record) = 14 /\
+      Datatypes.length (simple_stock_price_average_value record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (simple_stock_price_average_c_14 record) ++
+      encode_bytes 14 (simple_stock_price_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -773,11 +773,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (simple_stock_price_average_c_14_value, bytes) =>
+          | Some (simple_stock_price_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; simple_stock_price_average_c_14 := simple_stock_price_average_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; simple_stock_price_average_value := simple_stock_price_average_value_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -811,19 +811,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Stock price average Day-on-day comparison *)
     Record t := {
       unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
+      day_on_day_comparison : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
+      Datatypes.length (day_on_day_comparison record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
+      encode_bytes 14 (day_on_day_comparison record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -832,11 +832,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (day_on_day_comparison_c_14_value, bytes) =>
+          | Some (day_on_day_comparison_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; day_on_day_comparison := day_on_day_comparison_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -945,19 +945,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Weighted stock price average *)
     Record t := {
       unit_flag : list byte;
-      weighted_stock_price_average_c_14 : list byte;
+      weighted_stock_price_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (weighted_stock_price_average_c_14 record) = 14 /\
+      Datatypes.length (weighted_stock_price_average_value record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (weighted_stock_price_average_c_14 record) ++
+      encode_bytes 14 (weighted_stock_price_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -966,11 +966,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (weighted_stock_price_average_c_14_value, bytes) =>
+          | Some (weighted_stock_price_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; weighted_stock_price_average_c_14 := weighted_stock_price_average_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; weighted_stock_price_average_value := weighted_stock_price_average_value_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -1154,28 +1154,28 @@ Module TseEquitiesIndexStatisticsV195.
     (** Overall Simple average *)
     Record t := {
       unit_flag : list byte;
-      simple_average_c_14 : list byte;
+      simple_average_value : list byte;
       sign : list byte;
       second_unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
+      day_on_day_comparison : list byte;
       second_sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (simple_average_c_14 record) = 14 /\
+      Datatypes.length (simple_average_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (second_unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
+      Datatypes.length (day_on_day_comparison record) = 14 /\
       Datatypes.length (second_sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (simple_average_c_14 record) ++
+      encode_bytes 14 (simple_average_value record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 1 (second_unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
+      encode_bytes 14 (day_on_day_comparison record) ++
       encode_bytes 1 (second_sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1184,7 +1184,7 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (simple_average_c_14_value, bytes) =>
+          | Some (simple_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
@@ -1193,11 +1193,11 @@ Module TseEquitiesIndexStatisticsV195.
                   | Some (second_unit_flag_value, bytes) =>
                       match decode_bytes 14 bytes with
                       | None => None
-                      | Some (day_on_day_comparison_c_14_value, bytes) =>
+                      | Some (day_on_day_comparison_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_sign_value, bytes) =>
-                              Some ({| unit_flag := unit_flag_value; simple_average_c_14 := simple_average_c_14_value; sign := sign_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; second_sign := second_sign_value |}, bytes)
+                              Some ({| unit_flag := unit_flag_value; simple_average_value := simple_average_value_value; sign := sign_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison := day_on_day_comparison_value; second_sign := second_sign_value |}, bytes)
                           end
                       end
                   end
@@ -1236,39 +1236,39 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Overall Divergence average *)
     Record t := {
-      divergence_average_c_8 : list byte;
+      divergence_average_value : list byte;
       sign : list byte;
-      day_on_day_comparison_c_8 : list byte;
+      day_on_day_comparison_rate : list byte;
       second_sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (divergence_average_c_8 record) = 8 /\
+      Datatypes.length (divergence_average_value record) = 8 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_8 record) = 8 /\
+      Datatypes.length (day_on_day_comparison_rate record) = 8 /\
       Datatypes.length (second_sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (divergence_average_c_8 record) ++
+      encode_bytes 8 (divergence_average_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 8 (day_on_day_comparison_c_8 record) ++
+      encode_bytes 8 (day_on_day_comparison_rate record) ++
       encode_bytes 1 (second_sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (divergence_average_c_8_value, bytes) =>
+      | Some (divergence_average_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (day_on_day_comparison_c_8_value, bytes) =>
+              | Some (day_on_day_comparison_rate_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (second_sign_value, bytes) =>
-                      Some ({| divergence_average_c_8 := divergence_average_c_8_value; sign := sign_value; day_on_day_comparison_c_8 := day_on_day_comparison_c_8_value; second_sign := second_sign_value |}, bytes)
+                      Some ({| divergence_average_value := divergence_average_value_value; sign := sign_value; day_on_day_comparison_rate := day_on_day_comparison_rate_value; second_sign := second_sign_value |}, bytes)
                   end
               end
           end
@@ -1304,28 +1304,28 @@ Module TseEquitiesIndexStatisticsV195.
     (** Overall Parity average *)
     Record t := {
       unit_flag : list byte;
-      parity_average_c_14 : list byte;
+      parity_average_value : list byte;
       sign : list byte;
       second_unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
+      day_on_day_comparison : list byte;
       second_sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (parity_average_c_14 record) = 14 /\
+      Datatypes.length (parity_average_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (second_unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
+      Datatypes.length (day_on_day_comparison record) = 14 /\
       Datatypes.length (second_sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (parity_average_c_14 record) ++
+      encode_bytes 14 (parity_average_value record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 1 (second_unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
+      encode_bytes 14 (day_on_day_comparison record) ++
       encode_bytes 1 (second_sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1334,7 +1334,7 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (parity_average_c_14_value, bytes) =>
+          | Some (parity_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
@@ -1343,11 +1343,11 @@ Module TseEquitiesIndexStatisticsV195.
                   | Some (second_unit_flag_value, bytes) =>
                       match decode_bytes 14 bytes with
                       | None => None
-                      | Some (day_on_day_comparison_c_14_value, bytes) =>
+                      | Some (day_on_day_comparison_value, bytes) =>
                           match decode_bytes 1 bytes with
                           | None => None
                           | Some (second_sign_value, bytes) =>
-                              Some ({| unit_flag := unit_flag_value; parity_average_c_14 := parity_average_c_14_value; sign := sign_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; second_sign := second_sign_value |}, bytes)
+                              Some ({| unit_flag := unit_flag_value; parity_average_value := parity_average_value_value; sign := sign_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison := day_on_day_comparison_value; second_sign := second_sign_value |}, bytes)
                           end
                       end
                   end
@@ -1386,39 +1386,39 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Overall Direct yield average *)
     Record t := {
-      direct_yield_average_c_8 : list byte;
+      direct_yield_average_value : list byte;
       sign : list byte;
-      day_on_day_comparison_c_8 : list byte;
+      day_on_day_comparison_rate : list byte;
       second_sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (direct_yield_average_c_8 record) = 8 /\
+      Datatypes.length (direct_yield_average_value record) = 8 /\
       Datatypes.length (sign record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_8 record) = 8 /\
+      Datatypes.length (day_on_day_comparison_rate record) = 8 /\
       Datatypes.length (second_sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (direct_yield_average_c_8 record) ++
+      encode_bytes 8 (direct_yield_average_value record) ++
       encode_bytes 1 (sign record) ++
-      encode_bytes 8 (day_on_day_comparison_c_8 record) ++
+      encode_bytes 8 (day_on_day_comparison_rate record) ++
       encode_bytes 1 (second_sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (direct_yield_average_c_8_value, bytes) =>
+      | Some (direct_yield_average_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
               match decode_bytes 8 bytes with
               | None => None
-              | Some (day_on_day_comparison_c_8_value, bytes) =>
+              | Some (day_on_day_comparison_rate_value, bytes) =>
                   match decode_bytes 1 bytes with
                   | None => None
                   | Some (second_sign_value, bytes) =>
-                      Some ({| direct_yield_average_c_8 := direct_yield_average_c_8_value; sign := sign_value; day_on_day_comparison_c_8 := day_on_day_comparison_c_8_value; second_sign := second_sign_value |}, bytes)
+                      Some ({| direct_yield_average_value := direct_yield_average_value_value; sign := sign_value; day_on_day_comparison_rate := day_on_day_comparison_rate_value; second_sign := second_sign_value |}, bytes)
                   end
               end
           end
@@ -1521,19 +1521,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Simple average *)
     Record t := {
       unit_flag : list byte;
-      simple_average_c_14 : list byte;
+      simple_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (simple_average_c_14 record) = 14 /\
+      Datatypes.length (simple_average_value record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (simple_average_c_14 record) ++
+      encode_bytes 14 (simple_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1542,11 +1542,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (simple_average_c_14_value, bytes) =>
+          | Some (simple_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; simple_average_c_14 := simple_average_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; simple_average_value := simple_average_value_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -1579,27 +1579,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Divergence average *)
     Record t := {
-      divergence_average_c_8 : list byte;
+      divergence_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (divergence_average_c_8 record) = 8 /\
+      Datatypes.length (divergence_average_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (divergence_average_c_8 record) ++
+      encode_bytes 8 (divergence_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (divergence_average_c_8_value, bytes) =>
+      | Some (divergence_average_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| divergence_average_c_8 := divergence_average_c_8_value; sign := sign_value |}, bytes)
+              Some ({| divergence_average_value := divergence_average_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -1631,19 +1631,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Parity average *)
     Record t := {
       unit_flag : list byte;
-      parity_average_c_14 : list byte;
+      parity_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (parity_average_c_14 record) = 14 /\
+      Datatypes.length (parity_average_value record) = 14 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (parity_average_c_14 record) ++
+      encode_bytes 14 (parity_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1652,11 +1652,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (parity_average_c_14_value, bytes) =>
+          | Some (parity_average_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
-                  Some ({| unit_flag := unit_flag_value; parity_average_c_14 := parity_average_c_14_value; sign := sign_value |}, bytes)
+                  Some ({| unit_flag := unit_flag_value; parity_average_value := parity_average_value_value; sign := sign_value |}, bytes)
               end
           end
       end.
@@ -1689,27 +1689,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Direct yield average *)
     Record t := {
-      direct_yield_average_c_8 : list byte;
+      direct_yield_average_value : list byte;
       sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (direct_yield_average_c_8 record) = 8 /\
+      Datatypes.length (direct_yield_average_value record) = 8 /\
       Datatypes.length (sign record) = 1.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (direct_yield_average_c_8 record) ++
+      encode_bytes 8 (direct_yield_average_value record) ++
       encode_bytes 1 (sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (direct_yield_average_c_8_value, bytes) =>
+      | Some (direct_yield_average_value_value, bytes) =>
           match decode_bytes 1 bytes with
           | None => None
           | Some (sign_value, bytes) =>
-              Some ({| direct_yield_average_c_8 := direct_yield_average_c_8_value; sign := sign_value |}, bytes)
+              Some ({| direct_yield_average_value := direct_yield_average_value_value; sign := sign_value |}, bytes)
           end
       end.
 
@@ -2379,17 +2379,17 @@ Module TseEquitiesIndexStatisticsV195.
     (** Estimated total trading volume *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      estimated_total_trading_volume_c_14 : list byte;
+      estimated_total_trading_volume_value : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (estimated_total_trading_volume_c_14 record) = 14.
+      Datatypes.length (estimated_total_trading_volume_value record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (estimated_total_trading_volume_c_14 record).
+      encode_bytes 14 (estimated_total_trading_volume_value record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 1 bytes with
@@ -2397,8 +2397,8 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (estimated_total_trading_volume_c_14_value, bytes) =>
-              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; estimated_total_trading_volume_c_14 := estimated_total_trading_volume_c_14_value |}, bytes)
+          | Some (estimated_total_trading_volume_value_value, bytes) =>
+              Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; estimated_total_trading_volume_value := estimated_total_trading_volume_value_value |}, bytes)
           end
       end.
 
@@ -2505,19 +2505,19 @@ Module TseEquitiesIndexStatisticsV195.
     (** Estimated total turnover *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      estimated_total_turnover_c_14 : list byte;
+      estimated_total_turnover_value : list byte;
       reserved_1 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (estimated_total_turnover_c_14 record) = 14 /\
+      Datatypes.length (estimated_total_turnover_value record) = 14 /\
       Datatypes.length (reserved_1 record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (estimated_total_turnover_c_14 record) ++
+      encode_bytes 14 (estimated_total_turnover_value record) ++
       encode_bytes 1 (reserved_1 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2526,11 +2526,11 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (estimated_total_turnover_c_14_value, bytes) =>
+          | Some (estimated_total_turnover_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (reserved_1_value, bytes) =>
-                  Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; estimated_total_turnover_c_14 := estimated_total_turnover_c_14_value; reserved_1 := reserved_1_value |}, bytes)
+                  Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; estimated_total_turnover_value := estimated_total_turnover_value_value; reserved_1 := reserved_1_value |}, bytes)
               end
           end
       end.
@@ -2639,31 +2639,31 @@ Module TseEquitiesIndexStatisticsV195.
     (** VWAP by market *)
     Record t := {
       unit_flag : list byte;
-      vwap_by_market_c_14 : list byte;
+      vwap_by_market_value : list byte;
       sign : list byte;
       reserved_1 : list byte;
       second_unit_flag : list byte;
-      day_on_day_comparison_c_14 : list byte;
+      day_on_day_comparison : list byte;
       second_sign : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (unit_flag record) = 1 /\
-      Datatypes.length (vwap_by_market_c_14 record) = 14 /\
+      Datatypes.length (vwap_by_market_value record) = 14 /\
       Datatypes.length (sign record) = 1 /\
       Datatypes.length (reserved_1 record) = 1 /\
       Datatypes.length (second_unit_flag record) = 1 /\
-      Datatypes.length (day_on_day_comparison_c_14 record) = 14 /\
+      Datatypes.length (day_on_day_comparison record) = 14 /\
       Datatypes.length (second_sign record) = 1.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (unit_flag record) ++
-      encode_bytes 14 (vwap_by_market_c_14 record) ++
+      encode_bytes 14 (vwap_by_market_value record) ++
       encode_bytes 1 (sign record) ++
       encode_bytes 1 (reserved_1 record) ++
       encode_bytes 1 (second_unit_flag record) ++
-      encode_bytes 14 (day_on_day_comparison_c_14 record) ++
+      encode_bytes 14 (day_on_day_comparison record) ++
       encode_bytes 1 (second_sign record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -2672,7 +2672,7 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (vwap_by_market_c_14_value, bytes) =>
+          | Some (vwap_by_market_value_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (sign_value, bytes) =>
@@ -2684,11 +2684,11 @@ Module TseEquitiesIndexStatisticsV195.
                       | Some (second_unit_flag_value, bytes) =>
                           match decode_bytes 14 bytes with
                           | None => None
-                          | Some (day_on_day_comparison_c_14_value, bytes) =>
+                          | Some (day_on_day_comparison_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (second_sign_value, bytes) =>
-                                  Some ({| unit_flag := unit_flag_value; vwap_by_market_c_14 := vwap_by_market_c_14_value; sign := sign_value; reserved_1 := reserved_1_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison_c_14 := day_on_day_comparison_c_14_value; second_sign := second_sign_value |}, bytes)
+                                  Some ({| unit_flag := unit_flag_value; vwap_by_market_value := vwap_by_market_value_value; sign := sign_value; reserved_1 := reserved_1_value; second_unit_flag := second_unit_flag_value; day_on_day_comparison := day_on_day_comparison_value; second_sign := second_sign_value |}, bytes)
                               end
                           end
                       end
@@ -2797,11 +2797,11 @@ Module TseEquitiesIndexStatisticsV195.
     (** Trading volume *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      single_issue_transaction_c_14 : list byte;
+      single_issue_transaction : list byte;
       second_trading_volume_turnover_unit_flag : list byte;
       closing_price_transaction : list byte;
       third_trading_volume_turnover_unit_flag : list byte;
-      basket_transaction_c_14 : list byte;
+      basket_transaction : list byte;
       fourth_trading_volume_turnover_unit_flag : list byte;
       aggregate_trading_volume : list byte;
     }.
@@ -2809,21 +2809,21 @@ Module TseEquitiesIndexStatisticsV195.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (single_issue_transaction_c_14 record) = 14 /\
+      Datatypes.length (single_issue_transaction record) = 14 /\
       Datatypes.length (second_trading_volume_turnover_unit_flag record) = 1 /\
       Datatypes.length (closing_price_transaction record) = 14 /\
       Datatypes.length (third_trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (basket_transaction_c_14 record) = 14 /\
+      Datatypes.length (basket_transaction record) = 14 /\
       Datatypes.length (fourth_trading_volume_turnover_unit_flag record) = 1 /\
       Datatypes.length (aggregate_trading_volume record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (single_issue_transaction_c_14 record) ++
+      encode_bytes 14 (single_issue_transaction record) ++
       encode_bytes 1 (second_trading_volume_turnover_unit_flag record) ++
       encode_bytes 14 (closing_price_transaction record) ++
       encode_bytes 1 (third_trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (basket_transaction_c_14 record) ++
+      encode_bytes 14 (basket_transaction record) ++
       encode_bytes 1 (fourth_trading_volume_turnover_unit_flag record) ++
       encode_bytes 14 (aggregate_trading_volume record).
 
@@ -2833,7 +2833,7 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (single_issue_transaction_c_14_value, bytes) =>
+          | Some (single_issue_transaction_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (second_trading_volume_turnover_unit_flag_value, bytes) =>
@@ -2845,14 +2845,14 @@ Module TseEquitiesIndexStatisticsV195.
                       | Some (third_trading_volume_turnover_unit_flag_value, bytes) =>
                           match decode_bytes 14 bytes with
                           | None => None
-                          | Some (basket_transaction_c_14_value, bytes) =>
+                          | Some (basket_transaction_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (fourth_trading_volume_turnover_unit_flag_value, bytes) =>
                                   match decode_bytes 14 bytes with
                                   | None => None
                                   | Some (aggregate_trading_volume_value, bytes) =>
-                                      Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; single_issue_transaction_c_14 := single_issue_transaction_c_14_value; second_trading_volume_turnover_unit_flag := second_trading_volume_turnover_unit_flag_value; closing_price_transaction := closing_price_transaction_value; third_trading_volume_turnover_unit_flag := third_trading_volume_turnover_unit_flag_value; basket_transaction_c_14 := basket_transaction_c_14_value; fourth_trading_volume_turnover_unit_flag := fourth_trading_volume_turnover_unit_flag_value; aggregate_trading_volume := aggregate_trading_volume_value |}, bytes)
+                                      Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; single_issue_transaction := single_issue_transaction_value; second_trading_volume_turnover_unit_flag := second_trading_volume_turnover_unit_flag_value; closing_price_transaction := closing_price_transaction_value; third_trading_volume_turnover_unit_flag := third_trading_volume_turnover_unit_flag_value; basket_transaction := basket_transaction_value; fourth_trading_volume_turnover_unit_flag := fourth_trading_volume_turnover_unit_flag_value; aggregate_trading_volume := aggregate_trading_volume_value |}, bytes)
                                   end
                               end
                           end
@@ -2896,11 +2896,11 @@ Module TseEquitiesIndexStatisticsV195.
     (** Turnover *)
     Record t := {
       trading_volume_turnover_unit_flag : list byte;
-      single_issue_transaction_c_14 : list byte;
+      single_issue_transaction : list byte;
       second_trading_volume_turnover_unit_flag : list byte;
       closing_price_transaction : list byte;
       third_trading_volume_turnover_unit_flag : list byte;
-      basket_transaction_c_14 : list byte;
+      basket_transaction : list byte;
       fourth_trading_volume_turnover_unit_flag : list byte;
       aggregate_turnover : list byte;
     }.
@@ -2908,21 +2908,21 @@ Module TseEquitiesIndexStatisticsV195.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (single_issue_transaction_c_14 record) = 14 /\
+      Datatypes.length (single_issue_transaction record) = 14 /\
       Datatypes.length (second_trading_volume_turnover_unit_flag record) = 1 /\
       Datatypes.length (closing_price_transaction record) = 14 /\
       Datatypes.length (third_trading_volume_turnover_unit_flag record) = 1 /\
-      Datatypes.length (basket_transaction_c_14 record) = 14 /\
+      Datatypes.length (basket_transaction record) = 14 /\
       Datatypes.length (fourth_trading_volume_turnover_unit_flag record) = 1 /\
       Datatypes.length (aggregate_turnover record) = 14.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 1 (trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (single_issue_transaction_c_14 record) ++
+      encode_bytes 14 (single_issue_transaction record) ++
       encode_bytes 1 (second_trading_volume_turnover_unit_flag record) ++
       encode_bytes 14 (closing_price_transaction record) ++
       encode_bytes 1 (third_trading_volume_turnover_unit_flag record) ++
-      encode_bytes 14 (basket_transaction_c_14 record) ++
+      encode_bytes 14 (basket_transaction record) ++
       encode_bytes 1 (fourth_trading_volume_turnover_unit_flag record) ++
       encode_bytes 14 (aggregate_turnover record).
 
@@ -2932,7 +2932,7 @@ Module TseEquitiesIndexStatisticsV195.
       | Some (trading_volume_turnover_unit_flag_value, bytes) =>
           match decode_bytes 14 bytes with
           | None => None
-          | Some (single_issue_transaction_c_14_value, bytes) =>
+          | Some (single_issue_transaction_value, bytes) =>
               match decode_bytes 1 bytes with
               | None => None
               | Some (second_trading_volume_turnover_unit_flag_value, bytes) =>
@@ -2944,14 +2944,14 @@ Module TseEquitiesIndexStatisticsV195.
                       | Some (third_trading_volume_turnover_unit_flag_value, bytes) =>
                           match decode_bytes 14 bytes with
                           | None => None
-                          | Some (basket_transaction_c_14_value, bytes) =>
+                          | Some (basket_transaction_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (fourth_trading_volume_turnover_unit_flag_value, bytes) =>
                                   match decode_bytes 14 bytes with
                                   | None => None
                                   | Some (aggregate_turnover_value, bytes) =>
-                                      Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; single_issue_transaction_c_14 := single_issue_transaction_c_14_value; second_trading_volume_turnover_unit_flag := second_trading_volume_turnover_unit_flag_value; closing_price_transaction := closing_price_transaction_value; third_trading_volume_turnover_unit_flag := third_trading_volume_turnover_unit_flag_value; basket_transaction_c_14 := basket_transaction_c_14_value; fourth_trading_volume_turnover_unit_flag := fourth_trading_volume_turnover_unit_flag_value; aggregate_turnover := aggregate_turnover_value |}, bytes)
+                                      Some ({| trading_volume_turnover_unit_flag := trading_volume_turnover_unit_flag_value; single_issue_transaction := single_issue_transaction_value; second_trading_volume_turnover_unit_flag := second_trading_volume_turnover_unit_flag_value; closing_price_transaction := closing_price_transaction_value; third_trading_volume_turnover_unit_flag := third_trading_volume_turnover_unit_flag_value; basket_transaction := basket_transaction_value; fourth_trading_volume_turnover_unit_flag := fourth_trading_volume_turnover_unit_flag_value; aggregate_turnover := aggregate_turnover_value |}, bytes)
                                   end
                               end
                           end
@@ -2994,27 +2994,27 @@ Module TseEquitiesIndexStatisticsV195.
 
     (** Number of transactions *)
     Record t := {
-      single_issue_transaction_c_8 : list byte;
-      basket_transaction_c_8 : list byte;
+      single_issue_transaction_count : list byte;
+      basket_transaction_count : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      Datatypes.length (single_issue_transaction_c_8 record) = 8 /\
-      Datatypes.length (basket_transaction_c_8 record) = 8.
+      Datatypes.length (single_issue_transaction_count record) = 8 /\
+      Datatypes.length (basket_transaction_count record) = 8.
 
     Definition encode (record : t) : list byte :=
-      encode_bytes 8 (single_issue_transaction_c_8 record) ++
-      encode_bytes 8 (basket_transaction_c_8 record).
+      encode_bytes 8 (single_issue_transaction_count record) ++
+      encode_bytes 8 (basket_transaction_count record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_bytes 8 bytes with
       | None => None
-      | Some (single_issue_transaction_c_8_value, bytes) =>
+      | Some (single_issue_transaction_count_value, bytes) =>
           match decode_bytes 8 bytes with
           | None => None
-          | Some (basket_transaction_c_8_value, bytes) =>
-              Some ({| single_issue_transaction_c_8 := single_issue_transaction_c_8_value; basket_transaction_c_8 := basket_transaction_c_8_value |}, bytes)
+          | Some (basket_transaction_count_value, bytes) =>
+              Some ({| single_issue_transaction_count := single_issue_transaction_count_value; basket_transaction_count := basket_transaction_count_value |}, bytes)
           end
       end.
 

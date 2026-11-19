@@ -397,22 +397,22 @@ Module MemxOptionsRiskControlV13Client.
     (** ActiveRiskThresholdChangeReqMessage *)
     Record t := {
       cl_ord_id : list byte;
-      underlier_active_risk_threshold_change_req_underlier : list byte;
-      efid_active_risk_threshold_change_req_efid : list byte;
+      underlier : list byte;
+      efid : list byte;
       threshold_quantity : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (cl_ord_id record) = 20 /\
-      Datatypes.length (underlier_active_risk_threshold_change_req_underlier record) = 6 /\
-      Datatypes.length (efid_active_risk_threshold_change_req_efid record) = 4 /\
+      Datatypes.length (underlier record) = 6 /\
+      Datatypes.length (efid record) = 4 /\
       (threshold_quantity record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 20 (cl_ord_id record) ++
-      encode_bytes 6 (underlier_active_risk_threshold_change_req_underlier record) ++
-      encode_bytes 4 (efid_active_risk_threshold_change_req_efid record) ++
+      encode_bytes 6 (underlier record) ++
+      encode_bytes 4 (efid record) ++
       encode_uint 4 (threshold_quantity record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -421,14 +421,14 @@ Module MemxOptionsRiskControlV13Client.
       | Some (cl_ord_id_value, bytes) =>
           match decode_bytes 6 bytes with
           | None => None
-          | Some (underlier_active_risk_threshold_change_req_underlier_value, bytes) =>
+          | Some (underlier_value, bytes) =>
               match decode_bytes 4 bytes with
               | None => None
-              | Some (efid_active_risk_threshold_change_req_efid_value, bytes) =>
+              | Some (efid_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
                   | Some (threshold_quantity_value, bytes) =>
-                      Some ({| cl_ord_id := cl_ord_id_value; underlier_active_risk_threshold_change_req_underlier := underlier_active_risk_threshold_change_req_underlier_value; efid_active_risk_threshold_change_req_efid := efid_active_risk_threshold_change_req_efid_value; threshold_quantity := threshold_quantity_value |}, bytes)
+                      Some ({| cl_ord_id := cl_ord_id_value; underlier := underlier_value; efid := efid_value; threshold_quantity := threshold_quantity_value |}, bytes)
                   end
               end
           end

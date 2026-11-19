@@ -1060,6 +1060,7 @@ Module ArcaOptionsComplexFeedV13A.
       source_time_ns : N;
       product_id : N;
       channel_id : N;
+      reserved_2 : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
@@ -1067,13 +1068,15 @@ Module ArcaOptionsComplexFeedV13A.
       (source_time record < 256 ^ N.of_nat 4)%N /\
       (source_time_ns record < 256 ^ N.of_nat 4)%N /\
       (product_id record < 256 ^ N.of_nat 1)%N /\
-      (channel_id record < 256 ^ N.of_nat 1)%N.
+      (channel_id record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (reserved_2 record) = 2.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (source_time record) ++
       encode_uint_le 4 (source_time_ns record) ++
       encode_uint 1 (product_id record) ++
-      encode_uint 1 (channel_id record).
+      encode_uint 1 (channel_id record) ++
+      encode_bytes 2 (reserved_2 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -1088,34 +1091,39 @@ Module ArcaOptionsComplexFeedV13A.
                   match decode_uint 1 bytes with
                   | None => None
                   | Some (channel_id_value, bytes) =>
-                      Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; product_id := product_id_value; channel_id := channel_id_value |}, bytes)
+                      match decode_bytes 2 bytes with
+                      | None => None
+                      | Some (reserved_2_value, bytes) =>
+                          Some ({| source_time := source_time_value; source_time_ns := source_time_ns_value; product_id := product_id_value; channel_id := channel_id_value; reserved_2 := reserved_2_value |}, bytes)
+                      end
                   end
               end
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 12.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_le_length, !encode_uint_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_uint_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 bound_3]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_uint_le by exact bound_1.
       rewrite decode_encode_uint by exact bound_2.
       rewrite decode_encode_uint by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End SequenceNumberResetMessage.
 

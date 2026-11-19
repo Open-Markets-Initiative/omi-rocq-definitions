@@ -290,7 +290,7 @@ Module WseMarketInformationV68.
       source_time_micro_secs : N;
       scope : list byte;
       title : list byte;
-      text_ascii_str_1000 : list byte;
+      mail_text : list byte;
       reserved_3 : list byte;
     }.
 
@@ -302,7 +302,7 @@ Module WseMarketInformationV68.
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
       Datatypes.length (scope record) = 1 /\
       Datatypes.length (title record) = 80 /\
-      Datatypes.length (text_ascii_str_1000 record) = 1000 /\
+      Datatypes.length (mail_text record) = 1000 /\
       Datatypes.length (reserved_3 record) = 3.
 
     Definition encode (record : t) : list byte :=
@@ -312,7 +312,7 @@ Module WseMarketInformationV68.
       encode_uint 2 (source_time_micro_secs record) ++
       encode_bytes 1 (scope record) ++
       encode_bytes 80 (title record) ++
-      encode_bytes 1000 (text_ascii_str_1000 record) ++
+      encode_bytes 1000 (mail_text record) ++
       encode_bytes 3 (reserved_3 record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -336,11 +336,11 @@ Module WseMarketInformationV68.
                           | Some (title_value, bytes) =>
                               match decode_bytes 1000 bytes with
                               | None => None
-                              | Some (text_ascii_str_1000_value, bytes) =>
+                              | Some (mail_text_value, bytes) =>
                                   match decode_bytes 3 bytes with
                                   | None => None
                                   | Some (reserved_3_value, bytes) =>
-                                      Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; scope := scope_value; title := title_value; text_ascii_str_1000 := text_ascii_str_1000_value; reserved_3 := reserved_3_value |}, bytes)
+                                      Some ({| source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; scope := scope_value; title := title_value; mail_text := mail_text_value; reserved_3 := reserved_3_value |}, bytes)
                                   end
                               end
                           end
@@ -611,7 +611,7 @@ Module WseMarketInformationV68.
       symbol_index : N;
       source_time : N;
       source_seq_num : N;
-      date_binary_int_4 : N;
+      date : N;
       multiplier : N;
       accumulated_interest : N;
       opening_price : N;
@@ -719,7 +719,7 @@ Module WseMarketInformationV68.
       (symbol_index record < 256 ^ N.of_nat 4)%N /\
       (source_time record < 256 ^ N.of_nat 4)%N /\
       (source_seq_num record < 256 ^ N.of_nat 4)%N /\
-      (date_binary_int_4 record < 256 ^ N.of_nat 4)%N /\
+      (date record < 256 ^ N.of_nat 4)%N /\
       (multiplier record < 256 ^ N.of_nat 4)%N /\
       (accumulated_interest record < 256 ^ N.of_nat 4)%N /\
       (opening_price record < 256 ^ N.of_nat 4)%N /\
@@ -825,7 +825,7 @@ Module WseMarketInformationV68.
       encode_uint 4 (symbol_index record) ++
       encode_uint 4 (source_time record) ++
       encode_uint 4 (source_seq_num record) ++
-      encode_uint 4 (date_binary_int_4 record) ++
+      encode_uint 4 (date record) ++
       encode_uint 4 (multiplier record) ++
       encode_uint 4 (accumulated_interest record) ++
       encode_uint 4 (opening_price record) ++
@@ -939,7 +939,7 @@ Module WseMarketInformationV68.
               | Some (source_seq_num_value, bytes) =>
                   match decode_uint 4 bytes with
                   | None => None
-                  | Some (date_binary_int_4_value, bytes) =>
+                  | Some (date_value, bytes) =>
                       match decode_uint 4 bytes with
                       | None => None
                       | Some (multiplier_value, bytes) =>
@@ -1240,7 +1240,7 @@ Module WseMarketInformationV68.
                                                                                                                                                                                                                                                                                                                                                                                                                                   match decode_bytes 1 bytes with
                                                                                                                                                                                                                                                                                                                                                                                                                                   | None => None
                                                                                                                                                                                                                                                                                                                                                                                                                                   | Some (ninth_reserved_1_value, bytes) =>
-                                                                                                                                                                                                                                                                                                                                                                                                                                      Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; date_binary_int_4 := date_binary_int_4_value; multiplier := multiplier_value; accumulated_interest := accumulated_interest_value; opening_price := opening_price_value; maximum_price := maximum_price_value; minimum_price := minimum_price_value; closing_price := closing_price_value; implied_volatility := implied_volatility_value; average_weighted_price := average_weighted_price_value; reference_price := reference_price_value; pct_change_price := pct_change_price_value; dividend_rate := dividend_rate_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; reserved_4 := reserved_4_value; open_positions := open_positions_value; trading_volume := trading_volume_value; transactions_number := transactions_number_value; trading_value := trading_value_value; currency_price := currency_price_value; delta := delta_value; gamma := gamma_value; rho := rho_value; theta := theta_value; vega := vega_value; end_trading := end_trading_value; number_of_instruments := number_of_instruments_value; trading_value_currency := trading_value_currency_value; interest_rate := interest_rate_value; volatility := volatility_value; strike_price := strike_price_value; short_selling_trades_number := short_selling_trades_number_value; volume_short_selling_trades := volume_short_selling_trades_value; value_short_selling_trades := value_short_selling_trades_value; last_trade_date := last_trade_date_value; last_trade_price := last_trade_price_value; block_trades_number := block_trades_number_value; volume_block_trades := volume_block_trades_value; value_block_trades := value_block_trades_value; vwap_blocktrade := vwap_blocktrade_value; maximum_block_price := maximum_block_price_value; minimum_block_price := minimum_block_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; multiplier_scale_code := multiplier_scale_code_value; accumulated_interest_scale_code := accumulated_interest_scale_code_value; opening_price_scale_code := opening_price_scale_code_value; maximum_price_scale_code := maximum_price_scale_code_value; minimum_price_scale_code := minimum_price_scale_code_value; closing_price_scale_code := closing_price_scale_code_value; implied_volatility_scale_code := implied_volatility_scale_code_value; average_weighted_price_scale_code := average_weighted_price_scale_code_value; reference_price_scale_code := reference_price_scale_code_value; pct_change_price_scale_code := pct_change_price_scale_code_value; dividend_rate_scale_code := dividend_rate_scale_code_value; settlement_price_scale_code := settlement_price_scale_code_value; settlement_value_scale_code := settlement_value_scale_code_value; reserved_1 := reserved_1_value; trading_value_scale_code := trading_value_scale_code_value; currency_price_scale_code := currency_price_scale_code_value; delta_scale_code := delta_scale_code_value; gamma_scale_code := gamma_scale_code_value; rho_scale_code := rho_scale_code_value; theta_scale_code := theta_scale_code_value; vega_scale_code := vega_scale_code_value; trading_value_currency_scale_code := trading_value_currency_scale_code_value; interest_rate_scale_code := interest_rate_scale_code_value; volatility_scale_code := volatility_scale_code_value; strike_price_scale_code := strike_price_scale_code_value; value_short_selling_trades_scale_code := value_short_selling_trades_scale_code_value; last_trade_price_scale_code := last_trade_price_scale_code_value; value_block_trades_scale_code := value_block_trades_scale_code_value; vwap_blocktrade_scale_code := vwap_blocktrade_scale_code_value; maximum_block_price_scale_code := maximum_block_price_scale_code_value; minimum_block_price_scale_code := minimum_block_price_scale_code_value; status_indicator := status_indicator_value; sector := sector_value; market := market_value; second_reserved_1 := second_reserved_1_value; short_sale := short_sale_value; marker_pct_change_price := marker_pct_change_price_value; symbol_delta := symbol_delta_value; symbol_gamma := symbol_gamma_value; symbol_rho := symbol_rho_value; symbol_theta := symbol_theta_value; symbol_vega := symbol_vega_value; third_reserved_1 := third_reserved_1_value; fourth_reserved_1 := fourth_reserved_1_value; fifth_reserved_1 := fifth_reserved_1_value; sixth_reserved_1 := sixth_reserved_1_value; seventh_reserved_1 := seventh_reserved_1_value; eighth_reserved_1 := eighth_reserved_1_value; segment := segment_value; lower_liquidity := lower_liquidity_value; dividend := dividend_value; subscription_right := subscription_right_value; split := split_value; interim_dividend_right := interim_dividend_right_value; quotation_system := quotation_system_value; liquidity_support_pge := liquidity_support_pge_value; ninth_reserved_1 := ninth_reserved_1_value |}, bytes)
+                                                                                                                                                                                                                                                                                                                                                                                                                                      Some ({| symbol_index := symbol_index_value; source_time := source_time_value; source_seq_num := source_seq_num_value; date := date_value; multiplier := multiplier_value; accumulated_interest := accumulated_interest_value; opening_price := opening_price_value; maximum_price := maximum_price_value; minimum_price := minimum_price_value; closing_price := closing_price_value; implied_volatility := implied_volatility_value; average_weighted_price := average_weighted_price_value; reference_price := reference_price_value; pct_change_price := pct_change_price_value; dividend_rate := dividend_rate_value; settlement_price := settlement_price_value; settlement_value := settlement_value_value; reserved_4 := reserved_4_value; open_positions := open_positions_value; trading_volume := trading_volume_value; transactions_number := transactions_number_value; trading_value := trading_value_value; currency_price := currency_price_value; delta := delta_value; gamma := gamma_value; rho := rho_value; theta := theta_value; vega := vega_value; end_trading := end_trading_value; number_of_instruments := number_of_instruments_value; trading_value_currency := trading_value_currency_value; interest_rate := interest_rate_value; volatility := volatility_value; strike_price := strike_price_value; short_selling_trades_number := short_selling_trades_number_value; volume_short_selling_trades := volume_short_selling_trades_value; value_short_selling_trades := value_short_selling_trades_value; last_trade_date := last_trade_date_value; last_trade_price := last_trade_price_value; block_trades_number := block_trades_number_value; volume_block_trades := volume_block_trades_value; value_block_trades := value_block_trades_value; vwap_blocktrade := vwap_blocktrade_value; maximum_block_price := maximum_block_price_value; minimum_block_price := minimum_block_price_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; multiplier_scale_code := multiplier_scale_code_value; accumulated_interest_scale_code := accumulated_interest_scale_code_value; opening_price_scale_code := opening_price_scale_code_value; maximum_price_scale_code := maximum_price_scale_code_value; minimum_price_scale_code := minimum_price_scale_code_value; closing_price_scale_code := closing_price_scale_code_value; implied_volatility_scale_code := implied_volatility_scale_code_value; average_weighted_price_scale_code := average_weighted_price_scale_code_value; reference_price_scale_code := reference_price_scale_code_value; pct_change_price_scale_code := pct_change_price_scale_code_value; dividend_rate_scale_code := dividend_rate_scale_code_value; settlement_price_scale_code := settlement_price_scale_code_value; settlement_value_scale_code := settlement_value_scale_code_value; reserved_1 := reserved_1_value; trading_value_scale_code := trading_value_scale_code_value; currency_price_scale_code := currency_price_scale_code_value; delta_scale_code := delta_scale_code_value; gamma_scale_code := gamma_scale_code_value; rho_scale_code := rho_scale_code_value; theta_scale_code := theta_scale_code_value; vega_scale_code := vega_scale_code_value; trading_value_currency_scale_code := trading_value_currency_scale_code_value; interest_rate_scale_code := interest_rate_scale_code_value; volatility_scale_code := volatility_scale_code_value; strike_price_scale_code := strike_price_scale_code_value; value_short_selling_trades_scale_code := value_short_selling_trades_scale_code_value; last_trade_price_scale_code := last_trade_price_scale_code_value; value_block_trades_scale_code := value_block_trades_scale_code_value; vwap_blocktrade_scale_code := vwap_blocktrade_scale_code_value; maximum_block_price_scale_code := maximum_block_price_scale_code_value; minimum_block_price_scale_code := minimum_block_price_scale_code_value; status_indicator := status_indicator_value; sector := sector_value; market := market_value; second_reserved_1 := second_reserved_1_value; short_sale := short_sale_value; marker_pct_change_price := marker_pct_change_price_value; symbol_delta := symbol_delta_value; symbol_gamma := symbol_gamma_value; symbol_rho := symbol_rho_value; symbol_theta := symbol_theta_value; symbol_vega := symbol_vega_value; third_reserved_1 := third_reserved_1_value; fourth_reserved_1 := fourth_reserved_1_value; fifth_reserved_1 := fifth_reserved_1_value; sixth_reserved_1 := sixth_reserved_1_value; seventh_reserved_1 := seventh_reserved_1_value; eighth_reserved_1 := eighth_reserved_1_value; segment := segment_value; lower_liquidity := lower_liquidity_value; dividend := dividend_value; subscription_right := subscription_right_value; split := split_value; interim_dividend_right := interim_dividend_right_value; quotation_system := quotation_system_value; liquidity_support_pge := liquidity_support_pge_value; ninth_reserved_1 := ninth_reserved_1_value |}, bytes)
                                                                                                                                                                                                                                                                                                                                                                                                                                   end
                                                                                                                                                                                                                                                                                                                                                                                                                               end
                                                                                                                                                                                                                                                                                                                                                                                                                           end
@@ -1766,7 +1766,7 @@ Module WseMarketInformationV68.
       source_time : N;
       system_id : N;
       source_time_micro_secs : N;
-      text_ascii_ch_100 : list byte;
+      text : list byte;
       authority : list byte;
       ss_market_maker : list byte;
       ss_non_market_maker : list byte;
@@ -1780,7 +1780,7 @@ Module WseMarketInformationV68.
       (source_time record < 256 ^ N.of_nat 4)%N /\
       (system_id record < 256 ^ N.of_nat 4)%N /\
       (source_time_micro_secs record < 256 ^ N.of_nat 2)%N /\
-      Datatypes.length (text_ascii_ch_100 record) = 100 /\
+      Datatypes.length (text record) = 100 /\
       Datatypes.length (authority record) = 1 /\
       Datatypes.length (ss_market_maker record) = 1 /\
       Datatypes.length (ss_non_market_maker record) = 1 /\
@@ -1792,7 +1792,7 @@ Module WseMarketInformationV68.
       encode_uint 4 (source_time record) ++
       encode_uint 4 (system_id record) ++
       encode_uint 2 (source_time_micro_secs record) ++
-      encode_bytes 100 (text_ascii_ch_100 record) ++
+      encode_bytes 100 (text record) ++
       encode_bytes 1 (authority record) ++
       encode_bytes 1 (ss_market_maker record) ++
       encode_bytes 1 (ss_non_market_maker record) ++
@@ -1816,7 +1816,7 @@ Module WseMarketInformationV68.
                       | Some (source_time_micro_secs_value, bytes) =>
                           match decode_bytes 100 bytes with
                           | None => None
-                          | Some (text_ascii_ch_100_value, bytes) =>
+                          | Some (text_value, bytes) =>
                               match decode_bytes 1 bytes with
                               | None => None
                               | Some (authority_value, bytes) =>
@@ -1829,7 +1829,7 @@ Module WseMarketInformationV68.
                                           match decode_bytes 3 bytes with
                                           | None => None
                                           | Some (reserved_3_value, bytes) =>
-                                              Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; text_ascii_ch_100 := text_ascii_ch_100_value; authority := authority_value; ss_market_maker := ss_market_maker_value; ss_non_market_maker := ss_non_market_maker_value; reserved_3 := reserved_3_value |}, bytes)
+                                              Some ({| symbol_index := symbol_index_value; source_seq_num := source_seq_num_value; source_time := source_time_value; system_id := system_id_value; source_time_micro_secs := source_time_micro_secs_value; text := text_value; authority := authority_value; ss_market_maker := ss_market_maker_value; ss_non_market_maker := ss_non_market_maker_value; reserved_3 := reserved_3_value |}, bytes)
                                           end
                                       end
                                   end
@@ -1879,7 +1879,7 @@ Module WseMarketInformationV68.
       isin_code : list byte;
       date_of_first_quotation : list byte;
       short_name : list byte;
-      date_ascii_str_8 : list byte;
+      start_date : list byte;
       underlying_isin_code : list byte;
       treasury_bond_1_isin_code : list byte;
       conversion_coefficient_factor_1 : list byte;
@@ -1899,7 +1899,7 @@ Module WseMarketInformationV68.
       Datatypes.length (isin_code record) = 12 /\
       Datatypes.length (date_of_first_quotation record) = 8 /\
       Datatypes.length (short_name record) = 16 /\
-      Datatypes.length (date_ascii_str_8 record) = 8 /\
+      Datatypes.length (start_date record) = 8 /\
       Datatypes.length (underlying_isin_code record) = 12 /\
       Datatypes.length (treasury_bond_1_isin_code record) = 12 /\
       Datatypes.length (conversion_coefficient_factor_1 record) = 9 /\
@@ -1917,7 +1917,7 @@ Module WseMarketInformationV68.
       encode_bytes 12 (isin_code record) ++
       encode_bytes 8 (date_of_first_quotation record) ++
       encode_bytes 16 (short_name record) ++
-      encode_bytes 8 (date_ascii_str_8 record) ++
+      encode_bytes 8 (start_date record) ++
       encode_bytes 12 (underlying_isin_code record) ++
       encode_bytes 12 (treasury_bond_1_isin_code record) ++
       encode_bytes 9 (conversion_coefficient_factor_1 record) ++
@@ -1943,7 +1943,7 @@ Module WseMarketInformationV68.
               | Some (short_name_value, bytes) =>
                   match decode_bytes 8 bytes with
                   | None => None
-                  | Some (date_ascii_str_8_value, bytes) =>
+                  | Some (start_date_value, bytes) =>
                       match decode_bytes 12 bytes with
                       | None => None
                       | Some (underlying_isin_code_value, bytes) =>
@@ -1980,7 +1980,7 @@ Module WseMarketInformationV68.
                                                                   match decode_bytes 59 bytes with
                                                                   | None => None
                                                                   | Some (reserved_59_value, bytes) =>
-                                                                      Some ({| isin_code := isin_code_value; date_of_first_quotation := date_of_first_quotation_value; short_name := short_name_value; date_ascii_str_8 := date_ascii_str_8_value; underlying_isin_code := underlying_isin_code_value; treasury_bond_1_isin_code := treasury_bond_1_isin_code_value; conversion_coefficient_factor_1 := conversion_coefficient_factor_1_value; treasury_bond_2_isin_code := treasury_bond_2_isin_code_value; conversion_coefficient_factor_2 := conversion_coefficient_factor_2_value; treasury_bond_3_isin_code := treasury_bond_3_isin_code_value; conversion_coefficient_factor_3 := conversion_coefficient_factor_3_value; treasury_bond_4_isin_code := treasury_bond_4_isin_code_value; conversion_coefficient_factor_4 := conversion_coefficient_factor_4_value; treasury_bond_5_isin_code := treasury_bond_5_isin_code_value; conversion_coefficient_factor_5 := conversion_coefficient_factor_5_value; reserved_59 := reserved_59_value |}, bytes)
+                                                                      Some ({| isin_code := isin_code_value; date_of_first_quotation := date_of_first_quotation_value; short_name := short_name_value; start_date := start_date_value; underlying_isin_code := underlying_isin_code_value; treasury_bond_1_isin_code := treasury_bond_1_isin_code_value; conversion_coefficient_factor_1 := conversion_coefficient_factor_1_value; treasury_bond_2_isin_code := treasury_bond_2_isin_code_value; conversion_coefficient_factor_2 := conversion_coefficient_factor_2_value; treasury_bond_3_isin_code := treasury_bond_3_isin_code_value; conversion_coefficient_factor_3 := conversion_coefficient_factor_3_value; treasury_bond_4_isin_code := treasury_bond_4_isin_code_value; conversion_coefficient_factor_4 := conversion_coefficient_factor_4_value; treasury_bond_5_isin_code := treasury_bond_5_isin_code_value; conversion_coefficient_factor_5 := conversion_coefficient_factor_5_value; reserved_59 := reserved_59_value |}, bytes)
                                                                   end
                                                               end
                                                           end
@@ -2040,7 +2040,7 @@ Module WseMarketInformationV68.
     (** Body Message for InternalMsgType field = 03, which informs about the selected values for PRIIPs key information for the given trading day and includes the link to the issuer's website *)
     Record t := {
       isin_code : list byte;
-      type_of_instrument_ascii_str_4 : list byte;
+      kid_type_of_instrument : list byte;
       kid_version : list byte;
       kid_issue_date : list byte;
       value_at_risk : list byte;
@@ -2051,7 +2051,7 @@ Module WseMarketInformationV68.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       Datatypes.length (isin_code record) = 12 /\
-      Datatypes.length (type_of_instrument_ascii_str_4 record) = 4 /\
+      Datatypes.length (kid_type_of_instrument record) = 4 /\
       Datatypes.length (kid_version record) = 10 /\
       Datatypes.length (kid_issue_date record) = 8 /\
       Datatypes.length (value_at_risk record) = 1 /\
@@ -2060,7 +2060,7 @@ Module WseMarketInformationV68.
 
     Definition encode (record : t) : list byte :=
       encode_bytes 12 (isin_code record) ++
-      encode_bytes 4 (type_of_instrument_ascii_str_4 record) ++
+      encode_bytes 4 (kid_type_of_instrument record) ++
       encode_bytes 10 (kid_version record) ++
       encode_bytes 8 (kid_issue_date record) ++
       encode_bytes 1 (value_at_risk record) ++
@@ -2073,7 +2073,7 @@ Module WseMarketInformationV68.
       | Some (isin_code_value, bytes) =>
           match decode_bytes 4 bytes with
           | None => None
-          | Some (type_of_instrument_ascii_str_4_value, bytes) =>
+          | Some (kid_type_of_instrument_value, bytes) =>
               match decode_bytes 10 bytes with
               | None => None
               | Some (kid_version_value, bytes) =>
@@ -2089,7 +2089,7 @@ Module WseMarketInformationV68.
                               match decode_bytes 182 bytes with
                               | None => None
                               | Some (priip_kid_url_value, bytes) =>
-                                  Some ({| isin_code := isin_code_value; type_of_instrument_ascii_str_4 := type_of_instrument_ascii_str_4_value; kid_version := kid_version_value; kid_issue_date := kid_issue_date_value; value_at_risk := value_at_risk_value; holding_period := holding_period_value; priip_kid_url := priip_kid_url_value |}, bytes)
+                                  Some ({| isin_code := isin_code_value; kid_type_of_instrument := kid_type_of_instrument_value; kid_version := kid_version_value; kid_issue_date := kid_issue_date_value; value_at_risk := value_at_risk_value; holding_period := holding_period_value; priip_kid_url := priip_kid_url_value |}, bytes)
                               end
                           end
                       end

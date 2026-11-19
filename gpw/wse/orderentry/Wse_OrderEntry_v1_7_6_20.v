@@ -185,7 +185,7 @@ Module WseOrderEntryV17620.
 
     (** The login response message. The result field describes the login status, indicating whether the login was successful or not (i.e. successful login) *)
     Record t := {
-      result_login_result : N;
+      login_result : N;
       next_expected_seq_num : N;
       last_replay_seq_num : N;
       session_id : N;
@@ -193,13 +193,13 @@ Module WseOrderEntryV17620.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (result_login_result record < 256 ^ N.of_nat 1)%N /\
+      (login_result record < 256 ^ N.of_nat 1)%N /\
       (next_expected_seq_num record < 256 ^ N.of_nat 4)%N /\
       (last_replay_seq_num record < 256 ^ N.of_nat 4)%N /\
       (session_id record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (result_login_result record) ++
+      encode_uint 1 (login_result record) ++
       encode_uint_le 4 (next_expected_seq_num record) ++
       encode_uint_le 4 (last_replay_seq_num record) ++
       encode_uint_le 2 (session_id record).
@@ -207,7 +207,7 @@ Module WseOrderEntryV17620.
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (result_login_result_value, bytes) =>
+      | Some (login_result_value, bytes) =>
           match decode_uint_le 4 bytes with
           | None => None
           | Some (next_expected_seq_num_value, bytes) =>
@@ -217,7 +217,7 @@ Module WseOrderEntryV17620.
                   match decode_uint_le 2 bytes with
                   | None => None
                   | Some (session_id_value, bytes) =>
-                      Some ({| result_login_result := result_login_result_value; next_expected_seq_num := next_expected_seq_num_value; last_replay_seq_num := last_replay_seq_num_value; session_id := session_id_value |}, bytes)
+                      Some ({| login_result := login_result_value; next_expected_seq_num := next_expected_seq_num_value; last_replay_seq_num := last_replay_seq_num_value; session_id := session_id_value |}, bytes)
                   end
               end
           end
@@ -252,21 +252,21 @@ Module WseOrderEntryV17620.
 
     (** The ConnectionClose message confirms the termination of a session through the trading port service *)
     Record t := {
-      reason_connection_close_reason : N;
+      connection_close_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
-      (reason_connection_close_reason record < 256 ^ N.of_nat 1)%N.
+      (connection_close_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
-      encode_uint 1 (reason_connection_close_reason record).
+      encode_uint 1 (connection_close_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 1 bytes with
       | None => None
-      | Some (reason_connection_close_reason_value, bytes) =>
-          Some ({| reason_connection_close_reason := reason_connection_close_reason_value |}, bytes)
+      | Some (connection_close_reason_value, bytes) =>
+          Some ({| connection_close_reason := connection_close_reason_value |}, bytes)
       end.
 
     Theorem encode_length : forall record, Datatypes.length (encode record) = 1.
@@ -1011,19 +1011,19 @@ Module WseOrderEntryV17620.
     (** The response to the Market Maker command *)
     Record t := {
       ref_id : N;
-      result_command_result : N;
+      command_result : N;
       rejection_code : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (ref_id record < 256 ^ N.of_nat 4)%N /\
-      (result_command_result record < 256 ^ N.of_nat 1)%N /\
+      (command_result record < 256 ^ N.of_nat 1)%N /\
       (rejection_code record < 256 ^ N.of_nat 2)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (ref_id record) ++
-      encode_uint 1 (result_command_result record) ++
+      encode_uint 1 (command_result record) ++
       encode_uint_le 2 (rejection_code record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
@@ -1032,11 +1032,11 @@ Module WseOrderEntryV17620.
       | Some (ref_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (result_command_result_value, bytes) =>
+          | Some (command_result_value, bytes) =>
               match decode_uint_le 2 bytes with
               | None => None
               | Some (rejection_code_value, bytes) =>
-                  Some ({| ref_id := ref_id_value; result_command_result := result_command_result_value; rejection_code := rejection_code_value |}, bytes)
+                  Some ({| ref_id := ref_id_value; command_result := command_result_value; rejection_code := rejection_code_value |}, bytes)
               end
           end
       end.
@@ -1070,17 +1070,17 @@ Module WseOrderEntryV17620.
     (** The information for the MM that one of the quotes has been crossed *)
     Record t := {
       instrument_id : N;
-      reason_request_for_execution_reason : N;
+      request_for_execution_reason : N;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_id record < 256 ^ N.of_nat 4)%N /\
-      (reason_request_for_execution_reason record < 256 ^ N.of_nat 1)%N.
+      (request_for_execution_reason record < 256 ^ N.of_nat 1)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint_le 4 (instrument_id record) ++
-      encode_uint 1 (reason_request_for_execution_reason record).
+      encode_uint 1 (request_for_execution_reason record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint_le 4 bytes with
@@ -1088,8 +1088,8 @@ Module WseOrderEntryV17620.
       | Some (instrument_id_value, bytes) =>
           match decode_uint 1 bytes with
           | None => None
-          | Some (reason_request_for_execution_reason_value, bytes) =>
-              Some ({| instrument_id := instrument_id_value; reason_request_for_execution_reason := reason_request_for_execution_reason_value |}, bytes)
+          | Some (request_for_execution_reason_value, bytes) =>
+              Some ({| instrument_id := instrument_id_value; request_for_execution_reason := request_for_execution_reason_value |}, bytes)
           end
       end.
 
