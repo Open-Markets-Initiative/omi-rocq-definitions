@@ -1077,6 +1077,7 @@ Module BzxEquitiesMulticastDepthOfBookV24181.
 
     (** BYX and BZX Equities Only. Auction Update messages are used to disseminate Cboe price and size information during auctions for Cboe listed securities and for Cboe Market Close (CMC) crosses on BZX, and for Periodic Auctions on BYX. Cboe Auction Update messages support the Cboe Opening, Closing, Halt and IPO Auctions on the BZX Exchange. On the BYX Exchange, Auction Update messages will be sent out at a randomized time between the start of an auction period and the end of the auction period minus 1 millisecond to inform participants that a Periodic Auction is taking place. *)
     Record t := {
+      time_offset : N;
       stock_symbol : list byte;
       auction_type : list byte;
       reference_price : N;
@@ -1088,6 +1089,7 @@ Module BzxEquitiesMulticastDepthOfBookV24181.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
+      (time_offset record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (stock_symbol record) = 8 /\
       Datatypes.length (auction_type record) = 1 /\
       (reference_price record < 256 ^ N.of_nat 8)%N /\
@@ -1097,6 +1099,7 @@ Module BzxEquitiesMulticastDepthOfBookV24181.
       (auction_only_price record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
+      encode_uint_le 4 (time_offset record) ++
       encode_bytes 8 (stock_symbol record) ++
       encode_bytes 1 (auction_type record) ++
       encode_uint_le 8 (reference_price record) ++
@@ -1106,28 +1109,32 @@ Module BzxEquitiesMulticastDepthOfBookV24181.
       encode_uint_le 8 (auction_only_price record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_bytes 8 bytes with
+      match decode_uint_le 4 bytes with
       | None => None
-      | Some (stock_symbol_value, bytes) =>
-          match decode_bytes 1 bytes with
+      | Some (time_offset_value, bytes) =>
+          match decode_bytes 8 bytes with
           | None => None
-          | Some (auction_type_value, bytes) =>
-              match decode_uint_le 8 bytes with
+          | Some (stock_symbol_value, bytes) =>
+              match decode_bytes 1 bytes with
               | None => None
-              | Some (reference_price_value, bytes) =>
-                  match decode_uint_le 4 bytes with
+              | Some (auction_type_value, bytes) =>
+                  match decode_uint_le 8 bytes with
                   | None => None
-                  | Some (buy_shares_value, bytes) =>
+                  | Some (reference_price_value, bytes) =>
                       match decode_uint_le 4 bytes with
                       | None => None
-                      | Some (sell_shares_value, bytes) =>
-                          match decode_uint_le 8 bytes with
+                      | Some (buy_shares_value, bytes) =>
+                          match decode_uint_le 4 bytes with
                           | None => None
-                          | Some (indicative_price_value, bytes) =>
+                          | Some (sell_shares_value, bytes) =>
                               match decode_uint_le 8 bytes with
                               | None => None
-                              | Some (auction_only_price_value, bytes) =>
-                                  Some ({| stock_symbol := stock_symbol_value; auction_type := auction_type_value; reference_price := reference_price_value; buy_shares := buy_shares_value; sell_shares := sell_shares_value; indicative_price := indicative_price_value; auction_only_price := auction_only_price_value |}, bytes)
+                              | Some (indicative_price_value, bytes) =>
+                                  match decode_uint_le 8 bytes with
+                                  | None => None
+                                  | Some (auction_only_price_value, bytes) =>
+                                      Some ({| time_offset := time_offset_value; stock_symbol := stock_symbol_value; auction_type := auction_type_value; reference_price := reference_price_value; buy_shares := buy_shares_value; sell_shares := sell_shares_value; indicative_price := indicative_price_value; auction_only_price := auction_only_price_value |}, bytes)
+                                  end
                               end
                           end
                       end
@@ -1136,26 +1143,27 @@ Module BzxEquitiesMulticastDepthOfBookV24181.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 41.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 45.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_bytes_length, !encode_uint_le_length. reflexivity.
+      rewrite !length_app, !encode_uint_le_length, !encode_bytes_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 bound_6]]]]]].
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
       unfold decode, encode.
       rewrite <- !app_assoc.
-      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_0.
       rewrite decode_encode_bytes by exact bound_1.
-      rewrite decode_encode_uint_le by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_2.
       rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint_le by exact bound_4.
       rewrite decode_encode_uint_le by exact bound_5.
       rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
       destruct record. reflexivity.
     Qed.
 

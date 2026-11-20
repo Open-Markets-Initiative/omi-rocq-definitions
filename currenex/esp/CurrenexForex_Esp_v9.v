@@ -524,7 +524,7 @@ Module CurrenexForexEspV9.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_index record < 256 ^ N.of_nat 2)%N /\
-      (price_id record < 256 ^ N.of_nat 1)%N /\
+      (price_id record < 256 ^ N.of_nat 4)%N /\
       Datatypes.length (side record) = 1 /\
       (max_amount record < 256 ^ N.of_nat 8)%N /\
       (min_amount record < 256 ^ N.of_nat 8)%N /\
@@ -534,7 +534,7 @@ Module CurrenexForexEspV9.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (instrument_index record) ++
-      encode_uint 1 (price_id record) ++
+      encode_uint 4 (price_id record) ++
       encode_bytes 1 (side record) ++
       encode_uint 8 (max_amount record) ++
       encode_uint 8 (min_amount record) ++
@@ -546,7 +546,7 @@ Module CurrenexForexEspV9.
       match decode_uint 2 bytes with
       | None => None
       | Some (instrument_index_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_uint 4 bytes with
           | None => None
           | Some (price_id_value, bytes) =>
               match decode_bytes 1 bytes with
@@ -577,7 +577,7 @@ Module CurrenexForexEspV9.
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 29.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 32.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
@@ -617,24 +617,24 @@ Module CurrenexForexEspV9.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (instrument_index record < 256 ^ N.of_nat 2)%N /\
-      (price_id record < 256 ^ N.of_nat 1)%N.
+      (price_id record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (instrument_index record) ++
-      encode_uint 1 (price_id record).
+      encode_uint 4 (price_id record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
       | None => None
       | Some (instrument_index_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_uint 4 bytes with
           | None => None
           | Some (price_id_value, bytes) =>
               Some ({| instrument_index := instrument_index_value; price_id := price_id_value |}, bytes)
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 3.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
       rewrite !length_app, !encode_uint_length. reflexivity.

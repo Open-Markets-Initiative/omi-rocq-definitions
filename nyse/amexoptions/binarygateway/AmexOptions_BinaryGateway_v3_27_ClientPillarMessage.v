@@ -288,4 +288,298 @@ Module AmexOptionsBinaryGatewayV327ClientPillarMessage.
 
   End SubMsgHeader.
 
+  Module Exposed.
+
+    (** Exposed *)
+    Record t := {
+      sub_msg_header : SubMsgHeader.t;
+      symbol_id : N;
+      mpid : list byte;
+      market_maker : list byte;
+      mp_sub_id : list byte;
+      cl_ord_id : N;
+      orig_cl_ord_id : N;
+      bitfield_order_instructions : list byte;
+      price : N;
+      order_qty : N;
+      min_qty : N;
+      user_data : list byte;
+      leg_open_close : N;
+      auction_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      SubMsgHeader.bounded (sub_msg_header record) /\
+      (symbol_id record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (mpid record) = 4 /\
+      Datatypes.length (market_maker record) = 10 /\
+      Datatypes.length (mp_sub_id record) = 4 /\
+      (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
+      (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (bitfield_order_instructions record) = 16 /\
+      (price record < 256 ^ N.of_nat 8)%N /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
+      (min_qty record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (user_data record) = 10 /\
+      (leg_open_close record < 256 ^ N.of_nat 8)%N /\
+      (auction_id record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      SubMsgHeader.encode (sub_msg_header record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_bytes 4 (mpid record) ++
+      encode_bytes 10 (market_maker record) ++
+      encode_bytes 4 (mp_sub_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
+      encode_bytes 16 (bitfield_order_instructions record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 4 (min_qty record) ++
+      encode_bytes 10 (user_data record) ++
+      encode_uint_le 8 (leg_open_close record) ++
+      encode_uint_le 8 (auction_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match SubMsgHeader.decode bytes with
+      | None => None
+      | Some (sub_msg_header_value, bytes) =>
+          match decode_uint_le 4 bytes with
+          | None => None
+          | Some (symbol_id_value, bytes) =>
+              match decode_bytes 4 bytes with
+              | None => None
+              | Some (mpid_value, bytes) =>
+                  match decode_bytes 10 bytes with
+                  | None => None
+                  | Some (market_maker_value, bytes) =>
+                      match decode_bytes 4 bytes with
+                      | None => None
+                      | Some (mp_sub_id_value, bytes) =>
+                          match decode_uint_le 8 bytes with
+                          | None => None
+                          | Some (cl_ord_id_value, bytes) =>
+                              match decode_uint_le 8 bytes with
+                              | None => None
+                              | Some (orig_cl_ord_id_value, bytes) =>
+                                  match decode_bytes 16 bytes with
+                                  | None => None
+                                  | Some (bitfield_order_instructions_value, bytes) =>
+                                      match decode_uint_le 8 bytes with
+                                      | None => None
+                                      | Some (price_value, bytes) =>
+                                          match decode_uint_le 4 bytes with
+                                          | None => None
+                                          | Some (order_qty_value, bytes) =>
+                                              match decode_uint_le 4 bytes with
+                                              | None => None
+                                              | Some (min_qty_value, bytes) =>
+                                                  match decode_bytes 10 bytes with
+                                                  | None => None
+                                                  | Some (user_data_value, bytes) =>
+                                                      match decode_uint_le 8 bytes with
+                                                      | None => None
+                                                      | Some (leg_open_close_value, bytes) =>
+                                                          match decode_uint_le 8 bytes with
+                                                          | None => None
+                                                          | Some (auction_id_value, bytes) =>
+                                                              Some ({| sub_msg_header := sub_msg_header_value; symbol_id := symbol_id_value; mpid := mpid_value; market_maker := market_maker_value; mp_sub_id := mp_sub_id_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; bitfield_order_instructions := bitfield_order_instructions_value; price := price_value; order_qty := order_qty_value; min_qty := min_qty_value; user_data := user_data_value; leg_open_close := leg_open_close_value; auction_id := auction_id_value |}, bytes)
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 100.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !SubMsgHeader.encode_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite SubMsgHeader.decode_encode by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubMsgHeader.eq_dec]. Defined.
+
+  End Exposed.
+
+  Module Covered.
+
+    (** Covered *)
+    Record t := {
+      sub_msg_header : SubMsgHeader.t;
+      symbol_id : N;
+      mpid : list byte;
+      market_maker : list byte;
+      mp_sub_id : list byte;
+      cl_ord_id : N;
+      orig_cl_ord_id : N;
+      bitfield_order_instructions : list byte;
+      price : N;
+      order_qty : N;
+      min_qty : N;
+      user_data : list byte;
+      leg_open_close : N;
+      auction_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      SubMsgHeader.bounded (sub_msg_header record) /\
+      (symbol_id record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (mpid record) = 4 /\
+      Datatypes.length (market_maker record) = 10 /\
+      Datatypes.length (mp_sub_id record) = 4 /\
+      (cl_ord_id record < 256 ^ N.of_nat 8)%N /\
+      (orig_cl_ord_id record < 256 ^ N.of_nat 8)%N /\
+      Datatypes.length (bitfield_order_instructions record) = 16 /\
+      (price record < 256 ^ N.of_nat 8)%N /\
+      (order_qty record < 256 ^ N.of_nat 4)%N /\
+      (min_qty record < 256 ^ N.of_nat 4)%N /\
+      Datatypes.length (user_data record) = 10 /\
+      (leg_open_close record < 256 ^ N.of_nat 8)%N /\
+      (auction_id record < 256 ^ N.of_nat 8)%N.
+
+    Definition encode (record : t) : list byte :=
+      SubMsgHeader.encode (sub_msg_header record) ++
+      encode_uint_le 4 (symbol_id record) ++
+      encode_bytes 4 (mpid record) ++
+      encode_bytes 10 (market_maker record) ++
+      encode_bytes 4 (mp_sub_id record) ++
+      encode_uint_le 8 (cl_ord_id record) ++
+      encode_uint_le 8 (orig_cl_ord_id record) ++
+      encode_bytes 16 (bitfield_order_instructions record) ++
+      encode_uint_le 8 (price record) ++
+      encode_uint_le 4 (order_qty record) ++
+      encode_uint_le 4 (min_qty record) ++
+      encode_bytes 10 (user_data record) ++
+      encode_uint_le 8 (leg_open_close record) ++
+      encode_uint_le 8 (auction_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match SubMsgHeader.decode bytes with
+      | None => None
+      | Some (sub_msg_header_value, bytes) =>
+          match decode_uint_le 4 bytes with
+          | None => None
+          | Some (symbol_id_value, bytes) =>
+              match decode_bytes 4 bytes with
+              | None => None
+              | Some (mpid_value, bytes) =>
+                  match decode_bytes 10 bytes with
+                  | None => None
+                  | Some (market_maker_value, bytes) =>
+                      match decode_bytes 4 bytes with
+                      | None => None
+                      | Some (mp_sub_id_value, bytes) =>
+                          match decode_uint_le 8 bytes with
+                          | None => None
+                          | Some (cl_ord_id_value, bytes) =>
+                              match decode_uint_le 8 bytes with
+                              | None => None
+                              | Some (orig_cl_ord_id_value, bytes) =>
+                                  match decode_bytes 16 bytes with
+                                  | None => None
+                                  | Some (bitfield_order_instructions_value, bytes) =>
+                                      match decode_uint_le 8 bytes with
+                                      | None => None
+                                      | Some (price_value, bytes) =>
+                                          match decode_uint_le 4 bytes with
+                                          | None => None
+                                          | Some (order_qty_value, bytes) =>
+                                              match decode_uint_le 4 bytes with
+                                              | None => None
+                                              | Some (min_qty_value, bytes) =>
+                                                  match decode_bytes 10 bytes with
+                                                  | None => None
+                                                  | Some (user_data_value, bytes) =>
+                                                      match decode_uint_le 8 bytes with
+                                                      | None => None
+                                                      | Some (leg_open_close_value, bytes) =>
+                                                          match decode_uint_le 8 bytes with
+                                                          | None => None
+                                                          | Some (auction_id_value, bytes) =>
+                                                              Some ({| sub_msg_header := sub_msg_header_value; symbol_id := symbol_id_value; mpid := mpid_value; market_maker := market_maker_value; mp_sub_id := mp_sub_id_value; cl_ord_id := cl_ord_id_value; orig_cl_ord_id := orig_cl_ord_id_value; bitfield_order_instructions := bitfield_order_instructions_value; price := price_value; order_qty := order_qty_value; min_qty := min_qty_value; user_data := user_data_value; leg_open_close := leg_open_close_value; auction_id := auction_id_value |}, bytes)
+                                                          end
+                                                      end
+                                                  end
+                                              end
+                                          end
+                                      end
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 100.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !SubMsgHeader.encode_length, !encode_uint_le_length, !encode_bytes_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 [bound_7 [bound_8 [bound_9 [bound_10 [bound_11 [bound_12 bound_13]]]]]]]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite SubMsgHeader.decode_encode by exact bound_0.
+      rewrite decode_encode_uint_le by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite decode_encode_bytes by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_uint_le by exact bound_5.
+      rewrite decode_encode_uint_le by exact bound_6.
+      rewrite decode_encode_bytes by exact bound_7.
+      rewrite decode_encode_uint_le by exact bound_8.
+      rewrite decode_encode_uint_le by exact bound_9.
+      rewrite decode_encode_uint_le by exact bound_10.
+      rewrite decode_encode_bytes by exact bound_11.
+      rewrite decode_encode_uint_le by exact bound_12.
+      rewrite decode_encode_uint_le by exact bound_13.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply SubMsgHeader.eq_dec]. Defined.
+
+  End Covered.
+
 End AmexOptionsBinaryGatewayV327ClientPillarMessage.

@@ -222,7 +222,7 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
 
   End PreventMatch.
 
-  Module OrderAcknowledgementMessage.
+  Module OrderAcknowledgement.
 
     (** Order Acknowledgement messages are sent in response to a new order message *)
     Record t := {
@@ -495,9 +495,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PreventMatch.eq_dec]. Defined.
 
-  End OrderAcknowledgementMessage.
+  End OrderAcknowledgement.
 
-  Module OrderRejectedMessage.
+  Module OrderRejected.
 
     (** Order Rejected messages are sent in response to a New Order which must be rejected *)
     Record t := {
@@ -570,9 +570,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End OrderRejectedMessage.
+  End OrderRejected.
 
-  Module OrderModifiedMessage.
+  Module OrderModified.
 
     (** Order Modified messages are sent in response to a Modify Order to indicate that the orderhas been successfully modified *)
     Record t := {
@@ -717,9 +717,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End OrderModifiedMessage.
+  End OrderModified.
 
-  Module ModifyRejectedMessage.
+  Module ModifyRejected.
 
     (** Modify Rejected messages are sent in response to a Modify Order for an order which cannot be modified *)
     Record t := {
@@ -800,9 +800,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End ModifyRejectedMessage.
+  End ModifyRejected.
 
-  Module OrderExecutionMessage.
+  Module OrderExecution.
 
     (** An Order Execution is sent for each fill on an order *)
     Record t := {
@@ -979,9 +979,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End OrderExecutionMessage.
+  End OrderExecution.
 
-  Module OrderCancelledMessage.
+  Module OrderCancelled.
 
     (** Order Cancelled message *)
     Record t := {
@@ -1054,9 +1054,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End OrderCancelledMessage.
+  End OrderCancelled.
 
-  Module CancelRejectedMessage.
+  Module CancelRejected.
 
     (** A Cancel Rejected message is sent in response to a Cancel Order message to indicate that the cancellation cannot occur *)
     Record t := {
@@ -1129,9 +1129,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End CancelRejectedMessage.
+  End CancelRejected.
 
-  Module MassCancelAcknowledgementMessage.
+  Module MassCancelAcknowledgement.
 
     (** A Mass Cancel Acknowledgment is an unsequenced message sent when a Cancel Order or Purge Orders message requesting a mass cancellation has completed cancelling all individual orders *)
     Record t := {
@@ -1196,9 +1196,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End MassCancelAcknowledgementMessage.
+  End MassCancelAcknowledgement.
 
-  Module MassCancelRejectedMessage.
+  Module MassCancelRejected.
 
     (** A Mass Cancel Rejected message is sent in response to a Mass Cancel Order message to indicate that the mass cancellation cannot occur *)
     Record t := {
@@ -1263,9 +1263,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End MassCancelRejectedMessage.
+  End MassCancelRejected.
 
-  Module PurgeAcknowledgementMessage.
+  Module PurgeAcknowledgement.
 
     (** A Purge Acknowledgment is an unsequenced message sent when a Purge Orders message requesting an order purge has completed cancelling all individual orders *)
     Record t := {
@@ -1330,9 +1330,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End PurgeAcknowledgementMessage.
+  End PurgeAcknowledgement.
 
-  Module PurgeRejectedMessage.
+  Module PurgeRejected.
 
     (** A Purge Rejected message is sent in response to a Purge Orders message to indicate that the mass cancellation cannot occur *)
     Record t := {
@@ -1397,9 +1397,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End PurgeRejectedMessage.
+  End PurgeRejected.
 
-  Module TradeCancelOrCorrectMessage.
+  Module TradeCancelOrCorrect.
 
     (** Used to provide notification that a trade has been cancelled or corrected *)
     Record t := {
@@ -1560,9 +1560,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End TradeCancelOrCorrectMessage.
+  End TradeCancelOrCorrect.
 
-  Module TasRestatementMessage.
+  Module TasRestatement.
 
     (** A Tas Restatement is sent post-settlement time for each TAS execution during the associated business day to communicate the updated Price and Symbol associated with the cleared execution *)
     Record t := {
@@ -1723,9 +1723,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End TasRestatementMessage.
+  End TasRestatement.
 
-  Module VarianceRestatementMessage.
+  Module VarianceRestatement.
 
     (** A Variance Restatement is sent post-settlement time for each VA and VAO execution during the associated business day to communicate updated Price, Size and Symbol associated with the cleared execution *)
     Record t := {
@@ -1894,9 +1894,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End VarianceRestatementMessage.
+  End VarianceRestatement.
 
-  Module QuoteUpdateRejectedMessage.
+  Module QuoteUpdateRejected.
 
     (** Quote Update Rejected messages are sent in response to a Quote Update or Quote Update Option message when the entire quote block is rejected by the order handler *)
     Record t := {
@@ -1953,9 +1953,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End QuoteUpdateRejectedMessage.
+  End QuoteUpdateRejected.
 
-  Module QuoteRestatedMessage.
+  Module QuoteRestated.
 
     (** Quote Restated messages are sent to inform the TPH that an order has been asynchronously modified for some reason by CFE *)
     Record t := {
@@ -2052,9 +2052,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End QuoteRestatedMessage.
+  End QuoteRestated.
 
-  Module QuoteExecutionMessage.
+  Module QuoteExecution.
 
     (** A Quote Execution message is used to indicate an execution has occurred on a resting quote *)
     Record t := {
@@ -2191,9 +2191,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End QuoteExecutionMessage.
+  End QuoteExecution.
 
-  Module QuoteCancelledMessage.
+  Module QuoteCancelled.
 
     (** A Quote Cancelled message will be sent to indicate an unsolicited cancellation of a quote entered with a Quote Update message *)
     Record t := {
@@ -2274,9 +2274,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End QuoteCancelledMessage.
+  End QuoteCancelled.
 
-  Module TasQuoteRestatementMessage.
+  Module TasQuoteRestatement.
 
     (** A TAS Quote Restatement is sent post-settlement time for each TAS quote execution during the associated business day to communicate the updated Price and Symbol associated with the cleared execution *)
     Record t := {
@@ -2357,9 +2357,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End TasQuoteRestatementMessage.
+  End TasQuoteRestatement.
 
-  Module VarianceQuoteRestatementMessage.
+  Module VarianceQuoteRestatement.
 
     (** A Variance Quote Restatement is sent post-settlement time for each VA and VAO execution during the associated business day to communicate updated Price, Size, and Symbol values associated with the cleared execution *)
     Record t := {
@@ -2448,9 +2448,9 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End VarianceQuoteRestatementMessage.
+  End VarianceQuoteRestatement.
 
-  Module ResetRiskAcknowledgementMessage.
+  Module ResetRiskAcknowledgement.
 
     (** Response to a Reset Risk request *)
     Record t := {
@@ -2507,6 +2507,6 @@ Module CfeFuturesBinaryOrderEntryV10Exchange.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End ResetRiskAcknowledgementMessage.
+  End ResetRiskAcknowledgement.
 
 End CfeFuturesBinaryOrderEntryV10Exchange.

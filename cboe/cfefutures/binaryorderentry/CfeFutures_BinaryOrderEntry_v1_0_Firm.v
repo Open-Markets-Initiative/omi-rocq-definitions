@@ -171,7 +171,7 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
 
   End PreventMatch.
 
-  Module NewOrderMessage.
+  Module NewOrder.
 
     (** New order futures message *)
     Record t := {
@@ -396,9 +396,9 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply PreventMatch.eq_dec]. Defined.
 
-  End NewOrderMessage.
+  End NewOrder.
 
-  Module ModifyOrderMessage.
+  Module ModifyOrder.
 
     (** Request to modify an order *)
     Record t := {
@@ -527,9 +527,9 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End ModifyOrderMessage.
+  End ModifyOrder.
 
-  Module CancelOrderMessage.
+  Module CancelOrder.
 
     (** Request to cancel a single order or quote *)
     Record t := {
@@ -594,7 +594,7 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End CancelOrderMessage.
+  End CancelOrder.
 
   Module MassCancelInst.
 
@@ -678,7 +678,7 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
 
   End MassCancelInst.
 
-  Module MassCancelOrderMessage.
+  Module MassCancelOrder.
 
     (** A Mass Cancel Order message is a request to cancel a group of orders or quotes *)
     Record t := {
@@ -759,9 +759,108 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply MassCancelInst.eq_dec]. Defined.
 
-  End MassCancelOrderMessage.
+  End MassCancelOrder.
 
-  Module ResetRiskMessage.
+  Module PurgeOrders.
+
+    (** Request to cancel a group of orders or quotes across all the TPH's sessions for that port’s matching unit *)
+    Record t := {
+      mass_cancel_id : list byte;
+      clearing_firm : list byte;
+      product_name : list byte;
+      mass_cancel_inst : MassCancelInst.t;
+      manual_order_indicator : list byte;
+      oeo_id : list byte;
+      custom_group_id_cnt : N;
+      custom_group_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      Datatypes.length (mass_cancel_id record) = 20 /\
+      Datatypes.length (clearing_firm record) = 4 /\
+      Datatypes.length (product_name record) = 6 /\
+      MassCancelInst.bounded (mass_cancel_inst record) /\
+      Datatypes.length (manual_order_indicator record) = 1 /\
+      Datatypes.length (oeo_id record) = 18 /\
+      (custom_group_id_cnt record < 256 ^ N.of_nat 1)%N /\
+      (custom_group_id record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_bytes 20 (mass_cancel_id record) ++
+      encode_bytes 4 (clearing_firm record) ++
+      encode_bytes 6 (product_name record) ++
+      MassCancelInst.encode (mass_cancel_inst record) ++
+      encode_bytes 1 (manual_order_indicator record) ++
+      encode_bytes 18 (oeo_id record) ++
+      encode_uint 1 (custom_group_id_cnt record) ++
+      encode_uint_le 2 (custom_group_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_bytes 20 bytes with
+      | None => None
+      | Some (mass_cancel_id_value, bytes) =>
+          match decode_bytes 4 bytes with
+          | None => None
+          | Some (clearing_firm_value, bytes) =>
+              match decode_bytes 6 bytes with
+              | None => None
+              | Some (product_name_value, bytes) =>
+                  match MassCancelInst.decode bytes with
+                  | None => None
+                  | Some (mass_cancel_inst_value, bytes) =>
+                      match decode_bytes 1 bytes with
+                      | None => None
+                      | Some (manual_order_indicator_value, bytes) =>
+                          match decode_bytes 18 bytes with
+                          | None => None
+                          | Some (oeo_id_value, bytes) =>
+                              match decode_uint 1 bytes with
+                              | None => None
+                              | Some (custom_group_id_cnt_value, bytes) =>
+                                  match decode_uint_le 2 bytes with
+                                  | None => None
+                                  | Some (custom_group_id_value, bytes) =>
+                                      Some ({| mass_cancel_id := mass_cancel_id_value; clearing_firm := clearing_firm_value; product_name := product_name_value; mass_cancel_inst := mass_cancel_inst_value; manual_order_indicator := manual_order_indicator_value; oeo_id := oeo_id_value; custom_group_id_cnt := custom_group_id_cnt_value; custom_group_id := custom_group_id_value |}, bytes)
+                                  end
+                              end
+                          end
+                      end
+                  end
+              end
+          end
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 68.
+    Proof.
+      intros record. unfold encode.
+      rewrite !length_app, !encode_bytes_length, !MassCancelInst.encode_length, !encode_uint_length, !encode_uint_le_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 [bound_4 [bound_5 [bound_6 bound_7]]]]]]].
+      unfold decode, encode.
+      rewrite <- !app_assoc.
+      rewrite decode_encode_bytes by exact bound_0.
+      rewrite decode_encode_bytes by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_2.
+      rewrite MassCancelInst.decode_encode by exact bound_3.
+      rewrite decode_encode_bytes by exact bound_4.
+      rewrite decode_encode_bytes by exact bound_5.
+      rewrite decode_encode_uint by exact bound_6.
+      rewrite decode_encode_uint_le by exact bound_7.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec) | apply MassCancelInst.eq_dec]. Defined.
+
+  End PurgeOrders.
+
+  Module ResetRisk.
 
     (** Reset or release Firm/EFID, Product, or Custom Group Id level lockout conditions resulting from risk profile trips or self-imposed lockouts issued viaMass Cancel Order or Purge Orders messages *)
     Record t := {
@@ -834,6 +933,6 @@ Module CfeFuturesBinaryOrderEntryV10Firm.
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
-  End ResetRiskMessage.
+  End ResetRisk.
 
 End CfeFuturesBinaryOrderEntryV10Firm.

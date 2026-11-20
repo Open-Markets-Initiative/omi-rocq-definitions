@@ -359,6 +359,7 @@ cboe/cfefutures/multicasttop/CfeFutures_MulticastTop_Pitch_v1_2_20.v
 cboe/cfefutures/multicasttop/CfeFutures_MulticastTop_Pitch_v1_2_22.v
 cboe/cfefutures/multicasttop/CfeFutures_MulticastTop_Spin_v1_2_20.v
 cboe/cfefutures/multicasttop/CfeFutures_MulticastTop_Spin_v1_2_22.v
+cboe/cfefutures/multicasttop/CfeFutures_MulticastTop_v1_0_15.v
 cboe/cfefutures/oofmulticastdepthofbook/CfeFutures_OofMulticastDepthOfBook_Pitch_v1_0_8.v
 cboe/cfefutures/oofmulticastdepthofbook/CfeFutures_OofMulticastDepthOfBook_Spin_v1_0_8.v
 cboe/cfefutures/oofmulticasttop/CfeFutures_OofMulticastTop_Pitch_v1_0_8.v
@@ -1670,6 +1671,8 @@ nasdaq/nomoptions/bono/NomOptions_Bono_v3_3_Server.v
 nasdaq/nomoptions/bono/NomOptions_Bono_v3_3_Udp.v
 nasdaq/nomoptions/cti/NomOptions_Cti_v3_0_Client.v
 nasdaq/nomoptions/cti/NomOptions_Cti_v3_0_Server.v
+nasdaq/nomoptions/depthofmarket/NomOptions_DepthOfMarket_v2_1_Client.v
+nasdaq/nomoptions/depthofmarket/NomOptions_DepthOfMarket_v2_1_Server.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v3_2_Client.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v3_2_Server.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v3_2_Udp.v
@@ -1679,6 +1682,9 @@ nasdaq/nomoptions/itto/NomOptions_Itto_v4_0_2025_Udp.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v4_0_Client.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v4_0_Server.v
 nasdaq/nomoptions/itto/NomOptions_Itto_v4_0_Udp.v
+nasdaq/nomoptions/orderfeed/NomOptions_OrderFeed_v2_1_Client.v
+nasdaq/nomoptions/orderfeed/NomOptions_OrderFeed_v2_1_Server.v
+nasdaq/nomoptions/orderfeed/NomOptions_OrderFeed_v2_1_Udp.v
 nasdaq/nomoptions/otto/NomOptions_Otto_v2_1_4_Client.v
 nasdaq/nomoptions/otto/NomOptions_Otto_v2_1_4_Server.v
 nasdaq/nomoptions/otto/NomOptions_Otto_v2_2_Client.v
@@ -1687,6 +1693,14 @@ nasdaq/nomoptions/otto/NomOptions_Otto_v3_0_0_Client.v
 nasdaq/nomoptions/otto/NomOptions_Otto_v3_0_0_Server.v
 nasdaq/nomoptions/quoting/NomOptions_Quoting_v9_0_Client.v
 nasdaq/nomoptions/quoting/NomOptions_Quoting_v9_0_Server.v
+nasdaq/nomoptions/topofmarket/NomOptions_TopOfMarket_Glimpse_v2_1_Client.v
+nasdaq/nomoptions/topofmarket/NomOptions_TopOfMarket_Glimpse_v2_1_Server.v
+nasdaq/nomoptions/topofmarket/NomOptions_TopOfMarket_Itch_v2_1_Client.v
+nasdaq/nomoptions/topofmarket/NomOptions_TopOfMarket_Itch_v2_1_Server.v
+nasdaq/nomoptions/topofmarket/NomOptions_TopOfMarket_Itch_v2_1_Udp.v
+nasdaq/nomoptions/tradefeed/NomOptions_TradeFeed_v2_1_Client.v
+nasdaq/nomoptions/tradefeed/NomOptions_TradeFeed_v2_1_Server.v
+nasdaq/nomoptions/tradefeed/NomOptions_TradeFeed_v2_1_Udp.v
 nasdaq/nordicderivatives/depthofbook/NordicDerivatives_DepthOfBook_Glimpse_v2_22_4_Client.v
 nasdaq/nordicderivatives/depthofbook/NordicDerivatives_DepthOfBook_Glimpse_v2_22_4_Server.v
 nasdaq/nordicderivatives/depthofbook/NordicDerivatives_DepthOfBook_Itch_v2_22_4.v
@@ -2171,6 +2185,8 @@ nyse/amexequities/depthfeedrequest/AmexEquities_DepthFeedRequest_v1_7_Server.v
 nyse/amexequities/depthfeedretransmission/AmexEquities_DepthFeedRetransmission_v1_1.v
 nyse/amexequities/depthfeedretransmission/AmexEquities_DepthFeedRetransmission_v1_6.v
 nyse/amexequities/depthfeedretransmission/AmexEquities_DepthFeedRetransmission_v1_7.v
+nyse/amexequities/imbalancesfeed/AmexEquities_ImbalancesFeed_v2_1_f.v
+nyse/amexequities/imbalancesfeed/AmexEquities_ImbalancesFeed_v2_2_a.v
 nyse/amexequities/imbalancesfeed/AmexEquities_ImbalancesFeed_v2_2_n.v
 nyse/amexequities/imbalancesfeed/AmexEquities_ImbalancesFeed_v2_2_o.v
 nyse/amexequities/integratedfeed/AmexEquities_IntegratedFeed_v2_1_g.v
@@ -2238,6 +2254,8 @@ nyse/arcaequities/depthfeedrequest/ArcaEquities_DepthFeedRequest_v1_7_Server.v
 nyse/arcaequities/depthfeedretransmission/ArcaEquities_DepthFeedRetransmission_v1_1.v
 nyse/arcaequities/depthfeedretransmission/ArcaEquities_DepthFeedRetransmission_v1_6.v
 nyse/arcaequities/depthfeedretransmission/ArcaEquities_DepthFeedRetransmission_v1_7.v
+nyse/arcaequities/imbalancesfeed/ArcaEquities_ImbalancesFeed_v2_1_f.v
+nyse/arcaequities/imbalancesfeed/ArcaEquities_ImbalancesFeed_v2_2_a.v
 nyse/arcaequities/imbalancesfeed/ArcaEquities_ImbalancesFeed_v2_2_n.v
 nyse/arcaequities/imbalancesfeed/ArcaEquities_ImbalancesFeed_v2_2_o.v
 nyse/arcaequities/integratedfeed/ArcaEquities_IntegratedFeed_v2_5_g.v
@@ -2274,6 +2292,7 @@ nyse/arcaoptions/topfeed/ArcaOptions_TopFeed_v1_2_c.v
 nyse/arcaoptions/topfeed/ArcaOptions_TopFeed_v1_2_j.v
 nyse/arcaoptions/topfeed/ArcaOptions_TopFeed_v1_2_k.v
 nyse/arcaoptions/topfeed/ArcaOptions_TopFeed_v1_3_a.v
+nyse/globalotc/bbo/GlobalOtc_Bbo_v2_5.v
 nyse/nationalequities/bbo/NationalEquities_Bbo_v2_5_d.v
 nyse/nationalequities/binarygateway/NationalEquities_BinaryGateway_v5_17_ClientPillarMessage.v
 nyse/nationalequities/binarygateway/NationalEquities_BinaryGateway_v5_17_ServerPillarMessage.v
