@@ -273,9 +273,10 @@ cboe/c1options/binaryorderentry/C1Options_BinaryOrderEntry_v1_1_23_Exchange.v
 cboe/c1options/binaryorderentry/C1Options_BinaryOrderEntry_v1_1_23_Firm.v
 cboe/c1options/binaryorderentry/C1Options_BinaryOrderEntry_v2_10.v
 cboe/c1options/binaryorderentry/C1Options_BinaryOrderEntry_v2_11_115.v
+cboe/c1options/complex/C1Options_Complex_Pitch_v2_1_18.v
 cboe/c1options/complex/C1Options_Complex_Pitch_v2_1_61.v
+cboe/c1options/complex/C1Options_Complex_Spin_v2_1_18.v
 cboe/c1options/complex/C1Options_Complex_Spin_v2_1_61.v
-cboe/c1options/complex/C1Options_Complex_v2_1_18.v
 cboe/c1options/complex/C1Options_Complex_v2_1_37.v
 cboe/c1options/complexauction/C1Options_ComplexAuction_v2_2_41.v
 cboe/c1options/complexoptionsfutures/C1Options_ComplexOptionsFutures_v1_0_0.v

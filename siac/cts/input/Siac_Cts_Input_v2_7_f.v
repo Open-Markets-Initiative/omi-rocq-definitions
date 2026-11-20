@@ -23,87 +23,13 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a Reassemble rule
+      - a Integrity rule
       - a run counted by a field
 
     License: MIT No Attribution
   *)
 
 Module SiacCtsInputV27F.
-
-  Module BlockHeader.
-
-    (** Cta participant input block header *)
-    Record t := {
-      version : N;
-      block_size : N;
-      block_sequence_number : N;
-      messages_in_block : N;
-      block_checksum : N;
-    }.
-
-    (** What its fields must hold for its bytes to read back as it *)
-    Definition bounded (record : t) : Prop :=
-      (version record < 256 ^ N.of_nat 1)%N /\
-      (block_size record < 256 ^ N.of_nat 2)%N /\
-      (block_sequence_number record < 256 ^ N.of_nat 4)%N /\
-      (messages_in_block record < 256 ^ N.of_nat 1)%N /\
-      (block_checksum record < 256 ^ N.of_nat 2)%N.
-
-    Definition encode (record : t) : list byte :=
-      encode_uint 1 (version record) ++
-      encode_uint 2 (block_size record) ++
-      encode_uint 4 (block_sequence_number record) ++
-      encode_uint 1 (messages_in_block record) ++
-      encode_uint 2 (block_checksum record).
-
-    Definition decode (bytes : list byte) : option (t * list byte) :=
-      match decode_uint 1 bytes with
-      | None => None
-      | Some (version_value, bytes) =>
-          match decode_uint 2 bytes with
-          | None => None
-          | Some (block_size_value, bytes) =>
-              match decode_uint 4 bytes with
-              | None => None
-              | Some (block_sequence_number_value, bytes) =>
-                  match decode_uint 1 bytes with
-                  | None => None
-                  | Some (messages_in_block_value, bytes) =>
-                      match decode_uint 2 bytes with
-                      | None => None
-                      | Some (block_checksum_value, bytes) =>
-                          Some ({| version := version_value; block_size := block_size_value; block_sequence_number := block_sequence_number_value; messages_in_block := messages_in_block_value; block_checksum := block_checksum_value |}, bytes)
-                      end
-                  end
-              end
-          end
-      end.
-
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 10.
-    Proof.
-      intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length. reflexivity.
-    Qed.
-
-    Theorem decode_encode :
-      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
-    Proof.
-      intros record after bound.
-      destruct bound as [bound_0 [bound_1 [bound_2 [bound_3 bound_4]]]].
-      unfold decode, encode.
-      rewrite <- !app_assoc.
-      rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_uint by exact bound_2.
-      rewrite decode_encode_uint by exact bound_3.
-      rewrite decode_encode_uint by exact bound_4.
-      destruct record. reflexivity.
-    Qed.
-
-    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
-
-  End BlockHeader.
 
   Module Timestamp1.
 
