@@ -47,6 +47,7 @@ asianext/asianextderivatives/snapshot/AsiaNextDerivatives_Snapshot_v1_3.v
 asianext/asianextderivatives/tradingprotocol/AsiaNextDerivatives_TradingProtocol_v1_2.v
 asx/asxderivatives/ntp/AsxDerivatives_Ntp_v1_05.v
 asx/asxderivatives/t24/AsxDerivatives_T24_v1_13.v
+asx/asxsecurities/mdf/AsxSecurities_Mdf_v1_0.v
 asx/asxsecurities/trade/AsxSecurities_Trade_Itch_v2_0.v
 asx/asxsecurities/trade/AsxSecurities_Trade_Ouch_v2_0_Client.v
 asx/asxsecurities/trade/AsxSecurities_Trade_Ouch_v2_0_Server.v
@@ -1507,13 +1508,6 @@ moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v6_0_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v8_0_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v9_12_0.v
 moex/spectra/orderslogsnapshot/Spectra_OrdersLogSnapshot_v9_9_0.v
-nairobi/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Client.v
-nairobi/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Server.v
-nairobi/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Client.v
-nairobi/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Server.v
-nairobi/nairobiequities/realtime/NairobiEquities_RealTime_v1_22.v
-nairobi/nairobiequities/replay/NairobiEquities_Replay_v1_22.v
-nairobi/nairobiequities/snapshot/NairobiEquities_Snapshot_v1_22.v
 nasdaq/gemxoptions/cti/GemxOptions_Cti_v3_0_Client.v
 nasdaq/gemxoptions/cti/GemxOptions_Cti_v3_0_Server.v
 nasdaq/gemxoptions/depthofmarket/GemxOptions_DepthOfMarket_Glimpse_v2_1_Client.v
@@ -1545,6 +1539,7 @@ nasdaq/gemxoptions/topofmarket/GemxOptions_TopOfMarket_Itch_v2_1_Udp.v
 nasdaq/gemxoptions/tradefeed/GemxOptions_TradeFeed_v2_1_Client.v
 nasdaq/gemxoptions/tradefeed/GemxOptions_TradeFeed_v2_1_Server.v
 nasdaq/gemxoptions/tradefeed/GemxOptions_TradeFeed_v2_1_Udp.v
+nasdaq/index/gids/Nasdaq_Index_Gids_v1_0_i.v
 nasdaq/iseoptions/cti/IseOptions_Cti_v3_0_Client.v
 nasdaq/iseoptions/cti/IseOptions_Cti_v3_0_Server.v
 nasdaq/iseoptions/depthcombofeed/IseOptions_DepthComboFeed_v1_0_Client.v
@@ -1658,6 +1653,7 @@ nasdaq/mrxoptions/topofmarket/MrxOptions_TopOfMarket_Itch_v2_1_Udp.v
 nasdaq/mrxoptions/tradefeed/MrxOptions_TradeFeed_v2_1_Client.v
 nasdaq/mrxoptions/tradefeed/MrxOptions_TradeFeed_v2_1_Server.v
 nasdaq/mrxoptions/tradefeed/MrxOptions_TradeFeed_v2_1_Udp.v
+nasdaq/nasdaqcanada/basic/NasdaqCanada_Basic_v1_6.v
 nasdaq/nasdaqcanada/chixmd/NasdaqCanada_Chixmd_v3_4_1_23_Client.v
 nasdaq/nasdaqcanada/chixmd/NasdaqCanada_Chixmd_v3_4_1_23_Server.v
 nasdaq/nasdaqcanada/chixmmd/NasdaqCanada_Chixmmd_v1_0_Client.v
@@ -2159,6 +2155,13 @@ nse/nseix/snapshot/NseIx_Snapshot_v1_4_Tcp.v
 nse/nseslbm/broadcast/NseSlbm_Broadcast_v2_7.v
 nse/nseslbm/orderentry/NseSlbm_OrderEntry_v2_7_Client.v
 nse/nseslbm/orderentry/NseSlbm_OrderEntry_v2_7_Server.v
+nsekenya/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Client.v
+nsekenya/nairobibonds/marketdata/NairobiBonds_MarketData_v2_14_Server.v
+nsekenya/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Client.v
+nsekenya/nairobiderivatives/marketdata/NairobiDerivatives_MarketData_v2_14_Server.v
+nsekenya/nairobiequities/realtime/NairobiEquities_RealTime_v1_22.v
+nsekenya/nairobiequities/replay/NairobiEquities_Replay_v1_22.v
+nsekenya/nairobiequities/snapshot/NairobiEquities_Snapshot_v1_22.v
 nsxaustralia/nets/marketdatafeed/NsxAustralia_Nets_MarketDataFeed_v4_2_55_Client.v
 nsxaustralia/nets/marketdatafeed/NsxAustralia_Nets_MarketDataFeed_v4_2_55_Server.v
 nyse/amexequities/bbo/AmexEquities_Bbo_v2_5_d.v

@@ -6,7 +6,7 @@ From Omi Require Import Wire.
 
 Import ListNotations.
 
-(** * Nairobi Securities Exchange Nairobi Bonds Market Data
+(** * Nairobi Securities Exchange Nairobi Derivatives Market Data
 
     Generated from the binary model. Every record is a run of fields, and carries the two
     theorems the model's rules call for: an encoding is as wide as its fields say, and
@@ -25,14 +25,14 @@ Import ListNotations.
       - a run filling what frames it
       - a run counted by a field
       - a Reassemble rule
-      - a length prefix framing what follows
+      - a field filling what is left of what holds it
       - a run filling a byte budget a field states
       - the dispatch that chooses a message by its type
 
     License: MIT No Attribution
   *)
 
-Module NairobiBondsMarketDataV214Server.
+Module NairobiDerivativesMarketDataV214Server.
 
   Module TransportHeader.
 
@@ -7843,4 +7843,4 @@ Module NairobiBondsMarketDataV214Server.
 
   End BusinessMessageRejectMessage.
 
-End NairobiBondsMarketDataV214Server.
+End NairobiDerivativesMarketDataV214Server.

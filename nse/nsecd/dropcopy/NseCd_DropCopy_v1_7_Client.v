@@ -23,6 +23,7 @@ Import ListNotations.
 
     What this definition does not state, and the model does:
       - a run filling what frames it
+      - a Integrity rule
       - a Composite rule
 
     License: MIT No Attribution
@@ -32,23 +33,20 @@ Module NseCdDropCopyV17Client.
 
   Module PacketHeader.
 
-    (** Direct interface twenty two byte packet header *)
+    (** Packet Length and Sequence number, the first six bytes of the direct interface's twenty two byte packet header; its last sixteen open each packet body branch *)
     Record t := {
       packet_length : N;
       packet_sequence_number : N;
-      checksum : list byte;
     }.
 
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (packet_length record < 256 ^ N.of_nat 2)%N /\
-      (packet_sequence_number record < 256 ^ N.of_nat 4)%N /\
-      Datatypes.length (checksum record) = 16.
+      (packet_sequence_number record < 256 ^ N.of_nat 4)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 2 (packet_length record) ++
-      encode_uint 4 (packet_sequence_number record) ++
-      encode_bytes 16 (checksum record).
+      encode_uint 4 (packet_sequence_number record).
 
     Definition decode (bytes : list byte) : option (t * list byte) :=
       match decode_uint 2 bytes with
@@ -57,35 +55,30 @@ Module NseCdDropCopyV17Client.
           match decode_uint 4 bytes with
           | None => None
           | Some (packet_sequence_number_value, bytes) =>
-              match decode_bytes 16 bytes with
-              | None => None
-              | Some (checksum_value, bytes) =>
-                  Some ({| packet_length := packet_length_value; packet_sequence_number := packet_sequence_number_value; checksum := checksum_value |}, bytes)
-              end
+              Some ({| packet_length := packet_length_value; packet_sequence_number := packet_sequence_number_value |}, bytes)
           end
       end.
 
-    Theorem encode_length : forall record, Datatypes.length (encode record) = 22.
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 6.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_bytes_length. reflexivity.
+      rewrite !length_app, !encode_uint_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
       forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
     Proof.
       intros record after bound.
-      destruct bound as [bound_0 [bound_1 bound_2]].
+      destruct bound as [bound_0 bound_1].
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
       rewrite decode_encode_uint by exact bound_1.
-      rewrite decode_encode_bytes by exact bound_2.
       destruct record. reflexivity.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
 
   End PacketHeader.
 

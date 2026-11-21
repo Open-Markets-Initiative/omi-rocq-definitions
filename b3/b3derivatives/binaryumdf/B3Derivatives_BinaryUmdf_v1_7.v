@@ -38,7 +38,7 @@ Module B3DerivativesBinaryUmdfV17.
     (** B3 Mdp Packet Header *)
     Record t := {
       channel_id : N;
-      packet_reserved : N;
+      packet_reserved : list byte;
       sequence_version : N;
       sequence_number : N;
       sending_time : N;
@@ -47,14 +47,14 @@ Module B3DerivativesBinaryUmdfV17.
     (** What its fields must hold for its bytes to read back as it *)
     Definition bounded (record : t) : Prop :=
       (channel_id record < 256 ^ N.of_nat 1)%N /\
-      (packet_reserved record < 256 ^ N.of_nat 1)%N /\
+      Datatypes.length (packet_reserved record) = 1 /\
       (sequence_version record < 256 ^ N.of_nat 2)%N /\
       (sequence_number record < 256 ^ N.of_nat 4)%N /\
       (sending_time record < 256 ^ N.of_nat 8)%N.
 
     Definition encode (record : t) : list byte :=
       encode_uint 1 (channel_id record) ++
-      encode_uint 1 (packet_reserved record) ++
+      encode_bytes 1 (packet_reserved record) ++
       encode_uint_le 2 (sequence_version record) ++
       encode_uint_le 4 (sequence_number record) ++
       encode_uint_le 8 (sending_time record).
@@ -63,7 +63,7 @@ Module B3DerivativesBinaryUmdfV17.
       match decode_uint 1 bytes with
       | None => None
       | Some (channel_id_value, bytes) =>
-          match decode_uint 1 bytes with
+          match decode_bytes 1 bytes with
           | None => None
           | Some (packet_reserved_value, bytes) =>
               match decode_uint_le 2 bytes with
@@ -85,7 +85,7 @@ Module B3DerivativesBinaryUmdfV17.
     Theorem encode_length : forall record, Datatypes.length (encode record) = 16.
     Proof.
       intros record. unfold encode.
-      rewrite !length_app, !encode_uint_length, !encode_uint_le_length. reflexivity.
+      rewrite !length_app, !encode_uint_length, !encode_bytes_length, !encode_uint_le_length. reflexivity.
     Qed.
 
     Theorem decode_encode :
@@ -96,7 +96,7 @@ Module B3DerivativesBinaryUmdfV17.
       unfold decode, encode.
       rewrite <- !app_assoc.
       rewrite decode_encode_uint by exact bound_0.
-      rewrite decode_encode_uint by exact bound_1.
+      rewrite decode_encode_bytes by exact bound_1.
       rewrite decode_encode_uint_le by exact bound_2.
       rewrite decode_encode_uint_le by exact bound_3.
       rewrite decode_encode_uint_le by exact bound_4.
@@ -104,7 +104,7 @@ Module B3DerivativesBinaryUmdfV17.
     Qed.
 
     Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
-    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+    Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End PacketHeader.
 
