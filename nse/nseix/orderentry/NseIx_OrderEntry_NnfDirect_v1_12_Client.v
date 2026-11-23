@@ -27,6 +27,7 @@ Import ListNotations.
       - a Composite rule
       - a field read in bits
       - a run of a stated number of entries
+      - the dispatch that chooses a message by its type
 
     License: MIT No Attribution
   *)

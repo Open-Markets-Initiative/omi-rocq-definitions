@@ -26,6 +26,7 @@ Import ListNotations.
       - a Integrity rule
       - a Composite rule
       - a field read in bits
+      - the dispatch that chooses a message by its type
 
     License: MIT No Attribution
   *)
@@ -248,6 +249,47 @@ Module NseCmOrderEntryV66Client.
     Proof. decide equality; solve [apply N.eq_dec | apply (list_eq_dec Byte.byte_eq_dec)]. Defined.
 
   End CancelOnLogoutStatusRequestMessage.
+
+  Module SecureBoxRegistrationRequestMessage.
+
+    (** Sent as SECURE_BOX_REGISTRATION_REQUE *)
+    Record t := {
+      box_id : N;
+    }.
+
+    (** What its fields must hold for its bytes to read back as it *)
+    Definition bounded (record : t) : Prop :=
+      (box_id record < 256 ^ N.of_nat 2)%N.
+
+    Definition encode (record : t) : list byte :=
+      encode_uint 2 (box_id record).
+
+    Definition decode (bytes : list byte) : option (t * list byte) :=
+      match decode_uint 2 bytes with
+      | None => None
+      | Some (box_id_value, bytes) =>
+          Some ({| box_id := box_id_value |}, bytes)
+      end.
+
+    Theorem encode_length : forall record, Datatypes.length (encode record) = 2.
+    Proof.
+      intros record. unfold encode.
+      rewrite !encode_uint_length. reflexivity.
+    Qed.
+
+    Theorem decode_encode :
+      forall record after, bounded record -> decode (encode record ++ after) = Some (record, after).
+    Proof.
+      intros record after bound.
+      unfold decode, encode.
+      rewrite decode_encode_uint by exact bound.
+      destruct record. reflexivity.
+    Qed.
+
+    Definition eq_dec : forall left right : t, {left = right} + {left <> right}.
+    Proof. decide equality; solve [apply N.eq_dec]. Defined.
+
+  End SecureBoxRegistrationRequestMessage.
 
   Module SecInfo.
 

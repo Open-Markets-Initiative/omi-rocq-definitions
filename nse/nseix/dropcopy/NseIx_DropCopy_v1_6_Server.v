@@ -26,6 +26,7 @@ Import ListNotations.
       - a Integrity rule
       - a Composite rule
       - a field read in bits
+      - the dispatch that chooses a message by its type
 
     License: MIT No Attribution
   *)
